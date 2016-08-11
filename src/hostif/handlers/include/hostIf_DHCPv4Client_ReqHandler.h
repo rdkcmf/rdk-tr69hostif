@@ -28,22 +28,24 @@
  *
  */
 
-/** @defgroup HOST_IF DHCPv4 CLIENT HANDLER
- *   @ingroup HOST_IF
- *
+/**
+ * @file hostIf_DHCPv4Client_ReqHandler.h
+ * @brief The header file provides HostIf DHCPv4 client request handler information APIs.
+ */
+
+/**
+ * @defgroup TR-069HOSTIF_DHCPV4CLIENT_REQHANDLER_CLASSES DHCPv4 Client RequestHandler Public Classes
+ * Describe the details about classes used in TR-069 DHCPv4Client request handler.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_HANDLER
+ */
+
+
+/**
  *  DHCPv4Client interface is a platform agnostic IARM communication interface. It allows
  *  DHCPv4 client applications to communicate by sending Get and Set operation
  *
  */
 
-/** @addtogroup HOST_IF DHCPv4 CLIENT HANDLER_API .
- *  @ingroup HOST_IF
- *
- *  Described herein are the functions that are part of the
- *  DHCPv4 Request handler .
- *
- *  @{
- */
 
 #ifndef HOSTIF_DHCPv4CLIENT_REQHANDLER_H_
 #define HOSTIF_DHCPv4CLIENT_REQHANDLER_H_
@@ -51,7 +53,10 @@
 #include "hostIf_msgHandler.h"
 #include "hostIf_updateHandler.h"
 
-
+/**
+ * @brief This class provides the interface for request handler operations for the DHCPV4 Client.
+ * @ingroup TR-069HOSTIF_DHCPV4CLIENT_REQHANDLER_CLASSES
+ */
 class DHCPv4ClientReqHandler : public msgHandler
 {
     DHCPv4ClientReqHandler() {};

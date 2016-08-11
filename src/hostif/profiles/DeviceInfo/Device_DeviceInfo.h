@@ -16,50 +16,67 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
 /**
  * @file Device_DeviceInfo.h
- *
- * @brief Device.DeviceInfo API.
- *
- * Description of DeviceInfo module.
- *
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * @brief The header file provides TR69 device information APIs.
  */
+
+/**
+ * @defgroup TR69_HOSTIF_DEVICEINFO TR-069 Object (Device.DeviceInfo)
+ *
+ *  TR069 is a technical specification entitled CPE WAN Management Protocol (CWMP). It
+ *  defines an application layer protocol for remote management of end-user devices. As
+ *  a bidirectional SOAP/HTTP-based protocol, it provides the communication between
+ *  customer-premises equipment (CPE) and Auto Configuration Servers (ACS).
+ *
+ *  The TR-069 Client API lists the TR-069 APIs that will be available for Xi3 client
+ *  applications and those that need to be implemented at the stub layer.
+ * @ingroup TR69_HOSTIF_PROFILE
+ *
+ * @defgroup TR69_HOSTIF_PROFILE TR-069 Host Interface Profile
+ * @par Trace Route Diagnostics - TR-069 profile
+ *
+ * Tracing the routing path to a given destination machine is very important diagnostic tool
+ * for administrators and service providers.Trace route utility is provided in many operating
+ * systems today. Its main purpose is to find out the route IP packets take to reach a specific
+ * destination. It gives indication on the routers in between and round trip time of each probe.
+ * This utility sends UDP, TCP or ICMP probes with small TTL and listen for ICMP 'time exceeded'
+ * reply. It starts with TTL 1 to find out the first hop, TTL 2 to find out the second hop and
+ * so on.
+ *
+ * @par Trace route utility provides options such as:
+ * - Destination Host IP address or FQDN.
+ * - Use ICMP, UDP or TCP.
+ * - Use IPv4 or IPv6
+ * - Packet size : Valid in case of ICMP and UDP. Not applicable if TCP is chosen. TCP probe always
+ * goes with SYN flag.
+ * - Port: Port number to use for destination port of the UDP or TCP probe. In case of ICMP, it is
+ * used as sequence number.
+ * - TOS: TOS value to use in the IP header of probe packet.
+ * - Link interface to use: Utility uses IP address of this link as source IP of the probe packet.
+ * if not specified, default is to use link determined by route.
+ * - Gateway IP address: This is mainly to select the right link, if there are multiple links on the host.
+ * Default is 'based on route'.
+ * - Maximum TTL: Indicates the maximum number of hops to discover. Default : 30
+ * - Number of Probes: Number of probe messages to each hop. Default 3.
+ * - Wait time: wait time to wait for the response to probe. Default : 5 seconds.
+ * - Send interval: Interval between probe messages to a hop: Default 0 seconds.
+ *
+ * @ingroup TR69_HOSTIF
+ * @defgroup TR69_HOSTIF_DEVICEINFO_IF TR-069 Object (Device.DeviceInfo.Interface)
+ * This object contains general device information such as
+ * @ingroup TR69_HOSTIF_DEVICEINFO
+ *
+ * @defgroup TR69_HOSTIF_DEVICEINFO_API TR-069 Object (Device.DeviceInfo Interface.{i}) Public APIs
+ * Describe the details about RDK TR69 DeviceInfo APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_IF
+ *
+ * @defgroup TR69_HOSTIF_DEVICEINFO_CLASSES TR-069 Object (Device.DeviceInfo Interface.{i}) Public Classes
+ * Describe the details about classes used in TR69 DeviceInfo.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_IF
+ */
+
 
 /** @defgroup TR_069_API TR-069 HAL API
  *  @ingroup COMCAST_RDK_HAL
@@ -568,7 +585,6 @@ public:
      *
      */
     int get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(HOSTIF_MsgData_t *, bool *pChanged = NULL);
-
 
     /**
      * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename.

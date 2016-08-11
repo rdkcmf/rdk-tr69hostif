@@ -17,6 +17,11 @@
  * limitations under the License.
 */
 
+/**
+ * @defgroup TR69_HOSTIF_WIFI_AP_WPS TR-069 Object (Device.WiFi.AccessPoint.{i}.WPS.) Public APIs
+ * This module provides interface functions related to Wi-Fi Protected Setup [WPSv1.0] for this access point.
+ * @ingroup TR69_HOSTIF_WIFI
+ */
 
 
 /**
@@ -54,18 +59,53 @@ public:
     char	ConfigMethodsSupported[100];
     char	ConfigMethodsEnabled[64];
 
-    /**
-     * @brief    Get the MAC Address of an Associated Device of a WiFi Interface.
-     *
-     * This function provides the MAC address of the WiFi interface of the device associated
-     * with this WiFi interface.
-     *
-     * See @ref dev_wifi_if_assocdev_getter
-     *
+
+   /**
+     * @ingroup TR69_HOSTIF_WIFI_AP_WPS
+     * @{
      */
+   /**
+    * @brief Enables or disables WPS functionality for this access point.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_hostIf_WiFi_AccessPoint_WPS_Enable(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief This function provides the comma-separated list of strings, which indicates WPS configuration
+    * methods supported by the device.
+    *
+    * Each list item is an enumeration of:
+    * - USBFlashDrive
+    * - Ethernet
+    * - ExternalNFCToken
+    * - IntegratedNFCToken
+    * - NFCInterface
+    * - PushButton
+    * - PIN 
+    * This parameter corresponds directly to the "Config Methods" attribute of the WPS specification [WPSv1.0].
+    * The PushButton and PIN methods MUST be supported.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_hostIf_WiFi_AccessPoint_WPS_ConfigMethodsSupported(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief This function provides the comma-separated list of strings.
+    * Each list item MUST be a member of the list reported by the ConfigMethodsSupported parameter.
+    * Indicates WPS configuration methods enabled on the device.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_hostIf_WiFi_AccessPoint_WPS_ConfigMethodsEnabled(HOSTIF_MsgData_t *stMsgData );
+
+    /** @} */ // End of doxygen tag TR69_HOSTIF_WIFI_AP_WPS
 };
 
 

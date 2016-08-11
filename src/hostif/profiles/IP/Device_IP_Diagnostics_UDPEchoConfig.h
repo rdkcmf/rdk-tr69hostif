@@ -19,44 +19,14 @@
 
 /**
  * @file Device_IP_Diagnostics_UDPEchoConfig.h
+ * @brief The header file provides TR069 device IP diagnostics UDPEcho config APIs.
+ */
+
+/**
  *
- * @brief TR-069 Device.IP.Diagnostics.UDPEchoConfig object Public API.
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * @defgroup TR69_HOSTIF_DEVICE_IP_UDPECHOCONFIG_API TR-069 Object (Device.IP.Diagnostics.UDPEChoConfig) Public APIs
+ * Describe the details about TR-069 Device IP Diagnostics UDPEChoConfig APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICE_IP
  */
 
 
@@ -122,57 +92,65 @@ extern "C"
      *  @{
      */
 
-    /**
-     * @brief    Set the enable flag for UDP Echo.
-     *
-     * This function sets the enable flag for UDP Echo.
-     *
-     * @note     <ul>
-     *               <li>MUST be enabled to receive UDP echo.</li>
-     *
-     *               <li>When enabled from a disabled state all related timestamps,
-     *               statistics and UDP Echo Plus counters are cleared.</li>
-     *           </ul>
-     *
-     * See @ref dev_ip_diag_udpechoconfig_setter
-     *
-     */
+/**
+ * @brief    Set the enable flag for UDP Echo.
+ *
+ * This function sets the enable flag for UDP Echo.
+ *
+ * @note MUST be enabled to receive UDP echo. When enabled from a disabled state
+ * all related timestamps, statistics and UDP Echo Plus counters are cleared.
+ *
+ * @param[in] const char   Source IP address.
+ * @param[in] ParameterType  Type of the valid interface.
+ * @param[in] ParameterValue   Valid interface name or empty string.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully set the source IP address of the interface.
+ * @retval -1 If Not able to set the source IP address of the interface.
+ * @retval -2 If Not handle setting the source IP address of the interface.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_UDPECHOCONFIG_API
+ */
 
     int set_Device_IP_Diagnostics_UDPEchoConfig_Enable(const char *, ParameterType, ParameterValue *);
 
-    /**
-     * @brief    Set the path over which the test is to be performed.
-     *
-     * This function sets the the path name of IP-layer interface over which the CPE
-     * MUST listen for and receive UDP echo requests.
-     *
-     * @note     <ul>
-     *               <li>The value of this parameter MUST be either a valid interface or
-     *               an empty string. An attempt to set this parameter to a different
-     *               value MUST be rejected as an invalid parameter value.</li>
-     *
-     *               <li>If an empty string is specified, the CPE MUST listen and receive
-     *               UDP echo requests on all interfaces.</li>
-     *
-     *               <li>Interfaces behind a NAT MAY require port forwarding rules
-     *               configured in the Gateway to enable receiving the UDP packets.</li>
-     *           </ul>
-     *
-     * See @ref dev_ip_diag_udpechoconfig_setter
-     *
-     */
+/**
+ * @brief This function sets the the path name of IP-layer interface over which the CPE
+ * MUST listen for and receive UDP echo requests.
+ *
+ * @note The value of this parameter MUST be either a valid interface or
+ * an empty string. An attempt to set this parameter to a different value MUST be rejected as an
+ * invalid parameter value.
+ * If an empty string is specified, the CPE MUST listen and receive UDP echo requests
+ * on all interfaces. Interfaces behind a NAT MAY require port forwarding rules
+ * configured in the Gateway to enable receiving the UDP packets.
+ *
+ * @param[in] const char   Source IP address.
+ * @param[in] ParameterType  Type of the valid interface.
+ * @param[in] ParameterValue   Valid interface name or empty string.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully set the path over which the test is to be performed.
+ * @retval -1 If Not able to set the path over which the test is to be performed.
+ * @retval -2 If Not handle setting the path over which the test is to be performed.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_UDPECHOCONFIG_API
+ */
 
     int set_Device_IP_Diagnostics_UDPEchoConfig_Interface(const char *, ParameterType, ParameterValue *);
 
-    /**
-     * @brief    Set The UDP Echo port.
-     *
-     * This function sets the UDP port on which the UDP server MUST listen and respond to
-     * UDP echo requests.
-     *
-     * See @ref dev_ip_diag_udpechoconfig_setter
-     *
-     */
+/**
+ * @brief This function sets the UDP port on which the UDP server MUST listen and respond to
+ * UDP echo requests.
+ *
+ * @param[in] const char   Source IP address.
+ * @param[in] ParameterType  Type of the valid interface.
+ * @param[in] ParameterValue   Valid interface name or empty string.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully set the UDP Echo port.
+ * @retval -1 If Not able to set the UDP Echo port.
+ * @retval -2 If Not handle setting the UDP Echo port.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_UDPECHOCONFIG_API
+ */
 
     int set_Device_IP_Diagnostics_UDPEchoConfig_UDPPort(const char *, ParameterType, ParameterValue *);
 

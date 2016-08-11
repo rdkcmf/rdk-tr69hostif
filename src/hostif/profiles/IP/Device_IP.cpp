@@ -18,20 +18,8 @@
 */
 
 /**
- * @file Device_IP.c
- *
- * @brief Device.IP. API Implementation.
- *
- * This is the implementation of the Device.IP. API.
- *
- * @par Document
- * TBD Relevant design or API documentation.
- *
- */
-
-/** @addtogroup Device.IP. Implementation
- *  This is the implementation of the Device Public API.
- *  @{
+ * @file Device_IP.cpp
+ * @brief This source file contains the APIs of device IP.
  */
 
 /*****************************************************************************
@@ -63,6 +51,13 @@ GHashTable *hostIf_IP::ifHash = NULL;
 
 GHashTable* hostIf_IP::m_notifyHash = NULL;
 
+/**
+ * @brief Class Constructor of the class hostIf_IP.
+ *
+ * It will initialize the device id ,backup IP4 status to empty string.
+ *
+ * @param[in] dev_id Device identification number.
+ */
 hostIf_IP::hostIf_IP(int dev_id):
     dev_id(dev_id),
     bCalledIPv4Capable(false),
@@ -516,6 +511,18 @@ int hostIf_IP::handleSetMsg (HOSTIF_MsgData_t* stMsgData)
 // Device.IP. Profile. Getters:
 /****************************************************************************************************************************************************/
 
+/**
+ * @brief This function gets the IPv4 capability of a device. It indicates
+ * whether or not the device is IPv4 capable. 'true' if it is capable, 'false' if it
+ * is not capable.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully get the capability of IPv4 interface else
+ * returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
 int hostIf_IP::get_Device_IP_IPv4Capable(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
 
@@ -533,6 +540,17 @@ int hostIf_IP::get_Device_IP_IPv4Capable(HOSTIF_MsgData_t *stMsgData, bool *pCha
     return OK;
 }
 
+/**
+ * @brief Get the status of the IPv4 stack on a device. This function provides the status
+ * 'enabled' or 'disabled' of the IPv4 stack, and the use of IPv4 on the device. This affects
+ * only layer 3 and above.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully get the device IPv4 enable else returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
 int hostIf_IP::get_Device_IP_IPv4Enable(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
 
@@ -550,6 +568,18 @@ int hostIf_IP::get_Device_IP_IPv4Enable(HOSTIF_MsgData_t *stMsgData, bool *pChan
     return OK;
 }
 
+/**
+ * @brief This function gets the status of the IPv4 stack on a device. It indicates the status of the IPv4 stack.
+ * It is an enumeration of: Disabled, Enabled, Error (OPTIONAL).
+ *
+ * @note The Error value MAY be used by the CPE to indicate a locally defined  error condition.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully get the device IPv4 status else returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
 int hostIf_IP::get_Device_IP_IPv4Status(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
 
@@ -567,6 +597,23 @@ int hostIf_IP::get_Device_IP_IPv4Status(HOSTIF_MsgData_t *stMsgData, bool *pChan
     return OK;
 }
 
+/**
+ * @brief Get the ULA(Unique Local Address)/48 prefix for a device. This function provides the
+ * ULA /48 prefix of the device. This is the IPv6 address prefix and can be any IPv6 prefix that
+ * is permitted by the IPPrefix data type. Currently not implemented.
+ *
+ * @note This is specified as an IP address followed by an appended "/n" suffix, where n
+ * (the prefix size) is an integer in the range 0-32 (for IPv4) or 0-128 (for IPv6) that
+ * indicates the number of (leftmost) '1' bits of the routing prefix.
+ * - IPv4 example: 192.168.1.0/24
+ * - IPv6 example: 2001:edff:fe6a:f76::/64
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully get the device IP ULA Prefix else returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
 int hostIf_IP::get_Device_IP_ULAPrefix(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] Parameter Not Supported \n",__FUNCTION__);
@@ -602,6 +649,22 @@ int hostIf_IP::get_Device_IP_ActivePortNumberOfEntries(HOSTIF_MsgData_t *stMsgDa
 /****************************************************************************************************************************************************/
 // Device.IP. Profile. Setters:
 /****************************************************************************************************************************************************/
+
+
+/**
+ * @brief This function sets the status to 'enabled' or 'disabled' of the IPv4 stack
+ * on a device. This affects only layer 3 and above.
+ *
+ * @note     When 'false', IP interfaces that had been operationally up and
+ *           passing IPv4 packets will now no longer be able to do so, and will be
+ *           operationally down (unless also attached to an enabled IPv6 stack).
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully set the device IPv4 enable else returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
 int hostIf_IP::set_Device_IP_IPv4Enable(HOSTIF_MsgData_t *stMsgData)
 {
     char command[BUFF_LENGTH]= {'\0'};
@@ -624,6 +687,23 @@ int hostIf_IP::set_Device_IP_IPv4Enable(HOSTIF_MsgData_t *stMsgData)
     return OK;
 }
 
+/**
+ * @brief This function sets the ULA /48 prefix of the device. This is the IPv6 address
+ * prefix and can be any IPv6 prefix that is permitted by the IPPrefix data type.
+ * Currently not implemented.
+ *
+ * @note This is specified as an IP address followed by an appended "/n" suffix, where n
+ * (the prefix size) is an integer in the range 0-32 (for IPv4) or 0-128 (for IPv6) that
+ * indicates the number of (leftmost) '1' bits of the routing prefix.
+ * - IPv4 example: 192.168.1.0/24
+ * - IPv6 example: 2001:edff:fe6a:f76::/64
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully set the device IP ULA prefix else returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
 int hostIf_IP::set_Device_IP_ULAPrefix(HOSTIF_MsgData_t *stMsgData)
 {
     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] Parameter Not Supported \n",__FUNCTION__);

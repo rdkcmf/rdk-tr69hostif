@@ -21,6 +21,11 @@
  *
  * @author karsomas@cisco.com
  */
+
+/**
+ * @file hostIf_StorageService_ReqHandler.cpp
+ * @brief The header file provides HostIf IP Storage service request handler information APIs.
+ */
 #include "hostIf_main.h"
 #include "hostIf_utils.h"
 #include "Service_Storage.h"
@@ -41,12 +46,29 @@ msgHandler* StorageSrvcReqHandler::getInstance()
     return pInstance;
 }
 
-
+/**
+ * @brief This function is use to initialize. Currently not implemented.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successfully .
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_STORAGESERVICE_REQHANDLER_CLASSES
+ */
 bool StorageSrvcReqHandler::init()
 {
     return true;
 }
 
+/**
+ * @brief This function is used to close all the instances of storage service.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if it is successfully close all the instances.
+ * @retval false if not able to close all the instances.
+ * @ingroup TR-069HOSTIF_STORAGESERVICE_REQHANDLER_CLASSES
+ */
 bool StorageSrvcReqHandler::unInit()
 {
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] Storage Service manager DeInitializing\n", __FUNCTION__);
@@ -55,6 +77,18 @@ bool StorageSrvcReqHandler::unInit()
     return true;
 }
 
+/**
+ * @brief This function use to handle the set message request of storage service.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_STORAGESERVICE_REQHANDLER_CLASSES
+ */
 int StorageSrvcReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -65,6 +99,17 @@ int StorageSrvcReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+/**
+ * @brief This function use to handle the get message request of storage service.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully.
+ * @retval ERR_INTERNAL_ERROR if not able to get data from the device.
+ * @ingroup TR-069HOSTIF_STORAGESERVICE_REQHANDLER_CLASSES
+ */
 int StorageSrvcReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;

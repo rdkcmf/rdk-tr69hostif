@@ -45,6 +45,11 @@
 #include "hostIf_utils.h"
 #include "Device_IP.h"
 
+/**
+ * @struct in6_ifreq
+ * @brief The structure holds the required parameters such as IPv6 address,interface index etc..
+ * for the IPv6 interface address.
+ */
 struct in6_ifreq {
     struct in6_addr ifr6_addr;
     long ifr6_prefixlen;
@@ -607,6 +612,19 @@ int hostIf_IPv6Address::setIp(int interfaceNo, char *value)
 // Device_IP_Interface_IPv6Address Profile. Getters:
 /****************************************************************************************************************************************************/
 
+/**
+ * @brief  This function provides the value 'true' or 'false' for Enable status of IPv6 address.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv6Address::get_IPv6Address_Enable(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -628,6 +646,27 @@ int hostIf_IPv6Address::get_IPv6Address_Enable(HOSTIF_MsgData_t *stMsgData,int s
     return OK;
 }
 
+/**
+ * @brief This function provides the status of this IPv6Address table entry. Possible values
+ * - Disabled
+ * - Enabled
+ * - Error_Misconfigured
+ * - Error (OPTIONAL)
+ * @note  - The "Error_Misconfigured" value indicates that a necessary
+ * configuration value is undefined or invalid.
+ *        - The "Error" value MAY be used by the CPE to indicate a
+ * locally defined error condition.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv6Address::get_IPv6Address_Status(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -709,6 +748,32 @@ int hostIf_IPv6Address::get_IPv6Address_IPAddressStatus (HOSTIF_MsgData_t *stMsg
     return OK;
 }
 
+/**
+ * @brief  This function provides a non-volatile handle used to reference this IPv6 address
+ * instance of this IP interface. Alias provides a mechanism for an ACS to label this
+ * instance for future reference. Currently not implemented.
+ *
+ * @note If the CPE supports the Alias-based Addressing feature as defined
+ * in [Section 3.6.1/TR-069 Amendment 4] and described in [Appendix II/TR-069 Amendment 4],
+ * the following mandatory constraints MUST be enforced:
+ *  - Its value MUST NOT be empty.
+ *  - Its value MUST start with a letter.
+ *
+ * If its instance object is created by the CPE, the initial value MUST start with a "cpe-" prefix.
+ * The CPE MUST NOT change the parameter value. This parameter can only be modified if "Origin"
+ * is "Static".
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number currently not in use.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @retval NOK if not handle.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv6Address::get_IPv6Address_Alias(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -716,6 +781,22 @@ int hostIf_IPv6Address::get_IPv6Address_Alias(HOSTIF_MsgData_t *stMsgData,int su
     return NOK;
 }
 
+/**
+ * @brief  This function provides the IPv6 address.
+ * @note     This parameter can only be modified if "Origin" is
+ *           "Static".
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @retval NOK if not handle.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv6Address::get_IPv6Address_IPAddress(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -743,6 +824,26 @@ int hostIf_IPv6Address::get_IPv6Address_IPAddress(HOSTIF_MsgData_t *stMsgData,in
     return OK;
 }
 
+/**
+ * @brief  This function provides the addressing method used to assign the IP address.
+ * The Possible enum vlaues
+ *
+ * - DHCP
+ * - AutoIP
+ * - IPCP
+ * - Static
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number currently not in use.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @retval NOK if it is not handle.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv6Address::get_IPv6Address_Origin(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -1510,6 +1611,20 @@ int hostIf_IPv6Address::get_IPv6Prefix_ValidLifetime (HOSTIF_MsgData_t *stMsgDat
 // Device_IP_Interface_IPv6Address Profile. Setters:
 /****************************************************************************************************************************************************/
 
+/**
+ * @brief This function enables or disables this IPv6 address. Currently not
+ * implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number currently not in use.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @retval NOK if it is not handle.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv6Address::set_IPv6Address_Enable(HOSTIF_MsgData_t *stMsgData, int subInstanceNo)
 {
     LOG_ENTRY_EXIT;
@@ -1517,6 +1632,30 @@ int hostIf_IPv6Address::set_IPv6Address_Enable(HOSTIF_MsgData_t *stMsgData, int 
     return NOK;
 }
 
+/**
+ * @brief  This function sets a non-volatile handle used to reference this IPv6 address
+ * instance of this IP interface. Alias provides a mechanism for an ACS to label this
+ * instance for future reference.
+ *
+ * @note     If the CPE supports the Alias-based Addressing feature as defined in
+ *           [Section 3.6.1/TR-069 Amendment 4] and described in [Appendix II/TR-069
+ *           Amendment 4], the following mandatory constraints MUST be enforced:
+ *               - Its value MUST NOT be empty.
+ *               - Its value MUST start with a letter.
+ *               - If its instance object is created by the CPE, the initial
+ *                   value MUST start with a "cpe-" prefix.
+ *               - The CPE MUST NOT change the parameter value.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number currently not in use.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @retval NOK if it is not handle.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv6Address::set_IPv6Address_Alias(HOSTIF_MsgData_t *stMsgData, int subInstanceNo)
 {
     LOG_ENTRY_EXIT;
@@ -1524,6 +1663,21 @@ int hostIf_IPv6Address::set_IPv6Address_Alias(HOSTIF_MsgData_t *stMsgData, int s
     return NOK;
 }
 
+/**
+ * @brief  This function sets the IPv6 address.
+ *
+ * @note  This parameter can only be modified if the Origin is <tt>Static</tt>.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number currently not in use.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @retval NOK if it is not handle.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv6Address::set_IPv6Address_IPAddress(HOSTIF_MsgData_t *stMsgData, int subInstanceNo)
 {
     LOG_ENTRY_EXIT;

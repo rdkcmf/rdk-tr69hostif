@@ -16,58 +16,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
 /**
- * @file hostIf_timeClient_ReqHandler.h
- *
- * @brief host Interface for timeClient Request Handler API.
- *
- * This API defines the request handler operations for mfr client
- *
- * @par Document
- * Document reference.
- *
- * @par Open Issues (in no particular order)
- * -# None
- *
- * @par Assumptions
- * -# None
- *
- * @par Abbreviations
- * - BE:       ig-Endian.
- * - cb:       allback function (suffix).
- * - FPD:     Front-Panel Display.
- * - HAL:     Hardware Abstraction Layer.
- * - LE:      Little-Endian.    virtual int handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData);
-    virtual int handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData);
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - RDK:     Reference Design Kit.
- * - _t:      Type (suffix).
- *
- * @par Implementation Notes
- * -# None
- *
+ * @file hostIf_WiFi_ReqHandler.h
+ * @brief The header file provides HostIf WiFi request handler information APIs.
  */
 
-/** @defgroup HOST_IF TIME CLIENT REQUEST HANDLER
- *   @ingroup HOST_IF
- *
+/**
+ * @defgroup TR-069HOSTIF_WIFI_REQHANDLER_CLASSES WiFi RequestHandler Public Classes
+ * Describe the details about classes used in TR-069 WiFi request handler.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_HANDLER
+ */
+
+/**
  *  It allows moca client applications to communicate by sending Get operation
  *  from Time library.
- *
  */
-
-/** @addtogroup HOST_IF TIME CLIENT REQUEST HANDLER API .
- *  @ingroup HOST_IF
- *
- *  Described herein are the functions that are part of the
- *  host interface binary.
- *
- *  @{
- */
-
-
 
 
 /**
@@ -91,6 +55,10 @@
 #define DEVICE_WIFI_RADIO_PROFILE       "Device.WiFi.Radio."
 #define DEVICE_WIFI_ENDPOINT_PROFILE    "Device.WiFi.EndPoint."
 
+/**
+ * @brief This class provides the interface for getting WiFi request handler information.
+ * @ingroup TR-069HOSTIF_WIFI_REQHANDLER_CLASSES
+ */
 class WiFiReqHandler : public msgHandler
 {
 //private:

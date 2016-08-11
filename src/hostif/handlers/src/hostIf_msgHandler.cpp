@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file hostIf_msgHandler.cpp
+ * @brief The header file provides HostIf message handler information APIs.
+ */
 
 /**
 * @defgroup tr69hostif

@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file hostIf_jsonReqHandlerThread.cpp
+ * @brief The header file provides HostIf IP json request handler information APIs.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -318,6 +322,11 @@ void hostIf_HTTPJsonMsgHandler(
     return;
 }
 
+/**
+ * @brief This API is used to initialize and start the HTTP server process. It use to serve the
+ * http json client request.
+ * @ingroup TR-069HOSTIF_JSON_REQHANDLER_API
+ */
 void hostIf_HttpServerStart()
 {
     GError *error = NULL;
@@ -352,6 +361,11 @@ void hostIf_HttpServerStart()
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
 }
 
+/**
+ * @brief This function is used to stop the http server. To stop the server
+ * it disconnects the soup server with the server handle.
+ * @ingroup TR-069HOSTIF_JSON_REQHANDLER_API
+ */
 void hostIf_HttpServerStop()
 {
     if(server) {

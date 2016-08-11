@@ -18,50 +18,31 @@
 */
 /**
  * @file Device_IP_ActivePort.h
- *
- * @brief TR-069 Device.IP.ActivePort object Public API.
- *
- * Description of Device IP Active module.
- *
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * @brief The header file provides TR069 device IP active port information APIs.
  */
 
-
+/**
+ * @defgroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT TR-069 Object (Device.IP.ActivePort.Interface)
+ * This table lists the ports on which TCP connections are listening or established.
+ * At most one entry in this table can exist with all the same values for
+ * - LocalIPAddress
+ * - LocalPort
+ * - RemoteIPAddress
+ * - RemotePort.
+ * @ingroup TR69_HOSTIF_DEVICE_IP
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT_API TR-069 Object (Device.IP.ActivePort.Interface.{i}) Public APIs
+ * Describe the details about TR-069 Device IP active port APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT_CLASSES TR-069 Object (Device.IP.ActivePort.Interface.{i}) Public Classes
+ * Describe the details about classes used in TR-069 Device IP active port.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT_DSSTRUCT TR-069 Object (Device.IP.ActivePort.Interface.{i}) Public DataStructure
+ * Describe the details about data structure used in TR-069 Device IP active port.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT
+ */
 
 
 /**
@@ -129,6 +110,16 @@
  *
  *  @{
  */
+
+/**
+ * @addtogroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT_DSSTRUCT
+ * @{
+ */
+
+/**
+ * @brief The structure holds the required parameters such as local ipaddress, localport, remoteIpAddress
+ * etc.. for the device ip of the active port.
+ */
 struct Device_IP_ActivePort {
 
     char localIpAddress[_LENGTH_IPADDR];
@@ -137,7 +128,12 @@ struct Device_IP_ActivePort {
     unsigned int remotePort;
     char  status[_LENGTH_STATUS];
 };
+/** @} */ //End of the Doxygen tag TR69_HOSTIF_DEVICE_IP_ACTIVEPORT_DSSTRUCT
 
+/**
+ * @brief This class provides the hostIf IP active port for getting IP active port information.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT_CLASSES
+ */
 class hostIf_IPActivePort {
 
     static  GHashTable  *ifHash;
@@ -184,69 +180,18 @@ public:
 
     int handleGetMsg (const char* pSetting, HOSTIF_MsgData_t* stMsgData);
 
-    /**
-     * @brief    Get the local IP Address of the connection.
-     *
-     * This function provides the [IPAddress] Connection local IP address.
-     *
-     * See @ref dev_ipactiveport_getter
-     *
-     */
 
     int get_Device_IP_ActivePort_LocalIPAddress(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the local port number of the connection.
-     *
-     * This function provides the Connection local port.
-     *
-     * See @ref dev_ipactiveport_getter
-     *
-     */
 
     int get_Device_IP_ActivePort_LocalPort(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the remote IP Address of the established connection.
-     *
-     * This function provides the remote IP address of the source of inbound packets.
-     *
-     * @note     This will be an empty string for listening connections (only connections in
-     *           ESTABLISHED state have remote addresses).
-     *
-     * See @ref dev_ipactiveport_getter
-     *
-     */
 
     int get_Device_IP_ActivePort_RemoteIPAddress(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the remote port number of the established connection.
-     *
-     * This function provides the remote port number of the source of inbound packets.
-     *
-     * @note     This will be 0 for listening connections (only connections in ESTABLISHED
-     *           state have remote addresses).
-     *
-     * See @ref dev_ipactiveport_getter
-     *
-     */
 
     int get_Device_IP_ActivePort_RemotePort(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get current status of the connection.
-     *
-     * This function provides the Current operational status of the connection.  Enumeration
-     * of:
-     *  <tt>
-     *        <ul><li>LISTEN</li>
-     *            <li>ESTABLISHED</li></ul>
-     *    </tt>
-     *
-     * See @ref dev_ipactiveport_getter
-     *
-     */
 
     int get_Device_IP_ActivePort_Status(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 

@@ -19,44 +19,14 @@
 
 /**
  * @file Device_IP_Diagnostics_TraceRoute_RouteHops.h
+ * @brief The header file provides TR069 device IP diagnostics trace route APIs.
+ */
+
+/**
  *
- * @brief TR-069 Device.IP.Diagnostics.TraceRoute.RouteHops object Public API.
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * @defgroup TR69_HOSTIF_DEVICE_ROUTEHOPS_API TR-069 Object (Device.IP.Diagnostics.TraceRoute.RouteHops.{i}) Public APIs
+ * Describe the details about TR-069 Device IP Interface APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICE_IP
  */
 
 
@@ -122,58 +92,74 @@ extern "C"
      *  @{
      */
 
-    /**
-     * @brief    Get the address of a hop.
-     *
-     * This function provides the result parameter indicating the Host Name, if DNS is
-     * able to resolve it, or the IP Address of a hop along the discovered route.
-     *
-     * See @ref dev_ip_diag_traceroute_hops_getter
-     *
-     */
+/**
+ * @brief This function provides the result parameter indicating the Host Name, if DNS is
+ * able to resolve it, or the IP Address of a hop along the discovered route.
+ *
+ * @param[in] name Source IP address.
+ * @param[in] type  Type of the valid interface.
+ * @param[in] value   Valid interface name or empty string.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the address of a hop.
+ * @retval -1 If Not able to get the address of a hop.
+ * @retval -2 If Not handle getting the address of a hop.
+ * @ingroup TR69_HOSTIF_DEVICE_ROUTEHOPS_API
+ */
 
     int get_Device_IP_Diagnostics_TraceRoute_RouteHops_Host(const char *name, ParameterType type, ParameterValue *value);
 
-    /**
-     * @brief    Get the address of the host returned for a hop.
-     *
-     * This function provides the last IP address of the host returned for this hop.
-     *
-     * @note     <ul>
-     *               <li>This may be an empty string.</li>
-     *
-     *               <li>If this parameter is not an empty string, the <tt>Host</tt> will
-     *               contain the Host Name returned from the reverse DNS query.</li>
-     *           </ul>
-     *
-     * See @ref dev_ip_diag_traceroute_hops_getter
-     *
-     */
+/**
+ * @brief This function provides the last IP address of the host returned for this hop.
+ *
+ * @note This may be an empty string. If this parameter is not an empty string, the "Host" will
+ * contain the Host Name returned from the reverse DNS query.
+ *
+ * @param[in] name  Source IP address.
+ * @param[in] type  Type of the valid interface.
+ * @param[in] value Valid interface name or empty string.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the address of the host returned for a hop.
+ * @retval -1 If Not able to get the address of the host returned for a hop.
+ * @retval -2 If Not handle getting the address of the host returned for a hop.
+ * @ingroup TR69_HOSTIF_DEVICE_ROUTEHOPS_API
+ */
 
     int get_Device_IP_Diagnostics_TraceRoute_RouteHops_HostAddress(const char *name, ParameterType type, ParameterValue *value);
 
-    /**
-     * @brief    Get the error code returned for this hop.
-     *
-     * This function provides the error code returned for this hop. This code is directly
-     * from the ICMP CODE field.
-     *
-     * See @ref dev_ip_diag_traceroute_hops_getter
-     *
-     */
+/**
+ * @brief This function provides the error code returned for this hop. This code is directly
+ * from the ICMP CODE field.
+ *
+ * @param[in] name  Source IP address.
+ * @param[in] type  Type of the valid interface.
+ * @param[in] value   Valid interface name or empty string.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the error code returned for this hop.
+ * @retval -1 If Not able to get the error code returned for this hop.
+ * @retval -2 If Not handle getting the error code returned for this hop.
+ * @ingroup TR69_HOSTIF_DEVICE_ROUTEHOPS_API
+ */
 
     int get_Device_IP_Diagnostics_TraceRoute_RouteHops_ErrorCode(const char *name, ParameterType type, ParameterValue *value);
 
-    /**
-     * @brief    Get round trip times for a hop.
-     *
-     * This function provides a comma-separated list (maximum length 16) of unsigned
-     * integers. Each list item contains one or more round trip times in milliseconds
-     * (one for each repetition) for this hop.
-     *
-     * See @ref dev_ip_diag_traceroute_hops_getter
-     *
-     */
+/**
+ * @brief This function provides a comma-separated list (maximum length 16) of unsigned
+ * integers. Each list item contains one or more round trip times in milliseconds
+ * (one for each repetition) for this hop.
+ *
+ * @param[in] name  Source IP address.
+ * @param[in] type  Type of the valid interface.
+ * @param[in] value   Valid interface name or empty string.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the round trip times for a hop.
+ * @retval -1 If Not able to get the round trip times for a hop.
+ * @retval -2 If Not handle getting the round trip times for a hop.
+ * @ingroup TR69_HOSTIF_DEVICE_ROUTEHOPS_API
+ */
 
     int get_Device_IP_Diagnostics_TraceRoute_RouteHops_RTTimes(const char *name, ParameterType type, ParameterValue *value);
 

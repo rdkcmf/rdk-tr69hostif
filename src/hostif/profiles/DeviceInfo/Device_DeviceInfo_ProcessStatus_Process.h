@@ -16,53 +16,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
 /**
  * @file Device_DeviceInfo_ProcessStatus_Process.h
- *
- * @brief Device.DeviceInfo.ProcessStatus.Process API.
- *
- * Description of XXX module.
- *
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * @brief The header file provides TR069 device processor status process information APIs.
  */
 
-
-
+/**
+ * @defgroup TR69_HOSTIF_DEVICE_STATUS_PROCESS TR-069 Object (Device.DeviceInfo.ProcessStatus.Process)
+ *  List of all processes running on the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_STATUS_PROCESS_API TR-069 Object (Device.DeviceInfo.ProcessStatus.Process.Interface.{i}) Public APIs
+ * Describe the details about TR-069 DeviceInfo processor status process APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICE_STATUS_PROCESS
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_STATUS_PROCESS_CLASSES TR-069 Object (Device.DeviceInfo.ProcessStatus.Process.Interface.{i}) Public Classes
+ * Describe the details about classes used in TR-069 DeviceInfo processor status process.
+ * @ingroup TR69_HOSTIF_DEVICE_STATUS_PROCESS
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_STATUS_PROCESS_DSSTRUCT TR-069 Object (Device.DeviceInfo.ProcessStatus.Process.Interface.{i}) Public DataStructure
+ * Describe the details about structure used in TR-069 DeviceInfo processor status process.
+ * @ingroup TR69_HOSTIF_DEVICE_STATUS_PROCESS
+ */
 
 /**
 * @defgroup tr69hostif
@@ -87,6 +63,14 @@
 #define PROCESS_STATE_STOPPED "Stopped"
 #define PROCESS_STATE_ZOMBIE "Zombie"
 
+/**
+ * @addtogroup TR69_HOSTIF_DEVICE_STATUS_PROCESS_DSSTRUCT
+ * @{
+ */
+
+/**
+ * @brief These values are the members variables of the DeviceProcessStatusProcess structure.
+ */
     typedef struct Device_DeviceInfo_ProcessStatus_Process
     {
         unsigned int uiPid;                    /*Process Identifier.*/
@@ -97,6 +81,9 @@
         char cState[_STATE_LENGTH];            /* The current state that the process is in.*/
     } DeviceProcessStatusProcess;
 
+/**
+ * @brief These values are the members of the process.
+ */
     typedef enum EProcessMembers
     {
         eProcessPid = 0,
@@ -107,6 +94,7 @@
         eProcessState
     } EProcessMembers;
 
+/** @} */ //End of the Doxygen tag TR69_HOSTIF_DEVICE_STATUS_PROCESS_DSSTRUCT
 /**
  *   Description. This returns the total number of processes running.
  *
@@ -114,6 +102,10 @@
  *   @param[out] value Total number of processes running.
  **/
 
+/**
+ * @brief This class provides the interface for getting device processor information.
+ * @ingroup TR69_HOSTIF_DEVICE_STATUS_PROCESS_CLASSES
+ */
 class hostIf_DeviceProcess
 {
     
@@ -122,7 +114,6 @@ class hostIf_DeviceProcess
     static GMutex *m_mutex;
 
     static GMutex *m_libproc_lock;
-    
     int dev_id;
 
     hostIf_DeviceProcess(int _dev_id);
@@ -183,100 +174,16 @@ public:
      */
 
 
-    /**
-     * @brief get_Device_DeviceInfo_ProcessStatus_Process_PID.
-     *
-     * This function provides the Process Identifier.
-     *
-     * @return The Process Identifier.
-     *
-     * @retval OK if is successful.
-     * @retval ERR_INTERNAL_ERROR if not able to fetch.
-     *
-     * @sideeffect All necessary structures and buffers are deallocated.
-     * @execution Synchronous.
-     *
-     */
     int get_Device_DeviceInfo_ProcessStatus_Process_PID(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
-    /**
-     * @brief get_Device_DeviceInfo_ProcessStatus_Process_Command.
-     *
-     * This function provides The name of the command that has caused the process to exist.
-     *
-     * @return The name of the command.
-     *
-     * @retval OK if is successful.
-     * @retval ERR_INTERNAL_ERROR if not able to fetch.
-     *
-     * @sideeffect All necessary structures and buffers are deallocated.
-     * @execution Synchronous.
-     *
-     */
     int get_Device_DeviceInfo_ProcessStatus_Process_Command(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
-    /**
-     * @brief get_Device_DeviceInfo_ProcessStatus_Process_Size.
-     *
-     * This function provides The Size in Killo bytes of the memory occupied by process.
-     *
-     * @return The size of memory occupied by process .
-     *
-     * @retval OK if is successful.
-     * @retval ERR_INTERNAL_ERROR if not able to fetch.
-     *
-     * @sideeffect All necessary structures and buffers are deallocated.
-     * @execution Synchronous.
-     *
-     */
     int get_Device_DeviceInfo_ProcessStatus_Process_Size(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
-    /**
-     * @brief get_Device_DeviceInfo_ProcessStatus_Process_Priority.
-     *
-     * This function provides The priority of the process.
-     *
-     * @return The priority of the process.
-     *
-     * @retval OK if is successful.
-     * @retval ERR_INTERNAL_ERROR if not able to fetch.
-     *
-     * @sideeffect All necessary structures and buffers are deallocated.
-     * @execution Synchronous.
-     *
-     */
     int get_Device_DeviceInfo_ProcessStatus_Process_Priority(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
-    /**
-     * @brief get_Device_DeviceInfo_ProcessStatus_Process_CPUTime.
-     *
-     * This function provides The amount of time spent by the process taking the cpu.
-     *
-     * @return The amount of time spent by the process taking the cpu.
-     *
-     * @retval OK if is successful.
-     * @retval ERR_INTERNAL_ERROR if not able to fetch.
-     *
-     * @sideeffect All necessary structures and buffers are deallocated.
-     * @execution Synchronous.
-     *
-     */
     int get_Device_DeviceInfo_ProcessStatus_Process_CPUTime(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
-    /**
-     * @brief get_Device_DeviceInfo_ProcessStatus_Process_State.
-     *
-     * This function provides The current state of the process.
-     *
-     * @return The current state of the process.
-     *
-     * @retval OK if is successful.
-     * @retval ERR_INTERNAL_ERROR if not able to fetch.
-     *
-     * @sideeffect All necessary structures and buffers are deallocated.
-     * @execution Synchronous.
-     *
-     */
     int get_Device_DeviceInfo_ProcessStatus_Process_State(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 };

@@ -19,58 +19,53 @@
 
 /**
  * @file Device_IP.h
+ * @brief The header file provides TR069 device IP information APIs.
+ */
+ 
+/**
+ * @defgroup TR69_HOSTIF_DEVICE_IP TR-069 Object (Device.IP) 
+ * IP interface table models the layer 3 IP interface. Each IP interface can be attached to
+ * the IPv4 and/or IPv6 stack. The interface's IP addresses and prefixes are listed in the IPv4Address,
+ * IPv6Address and IPv6Prefix tables. 
  *
- * @brief TR-069 Device.IP object Public API.
+ * @note Note that support for manipulating Loopback interfaces is OPTIONAL, so the implementation MAY choose
+ * not to create (or allow the ACS to create) Interface instances of type Loopback.
  *
- * Description of Device IP module.
+ * - When the ACS administratively disables the interface, i.e. sets Enable to false, the interface's
+ * automatically-assigned IP addresses and prefixes MAY be retained.
+ * - When the ACS administratively enables the interface, i.e. sets Enable to true, these IP
+ * addresses and prefixes MUST be refreshed.
  *
+ * It's up to the implementation to decide exactly what this means:
+ * It SHOULD take all reasonable steps to refresh everything but if it is unable, for example,
+ * to refresh a prefix that still has a significant lifetime, it might well choose to retain
+ * rather than discard it.
  *
- * @par Document
- * Document reference.
+ * @ingroup TR69_HOSTIF_PROFILE
+ * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE TR-069 Object (Device.IP.Object) 
+ * IP object that contains the Interface, ActivePort, and Diagnostics objects.
+ * @ingroup TR69_HOSTIF_DEVICE_IP
+ * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API TR-069 Object (Device.IP.Object.{i}) Public APIs
+ * Describe the details about TR69 Device IP interface APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE 
  *
+ * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE_CLASSES TR-069 Object (Device.IP.Object.{i}) Public Classes
+ * Describe the details about classes used in TR69 Device IP interface.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE
  *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
+ * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE_DSSTRUCT TR-069 Object (Device.IP.Object.{i}) Public DataStructure
+ * Describe the details about data structure used in TR69 Device IP interface.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE
  *
  */
-
-
-
-
+ 
 /**
 * @defgroup tr69hostif
 * @{
 * @defgroup hostif
 * @{
 **/
+
 
 
 #ifndef DEVICE_IP_H_
@@ -89,6 +84,15 @@
 
 #define LENGTH 16
 
+/**
+ * @addtogroup TR69_HOSTIF_DEVICE_IP_INTERFACE_DSSTRUCT
+ * @{
+ */
+ 
+/**
+ * @enum EIPMembers
+ * @brief These values are the members of the EIPMembers.
+ */
 typedef enum EIPMembers
 {
     eIpIPv4Capable=0,
@@ -100,6 +104,9 @@ typedef enum EIPMembers
 }
 EIPMembers;
 
+/**
+ * @brief It contains the members variables of the IP structure.
+ */
 typedef struct Device_IP
 {
     bool iPv4Capable;
@@ -109,6 +116,7 @@ typedef struct Device_IP
     unsigned int interfaceNumberOfEntries;
     unsigned int activePortNumberOfEntries;
 } IP;
+/** @} */ //End of the Doxygen tag TR69_HOSTIF_DEVICE_IP_INTERFACE_DSSTRUCT
 
 /** @defgroup TR_069_DEVICE_IP_API TR-069 Device.IP object API.
  *  @ingroup TR_069_API
@@ -144,6 +152,12 @@ typedef struct Device_IP
  *  @todo Clarify description of DIAG_ERROR.
  *
  *  @{
+ */
+
+ 
+/**
+ * @brief This class provides the hostIf IP interface for getting IP interface information.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_CLASSES
  */
 class hostIf_IP {
 
@@ -232,54 +246,9 @@ public:
      */
     int get_Device_IP_IPv4Enable(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the status of the IPv4 stack on a device.
-     *
-     * This function indicates the status of the IPv4 stack. It is an enumeration of:
-     *
-     * <tt>
-     *     <ul><li>Disabled</li>
-     *         <li>Enabled</li>
-     *         <li>Error (OPTIONAL)</li></ul>
-     * </tt>
-     *
-     * @note     The Error value MAY be used by the CPE to indicate a locally defined
-     *           error condition.
-     *
-     * See @ref dev_ip_getter
-     *
-     */
 
     int get_Device_IP_IPv4Status(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the ULA /48 prefix for a device.
-     *
-     * This function provides the ULA /48 prefix of the device. This is the IPv6 address
-     * prefix and can be any IPv6 prefix that is permitted by the IPPrefix data type.
-     *
-     * @note     <ul>
-     *               <li>This is specified as an IP address followed by an appended "/n"
-     *               suffix, where n (the prefix size) is an integer in the range 0-32
-     *               (for IPv4) or 0-128 (for IPv6) that indicates the number of
-     *               (leftmost) '1' bits of the routing prefix.
-     *               <ul>
-     *                   <li>IPv4 example: 192.168.1.0/24</li>
-     *                   <li>IPv6 example: 2001:edff:fe6a:f76::/64</li>
-     *               </ul></li>
-     *
-     *               <li>If the IP address part is unspecified or inapplicable, it MUST
-     *               be an empty string unless otherwise specified by the parameter
-     *               definition. In this case the IP prefix will be of the form "/n".</li>
-     *
-     *               <li>If the entire IP prefix is unspecified or inapplicable, it MUST
-     *               be an empty string unless otherwise specified by the parameter
-     *               definition.</li>
-     *           </ul>
-     *
-     * See @ref dev_ip_getter
-     *
-     */
 
     int get_Device_IP_ULAPrefix(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
@@ -357,34 +326,6 @@ public:
 
     int set_Device_IP_IPv4Enable(HOSTIF_MsgData_t *);
 
-    /**
-     * @brief    Set the ULA /48 prefix for a device.
-     *
-     * This function sets the ULA /48 prefix of the device. This is the IPv6 address
-     * prefix and can be any IPv6 prefix that is permitted by the IPPrefix data type.
-     *
-     * @note     <ul>
-     *               <li>This is specified as an IP address followed by an appended "/n"
-     *               suffix, where n (the prefix size) is an integer in the range 0-32
-     *               (for IPv4) or 0-128 (for IPv6) that indicates the number of
-     *               (leftmost) '1' bits of the routing prefix.
-     *               <ul>
-     *                   <li>IPv4 example: 192.168.1.0/24</li>
-     *                   <li>IPv6 example: 2001:edff:fe6a:f76::/64</li>
-     *               </ul></li>
-     *
-     *               <li>If the IP address part is unspecified or inapplicable, it MUST
-     *               be an empty string unless otherwise specified by the parameter
-     *               definition. In this case the IP prefix will be of the form "/n".</li>
-     *
-     *               <li>If the entire IP prefix is unspecified or inapplicable, it MUST
-     *               be an empty string unless otherwise specified by the parameter
-     *               definition.</li>
-     *           </ul>
-     *
-     * See @ref dev_ip_setter
-     *
-     */
 
     int set_Device_IP_ULAPrefix(HOSTIF_MsgData_t *);
 

@@ -16,53 +16,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
 /**
  * @file Device_DeviceInfo_ProcessStatus.h
- *
- * @brief Device.DeviceInfo.ProcessStatus API.
- *
- * Description of XXX module.
- *
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * @brief The header file provides TR069 device processor status information APIs.
  */
 
-
-
+/**
+ * @defgroup TR69_HOSTIF_DEVICE_PROCESSORSTATUS TR-069 Object (Device.DeviceInfo.ProcessStatus)
+ *  Status of the processes on the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_PROCESSORSTATUS_API TR-069 Object (Device.DeviceInfo.ProcessStatus.Interface.{i}) Public APIs
+ * Describe the details about TR-069 DeviceInfo processor status APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICE_PROCESSORSTATUS
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_PROCESSORSTATUS_CLASSES TR-069 Object (Device.DeviceInfo.ProcessStatus.Interface.{i}) Public Classes
+ * Describe the details about classes used in TR-069 DeviceInfo processor status.
+ * @ingroup TR69_HOSTIF_DEVICE_PROCESSORSTATUS
+ */
 
 /**
 * @defgroup tr69hostif
@@ -70,7 +42,6 @@
 * @defgroup hostif
 * @{
 **/
-
 
 #ifndef DEVICE_DEVICEINFO_PROCESSSTATUS_H_
 #define DEVICE_DEVICEINFO_PROCESSSTATUS_H_
@@ -89,6 +60,10 @@
 
 #define PARAM_LEN 256
 
+/**
+ * @brief This class provides the interface for getting device processor status information.
+ * @ingroup TR69_HOSTIF_DEVICE_PROCESSORSTATUS_CLASSES
+ */
 class hostIf_DeviceProcessStatusInterface
 {
     hostIf_DeviceProcessStatusInterface(int dev_id);
@@ -142,20 +117,6 @@ public:
      */
 
 
-    /**
-     * @brief get_Device_DeviceInfo_ProcessStatus_CPUUsage.
-     *
-     * This function provides the total amount of cpu usage, in percentage.
-     *
-     * @return The total amount of cpu usage in percentage.
-     *
-     * @retval OK if is successful.
-     * @retval ERR_INTERNAL_ERROR if not able to fetch.
-     *
-     * @sideeffect All necessary structures and buffers are deallocated.
-     * @execution Synchronous.
-     *
-     */
 
     int get_Device_DeviceInfo_ProcessStatus_CPUUsage(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     /**

@@ -24,6 +24,24 @@
  */
 
 
+/**
+ * @file Components_XrdkSDCard.h
+ * @brief The header file provides components Xrdk SDCard information APIs.
+ */
+
+/**
+ * @defgroup TR69_HOSTIF_STBSERVICES_SDCARD TR-069 Object (Device.STBServices.{i}.Components.XrdkSDCard.{i})
+ * @par External rdk SDCard
+ * @ingroup TR69_HOSTIF_STBSERVICES
+ *
+ * @defgroup TR69_HOSTIF_STBSERVICES_SDCARD_API TR-069 Object (Device.STBServices.{i}.Components.XrdkSDCard.{i}) Public APIs
+ * Describe the details about RDK TR-069 components XRDK_SDK APIs specifications.
+ * @ingroup TR69_HOSTIF_STBSERVICES_SDCARD
+ *
+ * @defgroup TR69_HOSTIF_STBSERVICES_SDCARD_CLASSES TR-069 Object (Device.STBServices.{i}.Components.XrdkSDCard.{i}) Public Classes
+ * Describe the details about classes used in TR069 components XRDK_SDCARD.
+ * @ingroup TR69_HOSTIF_STBSERVICES_SDCARD
+ */
 
 /**
 * @defgroup tr69hostif
@@ -56,6 +74,10 @@
 #define TSBQUALIFIED_STRING "tsbQualified"
 #define SDCARD_STATUS "Status"
 
+/**
+ * @brief This class provides the TR-069 components XSD Card information.
+ * @ingroup TR69_HOSTIF_STBSERVICES_SDCARD_CLASSES
+ */
 class hostIf_STBServiceXSDCard
 {
     static GHashTable *ifHash;

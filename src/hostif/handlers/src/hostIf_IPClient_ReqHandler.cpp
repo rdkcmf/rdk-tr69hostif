@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file hostIf_IPClient_ReqHandler.cpp
+ * @brief The header file provides HostIf IP client request handler information APIs.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -24,6 +28,7 @@
 * @defgroup hostif
 * @{
 **/
+
 
 //#define HAVE_VALUE_CHANGE_EVENT
 #include "hostIf_main.h"
@@ -80,6 +85,15 @@ void IPClientReqHandler::reset()
     memset (curNumOfActivePorts, 0, sizeof(curNumOfActivePorts));
 }
 
+/**
+ * @brief This function is used to initialize. Currently not implemented.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successful.
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_IPCLIENT_REQHANDLER_CLASSES
+ */
 bool IPClientReqHandler::init()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -87,6 +101,16 @@ bool IPClientReqHandler::init()
     return true;
 }
 
+/**
+ * @brief This function is used to close all the instances of IP interface, IP interface stats
+ * IPv4 Address, IPActivePort and IP.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if it successfully close all the instances.
+ * @retval false if not able to close all the instances.
+ * @ingroup TR-069HOSTIF_IPCLIENT_REQHANDLER_CLASSES
+ */
 bool IPClientReqHandler::unInit()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -101,6 +125,20 @@ bool IPClientReqHandler::unInit()
     return true;
 }
 
+/**
+ * @brief This function is used to handle the get message request of IP interface,
+ * IPv4Address, IPActivePort and IP. Gets the attribute of IP interface such as "BytesSent",
+ * "BytesReceived", "PacketsSent", "PacketsReceived" ect.. The attributes of IPv4Address such as
+ * "Enable", "IPv4Enable", "ULAEnable" etc..
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successful.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_IPCLIENT_REQHANDLER_CLASSES
+ */
 int IPClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -188,6 +226,20 @@ int IPClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+/**
+ * @brief This function is used to handle the set message request of IP interface
+ * IPv4Address and IP. Gets the attribute of IP interface such as "Enable",
+ * "IPv4Enable", "Reset", "MaxMTUSize" . The attributes of IPv4Address such as
+ * "Enable", "SubnetMask" and "IPAddress".
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successful.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_IPCLIENT_REQHANDLER_CLASSES
+ */
 int IPClientReqHandler::handleSetMsg (HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;

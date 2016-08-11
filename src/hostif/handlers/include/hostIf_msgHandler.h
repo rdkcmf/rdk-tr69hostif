@@ -16,58 +16,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-/**
-* @file hostIf_MsgHandler.h
-*
-* @brief hostIf Common Message Handler API.
-*
-* This API defines the core operations for Host interface
-*
-* @par Document
-* Document reference.
-*
-* @par Open Issues (in no particular order)
-* -# None
-*
-* @par Assumptions
-* -# None
-*
-* @par Abbreviations
-* - BE:      ig-Endian.
-* - cb:      allback function (suffix).
-* - hostIf:  Host Interface.
-* - DS:      Device Settings.
-* - FPD:     Front-Panel Display.
-* - HAL:     Hardware Abstraction Layer.
-* - LE:      Little-Endian.
-* - LS:      Least Significant.
-* - MBZ:     Must be zero.
-* - MS:      Most Significant.
-* - RDK:     Reference Design Kit.
-* - _t:      Type (suffix).
-*
-* @par Implementation Notes
-* -# None
-*
-*/
 
-/** @defgroup HOST_IF
-*    @ingroup HOST_IF
-*
+/**
+ * @file hostIf_msgHandler.h
+ * @brief The header file provides HostIf message handler information APIs.
+ */
+
+/**
+ *
+ * @defgroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES Message Handler Public Classes
+ * Describe the details about classes used in TR-069 message handler.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_HANDLER
+ */
+
+
+/**
 *  HOST-IF is a platform agnostic Inter-process communication (IPC) interface. It allows
 *  applications to communicate with each other by sending Events or invoking Remote
 *  Procedure Calls. The common programming APIs offered by the RDK IARM-Bus interface is
 *  independent of the operating system or the underlying IPC mechanism.
 *
-*/
-
-/** @addtogroup IARM_BUS_IARM_CORE_API IARM-Core library.
-*  @ingroup IARM_BUS
-*
-*  Described herein are the functions that are part of the
-*  IARM Core library.
-*
-*  @{
 */
 
 
@@ -134,13 +102,57 @@ protected:
     msgHandler() {};
 
 public:
+/**
+ * @brief This is a pure virtual function used for initialization. Currently not implemented.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successful .
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
+ */
     virtual bool init() = 0;
+	
+/**
+ * @brief This is a pure virtual function used for un initialization. Currently not implemented.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successful.
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
+ */
     virtual bool unInit() = 0;
 
     virtual int handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData) = 0;
     virtual int handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData) = 0;
-
+	
+/**
+ * @brief This is a pure virtual function used to handle the set message request.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successful.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
+ */
     virtual int handleSetMsg(HOSTIF_MsgData_t *stMsgData) = 0;
+
+/**
+ * @brief This is a pure virtual function used to handle the get message request.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successful.
+ * @retval ERR_INTERNAL_ERROR if not able to get the data from the device.
+ * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
+ */
     virtual int handleGetMsg(HOSTIF_MsgData_t *stMsgData) = 0;
 };
 

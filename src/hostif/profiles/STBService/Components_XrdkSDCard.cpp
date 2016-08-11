@@ -27,6 +27,20 @@
 **/
 
 
+
+/**
+ * @file Components_XrdkSDCard.cpp
+ * @brief This source file contains the APIs of TR069 Components external SD Card.
+ */
+
+/**
+* @defgroup tr69hostif
+* @{
+* @defgroup hostif
+* @{
+**/
+
+
 #ifdef USE_XRDK_SDCARD_PROFILE
 #include "rdk_debug.h" 
 #include "hostIf_main.h"
@@ -91,7 +105,9 @@ void hostIf_STBServiceXSDCard::closeInstance(hostIf_STBServiceXSDCard *pDev)
     }
 }
 
-
+/**
+ * @brief Class default Constructor.
+ */
 hostIf_STBServiceXSDCard::hostIf_STBServiceXSDCard()
 {
     /*    capacity = 0;
@@ -105,13 +121,38 @@ hostIf_STBServiceXSDCard::hostIf_STBServiceXSDCard()
         memset(serialNumber, '\0', SD_PARAM_LEN); */
 }
 
-
+/**
+ * @brief This function set the external SD Card interface attribute such as capacity,
+ * cardFailed, lifeElapsed, lotID, manufacturer, model, readOnly, serialNumber, tsbQualified
+ * in a connected external SD Card. Currently not implemented.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the external SD Card attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully set the hostIf external SD Card interface attribute.
+ * @retval -1 If Not able to set the hostIf external SD Card interface attribute.
+ * @retval -2 If Not handle the hostIf external SD Card interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_SDCARD_API
+ */
 int hostIf_STBServiceXSDCard::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
     return ret;
 }
 
+/**
+ * @brief This function get the external SD Card interface attribute such as capacity,
+ * cardFailed, lifeElapsed, lotID, manufacturer, model, readOnly, serialNumber, tsbQualified
+ * in a connected external SD Card.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the external SD Card attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf external SD Card interface attribute.
+ * @retval -1 If Not able to get the hostIf external SD Card interface attribute.
+ * @retval -2 If Not handle the hostIf external SD Card interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_SDCARD_API
+ */
 int hostIf_STBServiceXSDCard::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -131,7 +172,6 @@ int hostIf_STBServiceXSDCard::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d]Failed : Mismatch parameter path : %s  \n", __FILE__, __FUNCTION__, __LINE__, path);
             return ret;
         }
-
         const char *tmp_ptr = strchr(path+str_len-1,'.');
         if(tmp_ptr == NULL)  {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Parameter is NULL  \n", __FILE__, __FUNCTION__);
@@ -139,9 +179,7 @@ int hostIf_STBServiceXSDCard::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         }
 
         tmp_ptr++;
-
         paramName = tmp_ptr;
-
         if (strcasecmp(paramName, CAPACITY_STRING) == 0)
         {
             ret = getCapacity(stMsgData);

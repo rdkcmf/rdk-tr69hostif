@@ -18,21 +18,10 @@
 */
 
 /**
- * @file Device_DeviceInfo_ProcessStatus_Process.c
- *
- * @brief Device_DeviceInfo_ProcessStatus_Process. API Implementation.
- *
- * This is the implementation of the Device_DeviceInfo_ProcessStatus_Process. API.
- *
- * @par Document
- * TBD Relevant design or API documentation.
- *
+ * @file Device_DeviceInfo_ProcessStatus_Process.cpp
+ * @brief This source file contains the APIs for getting process of device processor status information.
  */
 
-/** @addtogroup Device_DeviceInfo_ProcessStatus_Process. Implementation
- *  This is the implementation of the Device Public API.
- *  @{
- */
 
 /*****************************************************************************
  * STANDARD INCLUDE FILES
@@ -62,6 +51,13 @@ GMutex* hostIf_DeviceProcess::m_mutex = NULL;
 
 GMutex* hostIf_DeviceProcess::m_libproc_lock = NULL;
 
+/**
+ * @brief Class Constructor of the class hostIf_DeviceProcess.
+ *
+ * It will initialize the device id, process attribute such as  id, command, size, priority etc.
+ *
+ * @param[in] _dev_id Device identification Number.
+ */
 hostIf_DeviceProcess::hostIf_DeviceProcess(int _dev_id)
 {
     dev_id = _dev_id;
@@ -80,6 +76,8 @@ hostIf_DeviceProcess::hostIf_DeviceProcess(int _dev_id)
     memset(backupProcessState,0,_STATE_LENGTH);
     hostIf_DeviceProcess::initProcpsLock();
 }
+
+
 GMutex* hostIf_DeviceProcess::initProcpsLock()
 {
 #if GLIB_VERSION_CUR_STABLE <= GLIB_VERSION_2_32
@@ -93,6 +91,11 @@ GMutex* hostIf_DeviceProcess::initProcpsLock()
   return m_libproc_lock;
 }
 
+/**
+ * @brief Class destructor.
+ *
+ * It does the mutex free of 'm_libproc_lock' mutex variable of hostIf_DeviceProcess class.
+ */
 hostIf_DeviceProcess::~hostIf_DeviceProcess()
 {
     if( NULL == m_libproc_lock )
@@ -215,13 +218,16 @@ int hostIf_DeviceProcess::getNumOfProcessEntries(HOSTIF_MsgData_t *stMsgData)
 }
 
 /**
- *    Description: This is a helper function to fill values for the Process Profile.
+ * @brief This is a helper function to fill values for the Process Profile.
  *
- *    @param[in] ProcessInstanceNumber     Takes the instance number in the process profile table.
- *    @param[in] enum value        Takes the Enum value of the member in the process instance to be filled.
+ * @param[in] iProcInstanceNum  Takes the instance number in the process profile table.
+ * @param[in] eProcessMem  Takes the Enum value of the member in the process instance to be filled.
  *
- *    @param[out] value    returns OK
- **/
+ * @return The Process Fields.
+ *
+ * @retval OK if is successfully fetch the data.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch.
+ */
 int getProcessFields(int iProcInstanceNum, EProcessMembers eProcessMem)
 {
     PROCTAB *pProcTab = NULL;
@@ -331,6 +337,19 @@ readProcessFields(const char *name,EProcessMembers eProcessMem)
 /****************************************************************************************************************************************************/
 // Device_DeviceInfo_ProcessStatus_Process. Profile. Getters:
 /****************************************************************************************************************************************************/
+
+/**
+ * @brief  This function provides the Process Identifier.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_STATUS_PROCESS_API
+ */
 int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_PID(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     g_mutex_lock(m_libproc_lock);
@@ -352,6 +371,18 @@ int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_PID(HOSTIF
     return OK;
 }
 
+/**
+ * @brief This function provides The name of the command that has caused the process to exist.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_STATUS_PROCESS_API
+ */
 int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_Command(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     g_mutex_lock(m_libproc_lock);
@@ -371,6 +402,19 @@ int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_Command(HO
     g_mutex_unlock(m_libproc_lock);
     return OK;
 }
+
+/**
+ * @brief This function provides The Size in Kilo bytes of the memory occupied by process.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_STATUS_PROCESS_API
+ */
 int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_Size(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     g_mutex_lock(m_libproc_lock);
@@ -391,6 +435,19 @@ int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_Size(HOSTI
     g_mutex_unlock(m_libproc_lock);
     return OK;
 }
+
+/**
+ * @brief This function provides The priority of the process.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_STATUS_PROCESS_API
+ */
 int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_Priority(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     g_mutex_lock(m_libproc_lock);
@@ -411,6 +468,19 @@ int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_Priority(H
     g_mutex_unlock(m_libproc_lock);
     return OK;
 }
+
+/**
+ * @brief This function provides The amount of time spent by the process taking the cpu.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_STATUS_PROCESS_API
+ */
 int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_CPUTime(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     g_mutex_lock(m_libproc_lock);
@@ -431,6 +501,19 @@ int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_CPUTime(HO
     g_mutex_unlock(m_libproc_lock);
     return OK;
 }
+
+/**
+ * @brief This function provides The current state of the process.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_STATUS_PROCESS_API
+ */
 int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_State(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     g_mutex_lock(m_libproc_lock);

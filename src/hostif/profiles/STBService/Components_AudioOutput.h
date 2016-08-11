@@ -17,6 +17,60 @@
  * limitations under the License.
 */
 
+/**
+ * @file Components_AudioOutput.h
+ * @brief The header file provides capabilities audio output information APIs.
+ */
+
+/**
+ * @defgroup TR69_HOSTIF_STBSERVICES TR-069 Object (Device.STBServices.{i})
+ * STBService defines as the container associated with the remote management of
+ * objects for STB devices. The STBService object is a service object.
+ *
+ * As such, individual CPE devices can contain one or more of these objects
+ * within their Services object alongside the generic data objects. The presence of
+ * more than one STBService object would be appropriate primarily where a CPE device serves as a
+ * management proxy for other non TR-069 capable STBService devices.
+ *
+ * @par For example,
+ * An Internet Gateway Device might serve as a management proxy for one or more non TR-069 capable STBs.
+ *
+ * @par Components
+ * The STB data model contains a Components object that describes the devices functional blocks.
+ * It contains the following components:
+ * - Display Devices
+ * - HDMI
+ * - AudioDecoder
+ * - VideoDecoder
+ * - AudioOutput
+ * - VideoOutput etc..
+ *
+ * each of which can be multi-instance.
+ *
+ * @ingroup TR69_HOSTIF_PROFILE
+ * @defgroup TR69_HOSTIF_STBSERVICES_AUDIOOUTPUT TR-069 Object (Device.STBServices.{i}.Capabilities.AudioOutput)
+ * AudioOutput objects describe the functional blocks in charge of audio rendering.
+ * An Audio Output receives uncompressed audio streams from one or more Audio Decoders and
+ * performs format adaptations as required by the relevant presentation standard e.g., analog mono
+ * or stereo audio as needed for speakers or headphones, S/PDIF or HDMI/HDCP as needed by
+ * specific digital devices.
+ * - Adaptation of the audio to the specified output format can include digital-to-analog conversion
+ * or other analog or digital processing, including encryption.
+ * - Each Audio Output is mapped to one or more physical output connectors. Where an Audio
+ * Output is mapped directly to a SCART connector, this is indicated in the data model via a
+ * reference from the Audio Output to the corresponding SCART instance other types of physical
+ * connector are not modelled.
+ *
+ * @ingroup TR69_HOSTIF_STBSERVICES
+ *
+ * @defgroup TR69_HOSTIF_STBSERVICES_AUDIOOUTPUT_API TR-069 Object (Device.STBServices.{i}.Capabilities.AudioOutput) Public APIs
+ * Describe the details about RDK TR069 capabilities audio output APIs specifications.
+ * @ingroup TR69_HOSTIF_STBSERVICES_AUDIOOUTPUT
+ *
+ * @defgroup TR69_HOSTIF_STBSERVICES_AUDIOOUTPUT_CLASSES TR-069 Object (Device.STBServices.{i}.Capabilities.AudioOutput) Public Classes
+ * Describe the details about classes used in TR069 capabilities audio output.
+ * @ingroup TR69_HOSTIF_STBSERVICES_AUDIOOUTPUT
+ */
 
 
 /**
@@ -51,6 +105,10 @@
 #define PARAM_LEN TR69HOSTIFMGR_MAX_PARAM_LEN
 #endif
 
+/**
+ * @brief This class provides the TR069 components audio output information.
+ * @ingroup TR69_HOSTIF_STBSERVICES_AUDIOOUTPUT_CLASSES
+ */
 class hostIf_STBServiceAudioInterface
 {
     static GHashTable *ifHash;

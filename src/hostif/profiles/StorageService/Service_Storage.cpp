@@ -17,6 +17,10 @@
  * limitations under the License.
 */
  
+/**
+ * @file Service_Storage.cpp
+ * @brief This source file contains the APIs of TR069 storage service.
+ */
 #include <string.h>
 #include "Service_Storage_PhyMedium.h"
 #include "Service_Storage.h"
@@ -30,6 +34,14 @@ GHashTable *hostIf_StorageSrvc::storageSrvHash = NULL;
 GMutex *hostIf_StorageSrvc::m_mutex = NULL;
 
 /* Constructor for hostIf_StorageSrvc*/
+
+/**
+ * @brief Class Constructor of the class hostIf_StorageSrvc.
+ *
+ * It will initialize the device id.
+ *
+ * @param[in] dev_id Identification number of the device.
+ */
 hostIf_StorageSrvc::hostIf_StorageSrvc(int dev_id):dev_id(dev_id) {
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Inside constructor for dev_id:%d\n", dev_id);
 }
@@ -129,6 +141,19 @@ unsigned int hostIf_StorageSrvc :: get_Device_StorageSrvc_ClientNumberOfEntries(
     return OK;
 }
 
+/**
+ * @brief This function get the hostIf storage service interface such as total number
+ * physical medium entries, attributes of physical medium "Name", "SmartCapable" and
+ * "Health".
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage service attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage service interface attribute.
+ * @retval -1 If Not able to get the hostIf storage service interface attribute.
+ * @retval -2 If Not handle the hostIf storage service interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_SERVICE_API
+ */
 int hostIf_StorageSrvc :: handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Entring:%s\n",__FUNCTION__);

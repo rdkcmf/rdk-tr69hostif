@@ -16,6 +16,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+/**
+ * @file Device_IP_Interface_IPv6Address.h
+ * @brief The header file provides TR069 device IPv6 interface address information APIs.
+ */
+ 
+/**
+ * @defgroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS TR-069 Object (Device.IP.Interface.IPv6Address)
+ * @par IPv6 address table 
+ * This table contains the IP interface's IPv6 unicast addresses. There MUST be an entry for each such
+ * address, including any cast addresses.
+ *
+ * There are several ways in which entries can be added to and deleted from this table, including:
+ * - Automatically via SLAAC
+ * which covers generation of link-local addresses for all types of device and global addresses for
+ * non-router devices.
+ * - Automatically via DHCPv6
+ * which covers generation of any type of address subject to the configured DHCP server policy.
+ * - Manually via a GUI or some other local management interface. 
+ * - Manually via factory default configuration.
+ * by the ACS. This table MUST NOT include entries for the Subnet-Router anycast address. Such
+ * entries would be identical to others but with a zero interface identifier, and would add no value.
+ *
+ * A loopback interface will always have address ::1 and MAY also have link-local address fe80::1.
+ * This object is based on ipAddressTable from [RFC4293].
+ * At most one entry in this table regardless of whether or not it is enabled can exist with
+ * a given value for Alias. On creation of a new table entry, the CPE MUST choose an initial
+ * value for Alias such that the new entry does not conflict with any existing entries.
+ *
+ * At most one enabled entry in this table can exist with a given value for IPAddress.
+ *
+ * @ingroup TR69_HOSTIF_DEVICE_IP 
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_API TR-069 Object (Device.IP.Interface.IPv6Address) Public APIs
+ * Describe the details about RDK TR069 Device IPv6 Interface address APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS 
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_CLASSES TR-069 Object (Device.IP.Interface.IPv6Address) Public Classes
+ * Describe the details about classes used in TR069 Device IPv6 Interface address.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_DSSTRUCT TR-069 Object (Device.IP.Interface.IPv6Address) Public DataStructure
+ * Describe the details about data structure used in TR069 Device IPv6 Interface address.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS
+ */
+
 #ifndef DEVICE_IP_INTERFACE_IPV6ADDRESS_H_
 #define DEVICE_IP_INTERFACE_IPV6ADDRESS_H_
 
@@ -28,7 +74,10 @@
 #include "hostIf_updateHandler.h"
 #include <net/if.h>
 
-
+/**
+ * @brief This class provides the hostIf IP interface for getting IPv6 interface information.
+ * @ingroup TR69_HOSTIF_DEVICE_IPv6_INTERFACE_ADDRESS_CLASSES
+ */
 class hostIf_IPv6Address {
 
     static  GHashTable  *ifHash;
@@ -100,99 +149,16 @@ public:
     int handleGetMsg (const char* pSubSetting, int subInstanceNumber, HOSTIF_MsgData_t* stMsgData, bool isAddress);
     int handleSetMsg (const char* pSubSetting, int subInstanceNumber, HOSTIF_MsgData_t* stMsgData, bool isAddress);
 
-    /**
-     * @brief    Get status (enabled/disabled) of IPv6 address.
-     *
-     * This function provides the value (<tt>true/false</tt>) of the Enable status of this
-     * IPv6 address.
-     *
-     * See @ref dev_ip_ipv6address_getter
-     *
-     */
     int get_IPv6Address_Enable(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the status of an IPv6 Address table entry.
-     *
-     * This function provides the status of this IPv6Address table entry.   Enumeration of:
-     * <tt>
-     *     <ul><li>Disabled</li>
-     *         <li>Enabled</li>
-     *         <li>Error_Misconfigured</li>
-     *         <li>Error (OPTIONAL)</li></ul>
-     * </tt>
-     *
-     * @note    <ul>
-     *              <li>The <tt>Error_Misconfigured</tt> value indicates that a necessary
-     *              configuration value is undefined or invalid.</li>
-     *
-     *              <li>The <tt>Error</tt> value MAY be used by the CPE to indicate a
-     *              locally defined error condition.</li>
-     *          </ul>
-     *
-     * See @ref dev_ip_ipv6address_getter
-     *
-     */
     int get_IPv6Address_Status(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
     int get_IPv6Address_IPAddressStatus (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the instance handle for an IPv6 Address of an IP Interface.
-     *
-     * This function provides a non-volatile handle used to reference this IPv6 address
-     * instance of this IP interface. Alias provides a mechanism for an ACS to label this
-     * instance for future reference.
-     *
-     * @note     <ul>
-     *               <li>If the CPE supports the Alias-based Addressing feature as defined
-     *               in [Section 3.6.1/TR-069 Amendment 4] and described in [Appendix
-     *               II/TR-069 Amendment 4], the following mandatory constraints MUST be
-     *               enforced:
-     *               <ul><li>Its value MUST NOT be empty.</li>
-     *                   <li>Its value MUST start with a letter.</li>
-     *                   <li>If its instance object is created by the CPE, the initial
-     *                   value MUST start with a "cpe-" prefix.</li>
-     *                   <li>The CPE MUST NOT change the parameter value.</li>
-     *               </ul></li>
-     *               <li>This parameter can only be modified if <tt>Origin</tt>
-     *               is <tt>Static</tt>.</li>
-     *           </ul>
-     * @par
-     *
-     * See @ref dev_ip_ipv6address_getter
-     *
-     */
     int get_IPv6Address_Alias(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get an IP Interface IPv6 IP Address
-     *
-     * This function provides the IPv6 address.
-     *
-     * @note     This parameter can only be modified if <tt>Origin</tt> is
-     *           <tt>Static</tt>.
-     *
-     * See @ref dev_ip_ipv6address_getter
-     *
-     */
     int get_IPv6Address_IPAddress(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get an IP Interface IPv6 Address Origin.
-     *
-     * This function provides the addressing method used to assign the IP address.
-     * Enumeration of:
-     * <tt>
-     *     <ul><li>DHCP</li>
-     *         <li>AutoIP</li>
-     *         <li>IPCP</li>
-     *         <li>Static</li></ul>
-     * </tt>
-     *
-     * See @ref dev_ip_ipv6address_getter
-     *
-     */
     int get_IPv6Address_Origin(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
     int get_IPv6Address_Prefix (HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged = NULL);
@@ -219,8 +185,7 @@ public:
      * @}
      */
 
-    /** @addtogroup TR_069_DEVICE_IP_IPV6ADDRESS_SETTER_API TR-069 Device.IP.Interface.IPv6Address Setter API.
-     *  @ingroup TR_069_DEVICE_IP_INTERFACE_IPV6ADDRESS_API
+    /** 
      *
      *  \section dev_ip_ipv6address_setter TR-069 Device.IP.Interface.IPv6Address object Setter API
      *

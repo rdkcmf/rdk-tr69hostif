@@ -16,6 +16,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+/**
+ * @file hostIf_InterfaceStackClient_ReqHandler.h
+ * @brief The header file provides HostIf InterfaceStack client request handler information APIs.
+ */
+
+/**
+ * @defgroup TR-069HOSTIF_INTERFACESTACKCLIENT_REQHANDLER_CLASSES InterfaceStack Client RequestHandler Public Classes
+ * Describe the details about classes used in TR-069 InterfaceStackClient request handler.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_HANDLER
+ */
+
 /**
  * @file hostIf_InterfaceStackClient_ReqHandler.h
  *
@@ -27,22 +39,12 @@
  *
  */
 
-/** @defgroup HOST_IF Interface Stack CLIENT HANDLER
- *   @ingroup HOST_IF
- *
+/**
  *  Interface Stack Client interface is a platform agnostic IARM communication interface. It allows
  *  Interface stack client applications to communicate by sending Get and Set operation
  *
  */
 
-/** @addtogroup HOST_IF Interface Stack CLIENT HANDLER_API .
- *  @ingroup HOST_IF
- *
- *  Described herein are the functions that are part of the
- *  Interface Stack Client Request handler .
- *
- *  @{
- */
 
 #ifndef HOSTIF_INTERFACESTACKCLIENT_REQHANDLER_H_
 #define HOSTIF_INTERFACESTACKCLIENT_REQHANDLER_H_
@@ -50,7 +52,10 @@
 #include "hostIf_msgHandler.h"
 #include "hostIf_updateHandler.h"
 
-
+/**
+ * @brief This class provides the interface for getting InterfaceStack client request handler information.
+ * @ingroup TR-069HOSTIF_INTERFACESTACKCLIENT_REQHANDLER_CLASSES
+ */
 class InterfaceStackClientReqHandler : public msgHandler
 {
     InterfaceStackClientReqHandler() {};

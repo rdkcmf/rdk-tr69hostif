@@ -20,46 +20,7 @@
 /**
  * @file Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTable.h
  *
- * @brief TR-069 Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTable object Public API.
- *
- * Description of Device_MoCA module.
- *
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * TR-069 Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTable object Public API.
  */
 
 
@@ -88,7 +49,8 @@
  *****************************************************************************/
 
 
-/** @defgroup TR_069_DEVICE_MOCA_INTERFACE_ASSOCIATEDDEVICE_API TR-069 Device.Moca.Interface.AssociatedDevice object API.
+/**
+ * @defgroup TR_069_DEVICE_MOCA_INTERFACE_ASSOCIATEDDEVICE_API TR-069 Device.Moca.Interface.AssociatedDevice object API.
  *  @ingroup TR_069_DEVICE_MOCA_INTERFACE_API
  *
  *  This table contains the unicast transmit PHY rate between all pair of nodes in the MoCA Network.

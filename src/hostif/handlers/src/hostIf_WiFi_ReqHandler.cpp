@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file hostIf_WiFi_ReqHandler.cpp
+ * @brief The header file provides HostIf IP WiFi request handler information APIs.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -65,6 +69,15 @@ msgHandler* WiFiReqHandler::getInstance()
     return pInstance;
 }
 
+/**
+ * @brief This function is use to initialize. Currently not implemented.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successfully .
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_WIFI_REQHANDLER_CLASSES
+ */
 bool WiFiReqHandler::init()
 {
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] WiFi manager Initializing\n", __FUNCTION__);
@@ -79,6 +92,16 @@ void WiFiReqHandler::reset()
     savedEndPointNumberOfEntries = 0;
 }
 
+/**
+ * @brief This function is used to close all the instances of WiFi, WiFi Radio,
+ * SSID, AccessPoint, EndPoint etc..
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if it is successfully close all the instances.
+ * @retval false if not able to close all the instances.
+ * @ingroup TR-069HOSTIF_WIFI_REQHANDLER_CLASSES
+ */
 bool WiFiReqHandler::unInit()
 {
 
@@ -113,6 +136,18 @@ bool WiFiReqHandler::unInit()
     return true;
 }
 
+/**
+ * @brief This function use to handle the set message request of WiFi.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_WIFI_REQHANDLER_CLASSES
+ */
 int WiFiReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -202,6 +237,18 @@ int WiFiReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+/**
+ * @brief This function use to handle the get message request of WiFi interface
+ * and get the attributes of "Radio", "SSID", "AccessPoint", "Endpoint" etc.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully.
+ * @retval ERR_INTERNAL_ERROR if not able to get data from the device.
+ * @ingroup TR-069HOSTIF_WIFI_REQHANDLER_CLASSES
+ */
 int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;

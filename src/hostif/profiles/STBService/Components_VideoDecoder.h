@@ -17,6 +17,27 @@
  * limitations under the License.
 */
 
+/**
+ * @file Components_VideoDecoder.h
+ * @brief The header file provides capabilities video output information APIs.
+ */
+
+/**
+ * @defgroup TR69_HOSTIF_STBSERVICES_VIDEODECODER TR-069 Object (Device.STBServices.{i}.Components.VideoDecoder.{i})
+ * @par VideoDecoder objects
+ *  - It describe the functional blocks in charge of video decoding.
+ *  - A Video Decoder receives an elementary video stream, decodes the video, and outputs an
+ * uncompressed native video stream to a Video Output object.
+ * @ingroup TR69_HOSTIF_STBSERVICES
+ *
+ * @defgroup TR69_HOSTIF_STBSERVICES_VIDEODECODER_API TR-069 Object (Device.STBServices.{i}.Components.VideoDecoder.{i}) Public APIs
+ * Describe the details about TR-069 components video decoder APIs specifications.
+ * @ingroup TR69_HOSTIF_STBSERVICES_VIDEODECODER
+ *
+ * @defgroup TR69_HOSTIF_STBSERVICES_VIDEODECODER_CLASSES TR-069 Object (Device.STBServices.{i}.Components.VideoDecoder.{i}) Public Classes
+ * Describe the details about classes used in TR069 components video decoder.
+ * @ingroup TR69_HOSTIF_STBSERVICES_VIDEODECODER
+ */
 
 /**
 * @defgroup tr69hostif
@@ -51,6 +72,10 @@
 #define PARAM_LEN TR69HOSTIFMGR_MAX_PARAM_LEN
 #endif
 
+/**
+ * @brief This class provides the TR069 components video decoder information.
+ * @ingroup TR69_HOSTIF_STBSERVICES_VIDEODECODER_CLASSES
+ */
 class  hostIf_STBServiceVideoDecoder
 {
     static GHashTable *ifHash;
@@ -76,6 +101,15 @@ private:
 public:
     static hostIf_STBServiceVideoDecoder *getInstance(int dev_id);
     static void closeInstance(hostIf_STBServiceVideoDecoder *);
+/**
+ * @brief This function checks for the host IF video decoder interface updates such as Status,
+ * ContentAspectRatio, X_COMCAST-COM_Standby, Name in a connected video decoder. Currently
+ * not implemented.
+ *
+ * @param[in] mUpdateCallback  Callback function pointer to check for the host IF video decoder
+ * interface update.
+ * @ingroup TR69_HOSTIF_STBSERVICES_VIDEODECODER_API
+ */
     void checkForUpdates(updateCallback mUpdateCallback);
     static GList* getAllInstances();
     static void closeAllInstances();

@@ -16,49 +16,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
 /**
  * @file Device_DeviceInfo_Processor.h
+ * @brief The header file provides TR069 device information of processor APIs.
+ */
+
+/**
+ * @defgroup TR69_HOSTIF_DEVICE_PROCESSOR TR-069 Object (Device.DeviceInfo.Processor)
+ * Each table entry represents a hardware or virtual processor that resides on this device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO
  *
- * @brief Device_DeviceInfo_Processor API.
+ * @defgroup TR69_HOSTIF_DEVICE_PROCESSOR_API TR-069 Object (Device.DeviceInfo.Processor.Interface.{i}) Public APIs
+ * Describe the details about  TR069 DeviceInfo processor APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICE_PROCESSOR
  *
- * Description of XXX module.
- *
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * @defgroup TR69_HOSTIF_DEVICE_PROCESSOR_CLASSES TR-069 Object (Device.DeviceInfo.Processor.Interface.{i}) Public Classes
+ * Describe the details about classes used in TR069 DeviceInfo processor.
+ * @ingroup TR69_HOSTIF_DEVICE_PROCESSOR
  */
 
 
@@ -89,6 +64,10 @@
 #define SYS_STRING_LEN  256
 #define BUF_LEN         1024
 
+/**
+ * @brief This class provides the interface for getting device processor information.
+ * @ingroup TR69_HOSTIF_DEVICE_PROCESSOR_CLASSES
+ */
 class hostIf_DeviceProcessorInterface
 {
     hostIf_DeviceProcessorInterface(int dev_id);
@@ -139,20 +118,6 @@ public:
      */
 
 
-    /**
-     * @brief get_Device_DeviceInfo_Processor_Architecture.
-     *
-     * This function provides the architecture of the processor on the underlying hardware
-     *
-     * @return Processor hardware architecture.
-     *
-     * @retval OK if is successful.
-     * @retval ERR_INTERNAL_ERROR if not able to fetch.
-     *
-     * @sideeffect All necessary structures and buffers are deallocated.
-     * @execution Synchronous.
-     *
-     */
     int get_Device_DeviceInfo_Processor_Architecture(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 };

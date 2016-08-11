@@ -21,7 +21,12 @@
  *
  * @author vejuturu@cisco.com
  */
-//#define HAVE_VALUE_CHANGE_EVENT 
+
+/**
+ * @file hostIf_InterfaceStackClient_ReqHandler.cpp
+ * @brief The header file provides HostIf InterfaceStack client request handler information APIs.
+ */
+//#define HAVE_VALUE_CHANGE_EVENT
 #include "hostIf_main.h"
 #include "hostIf_utils.h"
 #include "Device_InterfaceStack.h"
@@ -48,11 +53,29 @@ void InterfaceStackClientReqHandler::reset()
     hostif_InterfaceStack::releaseLock();
 }
 
+/**
+ * @brief This function is used to initialize. Currently not implemented.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successful.
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_INTERFACESTACKCLIENT_REQHANDLER_CLASSES
+ */
 bool InterfaceStackClientReqHandler::init()
 {
     return true;
 }
 
+/**
+ * @brief This function is used to close all the instances of  interface stack.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if it successfully close all the instances.
+ * @retval false if not able to close all the instances.
+ * @ingroup TR-069HOSTIF_INTERFACESTACKCLIENT_REQHANDLER_CLASSES
+ */
 bool InterfaceStackClientReqHandler::unInit()
 {
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] Interface Stack manager DeInitializing\n", __FUNCTION__);
@@ -61,6 +84,19 @@ bool InterfaceStackClientReqHandler::unInit()
     return true;
 }
 
+
+/**
+ * @brief This function is used to handle the set message request of InterfaceStack Client.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successful.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_INTERFACESTACKCLIENT_REQHANDLER_CLASSES
+ */
 int InterfaceStackClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -71,6 +107,19 @@ int InterfaceStackClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+/**
+ * @brief This function is used to handle the get message request of InterfaceStack Client.
+ * Gets the total number of active interface stack entries or get the attributes of
+ * interface stack such as "HigherLayer" and "LowerLayer".
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successful.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_INTERFACESTACKCLIENT_REQHANDLER_CLASSES
+ */
 int InterfaceStackClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;

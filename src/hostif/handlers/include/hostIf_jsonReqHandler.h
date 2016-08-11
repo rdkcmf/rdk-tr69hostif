@@ -17,54 +17,21 @@
  * limitations under the License.
 */
 /**
- * @file hostIfJsonIfHandler.h
- *
- * @brief HOST-IF Json interface API.
- *
- * This API defines the Json Interface operations for Host If
- *
- * @par Document
- * Document reference.
- *
- * @par Open Issues (in no particular order)
- * -# None
- *
- * @par Assumptions
- * -# None
- *
- * @par Abbreviations
- * - BE:       ig-Endian.
- * - cb:       allback function (suffix).
- * - DS:      Device Settings.
- * - FPD:     Front-Panel Display.
- * - HAL:     Hardware Abstraction Layer.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - RDK:     Reference Design Kit.
- * - _t:      Type (suffix).
- *
- * @par Implementation Notes
- * -# None
- *
+ * @file hostIf_jsonReqHandler.h
+ * @brief The header file provides HostIf IP json request handler information APIs.
  */
 
-/** @defgroup HOST_IF JSON_IF
- *   @ingroup HOST_IF
+/**
  *
+ * @defgroup TR-069HOSTIF_JSON_REQHANDLER_API IP Json RequestHandler Public API
+ * Describe the details about API used in TR-069 json request handler.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_HANDLER
+ */
+
+ /**
  *  Json-interface is a platform agnostic http server communication interface. It allows
  *  json client applications to communicate by sending Get operation
  *
- */
-
-/** @addtogroup HOST_IF_JSON_IF_API .
- *  @ingroup HOST_IF
- *
- *  Described herein are the functions that are part of the
- *  IARM Core library.
- *
- *  @{
  */
 
 
@@ -86,15 +53,7 @@
 #include "hostIf_msgHandler.h"
 
 
-/**
- * @brief Initialize and start the HTTP Server process.
- *
- * This API is used to initialize the HTTP server process. It use to serve the http Json
- * client request.
- *
- *
- * @return Void
- */
+
 
 void hostIf_HttpServerStart();
 

@@ -18,20 +18,8 @@
 */
 
 /**
- * @file Device_IP_Interface.c
- *
- * @brief Device.IP.Interface. API Implementation.
- *
- * This is the implementation of the Device.IP.Interface. API.
- *
- * @par Document
- * TBD Relevant design or API documentation.
- *
- */
-
-/** @addtogroup Device.IP.Interface. Implementation
- *  This is the implementation of the Device Public API.
- *  @{
+ * @file Device_IP_Interface.cpp
+ * @brief This source file contains the APIs of device IP interface.
  */
 
 /*****************************************************************************
@@ -133,6 +121,13 @@ void hostIf_IPInterface::refreshInterfaceName ()
         RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: error getting interface name for Device.IP.Interface.%d\n", __FUNCTION__, dev_id);
 }
 
+/**
+ * @brief Class Constructor of the class hostIf_IPInterface.
+ *
+ * It will initialize the device id. Initialize the type and name to empty string.
+ *
+ * @param[in] dev_id Device identification number.
+ */
 hostIf_IPInterface::hostIf_IPInterface(int dev_id):
     dev_id(dev_id),
     bCalledEnable(false),
@@ -354,6 +349,19 @@ int hostIf_IPInterface::handleSetMsg (const char* pSetting, HOSTIF_MsgData_t* st
 // Device.IP.Interface. Profile. Getters:
 /****************************************************************************************************************************************************/
 
+/**
+ * @brief This function gets the status to enabled or disabled of an IP Interface.
+ * It provides the values such as 'true' or 'false' to Enable the status of IP interface.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_Enable(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -373,6 +381,32 @@ int hostIf_IPInterface::get_Interface_Enable(HOSTIF_MsgData_t *stMsgData, bool *
     return OK;
 }
 
+/**
+ * @brief This function gets the status of the IPv4 stack attachment for an IP interface.
+ * It indicates whether or not this IP interface is attached to the IPv4
+ * stack. If set to 'true', then this interface is attached to the IPv4 stack.
+ * If set to 'false', then this interface is detached from the IPv4 stack.
+ *
+ * @note  - Once detached from the IPv4 stack, the interface will now no
+ *         longer be able to pass IPv4 packets, and will be operationally down
+ *         unless until it attached to an enabled IPv6 stack.
+ *
+ *        - For an IPv4 capable device, if IPv4Enable is not present this
+ *          interface SHOULD be permanently attached to the IPv4 stack.
+ *
+ *        - IPv4Enable is independent of Enable, and that to administratively
+ *          enable an interface for IPv4 it is necessary for both Enable and
+ *          IPv4Enable to be 'true'.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_IPv4Enable(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -435,6 +469,20 @@ int hostIf_IPInterface::get_Interface_IPv6Enable(HOSTIF_MsgData_t *stMsgData, bo
     return OK;
 }
 
+/**
+ * @brief This function gets the status 'enabled' or 'disabled' of ULA(Unique local address)
+ * generation for an IP Interface. It indicates the status as 'true' or 'false' of the ULA
+ * generation and use this IP interface is enabled. Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_ULAEnable(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Parameter Not Supported \n",__FUNCTION__);
@@ -451,6 +499,39 @@ void hostIf_IPInterface::getInterfaceOperationalState (char* operationalState)
     strcpy (operationalState, (ifr.ifr_flags & IFF_UP) ? STATE_UP : STATE_DOWN);
 }
 
+/**
+ * @brief This function gets the IP interface Status. It provides the current operational state
+ * of the Interface. Possible state are Up, Down, Unknown, Dormant, NotPresent, LowerLayerDown
+ * Error (OPTIONAL).
+ * @note    <ul><li> When Enable flag is false then Status SHOULD normally be Down (or NotPresent
+ *          or Error if there is a fault condition on the interface).</li>
+ *          <li> When Enable is changed to true then ...
+ *             <ul><li>Status SHOULD change to Up if and only if the interface is able to
+ *                 transmit and receive network traffic.</li>
+ *                 <li>Status SHOULD change to Dormant if and only if the interface is operable
+ *                 but is waiting for external actions before it can transmit and receive
+ *                 network traffic (and subsequently change to Up if still operable when the
+ *                 expected actions have completed).</li>
+ *                 <li>Status SHOULD change to LowerLayerDown if and only if the interface is
+ *                 prevented from entering the Up state because one or more of the
+ *                 interfaces beneath it is down.</li>
+ *                 <li>Status SHOULD remain in the Error state if there is an error or other
+ *                 fault condition detected on the interface.</li>
+ *                 <li>Status SHOULD remain in the NotPresent state if the interface has missing
+ *                 (typically hardware) components.</li>
+ *                 <li>Status SHOULD change to Unknown if the state of the interface can not be
+ *                 determined for some reason.</li></ul>
+ *           </li></ul>
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_Status(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -470,11 +551,48 @@ int hostIf_IPInterface::get_Interface_Status(HOSTIF_MsgData_t *stMsgData, bool *
     return OK;
 }
 
+/**
+ * @brief This function gets the instance handle for an IP Interface. It provides a non-volatile handle
+ * used to reference this IP interface instance. Alias provides a mechanism for an ACS to label this
+ * instance for future reference. Currently not implemented.
+ *
+ * @note     If the CPE supports the Alias-based Addressing feature as defined in
+ *           [Section 3.6.1/TR-069 Amendment 4] and described in [Appendix II/TR-069
+ *           Amendment 4], the following mandatory constraints MUST be enforced:
+ *               <ul><li>Its value MUST NOT be empty.</li>
+ *                   <li>Its value MUST start with a letter.</li>
+ *                   <li>If its instance object is created by the CPE, the initial
+ *                   value MUST start with a "cpe-" prefix.</li>
+ *                   <li>The CPE MUST NOT change the parameter value.</li>
+ *               </ul>
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_Alias(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     return NOK;
 }
 
+/**
+ * @brief This function gets the IP Interface Name.It provides the textual name of the interface as
+ * assigned by the CPE(Customer Premises Equipment).
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_Name(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -497,6 +615,19 @@ int hostIf_IPInterface::get_Interface_Name(HOSTIF_MsgData_t *stMsgData, bool *pC
     return OK;
 }
 
+/**
+ * @brief This function gets the last change of status time of the interface. It provides the accumulated
+ * time in seconds since the interface entered its current operational state. Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_LastChange(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Parameter Not Supported \n",__FUNCTION__);
@@ -504,6 +635,27 @@ int hostIf_IPInterface::get_Interface_LastChange(HOSTIF_MsgData_t *stMsgData, bo
     return NOK;
 }
 
+/**
+ * @brief This function gets the IP Interface LowerLayers. It provides a comma-separated
+ * list (maximum length 1024) of strings. Each list item MUST be the path name of an
+ * interface object that is stacked immediately below this interface object.
+ * Currently not implemented.
+ *
+ * @note  - If the referenced object is deleted, the corresponding item MUST be removed
+ *          from the list.
+ *        - LowerLayers MUST be an empty string and 'read-only' when Type is Loop back,
+ *          Tunnel, or Tunnelled.
+ *
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_LowerLayers(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Parameter Not Supported \n",__FUNCTION__);
@@ -511,6 +663,27 @@ int hostIf_IPInterface::get_Interface_LowerLayers(HOSTIF_MsgData_t *stMsgData, b
     return NOK;
 }
 
+/**
+ * @brief  This function gets the Router instance that is associated with an IP Interface entry.
+ * It provides the Router instance that is associated with this IP Interface entry.
+ * Currently not implemented.
+ *
+ * @note     <ul>
+ *               <li>The value MUST be the path name of a row in the
+ *               <tt>Routing.Router</tt> table.</li>
+ *               <li>If the referenced object is deleted, the parameter value MUST be
+ *               set to an empty string.</li>
+ *           </ul>
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_Router(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Parameter Not Supported \n",__FUNCTION__);
@@ -518,6 +691,22 @@ int hostIf_IPInterface::get_Interface_Router(HOSTIF_MsgData_t *stMsgData, bool *
     return NOK;
 }
 
+/**
+ * @brief This function gets the IP Interface Reset status. It returns 'false', regardless
+ * of the actual value.
+ *
+ * @note  - The value of this parameter is not part of the device configuration and is
+ *           always false when read.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_Reset(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -540,6 +729,20 @@ int hostIf_IPInterface::get_Interface_Reset(HOSTIF_MsgData_t *stMsgData, bool *p
     return OK;
 }
 
+/**
+ * @brief This function gets the IP Interface MaxMTUSize. It provides the maximum transmission unit (MTU),
+ * i.e. the largest allowed size of an IP packet (including IP headers, but excluding lower layer headers such as
+ * Ethernet, PPP, or PPPoE headers) that is allowed to be transmitted by or through this device.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_MaxMTUSize(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -561,6 +764,21 @@ int hostIf_IPInterface::get_Interface_MaxMTUSize(HOSTIF_MsgData_t *stMsgData, bo
     return OK;
 }
 
+/**
+ * @brief This function gets the IP Interface Type. It provides the IP interface type.
+ * Possible values are  Normal, Loopback, Tunnel, Tunnelled.
+ * @note     For 'Loopback', 'Tunnel', and 'Tunnelled' IP interface
+ *           objects, the LowerLayers parameter MUST be an empty string.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_Type(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -627,6 +845,19 @@ int hostIf_IPInterface::getMTU (char* nameOfInterface)
     return ifr.ifr_mtu;
 }
 
+/**
+ * @brief This function gets the IP interface loopback. It indicates whether or not the
+ * IP interface is a loopback interface by 'true' or 'false'.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_Loopback(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -677,6 +908,19 @@ unsigned int hostIf_IPInterface::getIPv4AddressNumberOfEntries ()
     return getIPAddressNumberOfEntries (AF_INET);
 }
 
+/**
+ * @brief This function gets the IP Interface IPv4AddressNumberOfEntries. It provides the number
+ * of entries in the IPv4 Address table.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_IPv4AddressNumberOfEntries(HOSTIF_MsgData_t *stMsgData)
 {
     LOG_ENTRY_EXIT;
@@ -748,6 +992,30 @@ int hostIf_IPInterface::get_Interface_IPv6PrefixNumberOfEntries(HOSTIF_MsgData_t
 
 #endif // IPV6_SUPPORT
 
+/**
+ * @brief This function gets the status of Auto-IP on an IP Interface is 'enabled' or
+ * 'disabled'. It indicates whether or not auto-IP is enabled for this IP interface.
+ * Currently not implemented.
+ *
+ * @note     <ul>
+ *               <li>This mechanism is only used with IPv4.</li>
+ *               <li>When auto-IP is enabled on an interface, an IPv4Address object
+ *               will dynamically be created and configured with auto-IP parameter
+ *               values.</li>
+ *               <li>The exact conditions under which an auto-IP address is created
+ *               (e.g. always when enabled or only in absence of dynamic IP
+ *               addressing) is implementation specific.</li>
+ *           </ul>
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::get_Interface_AutoIPEnable(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Parameter Not Supported \n",__FUNCTION__);
@@ -774,6 +1042,19 @@ int hostIf_IPInterface::get_Interface_AutoIPEnable(HOSTIF_MsgData_t *stMsgData, 
 // Device.IP.Interface. Profile. Setters:
 /****************************************************************************************************************************************************/
 
+/**
+ * @brief This function sets the status of IP Interface 'enabled' or 'disabled'. It
+ * enables i.e 'true' or disables i.e 'false' this IP interface regardless of
+ * IPv4Enable and IPv6Enable. Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::set_Interface_Enable(HOSTIF_MsgData_t *stMsgData)
 {
     LOG_ENTRY_EXIT;
@@ -783,6 +1064,32 @@ int hostIf_IPInterface::set_Interface_Enable(HOSTIF_MsgData_t *stMsgData)
     return OK;
 }
 
+/**
+ * @brief This function attaches or detaches this IP interface to/from the IPv4 stack.
+ * If set to 'true', then this interface is attached to the IPv4 stack. If set to 'false',
+ * then this interface is detached from the IPv4 stack. Currently not implemented.
+ *
+ * @note     <ul>
+ *               <li>Once detached from the IPv4 stack, the interface will now no
+ *               longer be able to pass IPv4 packets, and will be operationally down
+ *               (unless also attached to an enabled IPv6 stack).</li>
+ *
+ *               <li>For an IPv4 capable device, if IPv4Enable is not present this
+ *               interface SHOULD be permanently attached to the IPv4 stack.</li>
+ *
+ *               <li>IPv4Enable is independent of Enable, and that to administratively
+ *               enable an interface for IPv4 it is necessary for both Enable and
+ *               IPv4Enable to be true.</li>
+ *           </ul>
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::set_Interface_IPv4Enable(HOSTIF_MsgData_t *stMsgData)
 {
     LOG_ENTRY_EXIT;
@@ -792,6 +1099,19 @@ int hostIf_IPInterface::set_Interface_IPv4Enable(HOSTIF_MsgData_t *stMsgData)
     return OK;
 }
 
+/**
+ * @brief This function sets the status 'enabled' or 'disabled' of ULA(Unique Local Address) generation
+ * for an IP Interface. It controls whether or not ULAs are generated and used on this interface.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::set_Interface_ULAEnable(HOSTIF_MsgData_t *stMsgData)
 {
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Parameter Not Supported \n",__FUNCTION__);
@@ -799,11 +1119,53 @@ int hostIf_IPInterface::set_Interface_ULAEnable(HOSTIF_MsgData_t *stMsgData)
     return NOK;
 }
 
+/**
+ * @brief This function sets a non-volatile handle used to reference this IP interface instance.
+ * Alias provides a mechanism for an ACS to label this instance for future reference.
+ * Currently not implemented.
+ *
+ * @note     If the CPE supports the Alias-based Addressing feature as defined in
+ *           [Section 3.6.1/TR-069 Amendment 4] and described in [Appendix II/TR-069
+ *           Amendment 4], the following mandatory constraints MUST be enforced:
+ *               <ul><li>Its value MUST NOT be empty.</li>
+ *                   <li>Its value MUST start with a letter.</li>
+ *                   <li>If its instance object is created by the CPE, the initial
+ *                   value MUST start with a "cpe-" prefix.</li>
+ *                   <li>The CPE MUST NOT change the parameter value.</li>
+ *               </ul>
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::set_Interface_Alias(HOSTIF_MsgData_t *stMsgData)
 {
     return NOK;
 }
 
+/**
+ * @brief  This function sets the IP Interface LowerLayers. Given a comma-separated
+ * list (maximum length 1024) of strings, each list item being the path name of an
+ * interface object, this function MUST stack each item in the list immediately below
+ * this interface object. Currently not implemented.
+ *
+ * @note  - If the referenced object is deleted, the corresponding item MUST be removed
+ *           from the list.
+ *        - LowerLayers MUST be an empty string and 'read-only' when Type is
+ *           'Loopback', 'Tunnel', or 'Tunneled'.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::set_Interface_LowerLayers(HOSTIF_MsgData_t *stMsgData)
 {
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Parameter Not Supported \n",__FUNCTION__);
@@ -811,6 +1173,25 @@ int hostIf_IPInterface::set_Interface_LowerLayers(HOSTIF_MsgData_t *stMsgData)
     return NOK;
 }
 
+/**
+ * @brief This function sets the router instance that is associated with an IP Interface entry.
+ * Currently not implemented.
+ *
+ * @note     <ul>
+ *               <li>The value MUST be the path name of a row in the
+ *               <tt>Routing.Router</tt> table.</li>
+ *               <li>If the referenced object is deleted, the parameter value MUST be
+ *               set to an empty string.</li>
+ *           </ul>
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::set_Interface_Router(HOSTIF_MsgData_t *stMsgData)
 {
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Parameter Not Supported \n",__FUNCTION__);
@@ -818,6 +1199,32 @@ int hostIf_IPInterface::set_Interface_Router(HOSTIF_MsgData_t *stMsgData)
     return NOK;
 }
 
+/**
+ * @brief This function sets the Reset flag to the requested value (normally 'true').
+ * Currently not implemented.
+ *
+ * @note     <ul>
+ *               <li>When set to <tt>true</tt>, the device MUST tear down the
+ *               existing IP connection represented by this object and establish a
+ *               new one.</li>
+ *
+ *               <li>The device MUST initiate the reset after completion of the
+ *               current CWMP session.</li>
+ *
+ *               <li>The device MAY delay resetting the connection in order to avoid
+ *               interruption of a user service such as an ongoing voice call.</li>
+ *
+ *               <li>Reset on a disabled interface is a no-op (not an error).</li>
+ *           </ul>
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::set_Interface_Reset(HOSTIF_MsgData_t *stMsgData)
 {
     LOG_ENTRY_EXIT;
@@ -827,6 +1234,20 @@ int hostIf_IPInterface::set_Interface_Reset(HOSTIF_MsgData_t *stMsgData)
     return OK;
 }
 
+/**
+ * @brief This function sets the size of maximum transmission unit (MTU), i.e. the largest
+ * allowed size of an IP packet (including IP headers, but excluding lower layer headers
+ * such as Ethernet, PPP, or PPPoE headers) that is allowed to be transmitted by or through this device.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::set_Interface_MaxMTUSize(HOSTIF_MsgData_t *stMsgData)
 {
     LOG_ENTRY_EXIT;
@@ -836,6 +1257,25 @@ int hostIf_IPInterface::set_Interface_MaxMTUSize(HOSTIF_MsgData_t *stMsgData)
     return OK;
 }
 
+/**
+ * @brief This function sets the IP interface LoopBack flag to 'true' or 'false'.
+ * Currently not implemented.
+ *
+ * @note     When set to <tt>true</tt>, the IP interface becomes a loopback interface and
+ *           the CPE MUST set Type to Loopback. In this case, the CPE MUST also set
+ *           the LowerLayers property to an empty string and fail subsequent attempts at
+ *           setting LowerLayers until the interface is no longer a loopback.
+ *
+ * @note     Support for manipulating loopback interfaces is OPTIONAL.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::set_Interface_Loopback(HOSTIF_MsgData_t *stMsgData)
 {
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Parameter Not Supported \n",__FUNCTION__);
@@ -843,6 +1283,27 @@ int hostIf_IPInterface::set_Interface_Loopback(HOSTIF_MsgData_t *stMsgData)
     return NOK;
 }
 
+/**
+ * @brief This function sets the Auto-IP on an IP Interface status 'enable' or 'disable'.
+ * It sets 'true' for enable  and 'false' for disables the auto-IP for this IP interface.
+ * Currently not implemented.
+ *
+ * @note     <ul>
+ *               <li>This mechanism is only used with IPv4.</li>
+ *               <li>When auto-IP is enabled on an interface, an IPv4Address object
+ *               will dynamically be created and configured with auto-IP parameter
+ *               values.</li>
+ *               <li>The exact conditions under which an auto-IP address is created
+ *               (e.g. always when enabled or only in absence of dynamic IP
+ *               addressing) is implementation specific.</li>
+ *           </ul>
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_INTERFACE_IP_API
+ */
 int hostIf_IPInterface::set_Interface_AutoIPEnable(HOSTIF_MsgData_t *stMsgData)
 {
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Parameter Not Supported \n",__FUNCTION__);

@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file Components_VideoDecoder.cpp
+ * @brief This source file contains the APIs of TR069 Components Video decoder.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -118,6 +122,13 @@ void hostIf_STBServiceVideoDecoder::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
+/**
+ * @brief Class Constructor of the class hostIf_STBServiceVideoDecoder.
+ *
+ * It will initialize the device id.
+ *
+ * @param[in] devid Identification number of the device.
+ */
 hostIf_STBServiceVideoDecoder::hostIf_STBServiceVideoDecoder(int devid)
 {
     dev_id = devid;
@@ -131,6 +142,20 @@ hostIf_STBServiceVideoDecoder::hostIf_STBServiceVideoDecoder(int devid)
     bCalledVideoDecoderStatus = false;
 }
 
+/**
+ * @brief This function sets the video decoder interface updates such as Status,
+ * ContentAspectRatio, X_COMCAST-COM_Standby, Name in a connected video decoder.
+ * Currently X_COMCAST-COM_Standby is handled.
+ *
+ * @param[in] paramName  Video decoder service name string.
+ * @param[in] stMsgData  HostIf Message Request param contains the video decoder attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully set the hostIf video decoder interface attribute.
+ * @retval -1 If Not able to set the hostIf video decoder interface attribute.
+ * @retval -2 If Not handle the hostIf video decoder interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_VIDEODECODER_API
+ */
 int hostIf_STBServiceVideoDecoder::handleSetMsg(const char *pSetting, HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -141,6 +166,19 @@ int hostIf_STBServiceVideoDecoder::handleSetMsg(const char *pSetting, HOSTIF_Msg
     return ret;
 }
 
+/**
+ * @brief This function get the video decoder interface updates such as Status,
+ * ContentAspectRatio, X_COMCAST-COM_Standby, Name in a connected video decoder.
+ *
+ * @param[in] paramName  Video decoder service name string.
+ * @param[in] stMsgData  HostIf Message Request param contains the video decoder attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf video decoder interface attribute.
+ * @retval -1 If Not able to get the hostIf video decoder interface attribute.
+ * @retval -2 If Not handle the hostIf video decoder interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_VIDEODECODER_API
+ */
 int hostIf_STBServiceVideoDecoder::handleGetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -180,6 +218,13 @@ int hostIf_STBServiceVideoDecoder::handleGetMsg(const char *paramName, HOSTIF_Ms
     return ret;
 }
 
+/**
+ * @brief This function updates the video decoder interface updates such as
+ * Status, ContentAspectRatio, X_COMCAST-COM_Standby, Name in a connected video decoder.
+ *
+ * @param[in] mUpdateCallback  Callback function which updates the hostIf video decoder interface.
+ * @ingroup TR69_HOSTIF_STBSERVICES_VIDEODECODER_API
+ */
 void hostIf_STBServiceVideoDecoder::doUpdates(updateCallback mUpdateCallback)
 {
     HOSTIF_MsgData_t msgData;

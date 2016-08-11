@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file Service_Storage_PhyMedium.cpp
+ * @brief This source file contains the APIs of TR069 storage service physical medium.
+ */
 #include <string.h>
 #include <errno.h>
 #include "Service_Storage_PhyMedium.h"
@@ -42,6 +46,11 @@ PhysicalMediumMembers_t hostIf_PhysicalMedium::physicalMediumMembers = {{'\0'}, 
 GHashTable *hostIf_PhysicalMedium::phyMedHash = NULL;
 GMutex *hostIf_PhysicalMedium::m_mutex = NULL;
 
+/**
+ * @enum ePhyMediumErrorCode_t
+ * @brief The enum holds the required error code parameters such as command execution fail, invalid
+ * param etc.. for the error code physical medium storage service.
+ */
 typedef enum 
 {
    PHYMED_GEN_FAILURE = -1, 
@@ -49,6 +58,11 @@ typedef enum
    PHYMED_INVALID_PARAM = -3
 }ePhyMediumErrorCode_t;
 
+/**
+ * @enum ePhyMedHealthCode_t
+ * @brief The enum holds the required health code parameters such as health invalid, health ok etc..
+ * for the health code physical medium storage service.
+ */
 typedef enum
 {
     PHYMED_HEALTH_INVALID = 100,
@@ -58,11 +72,25 @@ typedef enum
 }ePhyMedHealthCode_t;
 
 /* Constructor for hostIf_PhysicalMedium*/
+
+/**
+ * @brief Class Constructor of the class hostIf_PhysicalMedium.
+ *
+ * It will initialize the device id and instance number of the storage service.
+ *
+ * @param[in] storageServiceInstanceNumber Instance number of the storage service.
+ * @param[in] dev_id Device identification number.
+ */
 hostIf_PhysicalMedium::hostIf_PhysicalMedium(int storageServiceInstanceNumber, int dev_id):storageServiceInstanceNumber(storageServiceInstanceNumber),dev_id(dev_id) 
 {
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Inside constructor for dev_id:%d\n", dev_id);
 }
 
+/**
+ * @brief This function get the lock before setting or getting the attributes of the
+ * host interface physical medium.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 void hostIf_PhysicalMedium::getLock()
 {
     if(!m_mutex)
@@ -72,6 +100,11 @@ void hostIf_PhysicalMedium::getLock()
     g_mutex_lock(m_mutex);
 }
 
+/**
+ * @brief This function use to release the lock before setting or getting the
+ * attributes of the host interface physical medium.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 void hostIf_PhysicalMedium::releaseLock()
 {
     g_mutex_unlock(m_mutex);
@@ -224,6 +257,17 @@ int hostIf_PhysicalMedium:: get_Device_Service_StorageMedium_ClientNumberOfEntri
     return retVal;
 }
 
+/**
+ * @brief This function get the name of the storage service medium.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_Name(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = get_StorageService_PhyMed_Fields(eName);
@@ -237,6 +281,17 @@ int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_Name(HOSTIF_MsgDat
     return ret;
 }
 
+/**
+ * @brief This function get the health of the storage service medium.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_Health(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = get_StorageService_PhyMed_Fields(eHealth);
@@ -250,7 +305,17 @@ int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_Health(HOSTIF_MsgD
     return ret;
 }
 
-
+/**
+ * @brief This function get the SMART capability of the storage service medium.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_SMARTCapable(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = get_StorageService_PhyMed_Fields(eSmartCapable);
@@ -263,61 +328,180 @@ int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_SMARTCapable(HOSTI
     return ret;
 }
 
-
+/**
+ * @brief This function get the alias of storage service medium.
+ * Currently not implemented.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_Alias(HOSTIF_MsgData_t *stMsgData)
 {
     // TODO
     return NOK;
 }
 
+/**
+ * @brief This function get the vendor of the storage service medium.
+ * Currently not implemented.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_Vendor(HOSTIF_MsgData_t *stMsgData)
 {
     // TODO
     return NOK;
 }
 
+/**
+ * @brief This function get the model number of the storage service medium.
+ * Currently not implemented.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_Model(HOSTIF_MsgData_t *stMsgData)
 {
     // TODO
     return NOK;
 }
 
+/**
+ * @brief This function get the serial number of the storage service medium.
+ * Currently not implemented.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_SerialNumber(HOSTIF_MsgData_t *stMsgData)
 {
     // TODO
     return NOK;
 }
 
+/**
+ * @brief This function get the firmware version of the storage service medium.
+ * Currently not implemented.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_FirmwareVersion(HOSTIF_MsgData_t *stMsgData)
 {
     // TODO
     return NOK;
 }
 
+/**
+ * @brief This function get the connection type of the storage service medium.
+ * Currently not implemented.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_ConnectionType(HOSTIF_MsgData_t *stMsgData)
 {
     // TODO
     return NOK;
 }
 
+/**
+ * @brief This function get the storage service medium removable.
+ * Currently not implemented.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_Removable(HOSTIF_MsgData_t *stMsgData)
 {
     // TODO
     return NOK;
 }
 
+/**
+ * @brief This function get the status of the storage service medium.
+ * Currently not implemented.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_Status(HOSTIF_MsgData_t *stMsgData)
 {
     // TODO
     return NOK;
 }
 
+/**
+ * @brief This function get the uptime of the storage service medium.
+ * Currently not implemented.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_Uptime(HOSTIF_MsgData_t *stMsgData)
 {
     // TODO
     return NOK;
 }
 
+/**
+ * @brief This function get the storage service medium hot swappable.
+ * Currently not implemented.
+ *
+ * @param[in] stMsgData  HostIf Message Request param contains the storage medium attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf storage medium interface attribute.
+ * @retval -1 If Not able to get the hostIf storage medium interface attribute.
+ * @retval -2 If Not handle the hostIf storage medium interface attribute.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API
+ */
 int hostIf_PhysicalMedium :: get_Device_Service_StorageMedium_HotSwappable(HOSTIF_MsgData_t *stMsgData)
 {
     // TODO

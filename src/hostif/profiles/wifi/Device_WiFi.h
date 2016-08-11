@@ -19,47 +19,91 @@
 
 /**
  * @file Device_WiFi.h
+ * TR-069 Device.WiFi object Public API.
+ */
+
+/**
+ * @defgroup TR69_HOSTIF_WIFI TR-069 Object (Device.WiFi)
+ * The WiFi object is based on the WiFi Alliance 802.11 specifications ([802.11-2007]).
+ * It defines interface objects (Radio and SSID), and application objects (AccessPoint and EndPoint).
  *
- * @brief TR-069 Device.WiFi object Public API.
+ * @par About TR-069 Object Device.WiFi.AccessPoint.{i}
+ * @n
+ * This object models an 802.11 connection from the perspective of a wireless access point.
+ * Each AccessPoint entry is associated with a particular SSID interface instance via the SSIDReference parameter.
+ * @n @n
+ * For enabled table entries, if SSIDReference is not a valid reference then the table entry is inoperable
+ * and the CPE MUST set Status to Error_Misconfigured.
+ * @n
+ * @note The AccessPoint table includes a unique key parameter that is a strong reference.
+ * If a strongly referenced object is deleted, the CPE will set the referencing parameter to an empty string.
+ * However, doing so under these circumstances might cause the updated AccessPoint row to then violate
+ * the table's unique key constraint; if this occurs, the CPE MUST set Status to Error_Misconfigured
+ * and disable the offending AccessPoint row.
+ * @n @n
+ * At most one entry in this table (regardless of whether or not it is enabled) can exist with a given value
+ * for Alias. On creation of a new table entry, the CPE MUST choose an initial value for Alias such that the
+ * new entry does not conflict with any existing entries.
+ * @n @n
+ * At most one enabled entry in this table can exist with a given value for SSIDReference.
  *
- * Description of WiFi module.
+ * @par About TR-069 Object Device.WiFi.EndPoint.{i}
+ * @n
+ * This object models an 802.11 connection from the perspective of a wireless end point.
+ * Each EndPoint entry is associated with a particular SSID interface instance via the SSIDReference parameter,
+ * and an associated active Profile instance via the ProfileReference parameter.
+ * The active profile is responsible for specifying the actual SSID and security settings used by the end point.
+ * @n @n
+ * For enabled table entries, if SSIDReference or ProfileReference is not a valid reference then the table entry
+ * is inoperable and the CPE MUST set Status to Error_Misconfigured.
+ * @n @n
+ * Note: The EndPoint table includes a unique key parameter that is a strong reference.
+ * If a strongly referenced object is deleted, the CPE will set the referencing parameter to an empty string.
+ * However, doing so under these circumstances might cause the updated EndPoint row to then violate the table's
+ * unique key constraint;
+ * @n @n
+ * if this occurs, the CPE MUST set Status to Error_Misconfigured and disable the offending EndPoint row.
+ * At most one entry in this table (regardless of whether or not it is enabled) can exist with a given value for Alias.
+ * On creation of a new table entry, the CPE MUST choose an initial value for Alias
+ * such that the new entry does not conflict with any existing entries.
+ * @n @n
+ * At most one enabled entry in this table can exist with a given value for SSIDReference.
  *
+ * @par About TR-069 Object Device.WiFi.Radio.{i}.
+ * @n
+ * This object models an 802.11 wireless radio on a device (a stackable interface object as described
+ * in [Section 4.2/TR-181i2]).
+ * @n @n
+ * If the device can establish more than one connection simultaneously (e.g. a dual radio device),
+ * a separate Radio instance MUST be used for each physical radio of the device. See [Appendix III.1/TR-181i2]
+ * for additional information.
+ * @n
+ * @note A dual-band single-radio device (e.g. an 802.11a/b/g radio) can be configured to operate at 2.4 or
+ * 5 GHz frequency bands, but only a single frequency band is used to transmit/receive at a given time.
+ * Therefore, a single Radio instance is used even for a dual-band radio.
+ * @n @n
+ * At most one entry in this table can exist with a given value for Alias, or with a given value for Name.
  *
- * @par Document
- * Document reference.
+ * @par About TR-069 Object Device.WiFi.SSID.{i}.
+ * @n
+ * WiFi SSID table (a stackable interface object as described in [Section 4.2/TR-181i2]), where table
+ * entries model the MAC layer. A WiFi SSID entry is typically stacked on top of a Radio object.
+ * @n
+ * WiFi SSID is also a multiplexing layer, i.e. more than one SSID can be stacked above a single Radio.
+ * @n
+ * At most one entry in this table (regardless of whether or not it is enabled) can exist with a given
+ * value for Alias, or with a given value for Name. On creation of a new table entry, the CPE MUST choose
+ * initial values for Alias and Name such that the new entry does not conflict with any existing entries.
+ * @n
+ * At most one enabled entry in this table can exist with a given value for SSID, or with a given value for BSSID.
  *
+ * @ingroup TR69_HOSTIF_PROFILE
+ * 
+ * @defgroup TR69_HOSTIF_WIFI_API TR-069 Object (Device.WiFi.) Public APIs
+ * The WiFi object is based on the WiFi Alliance 802.11 specifications ([802.11-2007]).
+ * It defines interface objects (Radio and SSID), and application objects (AccessPoint and EndPoint).
  *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * @ingroup TR69_HOSTIF_WIFI
  */
 
 
@@ -163,36 +207,28 @@ public:
     static GList* getAllIntefaces();
     static void closeAllInstances();
 
+   /**
+     * @ingroup TR69_HOSTIF_WIFI_API
+     * @{
+     */
     /**
-     * @brief    Get the RadioNumberOfEntries.
-     *
-     * This function provides the number of entries in the Radio table.
-     *
+     * @brief This function provides the number of entries in the Radio table.
      */
     int get_Device_WiFi_RadioNumberOfEntries(HOSTIF_MsgData_t *);
 
 
     /**
-     * @brief    Get the SSIDNumberOfEntries.
-     *
-     * This function provides the number of entries in the SSID table.
-     *
+     * @brief This function provides the number of entries in the SSID table.
      */
     int get_Device_WiFi_SSIDNumberOfEntries(HOSTIF_MsgData_t *);
 
     /**
-     * @brief  Get the AccessPointNumberOfEntries.
-     *
-     * This function provides the number of entries in the AccessPoint table.
-     *
+     * @brief This function provides the number of entries in the AccessPoint table.
      */
     int get_Device_WiFi_AccessPointNumberOfEntries(HOSTIF_MsgData_t *);
 
     /**
-     * @brief    Get the EndPointNumberOfEntries.
-     *
-     * This function provides the number of entries in the EndPoint table.
-     *
+     * @brief This function provides the number of entries in the EndPoint table.
      */
     int get_Device_WiFi_EndPointNumberOfEntries(HOSTIF_MsgData_t *);
     
@@ -211,6 +247,7 @@ public:
      */
     int set_Device_WiFi_EnableWiFi(HOSTIF_MsgData_t *);
 
+    /** @} */ //End of Doxygen tag TR69_HOSTIF_WIFI_API
     /* End of TR_069_DEVICE_WIFI_GETTER_API doxygen group. */
     /**
      * @}

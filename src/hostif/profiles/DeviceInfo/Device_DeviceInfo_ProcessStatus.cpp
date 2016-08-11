@@ -18,21 +18,11 @@
 */
 
 /**
- * @file Device_DeviceInfo_ProcessStatus.c
- *
- * @brief Device_DeviceInfo_ProcessStatus. API Implementation.
- *
- * This is the implementation of the Device_DeviceInfo_ProcessStatus. API.
- *
- * @par Document
- * TBD Relevant design or API documentation.
- *
+ * @file Device_DeviceInfo_ProcessStatus.cpp
+ * @brief This source file contains the APIs for getting device processor status information.
  */
 
-/** @addtogroup Device_DeviceInfo_ProcessStatus. Implementation
- *  This is the implementation of the Device Public API.
- *  @{
- */
+
 
 /*****************************************************************************
  * STANDARD INCLUDE FILES
@@ -191,6 +181,19 @@ int hostIf_DeviceProcessStatusInterface::getProcessStatusCPUUsage() {
 /****************************************************************************************************************************************************/
 // Device_DeviceInfo_ProcessStatus. Profile. Getters:
 /****************************************************************************************************************************************************/
+
+/**
+ * @brief This function provides the total amount of cpu usage, in percentage.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_PROCESSORSTATUS_API
+ */
 int hostIf_DeviceProcessStatusInterface::get_Device_DeviceInfo_ProcessStatus_CPUUsage(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     int uiCpuUsage = getProcessStatusCPUUsage();
