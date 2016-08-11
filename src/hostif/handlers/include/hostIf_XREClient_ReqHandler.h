@@ -17,60 +17,23 @@
  * limitations under the License.
 */
 /**
-* @file hostIf_XREClient_ReqHandler.h
-*
-* @brief hostIf XRE Client Request Message Handler API.
-*
-* This API defines the core operations for Host interface
-*
-* @par Document
-* Document reference.
-*
-* @par Open Issues (in no particular order)
-* -# None
-*
-* @par Assumptions
-* -# None
-*
-* @par Abbreviations
-* - BE:      ig-Endian.
-* - cb:      allback function (suffix).
-* - hostIf:  Host Interface.
-* - DS:      Device Settings.
-* - FPD:     Front-Panel Display.
-* - HAL:     Hardware Abstraction Layer.
-* - LE:      Little-Endian.
-* - LS:      Least Significant.
-* - MBZ:     Must be zero.
-* - MS:      Most Significant.
-* - RDK:     Reference Design Kit.
-* - _t:      Type (suffix).
-*
-* @par Implementation Notes
-* -# None
-*
-*/
+ * @file hostIf_XREClient_ReqHandler.h
+ * @brief The header file provides HostIf XRE Client request handler information APIs.
+ */
 
-/** @defgroup HOST_IF
-*    @ingroup HOST_IF
-*
+/**
+ * @defgroup TR-069HOSTIF_XRECLIENT_REQHANDLER_CLASSES XREClient RequestHandler Public Classes
+ * Describe the details about classes used in TR-069 XREClient request handler.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_HANDLER
+ */
+
+/**
 *  HOST-IF is a platform agnostic Inter-process communication (IPC) interface. It allows
 *  applications to communicate with each other by sending Events or invoking Remote
 *  Procedure Calls. The common programming APIs offered by the RDK IARM-Bus interface is
 *  independent of the operating system or the underlying IPC mechanism.
 *
 */
-
-/** @addtogroup IARM_BUS_IARM_CORE_API IARM-Core library.
-*  @ingroup IARM_BUS
-*
-*  Described herein are the functions that are part of the
-*  IARM Core library.
-*
-*  @{
-*/
-
-
 
 
 /**
@@ -87,6 +50,11 @@
 #include "hostIf_msgHandler.h"
 #include "hostIf_updateHandler.h"
 #include "hostIf_main.h"
+
+/**
+ * @brief This class provides the interface for getting XRE request handler information.
+ * @ingroup TR-069HOSTIF_XRECLIENT_REQHANDLER_CLASSES
+ */
 class XREClientReqHandler : public msgHandler
 {
     XREClientReqHandler() {};

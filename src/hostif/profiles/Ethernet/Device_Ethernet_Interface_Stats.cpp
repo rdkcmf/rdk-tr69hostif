@@ -18,20 +18,8 @@
 */
 
 /**
- * @file Device_Ethernet_Interface.c
- *
- * @brief Device.Ethernet.Interface. API Implementation.
- *
- * This is the implementation of the Device.Ethernet.Interface. API.
- *
- * @par Document
- * TBD Relevant design or API documentation.
- *
- */
-
-/** @addtogroup Device.Ethernet.Interface.Stats. Implementation
- *  This is the implementation of the Device Public API.
- *  @{
+ * @file Device_Ethernet_Interface_Stats.cpp
+ * @brief This source file contains the APIs of device ethernet interface stats.
  */
 
 /*****************************************************************************
@@ -255,6 +243,7 @@ static int read_Device_Ethernet_Interface_Stats_Fields(unsigned int ethInterface
     return 0;
 }
 
+
 hostIf_EthernetInterfaceStats* hostIf_EthernetInterfaceStats::getInstance(int dev_id)
 {
     hostIf_EthernetInterfaceStats* pRet = NULL;
@@ -328,6 +317,13 @@ void hostIf_EthernetInterfaceStats::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
+/**
+ * @brief Class Constructor of the class hostIf_EthernetInterfaceStats.
+ *
+ * It will initialize the device id.
+ *
+ * @param[in] dev_id Device identification Number.
+ */
 hostIf_EthernetInterfaceStats::hostIf_EthernetInterfaceStats(int dev_id):
     dev_id(dev_id),
     backupBytesSent(0),
@@ -367,6 +363,20 @@ hostIf_EthernetInterfaceStats::hostIf_EthernetInterfaceStats(int dev_id):
 /****************************************************************************************************************************************************/
 // Device.Ethernet.Interface.Stats. Profile. Getters:
 /****************************************************************************************************************************************************/
+
+/**
+ * @brief This function provides the total number of bytes transmitted out of this Ethernet
+ * interface, including framing characters.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_BytesSent(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -384,6 +394,17 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_BytesSent
     return OK;
 }
 
+/**
+ * @brief This function provides the total number of bytes received on this Ethernet
+ * interface, including framing characters.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Return '0' if the method successfully received the total number of bytes
+ * via ethernet interface else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_BytesReceived(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -401,6 +422,16 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_BytesRece
     return OK;
 }
 
+/**
+ * @brief This function provides the total number of packets transmitted out of this Ethernet interface.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully sent the packets via ethernet interface
+ * else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_PacketsSent(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -418,6 +449,16 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_PacketsSe
     return OK;
 }
 
+/**
+ * @brief This function provides the total number of packets received on this Ethernet interface.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully receive the total number of packets via
+ * ethernet interface else returns '1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_PacketsReceived(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -435,6 +476,17 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_PacketsRe
     return OK;
 }
 
+/**
+ * @brief This function provides the total number of outbound packets that could not be
+ * transmitted because of errors.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully sent the errors via ethernet
+ * interface else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_ErrorsSent(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -452,6 +504,17 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_ErrorsSen
     return OK;
 }
 
+/**
+ * @brief This function provides the total number of inbound packets that contained errors
+ * preventing them from being delivered to a higher-layer protocol.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully receive the errors via ethernet
+ * interface stats else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_ErrorsReceived(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -469,6 +532,19 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_ErrorsRec
     return OK;
 }
 
+/**
+ * @brief This function get the number of unicast packets for which a request is send on the IP
+ * Interface was received. This function provides the total number of packets requested for
+ * transmission which were not addressed to a multicast or broadcast address at this layer,
+ * including those that were discarded or not sent.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully sent the unicast packets via
+ * ethernet interface else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_UnicastPacketsSent(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -486,6 +562,18 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_UnicastPa
     return OK;
 }
 
+/**
+ * @brief This function get the number of unicast packets received on an Ethernet Interface.
+ * This function provides the total number of received packets, delivered by this layer to
+ * a higher layer, which were not addressed to a multicast or broadcast address at this layer.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully receive the unicast packets via
+ * ethernet interface else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_UnicastPacketsReceived(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -503,6 +591,22 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_UnicastPa
     return OK;
 }
 
+/**
+ * @brief This function get the number of discarded outbound packets on an Ethernet Interface.
+ * This function provides the total number of outbound packets which were chosen to be
+ * discarded even though no errors had been detected to prevent their being transmitted.
+ *
+ * @note One possible reason for discarding such a packet could be to free up buffer
+ *        space.
+ *
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully discard the unicast packets sent via
+ * ethernet interface else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_DiscardPacketsSent(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     bCalledDiscardPacketsSent;
@@ -520,6 +624,22 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_DiscardPa
     return OK;
 }
 
+
+/**
+ * @brief This function get the number of discarded inbound packets on an Ethernet Interface.
+ * This function provides the total number of inbound packets which were chosen to be
+ * discarded even though no errors had been detected to prevent their being delivered.
+ *
+ * @note One possible reason for discarding such a packet could be to free up buffer
+ *       space.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully discard the unicast packets received via
+ * ethernet interface else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_DiscardPacketsReceived(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -537,6 +657,20 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_DiscardPa
     return OK;
 }
 
+
+/**
+ * @brief This function get the number of Multicast Packets sent on an Ethernet Interface.
+ * This function provides the total number of packets that higher-level protocols
+ * requested for transmission and which were addressed to a multicast address at
+ * this layer, including those that were discarded or not sent.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully sent the multicast packets via
+ * ethernet interface else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_MulticastPacketsSent(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -554,6 +688,19 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_Multicast
     return OK;
 }
 
+
+/**
+ * @brief This function get the number of Multicast Packets received on an Ethernet Interface.
+ * This function provides the total number of received packets, delivered by this layer
+ * to a higher layer, which were addressed to a multicast address at this layer.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully received the multicast packets via
+ * ethernet interface else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_MulticastPacketsReceived(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -571,6 +718,23 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_Multicast
     return OK;
 }
 
+/**
+ * @brief This function get the number of Broadcast Packets sent on an Ethernet Interface.
+ * This function provides the total number of packets that higher-level protocols
+ * requested for transmission and which were addressed to a broadcast address at this
+ * layer, including those that were discarded or not sent.
+ *
+ * @note IPv6 does not define broadcast addresses, so IPv6 packets will never cause
+ *           this counter to increment.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully sent the broadcast packets via etherne
+ * interface else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ *
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_BroadcastPacketsSent(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -588,6 +752,21 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_Broadcast
     return OK;
 }
 
+/**
+ * @brief This function get the number of Broadcast Packets received on an Ethernet Interface.
+ * This function provides the total number of received packets, delivered by this layer
+ * to a higher layer, which were addressed to a broadcast address at this layer.
+ *
+ * @note  IPv6 does not define broadcast addresses, so IPv6 packets will never cause
+ *           this counter to increment.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully received the broadcast packets via ethernet
+ * interface else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_BroadcastPacketsReceived(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
 
@@ -605,6 +784,18 @@ int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_Broadcast
     return OK;
 }
 
+/**
+ * @brief This function get the number of Packets of unidentified protocol received on an Ethernet Interface.
+ * This function provides the total number of packets received via this Ethernet interface which
+ * were discarded because they were of an unknown or unsupported protocol.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully received the unknown proto packets via ethernet
+ * interface else returns '-1'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_STATS_API
+ */
 int hostIf_EthernetInterfaceStats::get_Device_Ethernet_Interface_Stats_UnknownProtoPacketsReceived(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     bCalledUnknownProtoPacketsReceived;

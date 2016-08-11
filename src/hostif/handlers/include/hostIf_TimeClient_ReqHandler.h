@@ -16,58 +16,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
 /**
- * @file hostIf_timeClient_ReqHandler.h
- *
- * @brief host Interface for timeClient Request Handler API.
- *
- * This API defines the request handler operations for mfr client
- *
- * @par Document
- * Document reference.
- *
- * @par Open Issues (in no particular order)
- * -# None
- *
- * @par Assumptions
- * -# None
- *
- * @par Abbreviations
- * - BE:       ig-Endian.
- * - cb:       allback function (suffix).
- * - FPD:     Front-Panel Display.
- * - HAL:     Hardware Abstraction Layer.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - RDK:     Reference Design Kit.
- * - _t:      Type (suffix).
- *
- * @par Implementation Notes
- * -# None
- *
+ * @file hostIf_TimeClient_ReqHandler.h
+ * @brief The header file provides HostIf time client request handler information APIs.
  */
 
-/** @defgroup HOST_IF TIME CLIENT REQUEST HANDLER
- *   @ingroup HOST_IF
- *
+/**
+ * @defgroup TR-069HOSTIF_TIMECLIENT_REQHANDLER_CLASSES TimeClient RequestHandler Public Classes
+ * Describe the details about classes used in TR-069 time client request handler.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_HANDLER
+ */
+
+/**
  *  It allows moca client applications to communicate by sending Get operation
  *  from Time library.
- *
  */
-
-/** @addtogroup HOST_IF TIME CLIENT REQUEST HANDLER API .
- *  @ingroup HOST_IF
- *
- *  Described herein are the functions that are part of the
- *  host interface binary.
- *
- *  @{
- */
-
-
-
 
 /**
 * @defgroup tr69hostif
@@ -84,6 +48,10 @@
 #include "hostIf_updateHandler.h"
 #include "Device_Time.h"
 
+/**
+ * @brief This class provides the interface for getting TimeClient request handler information.
+ * @ingroup TR-069HOSTIF_TIMECLIENT_REQHANDLER_CLASSES
+ */
 class TimeClientReqHandler : public msgHandler
 {
     TimeClientReqHandler() {};

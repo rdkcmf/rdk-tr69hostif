@@ -17,7 +17,10 @@
  * limitations under the License.
 */
 
-
+/**
+ * @file Components_DisplayDevice.cpp
+ * @brief This source file contains the APIs of TR069 Components Display Device.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -45,6 +48,15 @@
 
 #define UPDATE_FORMAT_STRING "%s.%d.%s%s"
 
+/**
+ * @brief Class Constructor of the class hostIf_STBServiceDisplayDevice.
+ *
+ * It will initialize the device id and video output port.
+ *
+ * @param[in] devid Identification number of the device.
+ * @param[in] port Video output port number.
+ * @ingroup TR69_HOSTIF_STBSERVICES_DISPLAYDEVICE_API
+ */
 hostIf_STBServiceDisplayDevice::hostIf_STBServiceDisplayDevice(int devId, device::VideoOutputPort& port) : dev_id(devId), vPort(port)
 {
     strcpy(backupDisplayDeviceStatus," ");
@@ -60,6 +72,20 @@ hostIf_STBServiceDisplayDevice::hostIf_STBServiceDisplayDevice(int devId, device
     bCalledPreferredResolution = false;
 }
 
+/**
+ * @brief This function set the display device interface attribute value such as Status, EDID,
+ * SupportedResolutions, PreferredResolution etc.. in the connected display device. Currently not
+ * implemented.
+ *
+ * @param[in] paramName  Display device service name string.
+ * @param[in] stMsgData  HostIf Message Request param contains the display device attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully set the hostIf display device interface attribute.
+ * @retval -1 If Not able to set the hostIf display device interface attribute.
+ * @retval -2 If Not handle the hostIf display device interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_DISPLAYDEVICE_API
+ */
 int hostIf_STBServiceDisplayDevice::handleSetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData)
 {
     stMsgData->faultCode = fcInvalidParameterName;
@@ -67,6 +93,20 @@ int hostIf_STBServiceDisplayDevice::handleSetMsg(const char *paramName, HOSTIF_M
     return ret;
 }
 
+/**
+ * @brief This function get the display device interface attribute value such as Status, EDID,
+ * SupportedResolutions, PreferredResolution etc.. in the connected display device. Currently not handling
+ * VideoLatency, AutoLipSyncSupport, CECSupport and HDMI3DPresent.
+ *
+ * @param[in] paramName  Display device service name string.
+ * @param[in] stMsgData  HostIf Message Request param contains the display device attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf display device interface attribute.
+ * @retval -1 If Not able to get the hostIf display device interface attribute.
+ * @retval -2 If Not handle the hostIf display device interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_DISPLAYDEVICE_API
+ */
 int hostIf_STBServiceDisplayDevice::handleGetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -127,6 +167,14 @@ int hostIf_STBServiceDisplayDevice::handleGetMsg(const char *paramName, HOSTIF_M
     return ret;
 }
 
+/**
+ * @brief This function updates the hostIf display device interface attribute value such as Status, EDID,
+ * SupportedResolutions, PreferredResolution in the connected display device.
+ *
+ * @param[in] baseName  Display device service name string.
+ * @param[in] mUpdateCallback  Callback function which updates the hostIf video interface.
+ * @ingroup TR69_HOSTIF_STBSERVICES_DISPLAYDEVICE_API
+ */
 void hostIf_STBServiceDisplayDevice::doUpdates(const char *baseName, updateCallback mUpdateCallback)
 {
     HOSTIF_MsgData_t msgData;

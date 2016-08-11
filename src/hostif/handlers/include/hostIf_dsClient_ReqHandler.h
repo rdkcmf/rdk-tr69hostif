@@ -16,58 +16,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
 /**
  * @file hostIf_dsClient_ReqHandler.h
- *
- * @brief HOST-IF dsClient Request Handler interface API.
- *
- * This API defines the device setting Client ReqHandler Interface operations for STBService defined under Host If
- *
- * @par Document
- * Document reference.
- *
- * @par Open Issues (in no particular order)
- * -# None
- *
- * @par Assumptions
- * -# None
- *
- * @par Abbreviations
- * - BE:       ig-Endian.
- * - cb:       allback function (suffix).
- * - DS:      Device Settings.
- * - FPD:     Front-Panel Display.
- * - HAL:     Hardware Abstraction Layer.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - RDK:     Reference Design Kit.
- * - _t:      Type (suffix).
- *
- * @par Implementation Notes
- * -# None
- *
+ * @brief The header file provides HostIf ds client request handler information APIs.
  */
 
-/** @defgroup HOST_IF DSCLIENT HANDLER
- *   @ingroup HOST_IF
- *
+/**
+ * @defgroup TR-069HOSTIF_DSCLIENT_REQHANDLER_CLASSES DS Client RequestHandler Public Classes
+ * Describe the details about classes used in TR-069 dsClient request handler.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_HANDLER
+ */
+
+/**
  *  dsClient -interface is a platform agnostic IARM communication interface. It allows
  *  ds client applications to communicate by sending Get and Set operation
  *
  */
-
-/** @addtogroup HOST_IF DS CLIENT HANDLER_API .
- *  @ingroup HOST_IF
- *
- *  Described herein are the functions that are part of the
- *  dsClient Request handler .
- *
- *  @{
- */
-
-
 
 /**
 * @defgroup tr69hostif
@@ -83,6 +48,10 @@
 #include "hostIf_msgHandler.h"
 #include "hostIf_updateHandler.h"
 
+/**
+ * @brief This class provides device setting Client ReqHandler Interface operations for STBService defined under Host If
+ * @ingroup TR-069HOSTIF_DSCLIENT_REQHANDLER_CLASSES
+ */
 class DSClientReqHandler : public msgHandler
 {
     DSClientReqHandler() {};

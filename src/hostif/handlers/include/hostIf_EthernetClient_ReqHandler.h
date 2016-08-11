@@ -16,58 +16,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
 /**
- * @file hostIf_mfrClient_ReqHandler.h
- *
- * @brief host Interface for mfrClient Request Handler API.
- *
- * This API defines the request handler operations for mfr client
- *
- * @par Document
- * Document reference.
- *
- * @par Open Issues (in no particular order)
- * -# None
- *
- * @par Assumptions
- * -# None
- *
- * @par Abbreviations
- * - BE:       ig-Endian.
- * - cb:       allback function (suffix).
- * - FPD:     Front-Panel Display.
- * - HAL:     Hardware Abstraction Layer.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - RDK:     Reference Design Kit.
- * - _t:      Type (suffix).
- *
- * @par Implementation Notes
- * -# None
- *
+ * @file hostIf_EthernetClient_ReqHandler.h
+ * @brief The header file provides HostIf Ethernet client request handler information APIs.
  */
 
-/** @defgroup HOST_IF MOCA CLIENT REQUEST HANDLER
- *   @ingroup HOST_IF
- *
+/**
+ * @defgroup TR-069HOSTIF_ETHERNETCLIENT_REQHANDLER_CLASSES Ethernet Client RequestHandler Public Classes
+ * Describe the details about classes used in TR-069 EthernetClient request handler.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_HANDLER
+ */
+
+
+/**
  *  It allows moca client applications to communicate by sending Get operation
  *  from Ethernet library.
  *
  */
-
-/** @addtogroup HOST_IF MOCA CLIENT REQUEST HANDLER API .
- *  @ingroup HOST_IF
- *
- *  Described herein are the functions that are part of the
- *  host interface binary.
- *
- *  @{
- */
-
-
-
 
 /**
 * @defgroup tr69hostif
@@ -83,6 +49,10 @@
 #include "hostIf_msgHandler.h"
 #include "hostIf_updateHandler.h"
 
+/**
+ * @brief This class provides the interface for getting Ethernet client request handler information.
+ * @ingroup TR-069HOSTIF_ETHERNETCLIENT_REQHANDLER_CLASSES
+ */
 class EthernetClientReqHandler : public msgHandler
 {
     EthernetClientReqHandler() {};

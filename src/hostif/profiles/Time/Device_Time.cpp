@@ -29,10 +29,6 @@
  *
  */
 
-/** @addtogroup DeviceInfo Implementation
- *  This is the implementation of the Device Public API.
- *  @{
- */
 
 /*****************************************************************************
  * STANDARD INCLUDE FILES

@@ -17,6 +17,11 @@
  * limitations under the License.
 */
 
+/**
+  * @defgroup TR69_HOSTIF_WIFI_ENDPOINT_WPS TR-069 Object (Device.WiFi.EndPoint.{i}.WPS.) Public APIs
+  * This object contains parameters related to Wi-Fi Protected Setup [WPSv1.0] for this end point.
+  * @ingroup TR69_HOSTIF_WIFI
+  */
 
 
 /**
@@ -54,10 +59,52 @@ public:
     char	ConfigMethodsSupported[64];
     char ConfigMethodsEnabled[64];
 
-
+   /**
+    * @ingroup TR69_HOSTIF_WIFI_ENDPOINT_WPS
+    * @{
+    */
+   /**
+    * @brief Enables or disables WPS functionality for this end point.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_Device_WiFi_EndPoint_WPS_Enable(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief Get the comma-separated list of strings, containing the WPS configuration methods
+    * supported by the device.
+    *
+    * Each list item is an enumeration of:
+    * - USBFlashDrive
+    * - Ethernet
+    * - ExternalNFCToken
+    * - IntegratedNFCToken
+    * - NFCInterface
+    * - PushButton
+    * - PIN 
+    * This parameter corresponds directly to the "Config Methods" attribute of the WPS specification [WPSv1.0].
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_Device_WiFi_EndPoint_WPS_ConfigMethodsSupported(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief Check the WPS configuration methods enabled on the device.
+    *
+    * Comma-separated list of strings. Each list item MUST be a member of the list reported
+    * by the ConfigMethodsSupported parameter.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_Device_WiFi_EndPoint_WPS_ConfigMethodsEnabled(HOSTIF_MsgData_t *stMsgData );
+
+   /** @} */ //End of Doxygen Tag TR69_HOSTIF_WIFI_ENDPOINT_WPS
 };
 
 

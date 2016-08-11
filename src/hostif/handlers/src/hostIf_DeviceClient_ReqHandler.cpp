@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file hostIf_DeviceClient_ReqHandler.cpp
+ * @brief The header file provides HostIf Device client request handler information APIs.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -25,6 +29,7 @@
 * @{
 **/
 //#define HAVE_VALUE_CHANGE_EVENT
+
 
 #include "hostIf_main.h"
 #include "hostIf_DeviceClient_ReqHandler.h"
@@ -63,6 +68,16 @@ void DeviceClientReqHandler::reset()
     hostIf_DeviceInfo::releaseLock();
 }
 
+/**
+ * @brief This function is used to initialize all the current process and processor
+ * to '0' using memset.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successful.
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_REQHANDLER_CLASSES
+ */
 bool DeviceClientReqHandler::init()
 {
 //    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -72,6 +87,16 @@ bool DeviceClientReqHandler::init()
     return true;
 }
 
+/**
+ * @brief This function is used to close all the instances of device info, device processor
+ * interface, device process status interface.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if it successfully close all the instances.
+ * @retval false if not able to close all the instances.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_REQHANDLER_CLASSES
+ */
 bool DeviceClientReqHandler::unInit()
 {
 //    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -83,6 +108,18 @@ bool DeviceClientReqHandler::unInit()
     return true;
 }
 
+/**
+ * @brief This function is used to set the Device reset, FirmwareDownload and FirmwareDownload Status.
+ * The possible reset states of the device are "Cold", "Factory", "Warehouse" and "Customer".
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_REQHANDLER_CLASSES
+ */
 int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -233,6 +270,21 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+/**
+ * @brief This function is used to get the Process information such as "PID", "Command"
+ * "Size", "Priority", "CPUTime" and "State". It is also used to get the processor information,
+ * process status such as total number of active process entries and CPUUsage and device info
+ * such as "BootStatus", "Manufacturer", "ManufacturerOUI", "ModelName", "Description", "ProductClass"
+ * "SerialNumber", "HardwareVersion", "SoftwareVersion", "AdditionalHardwareVersion" etc..
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is gets the data successfully.
+ * @retval ERR_INTERNAL_ERROR if not able to get the data from the device.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_REQHANDLER_CLASSES
+ */
 int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -1140,6 +1192,8 @@ void DeviceClientReqHandler::notifyIARM(IARM_Bus_tr69HostIfMgr_EventId_t event_t
     eventData.paramtype = paramtype;
     IARM_Bus_BroadcastEvent(IARM_BUS_TR69HOSTIFMGR_NAME, (IARM_EventId_t) event_type, (void *)&eventData, sizeof(eventData));
 }
+
+
 
 
 

@@ -18,47 +18,37 @@
 */
 /**
  * @file Device_IP_Interface_IPv4Address.h
- *
- * @brief TR-069 Device.IP.Interface.IPv4Address object Public API.
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * @brief The header file provides TR069 device IPv4 interface address information APIs.
  */
 
-
+/**
+ * @defgroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS TR-069 Object (Device.IP.Interface.IPv4Address)
+ *
+ * @par IPv4 address table
+ * Entries are auto-created and auto-deleted as IP addresses are added and deleted via
+ * - DHCP
+ * - auto-IP or
+ * - IPCP
+ * Static entries are created and configured by the ACS.
+ * - At most one entry in this table regardless of whether or not it is enabled can exist with a
+ * given value for Alias. On creation of a new table entry, the CPE MUST choose an initial value
+ * for Alias such that the new entry does not conflict with any existing entries.
+ * - At most one enabled entry in this table can exist with the same values for IPAddress and SubnetMask.
+ *
+ * @ingroup TR69_HOSTIF_DEVICE_IP
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_API TR-069 Object (Device.IP.Interface.IPv4Address) Public APIs
+ * Describe the details about TR-069 Device IPv4 Interface address APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_CLASSES TR-069 Object (Device.IP.Interface.IPv4Address) Public Classes
+ * Describe the details about classes used in TR069 Device IPv4 Interface address.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_STRUCT TR-069 Object (Device.IP.Interface.IPv4Address) Public DataStructure
+ * Describe the details about data structure used in TR069 Device IPv4 Interface address.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS
+ */
 
 
 /**
@@ -130,7 +120,10 @@
  *  @{
  */
 
-
+/**
+ * @brief This class provides the hostIf IPv4 interface address for getting  interface address information.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_CLASSES
+ */
 class hostIf_IPv4Address {
 
     static  GHashTable  *ifHash;
@@ -185,99 +178,14 @@ public:
      */
     int get_IPv4Address_Enable(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the status of an IPv4 Address table entry.
-     *
-     * This function provides the status of this IPv4Address table entry.   Enumeration of:
-     * <tt>
-     *     <ul><li>Disabled</li>
-     *         <li>Enabled</li>
-     *         <li>Error_Misconfigured</li>
-     *         <li>Error (OPTIONAL)</li></ul>
-     * </tt>
-     *
-     * @note    <ul>
-     *              <li>The <tt>Error_Misconfigured</tt> value indicates that a necessary
-     *              configuration value is undefined or invalid.</li>
-     *
-     *              <li>The <tt>Error</tt> value MAY be used by the CPE to indicate a
-     *              locally defined error condition.</li>
-     *          </ul>
-     *
-     * See @ref dev_ip_ipv4address_getter
-     *
-     */
     int get_IPv4Address_Status(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the instance handle for an IPv4 Address of an IP Interface.
-     *
-     * This function provides a non-volatile handle used to reference this IPv4 address
-     * instance of this IP interface. Alias provides a mechanism for an ACS to label this
-     * instance for future reference.
-     *
-     * @note     <ul>
-     *               <li>If the CPE supports the Alias-based Addressing feature as defined
-     *               in [Section 3.6.1/TR-069 Amendment 4] and described in [Appendix
-     *               II/TR-069 Amendment 4], the following mandatory constraints MUST be
-     *               enforced:
-     *               <ul><li>Its value MUST NOT be empty.</li>
-     *                   <li>Its value MUST start with a letter.</li>
-     *                   <li>If its instance object is created by the CPE, the initial
-     *                   value MUST start with a "cpe-" prefix.</li>
-     *                   <li>The CPE MUST NOT change the parameter value.</li>
-     *               </ul></li>
-     *               <li>This parameter can only be modified if <tt>AddressingType</tt>
-     *               is <tt>Static</tt>.</li>
-     *           </ul>
-     * @par
-     *
-     * See @ref dev_ip_ipv4address_getter
-     *
-     */
     int get_IPv4Address_Alias(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get an IP Interface IPv4 IP Address
-     *
-     * This function provides the IPv4 address.
-     *
-     * @note     This parameter can only be modified if <tt>AddressingType</tt> is
-     *           <tt>Static</tt>.
-     *
-     * See @ref dev_ip_ipv4address_getter
-     *
-     */
     int get_IPv4Address_IPAddress(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get an IP Interface IPv4 Address SubnetMask.
-     *
-     * This function provides the IPv4 Address Subnet mask.
-     *
-     * @note     This parameter can only be modified if <tt>AddressingType</tt> is
-     *           <tt>Static</tt>.
-     *
-     * See @ref dev_ip_ipv4address_getter
-     *
-     */
     int get_IPv4Address_SubnetMask(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get an IP Interface IPv4 Address AddressingType.
-     *
-     * This function provides the addressing method used to assign the IP address.
-     * Enumeration of:
-     * <tt>
-     *     <ul><li>DHCP</li>
-     *         <li>AutoIP</li>
-     *         <li>IPCP</li>
-     *         <li>Static</li></ul>
-     * </tt>
-     *
-     * See @ref dev_ip_ipv4address_getter
-     *
-     */
     int get_IPv4Address_AddressingType(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
     /* End of TR_069_DEVICE_IP_IPV4ADDRESS_GETTER_API doxygen group */
@@ -315,61 +223,12 @@ public:
      *  @{
      */
 
-    /**
-     * @brief Enable/Disable an IP Interface IPv4 Address.
-     *
-     * This function enables or disables this IPv4 address.
-     *
-     * See @ref dev_ip_ipv4address_setter
-     *
-     */
     int set_IPv4Address_Enable(HOSTIF_MsgData_t *stMsgData, int subInstanceNo);
 
-    /**
-     * @brief    Set the instance handle for an IPv4 Address of an IP Interface.
-     *
-     * This function sets a non-volatile handle used to reference this IPv4 address
-     * instance of this IP interface. Alias provides a mechanism for an ACS to label this
-     * instance for future reference.
-     *
-     * @note     If the CPE supports the Alias-based Addressing feature as defined in
-     *           [Section 3.6.1/TR-069 Amendment 4] and described in [Appendix II/TR-069
-     *           Amendment 4], the following mandatory constraints MUST be enforced:
-     *               <ul><li>Its value MUST NOT be empty.</li>
-     *                   <li>Its value MUST start with a letter.</li>
-     *                   <li>If its instance object is created by the CPE, the initial
-     *                   value MUST start with a "cpe-" prefix.</li>
-     *                   <li>The CPE MUST NOT change the parameter value.</li>
-     *               </ul>
-     * @par
-     *
-     * See @ref dev_ip_ipv4address_setter
-     *
-     */
     int set_IPv4Address_Alias(HOSTIF_MsgData_t *stMsgData, int subInstanceNo);
 
-    /**
-     * @brief    Set an IP Interface IPv4 Address.
-     *
-     * This function sets the IPv4 address.
-     *
-     * @note     This parameter can only be modified if the AddressingType is <tt>Static</tt>.
-     *
-     * See @ref dev_ip_ipv4address_setter
-     *
-     */
     int set_IPv4Address_IPAddress(HOSTIF_MsgData_t *stMsgData, int subInstanceNo);
 
-    /**
-     * @brief    Set an IP Interface IPv4Address Subnet Mask.
-     *
-     * This function sets the Subnet Mask of an IPv4 Address.
-     *
-     * @note     This parameter can only be modified if the AddressingType is <tt>Static</tt>.
-     *
-     * See @ref dev_ip_ipv4address_setter
-     *
-     */
     int set_IPv4Address_SubnetMask(HOSTIF_MsgData_t *stMsgData, int subInstanceNo);
 
     /* End of TR_069_DEVICE_IP_IPV4ADDRESS_SETTER_API doxygen group */

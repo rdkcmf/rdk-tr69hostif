@@ -18,20 +18,8 @@
 */
 
 /**
- * @file Device_IP_Interface_IPv4Address.c
- *
- * @brief Device_IP_Interface_IPv4Address API Implementation.
- *
- * This is the implementation of the Device_IP_Interface_IPv4Address API.
- *
- * @par Document
- * TBD Relevant design or API documentation.
- *
- */
-
-/** @addtogroup Device_IP_Interface_IPv4Address Implementation
- *  This is the implementation of the Device Public API.
- *  @{
+ * @file Device_IP_Interface_IPv4Address.cpp
+ * @brief This source file contains the APIs of device IPv4 interface address.
  */
 
 /*****************************************************************************
@@ -126,6 +114,14 @@ void hostIf_IPv4Address::refreshInterfaceName ()
         RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: error getting interface name for Device.IP.Interface.%d\n", __FUNCTION__, dev_id);
 }
 
+/**
+ * @brief Class Constructor of the class hostIf_IPv4Address.
+ *
+ * It will initialize the device id. Initialize the status, IP Address, SubnetMask and AddressingType to
+ * empty string.
+ *
+ * @param[in] devid Identification number of the device to communicate.
+ */
 hostIf_IPv4Address::hostIf_IPv4Address(int dev_id):
     dev_id(dev_id),
     bCalledEnable(0),
@@ -295,6 +291,21 @@ int hostIf_IPv4Address::handleSetMsg (const char* pSubSetting, int subInstanceNu
 // Device_IP_Interface_IPv4Address Profile. Getters:
 /****************************************************************************************************************************************************/
 
+
+/**
+ * @brief This function gets the status of the IPv4 interface 'enabled' or 'disabled'.
+ * It provides 'true' for enable and 'false' for disable IPv4 address.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number currently not in use.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv4Address::get_IPv4Address_Enable(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -316,6 +327,26 @@ int hostIf_IPv4Address::get_IPv4Address_Enable(HOSTIF_MsgData_t *stMsgData,int s
     return OK;
 }
 
+/**
+ * @brief This function gets the status of an IPv4 Address table entry. It provides the status of
+ * this IPv4Address table entry. Possible enum values are Disabled, Enabled, Error_Misconfigured
+ * and Error (OPTIONAL).
+ *
+ * @note  - The 'Error_Misconfigured' value indicates that a necessary
+ *          configuration value is undefined or invalid.
+ *        - The 'Error' value MAY be used by the CPE to indicate a
+ *              locally defined error condition.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number currently not in use.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv4Address::get_IPv4Address_Status(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -338,6 +369,37 @@ int hostIf_IPv4Address::get_IPv4Address_Status(HOSTIF_MsgData_t *stMsgData,int s
     return OK;
 }
 
+/**
+ * @brief This function gets the instance handle for an IPv4 Address of an IP Interface.
+ * It provides a non-volatile handle used to reference this IPv4 address
+ * instance of this IP interface. Alias provides a mechanism for an ACS to label this
+ * instance for future reference. Currently not implemented.
+ *
+ * @note     <ul>
+ *               <li>If the CPE supports the Alias-based Addressing feature as defined
+ *               in [Section 3.6.1/TR-069 Amendment 4] and described in [Appendix
+ *               II/TR-069 Amendment 4], the following mandatory constraints MUST be
+ *               enforced:
+ *               <ul><li>Its value MUST NOT be empty.</li>
+ *                   <li>Its value MUST start with a letter.</li>
+ *                   <li>If its instance object is created by the CPE, the initial
+ *                   value MUST start with a "cpe-" prefix.</li>
+ *                   <li>The CPE MUST NOT change the parameter value.</li>
+ *               </ul></li>
+ *               <li>This parameter can only be modified if <tt>AddressingType</tt>
+ *               is <tt>Static</tt>.</li>
+ *           </ul>
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number currently not in use.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv4Address::get_IPv4Address_Alias(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -346,6 +408,21 @@ int hostIf_IPv4Address::get_IPv4Address_Alias(HOSTIF_MsgData_t *stMsgData,int su
     return NOK;
 }
 
+/**
+ * @brief This function used to get an IP Interface IPv4 IP Address.
+ *
+ * @note This parameter can only be modified if 'AddressingType' is static.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number currently not in use.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv4Address::get_IPv4Address_IPAddress(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -372,6 +449,21 @@ int hostIf_IPv4Address::get_IPv4Address_IPAddress(HOSTIF_MsgData_t *stMsgData,in
     return OK;
 }
 
+/**
+ * @brief This function gets an IP Interface IPv4 Address SubnetMask.
+ *
+ * @note This parameter can only be modified if 'AddressingType' is static.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number currently not in use.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv4Address::get_IPv4Address_SubnetMask(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -422,6 +514,20 @@ bool hostIf_IPv4Address::isLinkLocalAddress (const struct in_addr& in_address)
     return isAutoIp;
 }
 
+/** 
+ * @brief This function gets an IP Interface IPv4 Address AddressingType assign the IP address.
+ * Possible enum values are DHCP, AutoIP, IPCP and Static.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo SubInstance number currently not in use.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv4Address::get_IPv4Address_AddressingType(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -500,6 +606,18 @@ bool hostIf_IPv4Address::hasPhysicalInterfaceAs (char* phy_if_name)
 // Device_IP_Interface_IPv4Address Profile. Setters:
 /****************************************************************************************************************************************************/
 
+/**
+ * @brief This function sets the device IP Interface IPv4 Address to 'Enable' or 'Disable'.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo  SubInstance number currently not in use.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv4Address::set_IPv4Address_Enable(HOSTIF_MsgData_t *stMsgData, int subInstanceNo)
 {
     LOG_ENTRY_EXIT;
@@ -530,6 +648,30 @@ int hostIf_IPv4Address::set_IPv4Address_Enable(HOSTIF_MsgData_t *stMsgData, int 
     return OK;
 }
 
+/**
+ * @brief This function sets a non-volatile handle used to reference this IPv4 address
+ * instance of this IP interface. Alias provides a mechanism for an ACS to label this
+ * instance for future reference. Currently not implemented.
+ *
+ * @note     If the CPE supports the Alias-based Addressing feature as defined in
+ *           [Section 3.6.1/TR-069 Amendment 4] and described in [Appendix II/TR-069
+ *           Amendment 4], the following mandatory constraints MUST be enforced:
+ *               <ul><li>Its value MUST NOT be empty.</li>
+ *                   <li>Its value MUST start with a letter.</li>
+ *                   <li>If its instance object is created by the CPE, the initial
+ *                   value MUST start with a "cpe-" prefix.</li>
+ *                   <li>The CPE MUST NOT change the parameter value.</li>
+ *               </ul>
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo  SubInstance number currently not in use.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv4Address::set_IPv4Address_Alias(HOSTIF_MsgData_t *stMsgData, int subInstanceNo)
 {
     LOG_ENTRY_EXIT;
@@ -537,6 +679,20 @@ int hostIf_IPv4Address::set_IPv4Address_Alias(HOSTIF_MsgData_t *stMsgData, int s
     return NOK;
 }
 
+/**
+ * @brief This function sets an IP Interface IPv4 Address.
+ *
+ * @note  This parameter can only be modified if the 'AddressingType' is Static.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo  SubInstance number currently not in use.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv4Address::set_IPv4Address_IPAddress(HOSTIF_MsgData_t *stMsgData, int subInstanceNo)
 {
     LOG_ENTRY_EXIT;
@@ -546,6 +702,20 @@ int hostIf_IPv4Address::set_IPv4Address_IPAddress(HOSTIF_MsgData_t *stMsgData, i
     return OK;
 }
 
+/**
+ * @brief This function sets an IP Interface IPv4Address Subnet Mask of an IPv4 address.
+ *
+ * @note This parameter can only be modified if the 'AddressingType' is static.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] subInstanceNo  SubInstance number currently not in use.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_IPv4_INTERFACE_ADDRESS_API
+ */
 int hostIf_IPv4Address::set_IPv4Address_SubnetMask(HOSTIF_MsgData_t *stMsgData, int subInstanceNo)
 {
     LOG_ENTRY_EXIT;

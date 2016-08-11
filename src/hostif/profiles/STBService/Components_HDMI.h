@@ -17,7 +17,30 @@
  * limitations under the License.
 */
 
+/**
+ * @file Components_HDMI.h
+ * @brief The header file provides capabilities HDMI information APIs.
+ */
 
+/**
+ * @defgroup TR69_HOSTIF_STBSERVICES_HDMI TR-069 Object (Device.STBServices.{i}.Capabilities.HDMI)
+ * A HDMI component models features of the STB HDMI functionality, such as the output
+ * resolution mode and value.
+ * It also contains a sub object providing details on the connected HDMI display device typically
+ * a TV set for instance, the delay the STB is requested to apply to audio to preserve 'lip sync'
+ * synchronization. This is a read-only parameter for the ACS, and is communicated to the STB through
+ * the HDMI interface.
+ *
+ * @ingroup TR69_HOSTIF_STBSERVICES
+ *
+ * @defgroup TR69_HOSTIF_STBSERVICES_HDMI_API TR-069 Object (Device.STBServices.{i}.Capabilities.HDMI) Public APIs
+ * Describe the details about TR-069 capabilities of HDMI APIs specifications.
+ * @ingroup TR69_HOSTIF_STBSERVICES_HDMI
+ *
+ * @defgroup TR69_HOSTIF_STBSERVICES_HDMI_CLASSES TR-069 Object (Device.STBServices.{i}.Capabilities.HDMI) Public Classes
+ * Describe the details about classes used in TR069 capabilities of HDMI.
+ * @ingroup TR69_HOSTIF_STBSERVICES_HDMI
+ */
 
 /**
 * @defgroup tr69hostif
@@ -59,6 +82,10 @@
 #define PARAM_LEN TR69HOSTIFMGR_MAX_PARAM_LEN
 #endif
 
+/**
+ * @brief This class provides the TR-069 components HDMI information.
+ * @ingroup TR69_HOSTIF_STBSERVICES_HDMI_CLASSES
+ */
 class  hostIf_STBServiceHDMI
 {
     static GHashTable *ifHash;
@@ -93,6 +120,13 @@ private:
 public:
     static hostIf_STBServiceHDMI *getInstance(int dev_id);
     static void closeInstance(hostIf_STBServiceHDMI *);
+/**
+ * @brief This function checks for the host IF HDMI interface updates such as Status, Enable, ResolutionMode,
+ * ResolutionValue etc in a connected HDMI port. Currently not implemented.
+ *
+ * @param[in] mUpdateCallback  Callback function pointer to check for the host IF HDMI interface update.
+ * @ingroup TR69_HOSTIF_STBSERVICES_HDMI_API
+ */
     void checkForUpdates(updateCallback mUpdateCallback);
     static GList* getAllInstances();
     static void closeAllInstances();

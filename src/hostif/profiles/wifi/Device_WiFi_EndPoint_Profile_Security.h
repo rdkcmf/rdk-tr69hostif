@@ -18,6 +18,12 @@
 */
 
 
+/**
+ * @defgroup TR69_HOSTIF_WIFI_ENDPOINT_PROFILE_SECURITY TR-069 Object (Device.WiFi.EndPoint.{i}.Profile.{i}.Security.) Public APIs
+ * This object contains security related parameters that apply to a WiFi End Point profile [802.11-2007].
+ * @ingroup TR69_HOSTIF_WIFI
+ */
+
 
 /**
 * @defgroup tr69hostif
@@ -54,10 +60,64 @@ public:
     char PreSharedKey[64];
     char KeyPassphrase[64];
 
+   /**
+    * @ingroup TR69_HOSTIF_WIFI_ENDPOINT_PROFILE_SECURITY
+    * @{
+    */
+
+   /**
+    * @brief This function is used to get which security mode is enabled for wireless end point.
+    * The value MUST be a member of the list reported by the Security.ModesSupported parameter.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */ 
     int get_hostIf_WiFi_EndPoint_Profile_Security_ModeEnabled(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief Get a WEP key expressed as a hexadecimal string.
+    *
+    * WEPKey is used only if ModeEnabled is set to WEP-64 or WEP-128.
+    * @n A 5 byte WEPKey corresponds to security mode WEP-64 and a 13 byte WEPKey corresponds to security mode WEP-128.
+    * @n When read, this parameter returns an empty string, regardless of the actual value.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */ 
     int get_hostIf_WiFi_EndPoint_Profile_Security_WEPKey(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief Get a literal PreSharedKey (PSK) expressed as a hexadecimal string.
+    *
+    * PreSharedKey is only used if ModeEnabled is set to WPA-Personal or WPA2-Personal or WPA-WPA2-Personal.
+    * @n If KeyPassphrase is written, then PreSharedKey is immediately generated. The ACS SHOULD NOT set both
+    * the KeyPassphrase and the PreSharedKey directly (the result of doing this is undefined).
+    * @n When read, this parameter returns an empty string, regardless of the actual value.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    */ 
     int get_hostIf_WiFi_EndPoint_Profile_Security_PreSharedKey(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief Get a passphrase from which the PreSharedKey is to be generated, for WPA-Personal or WPA2-Personal
+    * or WPA-WPA2-Personal security modes.
+    *
+    * If KeyPassphrase is written, then PreSharedKey is immediately generated. The ACS SHOULD NOT set both the
+    * KeyPassphrase and the PreSharedKey directly (the result of doing this is undefined). The key is generated
+    * as specified by WPA, which uses PBKDF2 from PKCS #5: Password-based Cryptography Specification Version 2.0 [RFC2898].
+    * @n When read, this parameter returns an empty string, regardless of the actual value.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */ 
     int get_hostIf_WiFi_EndPoint_Profile_Security_KeyPassphrase(HOSTIF_MsgData_t *stMsgData );
+
+    /** @} */ // End of Doxygen tag TR69_HOSTIF_WIFI_ENDPOINT_PROFILE_SECURITY
 };
 
 

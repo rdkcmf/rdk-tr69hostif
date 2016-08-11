@@ -16,6 +16,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+/**
+ * @file Device_DHCPv4_Client.cpp
+ * @brief This source file contains the APIs of device DHCPv4 client.
+ */
 #include <net/if.h>
 #include <string.h>
 #include "Device_DHCPv4_Client.h"
@@ -31,6 +36,14 @@ GHashTable *hostIf_DHCPv4Client::dhcpv4ClientHash = NULL;
 GMutex *hostIf_DHCPv4Client::m_mutex = NULL;
 GHashTable* hostIf_DHCPv4Client::m_notifyHash = NULL;
 /* Constructor for hostIf_DHCPv4Client*/
+
+/**
+ * @brief Class Constructor of the class hostIf_DHCPv4Client.
+ *
+ * It will initialize the device id, interface, dns servers and ipRouters.
+ *
+ * @param[in] devid Device identification Number.
+ */
 hostIf_DHCPv4Client::hostIf_DHCPv4Client(int dev_id):dev_id(dev_id)
 {
     FILE* cmdOP;
@@ -136,6 +149,19 @@ void hostIf_DHCPv4Client::closeAllInstances()
     }
 }
 
+/**
+ * @brief This gets the interface information used by the DHCP(Dynamic Host Configuration Protocol)
+ * v4 client devices.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DHCPv4_CLIENT_API
+ */
 int hostIf_DHCPv4Client::get_Device_DHCPv4_Client_InterfaceReference(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     int ret = get_Device_DHCPv4_Client_Fields(eDHCPv4Interface);
@@ -156,6 +182,19 @@ int hostIf_DHCPv4Client::get_Device_DHCPv4_Client_InterfaceReference(HOSTIF_MsgD
     return ret;
 }
 
+/**
+ * @brief This gets the DNS server information used by the DHCP(Dynamic Host Configuration Protocol)
+ * v4 client devices.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DHCPv4_CLIENT_API
+ */
 int hostIf_DHCPv4Client::get_Device_DHCPv4_Client_DnsServer(HOSTIF_MsgData_t *stMsgData, bool* pChanged)
 {
     int ret= get_Device_DHCPv4_Client_Fields(eDHCPv4Dnsservers);
@@ -176,6 +215,19 @@ int hostIf_DHCPv4Client::get_Device_DHCPv4_Client_DnsServer(HOSTIF_MsgData_t *st
     return ret;
 }
 
+/**
+ * @brief This gets the IP Routers information used by the DHCP(Dynamic Host Configuration Protocol)
+ * v4 client devices.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DHCPv4_CLIENT_API
+ */
 int hostIf_DHCPv4Client::get_Device_DHCPv4_Client_IPRouters(HOSTIF_MsgData_t *stMsgData, bool* pChanged)
 {
     int ret = get_Device_DHCPv4_Client_Fields(eDHCPv4Iprouters);

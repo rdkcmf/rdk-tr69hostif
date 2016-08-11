@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file hostIf_MoCAClient_ReqHandler.cpp
+ * @brief The header file provides HostIf IP json request handler information APIs.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -58,6 +62,15 @@ void MoCAClientReqHandler::reset()
     MoCAInterface::releaseLock();
 }
 
+/**
+ * @brief This function is use to initialize. Currently not implemented.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successfully .
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_MOCACLIENT_REQHANDLER_CLASSES
+ */
 bool MoCAClientReqHandler::init()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -65,6 +78,16 @@ bool MoCAClientReqHandler::init()
     return true;
 }
 
+/**
+ * @brief This function is used to close all the instances of MoCA interface, MoCA interface stats
+ * MoCA interface QoS, MoCA interface QoSFlowStats and MoCA interface associated device.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if it is successfully close all the instances.
+ * @retval false if not able to close all the instances.
+ * @ingroup TR-069HOSTIF_MOCACLIENT_REQHANDLER_CLASSES
+ */
 bool MoCAClientReqHandler::unInit()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -81,6 +104,19 @@ bool MoCAClientReqHandler::unInit()
     return true;
 }
 
+/**
+ * @brief This function is use to handle the set message request of MoCA interface
+ * and set the attributes of the components such as "Enable", "Alias", "LowerLayers"
+ * etc..
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_MOCACLIENT_REQHANDLER_CLASSES
+ */
 int MoCAClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -158,6 +194,18 @@ int MoCAClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+/**
+ * @brief This function is use to handle the get message request of MoCA interface,
+ * QoS.FlowStats, Associated devices and get the attributes of the components.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_MOCACLIENT_REQHANDLER_CLASSES
+ */
 int MoCAClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;

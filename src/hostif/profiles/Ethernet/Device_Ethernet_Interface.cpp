@@ -18,21 +18,10 @@
 */
 
 /**
- * @file Device_Ethernet_Interface.c
- *
- * @brief Device.Ethernet.Interface. API Implementation.
- *
- * This is the implementation of the Device.Ethernet.Interface. API.
- *
- * @par Document
- * TBD Relevant design or API documentation.
- *
+ * @file Device_Ethernet_Interface.cpp
+ * @brief This source file contains the APIs of device ethernet interface.
  */
 
-/** @addtogroup Device.Ethernet.Interface. Implementation
- *  This is the implementation of the Device Public API.
- *  @{
- */
 
 /*****************************************************************************
  * STANDARD INCLUDE FILES
@@ -154,6 +143,14 @@ GHashTable* hostIf_EthernetInterface::getNotifyHash()
 		return m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
 	}
 }
+
+/**
+ * @brief Class Constructor of the class hostIf_EthernetInterface.
+ *
+ * It will initialize the device id.
+ *
+ * @param[in] devid Device identification Number.
+ */
 hostIf_EthernetInterface::hostIf_EthernetInterface(int dev_id):
     dev_id(dev_id),
     backupEnable(false),
@@ -454,6 +451,18 @@ int hostIf_EthernetInterface::get_Device_Ethernet_InterfaceNumberOfEntries(HOSTI
     return OK;
 }
 
+/**
+ * @brief Get the status of an Ethernet interface is 'Enabled' or 'Disabled'.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Enable(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eEnable);
@@ -471,6 +480,47 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Enable(HOSTIF_MsgDat
     return OK;
 }
 
+
+/**
+ * @brief This function gets the current operational state of the 'Ethernet' interface.
+ * Such as Up, Down, Unknown, Dormant, NotPresent, LowerLayerDown and Error (OPTIONAL).
+ *
+ * @note
+ *  - When Enable is "false" then status SHOULD normally be 'Down' or 'NotPresent' or
+ * 'Error' if there is a fault condition on the interface.
+ *
+ * Code             | Description
+ * -----------------|------------
+ * 'Error'          | if there is an error or other fault condition detected on the interface.
+ *                  |
+ * 'NotPresent'     | if the interface is missing i.e the hardware component is not present.
+ *                  |
+ * 'Unknown'        | if the state of the interface can not be determined for some reason.
+ *
+ *  - When enable is changed to "true" then status should change to
+ * Code             | Description
+ * -----------------|------------
+ * 'Up'             | if and only if the interface is able to transmit and receive network traffic
+ *                  |
+ * 'Dormant'        | if and only if the interface is operable but is waiting for external actions before
+ *                  | it can transmit and receive network traffic and subsequently change to 'Up' if still operable
+ *                  | when the expected actions have completed.
+ *                  |
+ * 'LowerLayerDown' | if and only if the interface is prevented from entering the 'Up' state because one or more
+ *                  | of the interfaces beneath it is down.
+ *
+ *  These parameter is based on ifOperStatus from RFC 2863, the Interfaces Group MIB, IETF, 2000.
+ *
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Status(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eStatus);
@@ -488,6 +538,18 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Status(HOSTIF_MsgDat
     return OK;
 }
 
+/**
+ * @brief Get the textual name of the 'Ethernet' interface.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Name(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eName);
@@ -505,6 +567,16 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Name(HOSTIF_MsgData_
     return OK;
 }
 
+/**
+ * @brief This function provides the accumulated time in seconds since this Ethernet
+ * interface entered its current operational state. Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns enum integer '-1' on method completion.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::get_Device_Ethernet_Interface_LastChange(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     /*Retrieving value */
@@ -513,6 +585,20 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_LastChange(HOSTIF_Ms
     return NOK;
 }
 
+/**
+ * @brief  This function provides a comma-separated list (maximum length 1024) of strings.  Each
+ * list item MUST be the path name of an interface object that is stacked immediately
+ * below this Ethernet interface object. Currently not implemented.
+ *
+ * @note  If the referenced object is deleted, the corresponding item MUST be removed from the list.
+ * Since Interface is a layer 1 interface, it is expected that 'LowerLayers' will not be used.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns enum integer '-1' on method completion.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::get_Device_Ethernet_Interface_LowerLayers(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     /*Retrieving value */
@@ -521,6 +607,26 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_LowerLayers(HOSTIF_M
     return NOK;
 }
 
+/**
+ * @brief This function indicates whether the interface points towards the Internet represent by 'true'
+ * or towards End Devices represent by false
+ * For example:
+ * - For an Internet Gateway Device, Upstream will be "true" for all WAN interfaces and "false"
+ * for all LAN interfaces.
+ * - For a standalone WiFi Access Point that is connected via Ethernet to an Internet Gateway
+ * Device, Upstream will be "true" for the Ethernet interface and "false" for the WiFi Radio interface.
+ * - For an End Device, Upstream will be "true" for all interfaces.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ *
+ */
 int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Upstream(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eUpstream);
@@ -538,6 +644,22 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Upstream(HOSTIF_MsgD
     return OK;
 }
 
+/**
+ * @brief This function provides the MAC Address of this Ethernet interface.
+ *
+ * @note    This is not necessarily the same as the Ethernet header source or
+ *          destination MAC address, which is associated with the IP interface and is
+ *          modelled via the Ethernet.Link.{i}.MACAddress parameter.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully get the MAC address.
+ * @retval ERR_INTERNAL_ERROR if not able to get the MAC address.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::get_Device_Ethernet_Interface_MACAddress(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eMACAddress);
@@ -555,6 +677,21 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_MACAddress(HOSTIF_Ms
     return OK;
 }
 
+/**
+ * @brief This function provides the maximum upstream and downstream PHY bit rate supported
+ * by this Ethernet interface it expressed in Mbps.
+ *
+ * @note  A value of -1 indicates automatic selection of the maximum bit rate.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully get the Max BitRate.
+ * @retval ERR_INTERNAL_ERROR if not able to get the Max BitRate.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::get_Device_Ethernet_Interface_MaxBitRate(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eMaxBitRate);
@@ -572,6 +709,19 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_MaxBitRate(HOSTIF_Ms
     return OK;
 }
 
+/**
+ * @brief  This function provides a string indicating the duplex mode available to this
+ * Ethernet connection. This contains the enumeration such as Half, Full, Auto.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully get the Duplex mode status of ethernet interface.
+ * @retval ERR_INTERNAL_ERROR if not able to get the Duplex mode status of ethernet interface.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::get_Device_Ethernet_Interface_DuplexMode(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eDuplexMode);
@@ -591,6 +741,15 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_DuplexMode(HOSTIF_Ms
 /****************************************************************************************************************************************************/
 // Device.Ethernet.Interface. Profile. Setters:
 /****************************************************************************************************************************************************/
+
+/**
+ * @brief This function sets the status of 'Ethernet' interface as enabled or disabled.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns 'true' if the Ethernet interface is enabled successfully else 'false'.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::set_Device_Ethernet_Interface_Enable(HOSTIF_MsgData_t* stMsgData)
 {
     unsigned int ethInterfNo = 0;
@@ -612,11 +771,44 @@ int hostIf_EthernetInterface::set_Device_Ethernet_Interface_Enable(HOSTIF_MsgDat
 
     return OK;
 }
+
+/**
+ * @brief  This function sets a non-volatile handle used to reference this Ethernet
+ * interface instance. Alias provides a mechanism for an ACS to label this instance
+ * for future reference. This function is currently not implemented.
+ * @note  If the CPE supports the Alias-based Addressing feature as defined in
+ * [Section 3.6.1/TR-069 Amendment 4] and described in [Appendix II/TR-069
+ * Amendment 4], the following mandatory constraints MUST be enforced:
+ * - Its value MUST NOT be empty.
+ * - Its value MUST start with a letter.
+ * - If its instance object is created by the CPE, the initial
+ *   value MUST start with a "cpe-" prefix.
+ * - The CPE MUST NOT change the parameter value.
+ *
+ * @param[out] TR-069 Host interface message request.
+ *
+ * @return Returns enum integer '-1' on method completion.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::set_Device_Ethernet_Interface_Alias(HOSTIF_MsgData_t* stMsgData)
 {
     return NOK;
 }
 
+/**
+ * @brief This function sets the 'Ethernet' interface 'LowerLayers'. Given a comma-separated list
+ * (maximum length 1024) of strings, each list item being the path name of an 'Ethernet' interface
+ * object, this function MUST stack each item in the list immediately below this interface object.
+ * Currently not implemented.
+ *
+ * @note If the referenced object is deleted, the corresponding item MUST be removed from the list.
+ * Since Interface is a layer 1 interface, it is expected that 'LowerLayers' will not be used.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns enum integer '-1' on method completion.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::set_Device_Ethernet_Interface_LowerLayers(HOSTIF_MsgData_t* stMsgData)
 {
     /*Retrieving value */
@@ -625,6 +817,20 @@ int hostIf_EthernetInterface::set_Device_Ethernet_Interface_LowerLayers(HOSTIF_M
 
     return NOK;
 }
+
+
+/**
+ * @brief This function sets the maximum bit rate attainable on an 'Ethernet' Interface.
+ * This function sets the maximum upstream and downstream PHY bit rate supported
+ * by this 'Ethernet' interface (expressed in Mbps). This function is currently not implemented.
+ *
+ * @note  A value of -1 indicates automatic selection of the maximum bit rate.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns enum integer '-1' on method completion.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::set_Device_Ethernet_Interface_MaxBitRate(HOSTIF_MsgData_t* stMsgData)
 {
 
@@ -633,6 +839,18 @@ int hostIf_EthernetInterface::set_Device_Ethernet_Interface_MaxBitRate(HOSTIF_Ms
     // value->out_cval =
     return NOK;
 }
+
+/**
+ * @brief This function sets the 'Duplex Mode' available on an ethernet Interface.
+ * This function sets the string indicating the duplex mode available to this
+ * Ethernet connection. This is an enumeration having values Half, Full, Auto.
+ * This function is currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns enum integer '-1' on method completion.
+ * @ingroup TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_API
+ */
 int hostIf_EthernetInterface::set_Device_Ethernet_Interface_DuplexMode(HOSTIF_MsgData_t* stMsgData)
 {
     /*Retrieving value */

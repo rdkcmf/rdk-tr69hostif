@@ -52,9 +52,7 @@
 *
 */
 
-/** @defgroup HOST_IF
-*    @ingroup HOST_IF
-*
+/**
 *  HOST-IF is a platform agnostic Inter-process communication (IPC) interface. It allows
 *  applications to communicate with each other by sending Events or invoking Remote
 *  Procedure Calls. The common programming APIs offered by the RDK IARM-Bus interface is

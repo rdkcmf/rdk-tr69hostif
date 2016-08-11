@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file hostIf_dsClient_ReqHandler.cpp
+ * @brief The header file provides HostIf ds client request handler information APIs.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -62,6 +66,15 @@ msgHandler* DSClientReqHandler::getInstance()
     return pInstance;
 }
 
+/**
+ * @brief This function is used to initialize the device manager.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successful.
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_DSCLIENT_REQHANDLER_CLASSES
+ */
 bool DSClientReqHandler::init()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -78,6 +91,17 @@ bool DSClientReqHandler::init()
     return true;
 }
 
+/**
+ * @brief This function is used to close all the instances of  STB services such as 
+ * HDMI, VideoOutput, VideoDecoder, AudioInterface and SPDIF. It also deinitialize the 
+ * device manager.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if it successfully close all the instances.
+ * @retval false if not able to close all the instances.
+ * @ingroup TR-069HOSTIF_DSCLIENT_REQHANDLER_CLASSES
+ */
 bool DSClientReqHandler::unInit()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -92,6 +116,18 @@ bool DSClientReqHandler::unInit()
     return true;
 }
 
+/**
+ * @brief This function is used to handle the set message request of DsClient i.c STBService such as
+ * "HDMI", "VideoDecoder", "AudioOutput" and "SPDIF".
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successful.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_DSCLIENT_REQHANDLER_CLASSES
+ */
 int DSClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -159,6 +195,19 @@ int DSClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+/**
+ * @brief This function is used to handle the get message request of DsClient i.e STBServices 
+ * components and the total number of active entries of "VideoDecode", "AudioOutput", 
+ * "VideoOutput", "HDMI", "SPDIF".
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is gets the data successfully.
+ * @retval ERR_INTERNAL_ERROR if not able to get the data from the device.
+ * @ingroup TR-069HOSTIF_DSCLIENT_REQHANDLER_CLASSES
+ */
 int DSClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -339,6 +388,7 @@ int DSClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     hostIf_STBServiceHDMI::releaseLock();
     return ret;
 }
+
 
 void DSClientReqHandler::registerUpdateCallback(updateCallback cb)
 {

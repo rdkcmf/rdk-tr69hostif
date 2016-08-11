@@ -18,20 +18,8 @@
 */
 
 /**
- * @file Device_IP_Interface_Stats.c
- *
- * @brief IP Interface Stats API Implementation.
- *
- * This is the implementation of the IP Interface Stats API.
- *
- * @par Document
- * TBD Relevant design or API documentation.
- *
- */
-
-/** @addtogroup IP Interface Stats Implementation
- *  This is the implementation of the Device Public API.
- *  @{
+ * @file Device_IP_Interface_Statss.cpp
+ * @brief This source file contains the APIs of device IPv4 interface stats.
  */
 
 /*****************************************************************************
@@ -148,6 +136,13 @@ void hostIf_IPInterfaceStats::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
+/**
+ * @brief Class Constructor of the class hostIf_IPInterfaceStats.
+ *
+ * It will initialize the device id.
+ *
+ * @param[in] dev_id Identification number of the device to communicate.
+ */
 hostIf_IPInterfaceStats::hostIf_IPInterfaceStats(int dev_id):
     dev_id(dev_id),
     backupBytesSent(0),
@@ -276,6 +271,19 @@ int hostIf_IPInterfaceStats::getSysClassNetStatistic (char* statistic, unsigned 
 // Device_IP_Interface_Stats Profile. Getters:
 /****************************************************************************************************************************************************/
 
+/**
+ * @brief This function gets the number of bytes sent on the IP Interface. It provides the
+ * total number of bytes transmitted out of the interface, including framing characters.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BytesSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.bytesSent = 0;
@@ -294,6 +302,19 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BytesSent(HOSTIF_MsgD
     return OK;
 }
 
+/**
+ * @brief This function gets the number of bytes received on the IP Interface. It provides
+ * the total number of bytes received on the interface, including framing characters.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BytesReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.bytesReceived = 0;
@@ -311,6 +332,20 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BytesReceived(HOSTIF_
 
     return OK;
 }
+
+/**
+ * @brief This function gets the number of packets sent on the IP Interface. It provides
+ * the total number of packets transmitted out of the interface.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_PacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.packetsSent = 0;
@@ -328,6 +363,19 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_PacketsSent(HOSTIF_Ms
 
     return OK;
 }
+
+/**
+ * @brief This function gets the total number of packets received on the IP Interface.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_PacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.packetsReceived = 0;
@@ -348,6 +396,20 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_PacketsReceived(HOSTI
 
     return OK;
 }
+
+/**
+ * @brief  This function gets the number of send errors on the IP Interface. It provides
+ * the total number of outbound packets that could not be transmitted because of errors.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_ErrorsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.errorsSent = 0;
@@ -365,6 +427,21 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_ErrorsSent(HOSTIF_Msg
 
     return OK;
 }
+
+/**
+ * @brief This function gets the number of receive errors on the IP Interface. It provides
+ * the total number of inbound packets that contained errors preventing them from being
+ * delivered to a higher-layer protocol.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_ErrorsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.errorsReceived = 0;
@@ -382,6 +459,22 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_ErrorsReceived(HOSTIF
 
     return OK;
 }
+
+/**
+ * @brief This function gets the number of unicast packets for which a request to send on the IP
+ * Interface was received. It provides the total number of packets requested for transmission which
+ * were not addressed to a multicast or broadcast address at this layer, including those that
+ * were discarded or not sent.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnicastPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.unicastPacketsSent = 0;
@@ -399,6 +492,21 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnicastPacketsSent(HO
 
     return OK;
 }
+
+/**
+ * @brief This function gets the number of unicast packets received on the IP Interface. Provides
+ * the total number of received packets, delivered by this layer to a higher layer, which were
+ * not addressed to a multicast or broadcast address at this layer.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnicastPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.unicastPacketsReceived = 0;
@@ -416,6 +524,23 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnicastPacketsReceive
 
     return OK;
 }
+
+/**
+ * @brief This function gets the number of discarded outbound packets on the IP Interface. It
+ * provides the total number of outbound packets which were chosen to be discarded even though
+ * no errors had been detected to prevent their being transmitted.
+ *
+ * @note One possible reason for discarding such a packet could be to free up buffer space.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_DiscardPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.discardPacketsSent = 0;
@@ -433,6 +558,23 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_DiscardPacketsSent(HO
 
     return OK;
 }
+
+/**
+ * @brief This function gets the number of discarded inbound packets on the IP Interface. It provides
+ * the total number of inbound packets which were chosen to be discarded even though no errors had
+ * been detected to prevent their being delivered.
+ *
+ * @note One possible reason for discarding such a packet could be to free up buffer space.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_DiscardPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.discardPacketsReceived = 0;
@@ -450,6 +592,21 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_DiscardPacketsReceive
 
     return OK;
 }
+
+/**
+ * @brief  This function gets the number of Multicast Packets sent on the IP Interface. It provides
+ * the total number of packets that higher-level protocols requested for transmission and which were
+ * addressed to a multicast address at this layer, including those that were discarded or not sent.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_MulticastPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.multicastPacketsSent = 0;
@@ -467,6 +624,21 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_MulticastPacketsSent(
 
     return OK;
 }
+
+/**
+ * @brief This function gets the number of Multicast Packets received on the IP Interface. It provides the
+ * total number of received packets, delivered by this layer to a higher layer, which were addressed
+ * to a multicast address at this layer.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_MulticastPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.multicastPacketsReceived = 0;
@@ -484,6 +656,23 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_MulticastPacketsRecei
 
     return OK;
 }
+
+/**
+ * @brief This function gets the number of broadcast packets sent on the IP Interface. It provides
+ * the total number of packets that higher-level protocols requested for transmission and which
+ * were addressed to a broadcast address at this layer, including those that were discarded or not sent.
+ *
+ * @note IPv6 does not define broadcast addresses, so IPv6 packets will never cause this counter to increment.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BroadcastPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.broadcastPacketsSent = 0;
@@ -501,6 +690,24 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BroadcastPacketsSent(
 
     return OK;
 }
+
+/**
+ * @brief This function gets the number of broadcast packets received on the IP interface.
+ * It provides the total number of received packets, delivered by this layer to a higher layer,
+ * which were addressed to a broadcast address at this layer.
+ *
+ * @note IPv6 does not define broadcast addresses, so IPv6 packets will never cause this counter
+ * to increment.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BroadcastPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.broadcastPacketsReceived = 0;
@@ -518,6 +725,21 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BroadcastPacketsRecei
 
     return OK;
 }
+
+/**
+ * @brief This function gets the number of Packets of unidentified protocol received on
+ * the IP Interface. It provides the total number of packets received via the interface
+ * which were discarded because they were of an unknown or unsupported protocol.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API
+ */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnknownProtoPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     curntIpStat.unknownProtoPacketsReceived = 0;

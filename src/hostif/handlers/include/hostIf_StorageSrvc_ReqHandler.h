@@ -16,33 +16,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+/**
+ * @file hostIf_StorageSrvc_ReqHandler.h
+ * @brief The header file provides HostIf Storage service request handler information APIs.
+ */
+
+/**
+ * @defgroup TR-069HOSTIF_STORAGESERVICE_REQHANDLER_CLASSES StorageService RequestHandler Public Classes
+ * Describe the details about classes used in TR-069 storage service handler.
+ * @ingroup TR-069HOSTIF_DEVICECLIENT_HANDLER
+ */
+
 /**
  * @file hostIf_StorageSrvc_ReqHandler.h
  *
  * @brief host Interface for Storage Service Request Handler
  *
- * This exposes APIs for get and set operations for the Storage service 
+ * This exposes APIs for get and set operations for the Storage service
  *
  * @author karsomas@cisco.com
  *
  */
 
-/** @defgroup HOST_IF STORAGE SERVICE HANDLER
- *   @ingroup HOST_IF
- *
+/**
  *  StorageService interface is a platform agnostic IARM communication interface. It allows
  *  StorageService applications to communicate by sending Get and Set operation
  *
  */
 
- /** @addtogroup HOST_IF STORAGE SERVICE HANDLER_API .
- *  @ingroup HOST_IF
- *
- *  Described herein are the functions that are part of the
- *  Storage service Request handler .
- *
- *  @{
- */
 
 #ifndef HOSTIF_STORAGESRVC_REQHANDLER_H_
 #define HOSTIF_STORAGESRVC_REQHANDLER_H_
@@ -50,7 +52,10 @@
 #include "hostIf_msgHandler.h"
 #include "hostIf_updateHandler.h"
 
-
+/**
+ * @brief This class provides the interface for getting StorageService request handler information.
+ * @ingroup TR-069HOSTIF_STORAGESERVICE_REQHANDLER_CLASSES
+ */
 class StorageSrvcReqHandler : public msgHandler
 {
     StorageSrvcReqHandler() {};

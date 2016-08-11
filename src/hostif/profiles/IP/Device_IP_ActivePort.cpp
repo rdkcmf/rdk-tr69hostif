@@ -18,20 +18,8 @@
 */
 
 /**
- * @file Device_IP_ActivePort.c
- *
- * @brief Device.IP.ActivePort. API Implementation.
- *
- * This is the implementation of the Device.IP.ActivePort. API.
- *
- * @par Document
- * TBD Relevant design or API documentation.
- *
- */
-
-/** @addtogroup Device.IP.ActivePort. Implementation
- *  This is the implementation of the Device Public API.
- *  @{
+ * @file Device_IP_ActivePort.cpp
+ * @brief This source file contains the APIs of device IP active ports.
  */
 
 /*****************************************************************************
@@ -130,6 +118,14 @@ int hostIf_IPActivePort::getActivePortsFields(unsigned int activePortNo)
     return ret;
 }
 
+/**
+ * @brief Class Constructor of the class hostIf_IPActivePort.
+ *
+ * It will initialize the device id. And it will initialize the local IP address , remote IP address to
+ * empty string.
+ *
+ * @param[in] dev_id Device identification number.
+ */
 hostIf_IPActivePort::hostIf_IPActivePort(int dev_id):
     dev_id(dev_id),
     bCalledLocalIPAddress(false),
@@ -252,6 +248,19 @@ int hostIf_IPActivePort::handleGetMsg (const char* pSetting, HOSTIF_MsgData_t* s
 /*
  * Parameter Name: Device.IP.ActivePort.
 */
+
+/**
+ * @brief This function gets the local IP Address of the connection.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT_API
+ */
 int hostIf_IPActivePort::get_Device_IP_ActivePort_LocalIPAddress(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     /*Retrieving value */
@@ -270,6 +279,18 @@ int hostIf_IPActivePort::get_Device_IP_ActivePort_LocalIPAddress(HOSTIF_MsgData_
     return OK;
 }
 
+/**
+ * @brief This function gets the local port number of the connection.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT_API
+ */
 int hostIf_IPActivePort::get_Device_IP_ActivePort_LocalPort(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
 
@@ -287,6 +308,23 @@ int hostIf_IPActivePort::get_Device_IP_ActivePort_LocalPort(HOSTIF_MsgData_t *st
 
     return OK;
 }
+
+/**
+ * @brief This function gets the remote IP Address of the established connection.
+ * It provides the remote IP address of the source of inbound packets.
+ *
+ * @note This will be an empty string for listening connections  ESTABLISHED state
+ * have remote addresses.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT_API
+ */
 int hostIf_IPActivePort::get_Device_IP_ActivePort_RemoteIPAddress(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     /*Retrieving value */
@@ -302,6 +340,22 @@ int hostIf_IPActivePort::get_Device_IP_ActivePort_RemoteIPAddress(HOSTIF_MsgData
     stMsgData->paramLen = strlen( activePort.remoteIpAddress);
     return OK;
 }
+
+/**
+ * @brief This function gets the remote port number of the established connection. It provides the
+ * remote port number of the source of inbound packets.
+ *
+ * @note  This will be 0 for listening connections only ESTABLISHED the state have remote addresses.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT_API
+ */
 int hostIf_IPActivePort::get_Device_IP_ActivePort_RemotePort(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
 
@@ -318,6 +372,20 @@ int hostIf_IPActivePort::get_Device_IP_ActivePort_RemotePort(HOSTIF_MsgData_t *s
     stMsgData->paramLen = 4;
     return OK;
 }
+
+/**
+ * @brief This function gets the current operational status of the connection. The possible values are
+ * 'LISTEN', 'ESTABLISHED'.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if is successfully fetch the data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_ACTIVEPORT_API
+ */
 int hostIf_IPActivePort::get_Device_IP_ActivePort_Status(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     /*Retrieving value */

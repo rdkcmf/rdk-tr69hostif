@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file hostIf_EthernetClient_ReqHandler.cpp
+ * @brief The header file provides HostIf Ethernet client request handler information APIs.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -49,6 +53,16 @@ void EthernetClientReqHandler::reset()
     memset(curNumOfDevices,0,sizeof(curNumOfDevices));
     hostIf_EthernetInterface::releaseLock();
 }
+
+/**
+ * @brief This function is used to initialize. Currently not implemented.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successful.
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_ETHERNETCLIENT_REQHANDLER_CLASSES
+ */
 bool EthernetClientReqHandler::init()
 {
 //    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -56,6 +70,16 @@ bool EthernetClientReqHandler::init()
     return true;
 }
 
+/**
+ * @brief This function is used to close all the instances of ethernet interface
+ * and ethernet interface stats.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if it successfully close all the instances.
+ * @retval false if not able to close all the instances.
+ * @ingroup TR-069HOSTIF_ETHERNETCLIENT_REQHANDLER_CLASSES
+ */
 bool EthernetClientReqHandler::unInit()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -67,6 +91,18 @@ bool EthernetClientReqHandler::unInit()
     return true;
 }
 
+/**
+ * @brief This function is used to handle the set message request of ethernet interface
+ * attribute such as "Enable", "Alias", "LowerLayers", "MaxBitRate" and "DuplexMode".
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if successful.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_ETHERNETCLIENT_REQHANDLER_CLASSES
+ */
 int EthernetClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -117,6 +153,19 @@ int EthernetClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+/**
+ * @brief This function is used to handle the get message request of ethernet interface
+ * attributes such as "Enable", "Status", "Name", "LastChange", "Upstream", "MACAddress"
+ * etc..
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it gets the data successfully.
+ * @retval ERR_INTERNAL_ERROR if not able to get the data from the device.
+ * @ingroup TR-069HOSTIF_ETHERNETCLIENT_REQHANDLER_CLASSES
+ */
 int EthernetClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;

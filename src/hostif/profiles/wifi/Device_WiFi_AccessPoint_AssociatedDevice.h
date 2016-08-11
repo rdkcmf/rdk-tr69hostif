@@ -17,6 +17,13 @@
  * limitations under the License.
 */
 
+/**
+ * @defgroup TR69_HOSTIF_WIFI_ACP_ASSOCIATEDDEV TR-069 Object (Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.) Public APIs
+ * The module provide the interface specifications for TR-069 Object Access Point.
+ * A table of the devices currently associated with the access point.
+ * At most one entry in this table can exist with a given value for MACAddress.
+ * @ingroup TR69_HOSTIF_WIFI
+ */
 
 
 /**
@@ -58,22 +65,84 @@ public:
     unsigned int Retransmissions;
     bool Active;
 
-    /**
-     * @brief    Get the MAC Address of an Associated Device of a WiFi Interface.
-     *
-     * This function provides the MAC address of the WiFi interface of the device associated
-     * with this WiFi interface.
-     *
-     * See @ref dev_wifi_if_assocdev_getter
-     *
-     */
+    /** @addtogroup TR69_HOSTIF_WIFI_ACP_ASSOCIATEDDEV
+      * @{
+      */
+   /**
+    * @brief Get the MAC Address of an Associated Device of a WiFi Interface.
+    *
+    * This function provides the MAC address of the WiFi interface of the device associated
+    * with this WiFi interface.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_hostIf_WiFi_AccessPoint_AssociatedDevice_MACAddress(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief Check Whether an associated device has authenticated (true) or not (false).
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_hostIf_WiFi_AccessPoint_AssociatedDevice_AuthenticationState(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief Get the data transmit rate in kbps that was most recently used for transmission from the access
+    * point to the associated device.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_hostIf_WiFi_AccessPoint_AssociatedDevice_LastDataDownlinkRate(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief Get the data transmit rate in kbps that was most recently used for transmission from the associated
+    * device to the access point.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_hostIf_WiFi_AccessPoint_AssociatedDevice_LastDataUplinkRate(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief Get the radio signal strength of the uplink from the associated device to the access point,
+    * measured in dBm, as an average of the last 100 packets received from the device.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_hostIf_WiFi_AccessPoint_AssociatedDevice_SignalStrength(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief Get the number of packets that had to be re-transmitted, from the last 100 packets sent to the
+    * associated device. Multiple re-transmissions of the same packet count as one.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_hostIf_WiFi_AccessPoint_AssociatedDevice_Retransmissions(HOSTIF_MsgData_t *stMsgData );
+
+   /**
+    * @brief Check whether or not this node is currently present in the WiFi AccessPoint network.
+    *
+    * The ability to list inactive nodes is optional. If the CPE includes inactive nodes in this table,
+    * Active MUST be set to false for each inactive node. The length of time an inactive node remains listed
+    * in this table is a local matter to the CPE.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_hostIf_WiFi_AccessPoint_AssociatedDevice_Active(HOSTIF_MsgData_t *stMsgData );
+
+    /** @} */ //End of doxygen Tag TR69_HOSTIF_WIFI_ACP_ASSOCIATEDDEV
 };
 
 

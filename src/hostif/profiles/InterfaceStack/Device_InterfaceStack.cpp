@@ -19,17 +19,7 @@
 
 /**
  * @file Device_InterfaceStack.cpp
- *
- * @brief Device.InterfaceStack API Implementation.
- *
- * This is the implementation of the InterfaceStack API.
- *
- * @author vejuturu@cisco.com
- */
-
-/** @addtogroup Device InterfaceStack Implementation
- *  This is the implementation of the Device Interface Stack Public API.
- *  @{
+ * @brief This source file contains the APIs of device interface stack.
  */
 
 /*****************************************************************************
@@ -81,6 +71,16 @@ GHashTable* hostif_InterfaceStack::m_notifyHash = NULL;
 
 /*
  * hostif_InterfaceStack Constructor
+ */
+
+/**
+ * @brief Class Constructor of the class hostif_InterfaceStack.
+ *
+ * It will initialize the device id.
+ *
+ * @param[in] dev_id Identification number of the device.
+ * @param[in] _higherLayer String of the higher layer i.e "Device.Bridging.Bridge.1.port.2".
+ * @param[in] _lowerLayer String of the lower layer i.e "Device.Ethernet.Interface.1".
  */
 hostif_InterfaceStack::hostif_InterfaceStack(int dev_id, char *_higherLayer, char *_lowerLayer):dev_id(dev_id)
 {
@@ -486,7 +486,7 @@ int hostif_InterfaceStack::insertRowIntoBridgeTable(IN char *bridge, IN char *br
 /*
  * This function returns the number of lower level interfaces available.
  *
- */ 
+ */
 template<typename T>
 int hostif_InterfaceStack::getLowerInterfaceNumberOfEntries()
 {
@@ -916,6 +916,17 @@ void hostif_InterfaceStack::print_map(InterfaceStackMap_t &layerInfo)
 /*
  * Gets the HigherLayer of Interface Stack table for a given instance
  */
+
+/**
+ * @brief This function gets the higher layer of the device interface stack.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully get the higher layer of interface stack
+ * else returns '-1'.
+ * @ingroup TR69_HOSTIF_INTERFACESTACK_INTERFACE_API
+ */
 int hostif_InterfaceStack::get_Device_InterfaceStack_HigherLayer(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     int ret = OK;
@@ -935,6 +946,15 @@ int hostif_InterfaceStack::get_Device_InterfaceStack_HigherLayer(HOSTIF_MsgData_
 
 /*
  * Gets the LowerLayer of Interface Stack table for a given instance
+ */
+/**
+ * @brief This function gets the lower layer of the device interface stack.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully get the lower layer of interface  stack else returns '-1'.
+ * @ingroup TR69_HOSTIF_INTERFACESTACK_INTERFACE_API
  */
 int hostif_InterfaceStack::get_Device_InterfaceStack_LowerLayer(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {

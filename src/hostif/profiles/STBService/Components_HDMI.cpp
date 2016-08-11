@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file Components_HDMI.cpp
+ * @brief This source file contains the APIs of TR069 Components HDMI.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -167,6 +171,14 @@ void hostIf_STBServiceHDMI::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
+/**
+ * @brief Class Constructor of the class hostIf_STBServiceHDMI.
+ *
+ * It will initialize the device id and video output port.
+ *
+ * @param[in] devid Identification number of the device.
+ * @param[in] port Video output port number.
+ */
 hostIf_STBServiceHDMI::hostIf_STBServiceHDMI(int devid, device::VideoOutputPort& port) : dev_id(devid), vPort(port)
 {
     backupEnable = false;
@@ -183,6 +195,19 @@ hostIf_STBServiceHDMI::hostIf_STBServiceHDMI(int devid, device::VideoOutputPort&
 
 }
 
+/**
+ * @brief This function set the HDMI interface updates such as Status, Enable,
+ * ResolutionMode, ResolutionValue etc in a connected HDMI port.
+ *
+ * @param[in] paramName  HDMI service name string.
+ * @param[in] stMsgData  HostIf Message Request param contains the HDMI attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully set the hostIf HDMI interface attribute.
+ * @retval -1 If Not able to set the hostIf HDMI interface attribute.
+ * @retval -2 If Not handle the hostIf HDMI interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_HDMI_API
+ */
 int hostIf_STBServiceHDMI::handleSetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -210,6 +235,19 @@ int hostIf_STBServiceHDMI::handleSetMsg(const char *paramName, HOSTIF_MsgData_t 
     return ret;
 }
 
+/**
+ * @brief This function get the HDMI interface updates such as Status, Enable,
+ * ResolutionMode, ResolutionValue etc in a connected HDMI port.
+ *
+ * @param[in] paramName  HDMI service name string.
+ * @param[in] stMsgData  HostIf Message Request param contains the HDMI attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the host IF HDMI interface attribute.
+ * @retval -1 If Not able to get the host IF HDMI interface attribute.
+ * @retval -2 If Not handle the host IF HDMI interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_HDMI_API
+ */
 int hostIf_STBServiceHDMI::handleGetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -243,6 +281,13 @@ int hostIf_STBServiceHDMI::handleGetMsg(const char *paramName, HOSTIF_MsgData_t 
     return ret;
 }
 
+/**
+ * @brief This function updates the HDMI interface updates such as Status, Enable,
+ * ResolutionMode, ResolutionValue etc in a connected HDMI port.
+ *
+ * @param[in] mUpdateCallback  Callback function pointer to updated the host IF HDMI interface.
+ * @ingroup TR69_HOSTIF_STBSERVICES_HDMI_API
+ */
 void hostIf_STBServiceHDMI::doUpdates(updateCallback mUpdateCallback)
 {
     displayDevice->doUpdates(BASE_NAME, mUpdateCallback);

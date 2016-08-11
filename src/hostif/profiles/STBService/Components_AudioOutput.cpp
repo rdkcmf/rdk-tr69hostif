@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file Components_AudioOutput.cpp
+ * @brief This source file contains the APIs of TR069 Components AudioOutput.
+ */
 
 
 /**
@@ -146,6 +150,14 @@ void hostIf_STBServiceAudioInterface::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
+/**
+ * @brief Class Constructor of the class hostIf_STBServiceAudioInterface.
+ *
+ * It will initialize the device id and audio output port.
+ *
+ * @param[in] devid Identification number of the device.
+ * @param[in] port Audio output port number.
+ */
 hostIf_STBServiceAudioInterface::hostIf_STBServiceAudioInterface(int devid, device::AudioOutputPort& port) : dev_id(devid), aPort(port)
 {
     strcpy(backupStatus, " ");
@@ -174,6 +186,19 @@ hostIf_STBServiceAudioInterface::hostIf_STBServiceAudioInterface(int devid, devi
     bCalledAudioOptimalLevel = false;
 }
 
+/**
+ * @brief This function set the audio interface such as mute status, audio encoding, audio level,
+ * Minimum dB(decibel) and Maximum dB(decibel) that can be supported on audio port, Stereo mode used
+ * in a given audio port etc..
+ *
+ * @param[in] pSetting  Audio service name string.
+ * @param[in] stMsgData  HostIf Message Request param contains the audio attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully set the hostIf audio interface attribute.
+ * @retval -1 If Not able to set the hostIf audio interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_AUDIOOUTPUT_API
+ */
 int hostIf_STBServiceAudioInterface::handleSetMsg(const char *pSetting, HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -208,6 +233,20 @@ int hostIf_STBServiceAudioInterface::handleSetMsg(const char *pSetting, HOSTIF_M
     return ret;
 }
 
+/**
+ * @brief This function get the audio interface attribute values such as mute status, audio encoding,
+ * audio level, Minimum dB(decibel) and Maximum dB(decibel) that can be supported on audio port, Stereo mode used
+ * in a given audio port etc..
+ *
+ * @param[in] paramName  Audio service name string.
+ * @param[in] stMsgData  Host IF Message Request param contains the audio attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf audio interface attribute.
+ * @retval -1 If Not able to get the hostIf audio interface attribute.
+ * @retval -2 If Not handle the hostIf audio interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_AUDIOOUTPUT_API
+ */
 int hostIf_STBServiceAudioInterface::handleGetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -274,6 +313,14 @@ int hostIf_STBServiceAudioInterface::handleGetMsg(const char *paramName, HOSTIF_
     return ret;
 }
 
+/**
+ * @brief This function updates the audio interface such as mute status, audio encoding, audio level,
+ * Minimum dB(decibel) and Maximum dB(decibel) that can be supported on audio port, Stereo mode used
+ * in a given audio port etc.. using callback mechanism.
+ *
+ * @param[in] mUpdateCallback  Callback function which updates the hostIf audio interface.
+ * @ingroup TR69_HOSTIF_STBSERVICES_AUDIOOUTPUT_API
+ */
 void hostIf_STBServiceAudioInterface::doUpdates(updateCallback mUpdateCallback)
 {
     HOSTIF_MsgData_t msgData;

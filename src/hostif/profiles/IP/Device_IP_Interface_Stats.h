@@ -18,47 +18,32 @@
 */
 /**
  * @file Device_IP_Interface_Stats.h
- *
- * @brief TR-069 Device.IP.Interface.Stats object Public API.
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * @brief The header file provides TR069 device IP interface stats information APIs.
  */
 
-
+/**
+ * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS TR-069 Object (Device.IP.Interface.Stats)
+ * @par Throughput statistics for this interface.
+ * The CPE MUST reset the interface's Stats parameters unless otherwise stated in individual object
+ * or parameter descriptions either
+ * - when the interface becomes operationally down due to a previous administrative down
+ * i.e. the interface's Status parameter transitions to a down state after the interface is disabled or
+ * - when the interface becomes administratively up i.e. the interface's Enable parameter transitions
+ * from false to true.
+ * @ingroup TR69_HOSTIF_DEVICE_IP
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_API TR-069 Object (Device.IP.Interface.Stats) Public APIs
+ * Describe the details about TR069 Device IP Interface stats APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_CLASSES TR-069 Object (Device.IP.Interface.Stats) Public Classes
+ * Describe the details about classes used in TR069 Device IP Interface stats.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS
+ *
+ * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_DSSTRUCT TR-069 Object (Device.IP.Interface.Stats) Public DataStructure
+ * Describe the details about data structure used in TR069 Device IP Interface stats.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS
+ */
 
 
 /**
@@ -83,6 +68,13 @@
 #define         _LENGTH_PARAMETER               64
 #define         _PATH_SYS_CLASS_NET             "/sys/class/net/"
 
+/**
+ * @addtogroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_DSSTRUCT
+ * @{
+ */
+/**
+ * @brief It contains the members variables of the Device_IP_Interface_stats structure.
+ */
 typedef struct Device_IP_Interface_Stats {
     unsigned long bytesSent;
     unsigned long bytesReceived;
@@ -144,6 +136,10 @@ typedef struct Device_IP_Interface_Stats {
  *  @{
  */
 
+/**
+ * @brief This class provides the hostIf IP interface stats for getting IP interface stats information.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_CLASSES
+ */
 class hostIf_IPInterfaceStats {
 
     static  GHashTable  *ifHash;
@@ -208,27 +204,9 @@ public:
 
     int handleGetMsg (const char* pSetting, HOSTIF_MsgData_t* stMsgData);
 
-    /**
-     * @brief    Get the number of bytes sent on the IP Interface.
-     *
-     * This function provides the total number of bytes transmitted out of the interface,
-     * including framing characters.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_BytesSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of bytes received on the IP Interface.
-     *
-     * This function provides the total number of bytes received on the interface, including
-     * framing characters.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_BytesReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
@@ -243,162 +221,39 @@ public:
 
     int get_Device_IP_Interface_Stats_PacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of packets received on the IP Interface.
-     *
-     * This function provides the total number of packets received on the interface.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_PacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of send errors on the IP Interface.
-     *
-     * This function provides the total number of outbound packets that could not be
-     * transmitted because of errors.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_ErrorsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of receive errors on the IP Interface.
-     *
-     * This function provides the total number of inbound packets that contained errors
-     * preventing them from being delivered to a higher-layer protocol.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_ErrorsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of unicast packets for which a request to send on the IP
-     *           Interface was received.
-     *
-     * This function provides the total number of packets requested for transmission which
-     * were not addressed to a multicast or broadcast address at this layer, including
-     * those that were discarded or not sent.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_UnicastPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of unicast packets received on the IP Interface.
-     *
-     * This function provides the total number of received packets, delivered by this layer to
-     * a higher layer, which were not addressed to a multicast or broadcast address at this layer.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_UnicastPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of discarded outbound packets on the IP Interface.
-     *
-     * This function provides the total number of outbound packets which were chosen to be
-     * discarded even though no errors had been detected to prevent their being transmitted.
-     *
-     * @note     One possible reason for discarding such a packet could be to free up buffer
-     *           space.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_DiscardPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of discarded inbound packets on the IP Interface.
-     *
-     * This function provides the total number of inbound packets which were chosen to be
-     * discarded even though no errors had been detected to prevent their being delivered.
-     *
-     * @note    One possible reason for discarding such a packet could be to free up buffer
-     *          space.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_DiscardPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of Multicast Packets sent on the IP Interface.
-     *
-     * This function provides the total number of packets that higher-level protocols
-     * requested for transmission and which were addressed to a multicast address at
-     * this layer, including those that were discarded or not sent.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_MulticastPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of Multicast Packets received on the IP Interface.
-     *
-     * This function provides the total number of received packets, delivered by this layer
-     * to a higher layer, which were addressed to a multicast address at this layer.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_MulticastPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of Broadcast Packets sent on the IP Interface.
-     *
-     * This function provides the total number of packets that higher-level protocols
-     * requested for transmission and which were addressed to a broadcast address at this
-     * layer, including those that were discarded or not sent.
-     *
-     * @note     IPv6 does not define broadcast addresses, so IPv6 packets will never cause
-     *           this counter to increment.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_BroadcastPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of Broadcast Packets received on the IP Interface.
-     *
-     * This function provides the total number of received packets, delivered by this layer
-     * to a higher layer, which were addressed to a broadcast address at this layer.
-     *
-     * @note     IPv6 does not define broadcast addresses, so IPv6 packets will never cause
-     *           this counter to increment.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_BroadcastPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    /**
-     * @brief    Get the number of Packets of unidentified protocol received on the IP Interface.
-     *
-     * This function provides the total number of packets received via the interface which
-     * were discarded because they were of an unknown or unsupported protocol.
-     *
-     * See @ref dev_ip_stats_getter
-     *
-     */
 
     int get_Device_IP_Interface_Stats_UnknownProtoPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 

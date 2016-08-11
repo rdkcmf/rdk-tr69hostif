@@ -18,21 +18,12 @@
 */
 
 /**
- * @file Device_DeviceInfo.c
- *
- * @brief DeviceInfo API Implementation.
- *
- * This is the implementation of the DeviceInfo API.
- *
- * @par Document
- * TBD Relevant design or API documentation.
- *
+ * @file Device_DeviceInfo.cpp
+ * @brief This source file contains the APIs for getting device information.
  */
 
-/** @addtogroup DeviceInfo Implementation
- *  This is the implementation of the Device Public API.
- *  @{
- */
+
+
 
 /*****************************************************************************
  * STANDARD INCLUDE FILES
@@ -92,6 +83,7 @@
 #endif
 
 #define VERSION_FILE 		"/version.txt"
+
 #define SOC_ID_FILE			"/var/log/socprov.log"
 #define PREFERRED_GATEWAY_FILE		"/opt/prefered-gateway"
 #define GATEWAY_NAME_SIZE 4
@@ -134,6 +126,12 @@ string hostIf_DeviceInfo::m_xrPollingAction = "0";
 // Device.DeviceInfo Profile. Getters:
 /****************************************************************************************************************************************************/
 
+/**
+ * @brief Class Constructor of the class hostIf_DeviceInfo.
+ *
+ * It memset the private members variables of the class such as backupSoftwareVersion, backupSerialNumber,
+ * backupManufacturer, backupModelName etc.
+ */
 hostIf_DeviceInfo::hostIf_DeviceInfo(int dev_id):
     dev_id(dev_id),
     bCalledSoftwareVersion(0),
@@ -254,6 +252,23 @@ GHashTable*  hostIf_DeviceInfo::getNotifyHash()
         return m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
     }
 }
+
+/**
+ * @brief This function provides the Identifier of the particular device that is
+ * unique for the indicated class of product and manufacturer. This is the Serial Number of the box.
+ * This value MUST remain fixed over the lifetime of the device, including
+ * across firmware updates. Any change would indicate that it's a new device
+ * and would therefore require to inform BOOTSTRAP.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret=NOT_HANDLED;
@@ -328,7 +343,23 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t * stM
     return ret;
 }
 
-
+/**
+ * @brief This function identifying the Software/Firmware version of the running
+ * image on the box (Vx.y.z). A string identifying the software version currently installed
+ * in the CPE (i.e. version of the overall CPE firmware). To allow version comparisons,
+ * this element SHOULD be in the form of dot-delimited integers, where each successive
+ * integer represents a more minor category of variation.
+ * For example, 3.0.21 where the components mean: Major.Minor.Build.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_SoftwareVersion(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     string line;
@@ -406,7 +437,19 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SoftwareVersion(HOSTIF_MsgData_t * 
     return OK;
 }
 
-
+/**
+ * @brief This function retrieves manufacturer specific data from the box using IARM Bus call.
+ *  The IARM Manager gets the manufacture information from mfr library.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret = NOT_HANDLED;
@@ -455,6 +498,23 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t * stM
     return ret;
 }
 
+/**
+ * @brief This function provides the manufactureOUT information. Organizationally unique
+ * identifier of the device manufacturer. Represented as a six hexadecimal-digit value using
+ * all upper-case letters and including any leading zeros. Possible patterns: [0-9A-F]{6}.
+ * This value MUST remain fixed over the lifetime of the device and also across
+ * firmware updates. Any change would indicate that, it's a new device and would
+ * therefore require a BOOTSTRAP.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if ManufacturerOUI was successfully fetched.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret=NOT_HANDLED;
@@ -505,6 +565,19 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t * 
     return ret;
 }
 
+/**
+ * @brief This function provides the Model name of the device.
+ * This MUST be based on Comcast_X_HW* specification and of the format TUVVVWXY.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if ManufacturerOUI was successfully fetched.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret=NOT_HANDLED;
@@ -554,6 +627,16 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgD
 
 }
 
+/**
+ * @brief This function provides the A full description of the device.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns enum integer '-1' on method completion.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_Description(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     stMsgData->paramtype = hostIf_StringType;
@@ -563,6 +646,21 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_Description(HOSTIF_MsgData_t * stMs
     return OK;
 }
 
+/**
+ * @brief This function provides the Identifier of the class of product for which
+ * the serial number applies. That is, for a given manufacturer,
+ * this parameter is used to identify the product or class of product
+ * over which the SerialNumber parameter is unique. This value MUST remain fixed
+ * over the lifetime of the device and also across firmware updates. Any change
+ * would indicate that it's a new device and would therefore require a BOOTSTRAP.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns enum integer '-1' on method completion.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_ProductClass(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
@@ -623,6 +721,19 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProductClass(HOSTIF_MsgData_t * stM
 #endif /* FETCH_PRODUCTCLASS_FROM_MFRLIB */
 }
 
+/**
+ * @brief This function identifying the particular CPE model and version.
+ * This MUST be based on Comcast_X_HW* specification and of the format VM.m.R.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch data from device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret=NOT_HANDLED;
@@ -674,12 +785,39 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t * 
     return ret;
 }
 
+/**
+ * @brief This function identifying any additional CPE model and version.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns enum integer '-1' on method completion.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalHardwareVersion(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__ );
     return NOK;
 }
 
+/**
+ * @brief This function identifying any additional Software/Firmware version of the running
+ * image on the box (Vx.y.z). A string identifying the software version currently installed
+ * in the CPE (i.e. version of the overall CPE firmware).
+ * To allow version comparisons, the version number SHOULD be in the form of
+ * dot-delimited integers, where each successive integer represents a more
+ * minor category of variation.
+ * For example, 3.0.21 where the components mean: Major.Minor.Build.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ * @retval OK if it is successful fetch data from device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret = NOT_HANDLED;
@@ -732,6 +870,20 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_Ms
 }
 
 
+/**
+ * @brief This is an identifier of the primary service provider and other provisioning
+ * information, which MAY be used to determine service provider-specific customization
+ * and provisioning parameters.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful fetch data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret=NOT_HANDLED;
@@ -779,6 +931,18 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t *
 
 
 
+/**
+ * @brief This is an identifier of time in seconds since the CPE was last restarted.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful fetch data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_UpTime(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     struct sysinfo info;
@@ -788,6 +952,22 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_UpTime(HOSTIF_MsgData_t * stMsgData
     return OK;
 }
 
+/**
+ * @brief This function use to get the 'Date' and 'Time' in UTC that the CPE first both
+ * successfully established an IP-layer network connection and acquired an absolute time
+ * reference using NTP or equivalent over that network connection. The CPE MAY reset this
+ * date after a factory reset. If NTP or equivalent is not available, this parameter, if
+ * present, SHOULD be set to the unknown time value.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful fetch data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_FirstUseDate(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     struct stat st;
@@ -812,6 +992,18 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_FirstUseDate(HOSTIF_MsgData_t * stM
     return OK;
 }
 
+/**
+ * @brief This function use to get the MAC Address of the eth1 interface currently.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret = NOT_HANDLED;
@@ -1077,6 +1269,19 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(HOSTIF_MsgData
     return OK;
 }
 
+/**
+ * @brief The X_COMCAST_COM_PowerStatus as get parameter results in the power status
+ * being performed on the device. Power status of the device based on the front panel
+ * power LED.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation. When read, this parameter returns an enumeration string.
+ * @retval OK if it is successful fetch data from the device.
+ * @retval NOK if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_PowerStatus(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]Entering..\n", __FUNCTION__);
@@ -1121,6 +1326,18 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_PowerStatus(HOSTIF_Ms
     return ret;
 }
 
+/**
+ * @brief Get the filename of the firmware currently running on the device.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the Filename of the firmware currently running on the device.
+ *
+ * @retval OK if it is successfully fetch data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     string line;
@@ -1207,6 +1424,18 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(H
     return OK;
 }
 
+/**
+ * @brief Get the filename of the firmware that the device was requested to download most recently.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the filename of the firmware that was recently downloaded.
+ *
+ * @retval OK if it is successfully fetch data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret = NOK;
@@ -1288,11 +1517,37 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareUpdateStat
         return NOK;
 }
 
+/**
+ * @brief This function gets the number of entries in the VendorConfigFile table.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful fetch data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_VendorConfigFileNumberOfEntries(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     return NOK;
 }
 
+/**
+ * @brief This function gets the number of entries in the SupportedDataModel table.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful fetch data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_SupportedDataModelNumberOfEntries(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
 //    put_int(stMsgData->paramValue, (unsigned int)DEVICE_SUPPORTED_DATA_MODEL_NUMBER_OF_ENTRIES);
@@ -1330,11 +1585,34 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProcessorNumberOfEntries(HOSTIF_Msg
     return OK;
 }
 
+/**
+ * @brief The function gets the number of entries in the VendorLogFile table.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful fetch data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_VendorLogFileNumberOfEntries(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     return NOK;
 }
 
+/**
+ * @brief This function get X_COMCAST-COM_Reset returns an empty string.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns integer '-1' on method completion
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     return NOK;
@@ -1344,6 +1622,19 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(HOSTIF_MsgDa
  * Parameter Name: Device.DeviceInfo.MemoryStatus.Total
  * Status of the device's volatile physical memory.
  * The total physical RAM, in kilobytes, installed on the device.
+ */
+
+/**
+ * @brief Get the device total memory status.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
  */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_MemoryStatus_Total (HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
@@ -1360,6 +1651,19 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_MemoryStatus_Total (HOSTIF_MsgData_
  * Status of the device's volatile physical memory.
  * The free physical RAM, in kilobytes, currently available on the device.
  */
+
+/**
+ * @brief Get the device total free memory status.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful fetch data from the device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_MemoryStatus_Free (HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     struct sysinfo sys_info;
@@ -1370,7 +1674,29 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_MemoryStatus_Free (HOSTIF_MsgData_t
     return OK;
 }
 
-
+/**
+ * @brief This method is updated with the boot status of the device at the time of query.
+ * If the device is currently starting up, this parameter will hold boot status as per the
+ * boot sequence of the device.
+ * BootStatus string - Boot status for an STB CPE via TR-069 ACS when powered On.
+ * Enumeration of :
+ *  			Coax connection confirmed, MoCA enabled
+ *  			Discovering MoCA Network Coordinator: MoCA MAC: xx:xx:xx:xx:xx:xx
+ *  			Joining MoCA Network
+ *  			Connection successful
+ *  			Acquiring IP Address from Gateway
+ *  			Contacting ACS
+ *  			Contacting XRE
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch data from the device.
+ * @retval NOK if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus (HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
 
@@ -1471,8 +1797,19 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus (HOSTIF
     return OK;
 }
 
-
-
+/**
+ * @brief This method gets the CPU temperature for doing general health check up
+ * of the box.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch data from the device.
+ * @retval NOK if not able to fetch data from the device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_CPUTemp(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     int cpuTemp = 0;
@@ -1622,6 +1959,24 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayTy
     return ret;
 }
 
+/**
+ * @brief This is set X_COMCAST-COM_Reset as setting this parameter results in
+ * the reset being performed on the device. The level of reset performed
+ * is defined by the value that is written into this parameter.
+ * Enumeration of:
+ *         Cold
+ *        Factory
+ *        Warehouse
+ *        Customer
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from device.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch the data from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOK;
@@ -1670,6 +2025,10 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(HOSTIF_MsgDa
     return OK;
 }
 
+/**
+ * @brief This method resets according to the STB reset state such as NoReset, ColdReset
+ * FactoryReset, WarehouseReset and CustomerReset.
+ */
 void *ResetFunc( void *)
 {
     sleep(2);
@@ -1685,6 +2044,18 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadUs
     return OK;
 }
 
+/**
+ * @brief This method set the firmware download file path which is present in
+ * "/opt/fwdnldstatus.txt"
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from device.
+ * @retval NOK if not able to fetch the data from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(HOSTIF_MsgData_t *stMsgData)
 {
 //    int ret = NOK;
@@ -1694,6 +2065,18 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload
     return OK;
 }
 
+/**
+ * @brief This method set the status of the firmware download which is present in
+ * "/opt/fwdnldstatus.txt"
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Return the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from device.
+ * @retval NOK if not able to fetch the data from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadStatus(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOK;
@@ -2559,6 +2942,19 @@ int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
     return ret;
 }
 
+/**
+ * @brief This method read the firmware information which is present in
+ * "/opt/fwdnldstatus.txt"
+ *
+ * @param[in] param Firmware name string.
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from device.
+ * @retval NOK if not able to fetch the data from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::readFirmwareInfo(char *param, HOSTIF_MsgData_t * stMsgData)
 {
     int ret = NOK;
@@ -2610,6 +3006,19 @@ int hostIf_DeviceInfo::readFirmwareInfo(char *param, HOSTIF_MsgData_t * stMsgDat
     return (ret = OK);
 }
 
+/**
+ * @brief This method writes the firmware information which is present in
+ * "/opt/fwdnldstatus.txt"
+ *
+ * @param[in] param  Firmware name string.
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from device.
+ * @retval NOK if not able to fetch the data from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
 int hostIf_DeviceInfo::writeFirmwareInfo(char *param, HOSTIF_MsgData_t * stMsgData)
 {
     int ret = NOK;

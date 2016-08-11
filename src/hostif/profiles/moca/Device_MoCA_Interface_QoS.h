@@ -20,49 +20,14 @@
 /**
  * @file Device_MoCA_Interface_QoS.h
  *
- * @brief TR-069 Device.Moca.Interface.QoS object Public API.
- *
- * Description of MoCA module.
- *
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * TR-069 Device.Moca.Interface.QoS object Public API.
  */
 
-
+/**
+ * @defgroup TR69_HOSTIF_MOCA_INTERFACE_QOS TR-069 Object (Device.MoCA.Interface.{i}.QoS) Public APIs
+ * The Device.Moca.Interface.QoS object provides information on MoCA parameterized QoS for this interface [MoCAv1.1].
+ * @ingroup TR69_HOSTIF_MOCA
+ */
 
 
 /**

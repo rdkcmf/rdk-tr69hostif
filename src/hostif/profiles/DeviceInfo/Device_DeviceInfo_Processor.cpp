@@ -18,21 +18,10 @@
 */
 
 /**
- * @file Device_DeviceInfo_Processor.c
- *
- * @brief Device_DeviceInfo_Processor. API Implementation.
- *
- * This is the implementation of the Device_DeviceInfo_Processor. API.
- *
- * @par Document
- * TBD Relevant design or API documentation.
- *
+ * @file Device_DeviceInfo_Processor.cpp
+ * @brief This source file contains the APIs for getting device processor information.
  */
 
-/** @addtogroup Device_DeviceInfo_Processor. Implementation
- *  This is the implementation of the Device Public API.
- *  @{
- */
 
 /*****************************************************************************
  * STANDARD INCLUDE FILES
@@ -123,6 +112,13 @@ void hostIf_DeviceProcessorInterface::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
+/**
+ * @brief Class Constructor of the class hostIf_DeviceProcessorInterface.
+ *
+ * It will initialize the device id.
+ *
+ * @param[in] devid Device identification Number.
+ */
 hostIf_DeviceProcessorInterface::hostIf_DeviceProcessorInterface(int devid)
 {
     dev_id = devid;
@@ -157,6 +153,18 @@ unsigned int hostIf_DeviceProcessorInterface::getNumOfProcessorEntries(void) {
     return noOfProcessorEntries;
 }
 
+/**
+ * @brief This function use to get the architecture of the processor on the underlying hardware.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully fetch the data from device.
+ * @retval NOK if not able to fetch the data from device.
+ * @ingroup TR69_HOSTIF_DEVICE_PROCESSOR_API
+ */
 int hostIf_DeviceProcessorInterface::get_Device_DeviceInfo_Processor_Architecture(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
     struct utsname  utsName;

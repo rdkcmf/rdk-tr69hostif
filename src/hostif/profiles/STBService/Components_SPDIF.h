@@ -17,7 +17,27 @@
  * limitations under the License.
 */
 
+/**
+ * @file Components_SPDIF.h
+ * @brief The header file provides components SPDIF(Sony/Philips Digital Interface Format) information APIs.
+ */
 
+/**
+ * @defgroup TR69_HOSTIF_STBSERVICES_SPDIF TR-069 Object (Device.STBServices.{i}.Components.SPDIF.{i})
+ * A SPDIF component models features of the S/PDIF functionality of the STB. It allows the ACS
+ * to force the audio format to be down mixed into stereo PCM in the case an external audio
+ * amplifier does not support multi-channel audio format decode. It also contains some parameters
+ * to manage the audio delay to preserve lip-sync.
+ * @ingroup TR69_HOSTIF_STBSERVICES
+ *
+ * @defgroup TR69_HOSTIF_STBSERVICES_SPDIF_API TR-069 Object (Device.STBServices.{i}.Components.SPDIF.{i}) Public APIs
+ * Describe the details about RDK TR-069 components SPDIF APIs specifications.
+ * @ingroup TR69_HOSTIF_STBSERVICES_SPDIF
+ *
+ * @defgroup TR69_HOSTIF_STBSERVICES_SPDIF_CLASSES TR-069 Object (Device.STBServices.{i}.Components.SPDIF.{i}) Public Classes
+ * Describe the details about classes used in TR-069 components SPDIF.
+ * @ingroup TR69_HOSTIF_STBSERVICES_SPDIF
+ */
 
 /**
 * @defgroup tr69hostif
@@ -51,6 +71,11 @@
 #define PARAM_LEN TR69HOSTIFMGR_MAX_PARAM_LEN
 #endif
 
+
+/**
+ * @brief This class provides the TR-069 components SPDIF information.
+ * @ingroup TR69_HOSTIF_STBSERVICES_SPDIF_CLASSES
+ */
 class hostIf_STBServiceSPDIF
 {
     static GHashTable *ifHash;

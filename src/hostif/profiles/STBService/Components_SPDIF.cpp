@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file Components_SPDIF.cpp
+ * @brief This source file contains the APIs of TR069 Components SBDIF.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -134,6 +138,14 @@ void hostIf_STBServiceSPDIF::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
+/**
+ * @brief Class Constructor of the class hostIf_STBServiceSPDIF.
+ *
+ * It will initialize the device id and audio output port.
+ *
+ * @param[in] devid Identification number of the device.
+ * @param[in] port Audio output port number.
+ */
 hostIf_STBServiceSPDIF::hostIf_STBServiceSPDIF(int devid, device::AudioOutputPort& port) : dev_id(devid), aPort(port)
 {
     backupEnable = false;
@@ -154,6 +166,20 @@ hostIf_STBServiceSPDIF::hostIf_STBServiceSPDIF(int devid, device::AudioOutputPor
 
 }
 
+/**
+ * @brief This function set the SPDIF  interface updates such as Enable, Status, Alias,
+ * Name, ForcePCM, Pass through, AudioDelay in a connected SPDIF port. Currently ForcePCM
+ * is handled.
+ *
+ * @param[in] paramName  SPDIF service name string.
+ * @param[in] stMsgData  HostIf Message Request param contains the SPDIF attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully set the hostIf SPDIF interface attribute.
+ * @retval -1 If Not able to set the hostIf SPDIF interface attribute.
+ * @retval -2 If Not handle the hostIf SPDIF interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_SPDIF_API
+ */
 int hostIf_STBServiceSPDIF::handleSetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -164,6 +190,19 @@ int hostIf_STBServiceSPDIF::handleSetMsg(const char *paramName, HOSTIF_MsgData_t
     return ret;
 }
 
+/**
+ * @brief This function get the SPDIF interface updates such as Enable, Status, Alias,
+ * Name, ForcePCM, Pass through, AudioDelay in a connected SPDIF port.
+ *
+ * @param[in] paramName  SPDIF service name string.
+ * @param[in] stMsgData  HostIf Message Request param contains the SPDIF attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf SPDIF interface attribute.
+ * @retval -1 If Not able to get the hostIf SPDIF interface attribute.
+ * @retval -2 If Not handle the hostIf SPDIF interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_SPDIF_API
+ */
 int hostIf_STBServiceSPDIF::handleGetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -199,6 +238,13 @@ int hostIf_STBServiceSPDIF::handleGetMsg(const char *paramName, HOSTIF_MsgData_t
     return ret;
 }
 
+/**
+ * @brief This function updates the SPDIF interface updates such as Enable, Status, Alias,
+ * Name, ForcePCM, Pass through, AudioDelay in a connected SPDIF port.
+ *
+ * @param[in] mUpdateCallback  Callback function which updates the hostIf SPDIF interface.
+ * @ingroup TR69_HOSTIF_STBSERVICES_SPDIF_API
+ */
 void hostIf_STBServiceSPDIF::doUpdates(updateCallback mUpdateCallback)
 {
     HOSTIF_MsgData_t msgData;

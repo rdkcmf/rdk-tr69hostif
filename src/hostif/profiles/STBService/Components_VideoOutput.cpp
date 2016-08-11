@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file Components_VideoOutput.cpp
+ * @brief This source file contains the APIs of TR069 Components VideoOutput.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -132,6 +136,14 @@ void hostIf_STBServiceVideoOutput::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
+/**
+ * @brief Class Constructor of the class hostIf_STBServiceVideoOutput. 
+ *
+ * It will initialize the device id and video output port.
+ *
+ * @param[in] devid Identification number of the device.
+ * @param[in] port Video output port number.
+ */
 hostIf_STBServiceVideoOutput::hostIf_STBServiceVideoOutput(int devid, device::VideoOutputPort& port) : dev_id(devid), vPort(port)
 {
     strcpy(backupAspectRatioBehaviour," ");
@@ -148,12 +160,40 @@ hostIf_STBServiceVideoOutput::hostIf_STBServiceVideoOutput(int devid, device::Vi
 
 }
 
+/**
+ * @brief This function set the video interface attribute value such as status, display format,
+ * video format, aspect ratio and HDPC(High-Bandwidth Digital Content Protection) in the connected
+ * video port etc.. Currently not implemented.
+ *
+ * @param[in] paramName  Video service name string.
+ * @param[in] stMsgData  HostIf Message Request param contains the video attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully set the hostIf video interface attribute.
+ * @retval -1 If Not able to set the hostIf video interface attribute.
+ * @retval -2 If Not handle the hostIf video interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_VIDEOOUTPUT_API
+ */
 int hostIf_STBServiceVideoOutput::handleSetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
     return ret;
 }
 
+/**
+ * @brief This function get the video interface attribute value such as status, display format,
+ * video format, aspect ratio and HDPC(High-Bandwidth Digital Content Protection) in the connected
+ * video port etc..
+ *
+ * @param[in] paramName  Video service name.
+ * @param[in] stMsgData  HostIf Message Request param which contains the video attribute value.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the hostIf video interface attribute.
+ * @retval -1 If Not able to get the hostIf video interface attribute.
+ * @retval -2 If Not handle the hostIf video interface attribute.
+ * @ingroup TR69_HOSTIF_STBSERVICES_VIDEOOUTPUT_API
+ */
 int hostIf_STBServiceVideoOutput::handleGetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -188,6 +228,14 @@ int hostIf_STBServiceVideoOutput::handleGetMsg(const char *paramName, HOSTIF_Msg
     return ret;
 }
 
+/**
+ * @brief This function updates the video interface such as status, display format, video format,
+ * aspect ratio and HDPC (High-Bandwidth Digital Content Protection) in a connected video port using
+ * callback mechanism.
+ *
+ * @param[in] mUpdateCallback  Callback function which updates the hostIf video interface.
+ * @ingroup TR69_HOSTIF_STBSERVICES_VIDEOOUTPUT_API
+ */
 void hostIf_STBServiceVideoOutput::doUpdates(updateCallback mUpdateCallback)
 {
     HOSTIF_MsgData_t msgData;
@@ -278,6 +326,14 @@ void hostIf_STBServiceVideoOutput::doUpdates(updateCallback mUpdateCallback)
 int hostIf_STBServiceVideoOutput::getStatus(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     try {
+        
+        /*
+            Following logic 
+            - If HDMI not connected - Disabled. 
+            - If HDMI connected and Port power is off - Disabled. 
+            - If HDMI connected and if Port power is ON and HDCP disabled - Disabled. 
+            - If HDMI connected and if Port power is ON and HDCP enabled - Enabled.  
+        */
         if (true == vPort.isDisplayConnected())
         {
             //g_printf("[%s] In getHDMIEnable(): vPort.isEnabled(): %d \n",__FUNCTION__, vPort.isEnabled());

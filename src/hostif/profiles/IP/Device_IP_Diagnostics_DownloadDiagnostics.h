@@ -18,44 +18,13 @@
 */
 /**
  * @file Device_IP_Diagnostics_DownloadDiagnostics.h
- *
- * @brief TR-069 Device.IP.Diagnostics.DownloadDiagnostics object Public API.
- *
- * @par Document
- * Document reference.
- *
- *
- * @par Open Issues (in no particular order)
- * -# Issue 1
- * -# Issue 2
- *
- *
- * @par Assumptions
- * -# Assumption
- * -# Assumption
- *
- *
- * @par Abbreviations
- * - ACK:     Acknowledge.
- * - BE:      Big-Endian.
- * - cb:      Callback function (suffix).
- * - config:  Configuration.
- * - desc:    Descriptor.
- * - dword:   Double word quantity, i.e., four bytes or 32 bits in size.
- * - intfc:   Interface.
- * - LE:      Little-Endian.
- * - LS:      Least Significant.
- * - MBZ:     Must be zero.
- * - MS:      Most Significant.
- * - _t:      Type (suffix).
- * - word:    Two byte quantity, i.e. 16 bits in size.
- * - xfer:    Transfer.
- *
- *
- * @par Implementation Notes
- * -# Note
- * -# Note
- *
+ * @brief The header file provides TR069 device IP download diagnostics information APIs.
+ */
+
+/**
+ * @defgroup TR69_HOSTIF_DEVICE_IP_DOWNLOADDIAGNOSTICS_INTERFACE_API TR-069 Object (Device.IP.Diagnostics.DownloadDiagnostics) Public APIs
+ * Describe the details about TR-069 Device IP download diagnostics interface APIs specifications.
+ * @ingroup TR69_HOSTIF_DEVICE_IP
  */
 
 
@@ -124,149 +93,158 @@ extern "C"
      *  @{
      */
 
-    /**
-     * @brief    Set the status of diagnostic data.
-     *
-     * This function sets the DiagnosticsState parameter which indicates the availability
-     * of diagnostic data. This is an enumeration of:
-     *
-     *   <tt>
-     *     <ul><li>None</li>
-     *         <li>Requested</li>
-     *         <li>Completed</li>
-     *         <li>Error_InitConnectionFailed</li>
-     *         <li>Error_NoResponse</li>
-     *         <li>Error_TransferFailed</li>
-     *         <li>Error_PasswordRequestFailed</li>
-     *         <li>Error_LoginFailed</li>
-     *         <li>Error_NoTransferMode</li>
-     *         <li>Error_NoPASV</li>
-     *         <li>Error_IncorrectSize</li>
-     *         <li>Error_Timeout</li></ul>
-     *   </tt>
-     *
-     * @note     <ul>
-     *               <li> If the ACS sets the value of this parameter to <tt>Requested</tt>,
-     *               the CPE MUST initiate the corresponding diagnostic test. When writing,
-     *               the only allowed value is <tt>Requested</tt>. To ensure the use of the
-     *               proper test parameters (the writable parameters in this object), the
-     *               test parameters MUST be set either prior to or at the same time as
-     *               (in the same SetParameterValues) setting the DiagnosticsState to
-     *               <tt>Requested</tt>.</li>
-     *
-     *               <li>When requested, the CPE SHOULD wait until after completion of the
-     *               communication session with the ACS before starting the diagnostic.</li>
-     *
-     *               <li>When the test is completed, the value of this parameter MUST be
-     *               either <tt>Completed</tt> (if the test completed successfully), or
-     *               one of the <tt>Error_xxx</tt> values listed above.</li>
-     *
-     *               <li>If the value of this parameter is anything other than
-     *               <tt>Completed</tt>, the values of the results parameters for this
-     *               test are indeterminate.</li>
-     *
-     *               <li>When the diagnostic initiated by the ACS is completed
-     *               (successfully or not), the CPE MUST establish a new connection to
-     *               the ACS to allow the ACS to view the results, indicating the Event
-     *               code 8 DIAGNOSTICS COMPLETE in the Inform message.</li>
-     *
-     *               <li>After the diagnostic is complete, the value of all result
-     *               parameters (all read-only parameters in this object) MUST be
-     *               retained by the CPE until either this diagnostic is run again, or
-     *               the CPE reboots. After a reboot, if the CPE has not retained the
-     *               result parameters from the most recent test, it MUST set the value
-     *               of this parameter to <tt>None</tt>.</li>
-     *
-     *               <li>Modifying any of the writable parameters in this object except
-     *               for this one MUST result in the value of this parameter being set
-     *               to <tt>None</tt>.</li>
-     *
-     *               <li>While the test is in progress, modifying any of the writable
-     *               parameters in this object except for this one MUST result in the
-     *               test being terminated and the value of this parameter being set to
-     *               <tt>None</tt>.</li>
-     *
-     *               <li>While the test is in progress, setting this parameter to
-     *               <tt>Requested</tt> (and possibly modifying other writable parameters
-     *               in this object) MUST result in the test being terminated and then
-     *               restarted using the current values of the test parameters.</li>
-     *           </ul>
-     *
-     * See @ref dev_ip_diag_downloaddiagnostics_setter
-     *
-     */
+/**
+ * @brief  This function sets the DiagnosticsState parameter which indicates the availability
+ * of diagnostic data. This is an enumeration of:
+ *
+ *   <tt>
+ *     <ul><li>None</li>
+ *         <li>Requested</li>
+ *         <li>Completed</li>
+ *         <li>Error_InitConnectionFailed</li>
+ *         <li>Error_NoResponse</li>
+ *         <li>Error_TransferFailed</li>
+ *         <li>Error_PasswordRequestFailed</li>
+ *         <li>Error_LoginFailed</li>
+ *         <li>Error_NoTransferMode</li>
+ *         <li>Error_NoPASV</li>
+ *         <li>Error_IncorrectSize</li>
+ *         <li>Error_Timeout</li></ul>
+ *   </tt>
+ *
+ * @note     <ul>
+ *               <li> If the ACS sets the value of this parameter to <tt>Requested</tt>,
+ *               the CPE MUST initiate the corresponding diagnostic test. When writing,
+ *               the only allowed value is <tt>Requested</tt>. To ensure the use of the
+ *               proper test parameters (the writable parameters in this object), the
+ *               test parameters MUST be set either prior to or at the same time as
+ *               (in the same SetParameterValues) setting the DiagnosticsState to
+ *               <tt>Requested</tt>.</li>
+ *
+ *               <li>When requested, the CPE SHOULD wait until after completion of the
+ *               communication session with the ACS before starting the diagnostic.</li>
+ *
+ *               <li>When the test is completed, the value of this parameter MUST be
+ *               either <tt>Completed</tt> (if the test completed successfully), or
+ *               one of the <tt>Error_xxx</tt> values listed above.</li>
+ *
+ *               <li>If the value of this parameter is anything other than
+ *               <tt>Completed</tt>, the values of the results parameters for this
+ *               test are indeterminate.</li>
+ *
+ *               <li>When the diagnostic initiated by the ACS is completed
+ *               (successfully or not), the CPE MUST establish a new connection to
+ *               the ACS to allow the ACS to view the results, indicating the Event
+ *               code 8 DIAGNOSTICS COMPLETE in the Inform message.</li>
+ *
+ *               <li>After the diagnostic is complete, the value of all result
+ *               parameters (all read-only parameters in this object) MUST be
+ *               retained by the CPE until either this diagnostic is run again, or
+ *               the CPE reboots. After a reboot, if the CPE has not retained the
+ *               result parameters from the most recent test, it MUST set the value
+ *               of this parameter to <tt>None</tt>.</li>
+ *
+ *               <li>Modifying any of the writable parameters in this object except
+ *               for this one MUST result in the value of this parameter being set
+ *               to <tt>None</tt>.</li>
+ *
+ *               <li>While the test is in progress, modifying any of the writable
+ *               parameters in this object except for this one MUST result in the
+ *               test being terminated and the value of this parameter being set to
+ *               <tt>None</tt>.</li>
+ *
+ *               <li>While the test is in progress, setting this parameter to
+ *               <tt>Requested</tt> (and possibly modifying other writable parameters
+ *               in this object) MUST result in the test being terminated and then
+ *               restarted using the current values of the test parameters.</li>
+ *           </ul>
+ *
+ */
 
     int set_Device_IP_Diagnostics_DownloadDiagnostics_DiagnosticsState(const char *, ParameterType, ParameterValue *);
 
-    /**
-     * @brief    Set the path over which the test is to be performed.
-     *
-     * This function sets the IP-layer interface over which the test is to be
-     * performed. This identifies the source IP address to use when performing the test.
-     * Example: Device.IP.Interface.1
-     *
-     * @note     <ul>
-     *               <li>The value of this parameter MUST be either a valid interface or
-     *               an empty string. An attempt to set this parameter to a different
-     *               value MUST be rejected as an invalid parameter value.</li>
-     *
-     *               <li>If an empty string is specified, the CPE MUST use the default
-     *               routing interface.</li>
-     *           </ul>
-     *
-     *
-     * See @ref dev_ip_diag_downloaddiagnostics_setter
-     *
-     */
+/**
+ * @brief This function sets the IP-layer interface over which the test is to be
+ * performed. This identifies the source IP address to use when performing the test.
+ * Example: Device.IP.Interface.1
+ *
+ * @note   The value of this parameter MUST be either a valid interface or
+ * an empty string. An attempt to set this parameter to a different value MUST be rejected
+ * as an invalid parameter value. If an empty string is specified, the CPE MUST use the default
+ * routing interface.
+ *
+ *
+ * @param[in] const char *  Source IP address.
+ * @param[in] ParameterType  Type of the valid interface.
+ * @param[in] ParameterValue   Valid interface name or empty string.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the diagnostics downloading interface attribute.
+ * @retval -1 If Not able to get the diagnostics downloading interface attribute.
+ * @retval -2 If Not handle the diagnostics downloading interface attribute.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_DOWNLOADDIAGNOSTICS_INTERFACE_API
+ */
 
     int set_Device_IP_Diagnostics_DownloadDiagnostics_Interface(const char *, ParameterType, ParameterValue *);
 
-    /**
-     * @brief    Set the download URL.
-     *
-     * This function sets the URL from which CPE is to perform the download. This
-     * parameter MUST be in the form of a valid HTTP or FTP URL.
-     *
-     * @note     <ul>
-     *               <li>When using FTP transport, FTP binary transfer MUST be used.</li>
-     *
-     *               <li>When using HTTP transport, persistent connections MUST be used
-     *               and pipelining MUST NOT be used.</li>
-     *
-     *               <li>When using HTTP transport the HTTP Authentication MUST NOT be
-     *               used.</li>
-     *           </ul>
-     *
-     * See @ref dev_ip_diag_downloaddiagnostics_setter
-     *
-     */
+/**
+ * @brief This function sets the URL from which CPE is to perform the download. This
+ * parameter MUST be in the form of a valid HTTP or FTP URL.
+ *
+ * @note
+ *       - When using FTP transport, FTP binary transfer MUST be used.
+ *       - When using HTTP transport, persistent connections MUST be used
+ *         and pipeline MUST NOT be used.
+ *       - When using HTTP transport the HTTP Authentication MUST NOT be
+ *         used.
+ *
+ * @param[in] const char *  Source IP address.
+ * @param[in] ParameterType  Type of the valid URL.
+ * @param[in] ParameterValue   Valid URL path or empty string.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the diagnostics downloading URL attribute.
+ * @retval -1 If Not able to get the diagnostics downloading URL attribute.
+ * @retval -2 If Not handle the diagnostics downloading URL attribute.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_DOWNLOADDIAGNOSTICS_INTERFACE_API
+ */
 
     int set_Device_IP_Diagnostics_DownloadDiagnostics_DownloadURL(const char *, ParameterType, ParameterValue *);
 
-    /**
-     * @brief    Set the ethernet priority code.
-     *
-     * This function sets the ethernet priority code for marking packets transmitted in the test (if applicable).
-     *
-     * @note     The default value SHOULD be zero.
-     *
-     * See @ref dev_ip_diag_downloaddiagnostics_setter
-     *
-     */
+/**
+ * @brief This function sets the ethernet priority code for marking packets transmitted in the test.
+ *
+ * @note  The default value SHOULD be zero.
+ *
+ * @param[in] const char *  Source IP address.
+ * @param[in] ParameterType  Type of the valid interface.
+ * @param[in] ParameterValue   Valid interface name or empty string.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the diagnostics downloading ethernet priority.
+ * @retval -1 If Not able to get the diagnostics downloading ethernet priority.
+ * @retval -2 If Not handle the diagnostics downloading ethernet priority.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_DOWNLOADDIAGNOSTICS_INTERFACE_API
+ */
 
     int set_Device_IP_Diagnostics_DownloadDiagnostics_EthernetPriority(const char *, ParameterType, ParameterValue *);
 
-    /**
-     * @brief    Set the DSCP to be used in test.
-     *
-     * This function sets the Differentiated Services Code Point (DSCP) to be used for
-     * marking packets transmitted in the test.
-     *
-     * @note     The default value SHOULD be zero.
-     *
-     * See @ref dev_ip_diag_downloaddiagnostics_setter
-     *
-     */
+/**
+ * @brief This function sets the Differentiated Services Code Point (DSCP) to be used for
+ * marking packets transmitted in the test.
+ *
+ * @note The default value SHOULD be zero.
+ *
+ * @param[in] const char *  Source IP address.
+ * @param[in] ParameterType  Type of the valid interface.
+ * @param[in] ParameterValue   Valid interface name or empty string.
+ *
+ * @return Returns an Integer value.
+ * @retval 0 If successfully get the diagnostics downloading DSCP.
+ * @retval -1 If Not able to get the diagnostics downloading DSCP.
+ * @retval -2 If Not handle the diagnostics downloading DSCP.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_DOWNLOADDIAGNOSTICS_INTERFACE_API
+ */
 
     int set_Device_IP_Diagnostics_DownloadDiagnostics_DSCP(const char *, ParameterType, ParameterValue *);
 

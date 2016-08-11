@@ -16,12 +16,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
- /*
-*   FileName: Service_Storage_PhyMedium.h
-*
-*   Purpose : This class is used to implement Physical Medium DM
-*
-*/
+
+/**
+ * @file Service_Storage_PhyMedium.h
+ * @brief The header file provides storage service physical medium information APIs.
+ */
+
+/**
+ * @defgroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM TR-069 Object (Device.StorageService.PhysicalMedium.Interface)
+ * This object provides information about each physical medium connected to this device.
+ * At most one entry in this table can exist with a given value for Name, or with all the
+ * same values for Vendor, Model and SerialNumber, or with a given value for Alias.
+ *
+ * @note Alias
+ * is a non-volatile handle used to reference this instance. Alias provides a mechanism for an ACS to
+ * label this instance for future reference.
+ *
+ * If the CPE supports the Alias-based Addressing feature the following mandatory constraints MUST be enforced:
+ * - Its value MUST NOT be empty.
+ * - Its value MUST start with a letter.
+ * If its value is not assigned by the ACS, it MUST start with a 'cpe-' prefix.
+ * The CPE MUST NOT change the parameter value.
+ * @ingroup TR69_HOSTIF_STORAGE
+ *
+ * @defgroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_API TR-069 Object (Device.StorageService.PhysicalMedium.Interface.{i}) Public APIs
+ * Describe the details about RDK TR069 storage service  physical medium  APIs specifications.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM
+ *
+ * @defgroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_CLASSES TR-069 Object (Device.StorageService.PhysicalMedium.Interface.{i}) Public Classes
+ * Describe the details about classes used in TR-069 storage service  physical medium.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM
+ */
 #ifndef _SERVICE_STORAGE_PHYMED_H_
 #define _SERVICE_STORAGE_PHYMED_H_
 #include "hostIf_main.h"
@@ -37,6 +62,11 @@
 #define MAX_PHY_MED_CONNECTION_TYPE_LEN 64
 #define MAX_PHY_MED_STATUS_LEN 64
 #define MAX_PHY_MED_HEALTH_LEN 64
+
+/**
+ * @struct physicalMediumMembers
+ * @brief It contains the members variables of the physicalMediumMembers structure.
+ */
 typedef struct physicalMediumMembers
 {
     char alias[MAX_PHY_MED_ALIAS_LEN];
@@ -55,6 +85,10 @@ typedef struct physicalMediumMembers
     bool hotSwappable;
 }PhysicalMediumMembers_t;
 
+/**
+ * @enum ePhysicalMediumMembers_t
+ * @brief It contains the members variables of the ePhysicalMediumMembers_t enum.
+ */
 typedef enum 
 {
     eAlias,
@@ -73,7 +107,10 @@ typedef enum
     eHotSwappable
 }ePhysicalMediumMembers_t;
 
-
+/**
+ * @brief This class provides the TR-069 host interface physical medium information.
+ * @ingroup TR69_HOSTIF_STORAGE_PHYSICALMEDIUM_CLASSES
+ */
 class hostIf_PhysicalMedium
 {
     

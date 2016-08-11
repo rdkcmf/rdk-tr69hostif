@@ -17,6 +17,11 @@
  * limitations under the License.
 */
 
+/**
+  * @defgroup TR69_HOSTIF_WIFI_ENDPOINT_SECURITY TR-069 Object (Device.WiFi.EndPoint.{i}.Security.) Public APIs
+  * This object contains security related parameters that apply to a WiFi end point [802.11-2007].
+  * @ingroup TR69_HOSTIF_WIFI
+  */
 
 /**
 * @defgroup tr69hostif
@@ -49,6 +54,29 @@ public:
 
     char ModesSupported[64];
 
+   /**
+    * @ingroup TR69_HOSTIF_WIFI_ENDPOINT_SECURITY
+    * @{
+    */
+   /**
+    * @brief This function provides the comma-separated list of strings contains which security modes
+    * the wireless EndPoint instance is capable of supporting.
+    *
+    * Each list item is an enumeration of:
+    * - None
+    * - WEP-64
+    * - WEP-128
+    * - WPA-Personal
+    * - WPA2-Personal
+    * - WPA-WPA2-Personal
+    * - WPA-Enterprise
+    * - WPA2-Enterprise
+    * - WPA-WPA2-Enterprise 
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
     int get_hostIf_WiFi_EndPoint_ModesSupported(HOSTIF_MsgData_t *stMsgData );
 
     /**

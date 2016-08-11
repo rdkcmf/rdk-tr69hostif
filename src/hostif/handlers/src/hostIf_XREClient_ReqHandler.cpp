@@ -17,6 +17,10 @@
  * limitations under the License.
 */
 
+/**
+ * @file hostIf_XREClient_ReqHandler.cpp
+ * @brief The header file provides HostIf IP XREClient request handler information APIs.
+ */
 
 /**
 * @defgroup tr69hostif
@@ -50,6 +54,15 @@ msgHandler* XREClientReqHandler::getInstance()
     return pInstance;
 }
 
+/**
+ * @brief This function is use to initialize. Currently not implemented.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successfully .
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_XRECLIENT_REQHANDLER_CLASSES
+ */
 bool XREClientReqHandler::init()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -57,6 +70,15 @@ bool XREClientReqHandler::init()
     return true;
 }
 
+/**
+ * @brief This function is use to uninitialized. Currently not implemented.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successfully .
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_XRECLIENT_REQHANDLER_CLASSES
+ */
 bool XREClientReqHandler::unInit()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
@@ -163,6 +185,19 @@ int XREClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+/**
+ * @brief This function use to handle the get message request of XREClient interface
+ * and get the attributes such as "xreEnable", "xreStatus", "xreVersion", "xreReceiverId",
+ * "xreSessionId", "xreSessionLastModTs", "xreSessionUptime" etc..
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successfully.
+ * @retval ERR_INTERNAL_ERROR if not able to get data from the device.
+ * @ingroup TR-069HOSTIF_XRECLIENT_REQHANDLER_CLASSES
+ */
 int XREClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -374,7 +409,6 @@ int XREClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         }
     }
 #endif
-	
 	else if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.Client.XRE.ConnectionTable.xreAppId") == 0)
     {
         ret = get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_ConnectionTable_xreAppId(stMsgData);

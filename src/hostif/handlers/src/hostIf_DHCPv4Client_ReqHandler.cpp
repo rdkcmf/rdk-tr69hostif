@@ -23,6 +23,10 @@
  */
 //#define HAVE_VALUE_CHANGE_EVENT
 
+/**
+ * @file hostIf_DHCPv4Client_ReqHandler.cpp
+ * @brief The header file provides HostIf DHCPv4 client request handler information APIs.
+ */
 #include "hostIf_main.h"
 #include "hostIf_utils.h"
 #include "Device_DHCPv4_Client.h"
@@ -50,11 +54,29 @@ void DHCPv4ClientReqHandler::reset()
     hostIf_DHCPv4Client::releaseLock();
 }
 
+/**
+ * @brief This function is used to initialize. Currently not implemented.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if initialization is successful.
+ * @retval false if initialization is not successful.
+ * @ingroup TR-069HOSTIF_DHCPV4CLIENT_REQHANDLER_CLASSES
+ */
 bool DHCPv4ClientReqHandler::init()
 {
     return true;
 }
 
+/**
+ * @brief This function is used to close all the instances of DHCPv4 client.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval true if it successfully close all the instances.
+ * @retval false if not able to close all the instances.
+ * @ingroup TR-069HOSTIF_DHCPV4CLIENT_REQHANDLER_CLASSES
+ */
 bool DHCPv4ClientReqHandler::unInit()
 {
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] DHCPv4 manager DeInitializing\n", __FUNCTION__);
@@ -63,6 +85,18 @@ bool DHCPv4ClientReqHandler::unInit()
     return true;
 }
 
+/**
+ * @brief This function is used to handle the set message request of DHCPv4 Client.
+ * Currently not implemented.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful.
+ * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+ * @ingroup TR-069HOSTIF_DHCPV4CLIENT_REQHANDLER_CLASSES
+ */
 int DHCPv4ClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
@@ -73,6 +107,18 @@ int DHCPv4ClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+/**
+ * @brief This function is used to handle the get message request of DHCPv4 Client information
+ * such as "Interface", "IPRouters" and "DNSServers".
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it gets the data successfully.
+ * @retval ERR_INTERNAL_ERROR if not able to get the data from the device.
+ * @ingroup TR-069HOSTIF_DHCPV4CLIENT_REQHANDLER_CLASSES
+ */
 int DHCPv4ClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
