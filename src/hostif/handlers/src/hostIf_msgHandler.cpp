@@ -37,7 +37,6 @@
 #include "hostIf_DeviceClient_ReqHandler.h"
 #ifdef USE_XRESRC
 #include "hostIf_XREClient_ReqHandler.h"
-#include "hostIf_CoPilotClient_ReqHandler.h"
 #endif /* USE_XRESRC */
 #ifdef USE_MoCA_PROFILE
 #include "hostIf_MoCAClient_ReqHandler.h"
@@ -201,10 +200,6 @@ bool hostIf_initalize_ConfigManger()
             {
                 mgrName = HOSTIF_XREMgr;
             }
-            else if(strcasecmp(mgr, "coPilotMgr") == 0)
-            {
-                mgrName = HOSTIF_CoPilotMgr;
-            }
 #endif /* USE_XRESRC*/
             else if(strcasecmp(mgr, "ethernetMgr") == 0)
             {
@@ -287,9 +282,6 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
 #ifdef USE_XRESRC
             case HOSTIF_XREMgr:
                 pRet = XREClientReqHandler::getInstance();
-                break;
-            case HOSTIF_CoPilotMgr:
-                pRet = CoPilotClientReqHandler::getInstance();
                 break;
 #endif /*USE_XRESRC*/
             case HOSTIF_DeviceMgr:
@@ -404,10 +396,6 @@ bool hostIf_ConfigProperties_Init()
                         else if(strcasecmp(value, "xreMgr") == 0)
                         {
                             mgrName = HOSTIF_XREMgr;
-                        }
-			else if(strcasecmp(value, "coPilotMgr") == 0)
-                        {
-                            mgrName = HOSTIF_CoPilotMgr;
                         }
 #endif /* USE_XRESRC*/
                         else if(strcasecmp(value, "ethernetMgr") == 0)

@@ -80,7 +80,6 @@ libMsgHandlers_la_SOURCES =	src/hostIf_IARM_ReqHandler.cpp \
 				src/hostIf_jsonReqHandlerThread.cpp \
 				src/hostIf_dsClient_ReqHandler.cpp \
 				src/hostIf_DeviceClient_ReqHandler.cpp \
-				src/hostIf_CoPilotClient_ReqHandler.cpp \
 				src/hostIf_XREClient_ReqHandler.cpp \
 				src/hostIf_updateHandler.cpp \
 				src/hostIf_MoCAClient_ReqHandler.cpp \

@@ -98,7 +98,6 @@ typedef enum _HostIf_ParamMgr
     HOSTIF_INVALID_Mgr = 0,
     HOSTIF_DeviceMgr,
     HOSTIF_XREMgr,
-    HOSTIF_CoPilotMgr,
     HOSTIF_DSMgr,
     HOSTIF_MoCAMgr,
     HOSTIF_EthernetMgr,
