@@ -463,6 +463,14 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->get_xOpsDMLogsUploadStatus(stMsgData);
         }
+        else if (strcasecmp(stMsgData->paramName, xOpsDMMoCALogEnabled) == 0)
+        {
+            ret = pIface->get_xOpsDMMoCALogEnabled(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName, xOpsDMMoCALogPeriod) == 0)
+        {
+            ret = pIface->get_xOpsDMMoCALogPeriod(stMsgData);
+        }
         else if (strcasecmp(stMsgData->paramName,xOpsDMUploadLogsNow_STR) == 0)
         {
             ret = pIface->get_xOpsDMUploadLogsNow(stMsgData);

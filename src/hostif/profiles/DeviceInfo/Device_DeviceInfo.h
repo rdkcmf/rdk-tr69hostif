@@ -525,6 +525,31 @@ public:
     */
     int get_xOpsDMLogsUploadStatus(HOSTIF_MsgData_t *);
     /**
+    * @brief get_xOpsDMMoCALogEnabled.
+    *
+    * This method is to get  moca telemetry log status
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMMoCALogEnabled
+    *   Data type: boolean - getting this parameter and if the value is true then  moca telemetry logging is enabled
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if not able to fetch from device.
+    */
+    int get_xOpsDMMoCALogEnabled(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief get_xOpsDMMoCALogPeriod.
+    *
+    * This method is to get the MoCA logging period
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMMoCALogPeriod
+    *   Data type: integer - getting the value for moca telemetry logging period
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if not able to fetch from device.
+    */ 
+    int get_xOpsDMMoCALogPeriod(HOSTIF_MsgData_t *);
+    /**
      * Helper methods
      */
     int set_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(HOSTIF_MsgData_t *);
