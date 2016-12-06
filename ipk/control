@@ -1,0 +1,12 @@
+Package: tr69hostif
+Version: git-r0.7
+Description: TR69 Host Interface
+ TR69 Host Interface.
+Section: console/utils
+Priority: optional
+Maintainer: CPE SI Yocto Team <CCP_CPESI-YOCTO@cable.comcast.com>
+License: CLOSED
+Architecture: mips32el
+OE: tr69hostif
+Depends: libgcc1 (>= 4.8.2), tr69profiles (>= git), libc6 (>= 2.19), libsoup-2.4 (>= 2.45.3), yajl (>= 1.0.9), libstdc++6 (>= 4.8.2), libglib-2.0-0 (>= 2.38.2), procps (>= 3.2.8)
+Source: git://gerrit.teamccp.com:29418/rdk/components/generic/tr69hostif/generic;protocol=ssh;branch=master file://tr69hostif.service git://gerrit.teamccp.com:29418/rdk/components/generic/tr69hostif/soc/broadcom/common;protocol=ssh;branch=master;destsuffix=git/soc/hostif;name=tr69hostifbcom

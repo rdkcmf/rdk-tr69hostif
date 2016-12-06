@@ -1,0 +1,545 @@
+/*
+ * If not stated otherwise in this file or this component's Licenses.txt file the
+ * following copyright and licenses apply:
+ *
+ * Copyright 2016 RDK Management
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
+/**
+ * @file Device_IP.cpp
+ * @brief This source file contains the APIs of device IP.
+ */
+
+/**
+ * @file Device_IP.c
+ *
+ * @brief Device.IP. API Implementation.
+ *
+ * This is the implementation of the Device.IP. API.
+ *
+ * @par Document
+ * TBD Relevant design or API documentation.
+ *
+ */
+
+
+/*****************************************************************************
+ * STANDARD INCLUDE FILES
+ *****************************************************************************/
+
+
+
+/**
+* @defgroup tr69hostif
+* @{
+* @defgroup hostif
+* @{
+**/
+
+
+#include "Device_IP.h"
+#include <net/if.h>
+
+IP hostIf_IP::stIPInstance = {TRUE,FALSE,{"Disabled"},FALSE,0,0};
+
+char* hostIf_IP::cmd_NumOfActivePorts = "cat /proc/net/tcp | awk '$4 == \"0A\" || $4 == \"01\" {print $2" "$3" "$4}' | wc -l";
+
+GMutex* hostIf_IP::m_mutex = NULL;
+
+GHashTable *hostIf_IP::ifHash = NULL;
+
+
+/** Description: Counts the number of IP
+ *               interfaces present in the device.
+ *
+ * \Return:  Count value or '0' if error
+ *
+ */
+unsigned int hostIf_IP::getNumOfIPInterfaces(void)
+{
+    struct if_nameindex *ifname = NULL, *ifnp = NULL;
+    int noOfIPInterfaces = 0;
+
+    //retrieve the current interfaces
+    if ((ifname = if_nameindex()) == NULL)
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): if_nameindex Error\n", __FUNCTION__);
+        return 0;
+    }
+
+    for (ifnp = ifname; ifnp->if_index != 0; ifnp++)
+    {
+        noOfIPInterfaces++;
+    }
+
+    if (ifname)
+    {
+        if_freenameindex(ifname); /* free the dynamic memory */
+        ifname = NULL;            /* prevent use after free  */
+    }
+
+    //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s: Current IP Interfaces Count: [%u]\n", __FUNCTION__, noOfIPInterfaces);
+
+    return (noOfIPInterfaces);
+}
+
+/**
+ * @brief Class Constructor of the class hostIf_IP.
+ *
+ * It will initialize the device id ,backup IP4 status to empty string.
+ *
+ * @param[in] dev_id Device identification number.
+ */
+hostIf_IP::hostIf_IP(int dev_id):
+    dev_id(dev_id),
+    bCalledIPv4Capable(false),
+    bCalledIPv4Enable(false),
+    bCalledIPv4Status(false),
+    bCalledInterfaceNumberOfEntries(false),
+    bCalledActivePortNumberOfEntries(false),
+    backupIPv4Capable(false),
+    backupIPv4Enable(false),
+    backupInterfaceNumberOfEntries(0),
+    backupActivePortNumberOfEntries(0)
+{
+    strcpy(backupIPv4Status,"");
+}
+
+hostIf_IP* hostIf_IP::getInstance(int dev_id)
+{
+    hostIf_IP* pRet = NULL;
+
+    if(ifHash)
+    {
+        pRet = (hostIf_IP *)g_hash_table_lookup(ifHash,(gpointer) dev_id);
+    }
+    else
+    {
+        ifHash = g_hash_table_new(NULL,NULL);
+    }
+
+    if(!pRet)
+    {
+        try {
+            pRet = new hostIf_IP(dev_id);
+        } catch(int e)
+        {
+            RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"Caught exception, not able create MoCA Interface instance..\n");
+        }
+        g_hash_table_insert(ifHash, (gpointer)dev_id, pRet);
+    }
+    return pRet;
+}
+
+GList* hostIf_IP::getAllInstances()
+{
+    if(ifHash)
+        return g_hash_table_get_keys(ifHash);
+    return NULL;
+}
+
+void hostIf_IP::closeInstance(hostIf_IP *pDev)
+{
+    if(pDev)
+    {
+        g_hash_table_remove(ifHash, (gconstpointer)pDev->dev_id);
+        delete pDev;
+    }
+}
+
+void hostIf_IP::closeAllInstances()
+{
+    if(ifHash)
+    {
+        GList* tmp_list = g_hash_table_get_values (ifHash);
+
+        while(tmp_list)
+        {
+            hostIf_IP* pDev = (hostIf_IP *)tmp_list->data;
+            tmp_list = tmp_list->next;
+            closeInstance(pDev);
+        }
+    }
+}
+
+void hostIf_IP::getLock()
+{
+    if(!m_mutex)
+    {
+        m_mutex = g_mutex_new();
+    }
+    g_mutex_lock(m_mutex);
+}
+
+void hostIf_IP::releaseLock()
+{
+    g_mutex_unlock(m_mutex);
+}
+
+/** Description: Counts the number of tcp sockets in the device
+ *               in listening or established state.
+ *
+ * \Return:  Count value or '0' if error
+ *
+ */
+unsigned int hostIf_IP::getNumOfActivePorts(void) {
+
+    FILE *fp = NULL;
+    char resultBuff[BUFF_LENGTH] = {'\0'};
+    int noOfActivePorts = 0;
+
+    fp = popen(cmd_NumOfActivePorts,"r");
+
+    if(fp == NULL)
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Error popen\n", __FUNCTION__);
+        return 0;
+    }
+
+    if(fgets(resultBuff, BUFF_LENGTH, fp)!=NULL)
+    {
+        sscanf(resultBuff,"%d",&noOfActivePorts);
+    }
+
+    pclose(fp);
+
+    //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s: Current Active Ports Count: [%u]\n", __FUNCTION__, noOfActivePorts);
+
+    return (noOfActivePorts);
+}
+
+
+int hostIf_IP::get_Device_IP_Fields(EIPMembers ipMem)
+{
+    FILE *fp = NULL;
+    struct if_nameindex *ifname, *ifnp;
+    unsigned int ipInterfaceCount = 0;
+    char resultBuff[BUFF_LENGTH] = {'\0'};
+    char command[BUFF_LENGTH] = {'\0'};
+    int ipv4AddressAvailable = 0;
+
+
+    switch(ipMem)
+    {
+    case eIpIPv4Capable:
+        /*the assumption is that we are always IPv4 capable*/
+        /*HARD CODING it to 1*/
+        stIPInstance.iPv4Capable = TRUE;
+        break;
+    case eIpIPv4Enable:
+    case eIpIPv4Status:
+        sprintf(command,"ifconfig | egrep 'inet addr:' | wc -l");
+
+        fp = popen(command,"r");
+
+        if(fp == NULL)
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Error in popen eIPv4Enable\n", __FUNCTION__);
+
+            return NOK;
+        }
+
+        if(fgets(resultBuff,BUFF_LENGTH,fp)!=NULL)
+        {
+            sscanf(resultBuff,"%d",&ipv4AddressAvailable);
+        }
+
+        /*If there are no IPV4 address available, then assume that IPv4 has been disabled.*/
+        if(0 == ipv4AddressAvailable)
+        {
+            stIPInstance.iPv4Enable = FALSE;
+            strcpy(stIPInstance.iPv4Status,"Disabled");
+            //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): stIPInstance.iPv4Enable = %d,stIPInstance.iPv4Status = %s\n",__FUNCTION__,stIPInstance.iPv4Enable,stIPInstance.iPv4Status);
+        }
+        else
+        {
+            stIPInstance.iPv4Enable = TRUE;
+            strcpy(stIPInstance.iPv4Status,"Enabled");
+            //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): stIPInstance.iPv4Enable = %d,stIPInstance.iPv4Status = %s\n",__FUNCTION__,stIPInstance.iPv4Enable,stIPInstance.iPv4Status);
+        }
+
+        pclose(fp);
+        break;
+    case eIpULAPrefix:
+        break;
+    case eIpInterfaceNumberOfEntries:
+        //retrieve the current interfaces
+        stIPInstance.interfaceNumberOfEntries = getNumOfIPInterfaces();
+
+        //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): InterfaceNumberOfEntries %u \n",__FUNCTION__,stIPInstance.interfaceNumberOfEntries);
+        break;
+
+    case eIpActivePortNumberOfEntries:
+        stIPInstance.activePortNumberOfEntries = getNumOfActivePorts();
+        //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): ActivePortsNumberOfEntries %u \n",__FUNCTION__,stIPInstance.activePortNumberOfEntries);
+        break;
+
+    default:
+        break;
+    }
+
+    return 0;
+}
+
+int hostIf_IP::handleGetMsg (HOSTIF_MsgData_t* stMsgData)
+{
+    int ret = NOT_HANDLED;
+
+    if (!strcasecmp (stMsgData->paramName, "Device.IP.IPv4Capable"))
+    {
+        ret = get_Device_IP_IPv4Capable (stMsgData);
+    }
+    else if (!strcasecmp (stMsgData->paramName, "Device.IP.IPv4Enable"))
+    {
+        ret = get_Device_IP_IPv4Enable (stMsgData);
+    }
+    else if (!strcasecmp (stMsgData->paramName, "Device.IP.IPv4Status"))
+    {
+        ret = get_Device_IP_IPv4Status (stMsgData);
+    }
+    else if (!strcasecmp (stMsgData->paramName, "Device.IP.ULAPrefix"))
+    {
+        ret = get_Device_IP_ULAPrefix (stMsgData);
+    }
+    else if (!strcasecmp (stMsgData->paramName, "Device.IP.InterfaceNumberOfEntries"))
+    {
+        ret = hostIf_IP::get_Device_IP_InterfaceNumberOfEntries (stMsgData);
+    }
+    else if (!strcasecmp (stMsgData->paramName, "Device.IP.ActivePortNumberOfEntries"))
+    {
+        ret = hostIf_IP::get_Device_IP_ActivePortNumberOfEntries (stMsgData);
+    }
+
+    return ret;
+}
+
+int hostIf_IP::handleSetMsg (HOSTIF_MsgData_t* stMsgData)
+{
+    int ret = NOT_HANDLED;
+
+    if (!strcasecmp (stMsgData->paramName, "Device.IP.IPv4Enable"))
+    {
+        ret = set_Device_IP_IPv4Enable (stMsgData);
+    }
+    return ret;
+}
+
+/****************************************************************************************************************************************************/
+// Device.IP. Profile. Getters:
+/****************************************************************************************************************************************************/
+
+/**
+ * @brief This function gets the IPv4 capability of a device. It indicates
+ * whether or not the device is IPv4 capable. 'true' if it is capable, 'false' if it
+ * is not capable.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully get the capability of IPv4 interface else
+ * returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
+int hostIf_IP::get_Device_IP_IPv4Capable(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
+{
+
+    get_Device_IP_Fields(eIpIPv4Capable);
+    if(bCalledIPv4Capable && pChanged && (backupIPv4Capable != stIPInstance.iPv4Capable))
+    {
+        *pChanged = true;
+    }
+    bCalledIPv4Capable = true;
+    backupIPv4Capable = stIPInstance.iPv4Capable;
+    put_int(stMsgData->paramValue,stIPInstance.iPv4Capable);
+    stMsgData->paramtype = hostIf_BooleanType;
+    stMsgData->paramLen = 1;
+
+    return OK;
+}
+
+/**
+ * @brief Get the status of the IPv4 stack on a device. This function provides the status
+ * 'enabled' or 'disabled' of the IPv4 stack, and the use of IPv4 on the device. This affects
+ * only layer 3 and above.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully get the device IPv4 enable else returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
+int hostIf_IP::get_Device_IP_IPv4Enable(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
+{
+
+    get_Device_IP_Fields(eIpIPv4Enable);
+    if(bCalledIPv4Enable && pChanged && (backupIPv4Enable != stIPInstance.iPv4Enable))
+    {
+        *pChanged = true;
+    }
+    bCalledIPv4Enable = true;
+    backupIPv4Enable = stIPInstance.iPv4Enable;
+    put_int(stMsgData->paramValue,stIPInstance.iPv4Enable);
+    stMsgData->paramtype = hostIf_BooleanType;
+    stMsgData->paramLen = 1;
+
+    return OK;
+}
+
+/**
+ * @brief This function gets the status of the IPv4 stack on a device. It indicates the status of the IPv4 stack.
+ * It is an enumeration of: Disabled, Enabled, Error (OPTIONAL).
+ *
+ * @note The Error value MAY be used by the CPE to indicate a locally defined  error condition.
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully get the device IPv4 status else returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
+int hostIf_IP::get_Device_IP_IPv4Status(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
+{
+
+    get_Device_IP_Fields(eIpIPv4Status);
+    if(bCalledIPv4Status && pChanged && strncmp(stIPInstance.iPv4Status, backupIPv4Status,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+    {
+        *pChanged = true;
+    }
+    bCalledIPv4Status = true;
+    strncpy(stMsgData->paramValue,stIPInstance.iPv4Status,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(backupIPv4Status,stIPInstance.iPv4Status,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    stMsgData->paramtype = hostIf_StringType;
+    stMsgData->paramLen = strlen(stIPInstance.iPv4Status);
+
+    return OK;
+}
+
+/**
+ * @brief Get the ULA(Unique Local Address)/48 prefix for a device. This function provides the
+ * ULA /48 prefix of the device. This is the IPv6 address prefix and can be any IPv6 prefix that
+ * is permitted by the IPPrefix data type. Currently not implemented.
+ *
+ * @note This is specified as an IP address followed by an appended "/n" suffix, where n
+ * (the prefix size) is an integer in the range 0-32 (for IPv4) or 0-128 (for IPv6) that
+ * indicates the number of (leftmost) '1' bits of the routing prefix.
+ * - IPv4 example: 192.168.1.0/24
+ * - IPv6 example: 2001:edff:fe6a:f76::/64
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully get the device IP ULA Prefix else returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
+int hostIf_IP::get_Device_IP_ULAPrefix(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
+{
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] Parameter Not Supported \n",__FUNCTION__);
+
+    return NOK;
+}
+
+int hostIf_IP::get_Device_IP_InterfaceNumberOfEntries(HOSTIF_MsgData_t *stMsgData)
+{
+
+    hostIf_IP::get_Device_IP_Fields(eIpInterfaceNumberOfEntries);
+    put_int(stMsgData->paramValue,stIPInstance.interfaceNumberOfEntries);
+    stMsgData->paramtype = hostIf_UnsignedIntType;
+    stMsgData->paramLen = 4;
+
+    return OK;
+}
+
+int hostIf_IP::get_Device_IP_ActivePortNumberOfEntries(HOSTIF_MsgData_t *stMsgData)
+{
+
+    get_Device_IP_Fields(eIpActivePortNumberOfEntries);
+    put_int(stMsgData->paramValue,stIPInstance.activePortNumberOfEntries);
+    stMsgData->paramtype = hostIf_UnsignedIntType;
+    stMsgData->paramLen = 4;
+
+    return OK;
+}
+
+
+
+
+/****************************************************************************************************************************************************/
+// Device.IP. Profile. Setters:
+/****************************************************************************************************************************************************/
+
+
+/**
+ * @brief This function sets the status to 'enabled' or 'disabled' of the IPv4 stack
+ * on a device. This affects only layer 3 and above.
+ *
+ * @note     When 'false', IP interfaces that had been operationally up and
+ *           passing IPv4 packets will now no longer be able to do so, and will be
+ *           operationally down (unless also attached to an enabled IPv6 stack).
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully set the device IPv4 enable else returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
+int hostIf_IP::set_Device_IP_IPv4Enable(HOSTIF_MsgData_t *stMsgData)
+{
+    char command[BUFF_LENGTH]= {'\0'};
+
+    if(get_int(stMsgData->paramValue) == 1)
+    {
+        strcpy(command,"ifup -a");
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] Enabled \n",__FUNCTION__);
+
+    }
+    else if(get_int(stMsgData->paramValue) == 0)
+    {
+        strcpy(command,"ifdown -a");
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] Disabled \n",__FUNCTION__);
+    }
+
+    if(system(command) < 0)
+        return NOK;
+
+    return OK;
+}
+
+/**
+ * @brief This function sets the ULA /48 prefix of the device. This is the IPv6 address
+ * prefix and can be any IPv6 prefix that is permitted by the IPPrefix data type.
+ * Currently not implemented.
+ *
+ * @note This is specified as an IP address followed by an appended "/n" suffix, where n
+ * (the prefix size) is an integer in the range 0-32 (for IPv4) or 0-128 (for IPv6) that
+ * indicates the number of (leftmost) '1' bits of the routing prefix.
+ * - IPv4 example: 192.168.1.0/24
+ * - IPv6 example: 2001:edff:fe6a:f76::/64
+ *
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged  Status of the operation.
+ *
+ * @returns Returns '0' if the method successfully set the device IP ULA prefix else returns '-1'.
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API
+ */
+int hostIf_IP::set_Device_IP_ULAPrefix(HOSTIF_MsgData_t *stMsgData)
+{
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] Parameter Not Supported \n",__FUNCTION__);
+
+    return NOK;
+}
+
+
+/** @} */
+/** @} */
