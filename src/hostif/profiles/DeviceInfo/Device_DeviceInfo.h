@@ -175,6 +175,8 @@
 
 #define XRDK_BOOT_TIME "Device.DeviceInfo.X_RDKCENTRAL-COM_BootTime"
 
+#define xOpsRPCRebootNow "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.RebootNow"
+
 /**
  * @brief This class provides the interface for getting device information.
  * @ingroup TR69_HOSTIF_DEVICEINFO_CLASSES
@@ -490,6 +492,7 @@ public:
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayType(HOSTIF_MsgData_t *, bool *pChanged = false);
 
     int get_X_RDKCENTRAL_COM_BootTime(HOSTIF_MsgData_t *, bool *pChanged = false);
+
     /**
     * @brief get_xOpsDMLogsUploadStatus.
     *
@@ -620,6 +623,19 @@ public:
     * @retval NOK if operation fails.
     */
     int get_xOpsReverseSshStatus(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xOpsDeviceMgmtRPCRebootNow
+    *
+    * This method is to trigger an immediate reboot of the box.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.RebootNow
+    *   Data type: boolean - Setting this parameter to true will immediately reboot the box.
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t *);
 
     int readFirmwareInfo(char *, HOSTIF_MsgData_t *);
     int writeFirmwareInfo(char *, HOSTIF_MsgData_t *);

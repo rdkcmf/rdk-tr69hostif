@@ -187,6 +187,10 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_xOpsReverseSshArgs(stMsgData);
         }
+        else if (strcasecmp(stMsgData->paramName,xOpsRPCRebootNow) == 0)
+        {
+            ret = pIface->set_xOpsDeviceMgmtRPCRebootNow (stMsgData);
+        }
 #ifdef USE_XRDK_BT_PROFILE
         else if(strncasecmp(stMsgData->paramName,X_BT_ROOT_OBJ,strlen(X_BT_ROOT_OBJ))==0)
         {

@@ -1753,7 +1753,6 @@ int hostIf_DeviceInfo::get_X_RDKCENTRAL_COM_BootTime(HOSTIF_MsgData_t * stMsgDat
     return ret;
 }
 
-
 int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayType(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOK;
@@ -2122,6 +2121,29 @@ int hostIf_DeviceInfo::get_xOpsReverseSshStatus(HOSTIF_MsgData_t *stMsgData)
 
    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
    return OK;
+}
+
+int hostIf_DeviceInfo::set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t * stMsgData)
+{
+    LOG_ENTRY_EXIT;
+
+    if (get_boolean (stMsgData->paramValue))
+    {
+        char* command = "(sleep 1; /lib/rdk/rebootNow.sh) &";
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Invoking 'system (\"%s\")'\n", __FUNCTION__, command);
+        int ret = system (command);
+        if (ret != 0)
+        {
+            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] 'system (\"%s\")' returned error code '%d'\n", __FUNCTION__, command, ret);
+            return NOK;
+        }
+    }
+    else
+    {
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Not rebooting\n", __FUNCTION__);
+    }
+
+    return OK;
 }
 
 int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
