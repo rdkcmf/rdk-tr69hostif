@@ -2130,7 +2130,7 @@ int hostIf_DeviceInfo::set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t * stMsgD
     if (get_boolean (stMsgData->paramValue))
     {
         char* command = "(sleep 1; /lib/rdk/rebootNow.sh) &";
-        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Invoking 'system (\"%s\")'\n", __FUNCTION__, command);
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Invoking 'system (\"%s\")'. %s = true\n", __FUNCTION__, command, stMsgData->paramName);
         int ret = system (command);
         if (ret != 0)
         {
@@ -2140,7 +2140,7 @@ int hostIf_DeviceInfo::set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t * stMsgD
     }
     else
     {
-        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Not rebooting\n", __FUNCTION__);
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Not rebooting. %s = false\n", __FUNCTION__, stMsgData->paramName);
     }
 
     return OK;
