@@ -125,7 +125,7 @@ class hostIf_IPv6Address {
 
     int getIPv6AddressAndMask (int instance, struct in6_addr& in6_address, struct in6_addr& in6_mask);
     int getIPv6Prefix (int instance, struct in6_addr& in6_prefix_address, unsigned int& prefix_length);
-    bool isLinkLocalIPv6Address (const struct in6_addr& in6_address);
+    static bool isLinkLocalAddress (const struct in6_addr& in6_address);
 
     bool get_ipv6address_lifetime (unsigned int instance, char* search_string, long int& lifetime);
     bool get_ipv6address_preferred_lifetime (unsigned int instance, long int& preferred_lifetime);

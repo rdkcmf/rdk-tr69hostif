@@ -125,10 +125,12 @@ bool get_ACSStatus();
 bool set_GatewayConnStatus();
 bool get_GatewayConnStatus();
 
-/* 
- * Get the configured Moca interface name
+/**
+ * Returns:
+ * the specified environment variable's value if it is not NULL.
+ * the specified default value otherwise.
  */
-char *get_Eth_If_Name( void );
+char* getenvOrDefault (const char* name, char* defaultValue);
 
 int read_command_output (char* cmd, char* resultBuff, int length);
 

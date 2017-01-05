@@ -439,11 +439,19 @@ int hostIf_IPv6Address::getIPv6Prefix (int instance, struct in6_addr& in6_prefix
     return OK;
 }
 
-// link scope ipv6 address range = fe80/10
-// that is, only first 10 bits of ipv6 address need to be looked at to determine if it is a link-local address
-bool hostIf_IPv6Address::isLinkLocalIPv6Address (const struct in6_addr& in6_address)
+/**
+ * @brief tests if an IPv6 address is link-local.
+ *
+ * @param[in] in6_address the IPv6 address to test.
+ *
+ * @retval true if the IPv6 address is link-local.
+ * @retval false otherwise.
+ */
+bool hostIf_IPv6Address::isLinkLocalAddress (const struct in6_addr& in6_address)
 {
     LOG_ENTRY_EXIT;
+
+    // check if the given IPv6 address falls in the IPv6 link-scope address range (fe80/10)
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "[%s]: ntohs(in6_address.s6_addr16[0]) = %x, (ntohs(in6_address.s6_addr16[0]) & 0xffc0) = %x\n",
             __FUNCTION__, ntohs(in6_address.s6_addr16[0]), (ntohs(in6_address.s6_addr16[0]) & 0xffc0));
@@ -820,6 +828,7 @@ int hostIf_IPv6Address::get_IPv6Address_IPAddress(HOSTIF_MsgData_t *stMsgData,in
 int hostIf_IPv6Address::get_IPv6Address_Origin(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
+
 /*
     From the spec:
 
@@ -852,15 +861,15 @@ int hostIf_IPv6Address::get_IPv6Address_Origin(HOSTIF_MsgData_t *stMsgData,int s
     char origin[BUFF_LENGTH_32];
     if (hostIf_IPInterface::isLoopback (nameOfInterface))
     {
-        strcpy (origin, WELLKNOWN); // "WellKnown" for loopback interface
+        strcpy (origin, WELLKNOWN);
     }
-    else if (isLinkLocalIPv6Address (in6_address))
+    else if (isLinkLocalAddress (in6_address))
     {
-        strcpy (origin, AUTOCONFIGURED); // "AutoConfigured" for link-local address (assuming specified by SLAAC)
+        strcpy (origin, AUTOCONFIGURED);
     }
     else
     {
-        strcpy (origin, DHCPv6); // DHCPv6 - otherwise (assume)
+        strcpy (origin, AUTOCONFIGURED); // otherwise assume "AutoConfigured" (even for sit0's IPv4-compatible address "::127.0.0.1"/96 ?)
     }
 
     if (bCalledOrigin && pChanged && strncmp (origin, backupIPv6AddressOrigin, BUFF_LENGTH_32))
@@ -1285,7 +1294,7 @@ int hostIf_IPv6Address::get_IPv6Prefix_Origin (int instance, char* origin)
     if (OK != getIPv6AddressAndMask (instance, in6_address, in6_mask))
         return NOK;
 
-    if (hostIf_IPInterface::isLoopback (nameOfInterface) || isLinkLocalIPv6Address (in6_address))
+    if (hostIf_IPInterface::isLoopback (nameOfInterface) || isLinkLocalAddress (in6_address))
     {
         strcpy (origin, WELLKNOWN); // "WellKnown" for loopback and link-local addresses
     }

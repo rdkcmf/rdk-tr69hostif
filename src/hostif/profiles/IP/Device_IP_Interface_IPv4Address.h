@@ -195,7 +195,7 @@ class hostIf_IPv4Address {
 
     void refreshInterfaceName ();
     int getIPv4AddressAndMask (int instance, struct in_addr& in_address, struct in_addr& in_mask);
-    bool isAutoIP (const struct in_addr& in_address);
+    static bool isLinkLocalAddress (const struct in_addr& in_address);
     int setIpOrMask(int interfaceNo, char *value, const char* ipOrMask);
 
 public:

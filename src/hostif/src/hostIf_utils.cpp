@@ -268,23 +268,16 @@ bool get_GatewayConnStatus()
     return gGatewayConnStatus;
 }
 
-char *get_Eth_If_Name( void )
+/**
+ * Returns:
+ * the specified environment variable's value if it is not NULL.
+ * the specified default value otherwise.
+ */
+char* getenvOrDefault (const char* name, char* defaultValue)
 {
-    static char *ethIf = NULL;
-    if ( NULL == ethIf )
-    {
-        ethIf = getenv( "MOCA_INTERFACE" );
-        if ( NULL == ethIf )
-        {
-            ethIf = INTERFACE_ETH;
-        }
-    }
-
-    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"get_Eth_If_Name(): ethIf=%s\n", ethIf);
-    return ethIf;
+    char* value = getenv (name);
+    return value ? value : defaultValue;
 }
-/** @} */
-/** @} */
 
 int read_command_output (char* cmd, char* resultBuff, int length)
 {
@@ -303,3 +296,6 @@ int read_command_output (char* cmd, char* resultBuff, int length)
     pclose (fp);
     return OK;
 }
+
+/** @} */
+/** @} */

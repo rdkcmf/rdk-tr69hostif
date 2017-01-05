@@ -1008,8 +1008,8 @@ string hostIf_DeviceInfo::getEstbIp()
         bool isWifiEnabled = (!access (Wifi_Enable_file, F_OK))?true:false;
 
         /* Get configured moca interface */
-        char *ethIf = get_Eth_If_Name();
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s():%d] ipv6Enabled : %d; isWifiEnabled : %d get_Eth_If_Name() : %s\n",
+        char *ethIf = getenvOrDefault ("MOCA_INTERFACE", "");
+        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s():%d] ipv6Enabled : %d; isWifiEnabled : %d ethIf : %s\n",
                 __FUNCTION__, __LINE__, ipv6Enabled, isWifiEnabled, ethIf);
 
         if(getifaddrs(&ifAddrStr))

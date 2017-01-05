@@ -487,9 +487,19 @@ int hostIf_IPv4Address::get_IPv4Address_SubnetMask(HOSTIF_MsgData_t *stMsgData,i
     return OK;
 }
 
-bool hostIf_IPv4Address::isAutoIP (const struct in_addr& in_address)
+/**
+ * @brief tests if an IPv4 address is link-local.
+ *
+ * @param[in] in_address the IPv4 address to test.
+ *
+ * @retval true if the IPv4 address is link-local.
+ * @retval false otherwise.
+ */
+bool hostIf_IPv4Address::isLinkLocalAddress (const struct in_addr& in_address)
 {
     LOG_ENTRY_EXIT;
+
+    // check if the given IPv4 address falls in the IPv4 link-local address range (169.254.x.y)
 
     char ipv4Address[BUFF_LENGTH_64];
     inet_ntop (AF_INET, &in_address, ipv4Address, BUFF_LENGTH_64);
@@ -519,20 +529,46 @@ int hostIf_IPv4Address::get_IPv4Address_AddressingType(HOSTIF_MsgData_t *stMsgDa
 {
     LOG_ENTRY_EXIT;
 
+/*
+    From the spec:
+
+    Addressing method used to assign the IP address. Enumeration of:
+
+        DHCP
+
+        IKEv2 (Assigned by IKEv2 [RFC5996])
+
+        AutoIP
+
+        IPCP
+
+        Static
+*/
+
     // first verify that we have an IPv4 address for the given instance
     struct in_addr in_address;
     struct in_addr in_mask;
     if (OK != getIPv4AddressAndMask (subInstanceNo, in_address, in_mask))
         return NOK;
 
+    char ipv4Address[BUFF_LENGTH_64];
+    inet_ntop (AF_INET, &in_address, ipv4Address, BUFF_LENGTH_64);
+
     char addressingType[BUFF_LENGTH_16];
     if (hostIf_IPInterface::isLoopback (nameOfInterface))
     {
-        strcpy (addressingType, "Static"); // Static for loopback interface
+        strcpy (addressingType, "Static");
     }
-    else if (strcmp (nameOfInterface, get_Eth_If_Name ()) == 0 && isAutoIP (in_address))
+    else if (isLinkLocalAddress (in_address))
     {
-        strcpy (addressingType, "AutoIP"); // AutoIP if MoCA interface and IP like "169.254.x.y"
+        strcpy (addressingType, "AutoIP");
+    }
+    else if (((0 == strcmp (nameOfInterface, getenvOrDefault ("MOCA_INTERFACE", ""))) &&
+              (0 == strcmp (ipv4Address, getenvOrDefault ("DEFAULT_MOCA_IFACE_IP", "")))) ||
+             ((0 == strcmp (nameOfInterface, getenvOrDefault ("WIFI_INTERFACE", ""))) &&
+              (0 == strcmp (ipv4Address, getenvOrDefault ("DEFAULT_WIFI_IFACE_IP", "")))))
+    {
+        strcpy (addressingType, "Static");
     }
     else
     {
