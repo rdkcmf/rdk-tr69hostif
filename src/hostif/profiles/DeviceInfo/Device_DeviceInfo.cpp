@@ -74,7 +74,9 @@
 #include "manager.hpp"
 #include "dsError.h"
 #include "sysMgr.h"
+#ifdef USE_MoCA_PROFILE
 #include "netsrvmgrIarm.h"
+#endif
 #include <map>
 #include <string>
 #include <iostream>
@@ -2007,7 +2009,7 @@ int hostIf_DeviceInfo::set_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
     mocaLogEnabled = get_boolean(stMsgData->paramValue);
-
+#ifdef USE_MoCA_PROFILE
     if (IARM_Bus_BroadcastEvent(IARM_BUS_NM_SRV_MGR_NAME, (IARM_EventId_t) IARM_BUS_NETWORK_MANAGER_MOCA_TELEMETRY_LOG, (void *)&mocaLogEnabled, sizeof(mocaLogEnabled)) == IARM_RESULT_SUCCESS)
     {
 	RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging is %d \n",__FUNCTION__, mocaLogEnabled);
@@ -2016,6 +2018,7 @@ int hostIf_DeviceInfo::set_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
     {
 	RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging IARM FAILURE \n",__FUNCTION__);
     }
+#endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
     return OK;
 }
@@ -2027,6 +2030,7 @@ int hostIf_DeviceInfo::set_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
     mocaLogDuration = get_int(stMsgData->paramValue);
     
+#ifdef USE_MoCA_PROFILE
     if (IARM_Bus_BroadcastEvent(IARM_BUS_NM_SRV_MGR_NAME, (IARM_EventId_t) IARM_BUS_NETWORK_MANAGER_MOCA_TELEMETRY_LOG_DURATION, (void *)&mocaLogDuration, sizeof(mocaLogDuration)) == IARM_RESULT_SUCCESS)
     {
         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging Duration is %d \n",__FUNCTION__, mocaLogDuration);
@@ -2035,6 +2039,7 @@ int hostIf_DeviceInfo::set_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging Duration IARM FAILURE \n",__FUNCTION__);
     }
+#endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
     return OK;
 }
@@ -2044,7 +2049,7 @@ int hostIf_DeviceInfo::get_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
     IARM_Result_t retVal = IARM_RESULT_SUCCESS;
     bool param;
     memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-
+#ifdef USE_MoCA_PROFILE
     retVal = IARM_Bus_Call(IARM_BUS_NM_SRV_MGR_NAME,IARM_BUS_NETWORK_MANAGER_MOCA_getTelemetryLogStatus, (void *)&param, sizeof(param));
 
     if(retVal == IARM_RESULT_SUCCESS)
@@ -2055,6 +2060,7 @@ int hostIf_DeviceInfo::get_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
     }
     else
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] IARM Failed \n", __FUNCTION__, __FILE__, __LINE__);
+#endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
     return OK;
 }
@@ -2066,7 +2072,7 @@ int hostIf_DeviceInfo::get_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
     unsigned int param;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
     memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-
+#ifdef USE_MoCA_PROFILE
     retVal = IARM_Bus_Call(IARM_BUS_NM_SRV_MGR_NAME,IARM_BUS_NETWORK_MANAGER_MOCA_getTelemetryLogDuration, (void *)&param, sizeof(param));
 
     if(retVal == IARM_RESULT_SUCCESS)
@@ -2077,7 +2083,7 @@ int hostIf_DeviceInfo::get_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
     }
     else
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] IARM Failed \n", __FUNCTION__, __FILE__, __LINE__);
-
+#endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
     return OK;
 }
