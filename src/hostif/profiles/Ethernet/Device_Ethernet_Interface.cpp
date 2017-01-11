@@ -169,12 +169,53 @@ hostIf_EthernetInterface::hostIf_EthernetInterface(int dev_id):
     strcpy(backupDuplexMode,"");
 }
 
+static int getEthernetInterfaceName (unsigned int ethInterfaceNum, char* name)
+{
+    int ret = NOK;
+
+    strcpy (name, "");
+
+    //retrieve the current interfaces
+    struct if_nameindex* ifname = if_nameindex ();
+
+    if (ifname != NULL)
+    {
+        unsigned int count = 0;
+        for (struct if_nameindex* ifnp = ifname; ifnp->if_index != 0; ifnp++)
+        {
+            if ((strncmp (ifnp->if_name, "eth", 3) == 0) && (++count == ethInterfaceNum))
+            {
+                strcpy (name, ifnp->if_name);
+                ret = OK;
+                break;
+            }
+        }
+
+        if_freenameindex (ifname); /* free the dynamic memory */
+
+        if (ret != OK)
+        {
+            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s(): Cannot find Ethernet Interface Name for Ethernet Interface Number '%u'\n",
+                    __FUNCTION__, ethInterfaceNum);
+        }
+    }
+    else
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s(): if_nameindex Error\n", __FUNCTION__);
+    }
+
+    RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s(): Ethernet Interface (number,name) = (%u,%s)\n", __FUNCTION__, ethInterfaceNum, name);
+
+    return ret;
+}
+
 static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEthInterfaceMembers ethInterfaceMem)
 {
     FILE *fp;
     char resultBuff[BUFF_LENGTH] = {'\0'};
     char cmd[BUFF_LENGTH] = {'\0'};
     int temp = 0;
+    char ethernetInterfaceName[BUFF_LENGTH_64];
 
     if(!ethInterfaceNum)
         return 0;
@@ -183,7 +224,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
     {
     case eEnable:
         hostIf_EthernetInterface::stEthInterface.enable = FALSE;
-        sprintf(cmd,"cat /sys/class/net/eth%d/carrier",ethInterfaceNum-1);
+
+        if (OK != getEthernetInterfaceName (ethInterfaceNum, ethernetInterfaceName))
+            return 0;
+
+        sprintf(cmd,"cat /sys/class/net/%s/carrier", ethernetInterfaceName);
 
         fp = popen(cmd,"r");
 
@@ -200,13 +245,18 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
         }
         pclose(fp);
 
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %d Enable: %d \n",  __FUNCTION__, ethInterfaceNum-1, hostIf_EthernetInterface::stEthInterface.enable);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u Enable: %d \n",
+                __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.enable);
 
         break;
 
     case eStatus:
         memset(hostIf_EthernetInterface::stEthInterface.status,'\0',S_LENGTH);
-        sprintf(cmd,"cat /sys/class/net/eth%d/carrier",ethInterfaceNum-1);
+
+        if (OK != getEthernetInterfaceName (ethInterfaceNum, ethernetInterfaceName))
+            return 0;
+
+        sprintf(cmd,"cat /sys/class/net/%s/carrier", ethernetInterfaceName);
 
         fp = popen(cmd,"r");
 
@@ -222,45 +272,18 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
             sscanf(resultBuff,"%d",&temp);
         }
 
-        if(TRUE == temp)
-        {
-            strcpy(hostIf_EthernetInterface::stEthInterface.status,"Up");
-        }
-        else
-        {
-            strcpy(hostIf_EthernetInterface::stEthInterface.status,"Down");
-        }
+        strcpy (hostIf_EthernetInterface::stEthInterface.status, (TRUE == temp) ? "Up" : "Down");
 
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %d Status: %s \n", __FUNCTION__, ethInterfaceNum-1, hostIf_EthernetInterface::stEthInterface.status);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u Status: %s \n",
+                __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.status);
 
         pclose(fp);
         break;
     case eName:
     {
-        strcpy (hostIf_EthernetInterface::stEthInterface.name, "");
-
-        //retrieve the current interfaces
-        struct if_nameindex *ifname = if_nameindex ();
-        if (ifname == NULL)
-        {
-            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s(): if_nameindex Error\n", __FUNCTION__);
+        if (OK != getEthernetInterfaceName (ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.name))
             return 0;
-        }
 
-        unsigned int count = 0;
-        for (struct if_nameindex *ifnp = ifname; ifnp->if_index != 0; ifnp++)
-        {
-            if ((strncmp (ifnp->if_name, "eth", 3) == 0) && (++count == ethInterfaceNum))
-            {
-                strcpy (hostIf_EthernetInterface::stEthInterface.name, ifnp->if_name);
-                break;
-            }
-        }
-
-        if_freenameindex (ifname); /* free the dynamic memory */
-
-        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s(): Interface %d Name: %s \n", __FUNCTION__, ethInterfaceNum,
-                hostIf_EthernetInterface::stEthInterface.name);
         break;
     }
     case eLastChange:
@@ -269,7 +292,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
         break;
     case eUpstream:
         hostIf_EthernetInterface::stEthInterface.upStream = FALSE;
-        sprintf(cmd,"cat /sys/class/net/eth%d/carrier",ethInterfaceNum-1);
+
+        if (OK != getEthernetInterfaceName (ethInterfaceNum, ethernetInterfaceName))
+            return 0;
+
+        sprintf(cmd,"cat /sys/class/net/%s/carrier", ethernetInterfaceName);
 
         fp = popen(cmd,"r");
 
@@ -284,13 +311,18 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
         }
         pclose(fp);
 
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %d UpStream: %d \n",  __FUNCTION__, ethInterfaceNum-1, hostIf_EthernetInterface::stEthInterface.upStream);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u UpStream: %d \n",
+                __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.upStream);
 
         break;
 
     case eMACAddress:
         memset(hostIf_EthernetInterface::stEthInterface.mACAddress, '\0', S_LENGTH);
-        sprintf(cmd,"cat /sys/class/net/eth%d/address",ethInterfaceNum-1);
+
+        if (OK != getEthernetInterfaceName (ethInterfaceNum, ethernetInterfaceName))
+            return 0;
+
+        sprintf(cmd,"cat /sys/class/net/%s/address", ethernetInterfaceName);
 
         fp = popen(cmd,"r");
 
@@ -308,12 +340,17 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
 
         pclose(fp);
 
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %d MACAddress: %s \n",  __FUNCTION__, ethInterfaceNum-1, hostIf_EthernetInterface::stEthInterface.mACAddress);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u MACAddress: %s \n",
+                __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.mACAddress);
 
         break;
     case eMaxBitRate:
         hostIf_EthernetInterface::stEthInterface.maxBitRate = 0;
-        sprintf(cmd,"cat /sys/class/net/eth%d/speed",ethInterfaceNum-1);
+
+        if (OK != getEthernetInterfaceName (ethInterfaceNum, ethernetInterfaceName))
+            return 0;
+
+        sprintf(cmd,"cat /sys/class/net/%s/speed", ethernetInterfaceName);
 
         fp = popen(cmd,"r");
 
@@ -331,11 +368,16 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
 
         pclose(fp);
 
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %d MaxBitRate: %d \n",  __FUNCTION__, ethInterfaceNum-1, hostIf_EthernetInterface::stEthInterface.maxBitRate);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u MaxBitRate: %d\n",
+                __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.maxBitRate);
         break;
     case eDuplexMode:
         memset(hostIf_EthernetInterface::stEthInterface.duplexMode, '\0',S_LENGTH);
-        sprintf(cmd,"cat /sys/class/net/eth%d/duplex",ethInterfaceNum-1);
+
+        if (OK != getEthernetInterfaceName (ethInterfaceNum, ethernetInterfaceName))
+            return 0;
+
+        sprintf(cmd,"cat /sys/class/net/%s/duplex", ethernetInterfaceName);
 
         fp = popen(cmd,"r");
 
@@ -352,7 +394,8 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
         }
 
         pclose(fp);
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %d DuplexMode: %s \n",  __FUNCTION__, ethInterfaceNum-1, hostIf_EthernetInterface::stEthInterface.duplexMode);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u DuplexMode: %s\n",
+                __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.duplexMode);
 
         break;
     default:
@@ -369,27 +412,27 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
 /****************************************************************************************************************************************************/
 int hostIf_EthernetInterface::get_Device_Ethernet_InterfaceNumberOfEntries(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
-    struct if_nameindex *ifname = NULL, *ifnp = NULL;
-    int noOfEthInterfaces = 0;
-
     //retrieve the current interfaces
-    if ((ifname = if_nameindex()) == NULL)
+    struct if_nameindex* ifname = if_nameindex ();
+
+    if (ifname == NULL)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): if_nameindex Error\n", __FUNCTION__);
         return NOK;
     }
 
-    for (ifnp = ifname; ifnp->if_index != 0; ifnp++) {
-        if(strcasestr(ifnp->if_name, "eth") != '\0')
+    int noOfEthInterfaces = 0;
+    for (struct if_nameindex* ifnp = ifname; ifnp->if_index != 0; ifnp++)
+    {
+        if (strncmp (ifnp->if_name, "eth", 3) == 0)
+        {
             noOfEthInterfaces++;
+        }
     }
 
-    if (ifname) {
-        if_freenameindex(ifname); /* free the dynamic memory */
-        ifname = NULL;            /* prevent use after free  */
-    }
+    if_freenameindex (ifname); /* free the dynamic memory */
 
-    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Current Ethernet Interfaces Count: [%u] \n", __FUNCTION__, noOfEthInterfaces);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Current Ethernet Interfaces Count: [%d] \n", __FUNCTION__, noOfEthInterfaces);
 
     stMsgData->paramtype=hostIf_IntegerType;
     stMsgData->paramLen=4;
