@@ -1092,6 +1092,36 @@ string hostIf_DeviceInfo::getEstbIp()
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]Exiting..\n", __FUNCTION__);
     return retAddr;
 }
+
+bool hostIf_DeviceInfo::isRsshactive()
+{
+   const string pidfile("/var/tmp/rssh.pid");
+   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+   bool retCode = false;
+
+   ifstream pidstrm;
+   pidstrm.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+   try {
+      pidstrm.open(pidfile.c_str());
+      int sshpid;
+      pidstrm>>sshpid;
+
+      if (getpgid(sshpid) >= 0)
+      {
+         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session Active \n",__FUNCTION__);
+         retCode = true;
+      }
+      else
+      {
+         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive \n",__FUNCTION__);
+      }
+   } catch (const std::exception& e) {
+         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive ; Error opening pid file\n",__FUNCTION__);
+   }
+
+   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
+   return retCode;
+}
 /**
  * @brief This function use to get the IPv4 Address of the eth1 interface currently.
  *
@@ -2060,9 +2090,21 @@ int hostIf_DeviceInfo::set_xOpsReverseSshTrigger(HOSTIF_MsgData_t *stMsgData)
     
     if (trigger)
     {
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting SSH Tunnel \n",__FUNCTION__);
-        string command = sshCommand + " start " + reverseSSHArgs;
-        system(command.c_str());
+#ifdef __SINGLE_SESSION_ONLY__
+        if (!isRsshactive())
+        {
+#endif
+           RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting SSH Tunnel \n",__FUNCTION__);
+           string command = sshCommand + " start " + reverseSSHArgs;
+           system(command.c_str());
+#ifdef __SINGLE_SESSION_ONLY__
+        }
+        else
+        {
+           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "[%s] SSH Session is already active. Not starting again!",__FUNCTION__);
+           return NOK;
+        }
+#endif
     }
     else
     {
@@ -2116,7 +2158,11 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
        }
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] parsed Values are : %s\n",__FUNCTION__,parsedValues.c_str());
 
-       reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["port"] + ":" + getEstbIp() + ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
+       reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":" + getEstbIp() + ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
+       if (parsedMap.find("sshport") != parsedMap.end())
+       {
+          reverseSSHArgs += " -p " + parsedMap["sshport"];
+       }
 
       RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] ReverseSSH Args = %s \n",__FUNCTION__,reverseSSHArgs.c_str());
     } catch (const std::exception e) {
@@ -2135,31 +2181,17 @@ int hostIf_DeviceInfo::get_xOpsReverseSshStatus(HOSTIF_MsgData_t *stMsgData)
 {
    const string activeStr("ACTIVE");
    const string inActiveStr("INACTIVE");
-   const string pidfile("/var/tmp/rssh.pid");
    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
    memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
    stMsgData->paramtype = hostIf_StringType;
 
-   ifstream pidstrm;
-   pidstrm.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-   try {
-      pidstrm.open(pidfile.c_str());
-      int sshpid;
-      pidstrm>>sshpid;
-
-      if (getpgid(sshpid) >= 0)
-      {
-         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session Active \n",__FUNCTION__);
-         strncpy(stMsgData->paramValue, activeStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
-      }
-      else
-      {
-         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive \n",__FUNCTION__);
-         strncpy(stMsgData->paramValue, inActiveStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
-      }
-   } catch (const std::exception& e) {
-         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive ; Error opening pid file\n",__FUNCTION__);
-         strncpy(stMsgData->paramValue, inActiveStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
+   if (isRsshactive())
+   {
+      strncpy(stMsgData->paramValue, activeStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
+   }
+   else
+   {
+      strncpy(stMsgData->paramValue, inActiveStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
    }
 
    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);

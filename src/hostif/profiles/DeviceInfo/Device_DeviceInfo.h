@@ -216,6 +216,7 @@ class hostIf_DeviceInfo {
     char backupAdditionalSoftwareVersion[TR69HOSTIFMGR_MAX_PARAM_LEN];
     
     string getEstbIp();
+    bool isRsshactive();
 
 public:
 
