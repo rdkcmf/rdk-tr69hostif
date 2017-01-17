@@ -234,6 +234,10 @@ class hostIf_IP {
     int backupActivePortNumberOfEntries;
     char backupIPv4Status[TR69HOSTIFMGR_MAX_PARAM_LEN];
 
+    static unsigned int getInterfaceNumberOfEntries(void);
+    static unsigned int getPhysicalInterfaceNumberOfEntries (struct if_nameindex* phy_if_list);
+    static unsigned int getVirtualInterfaceNumberOfEntries (struct if_nameindex* phy_if_list);
+    static char* getVirtualInterfaceName (struct if_nameindex *phy_if_list, unsigned int virtual_if_index, char* virtual_if_name);
 
 public:
 
@@ -249,7 +253,7 @@ public:
 
     static void releaseLock();
 
-    static unsigned int getNumOfIPInterfaces(void);
+    static char* getInterfaceName (int if_index, char* if_name);
 
     static unsigned int getNumOfActivePorts(void);
 

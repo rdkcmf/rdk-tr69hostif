@@ -43,6 +43,7 @@
 #include "Device_IP_Interface_Stats.h"
 #include "Device_IP_Interface.h"
 #include "hostIf_utils.h"
+#include "Device_IP.h"
 
 /**
  * @struct in6_ifreq
@@ -100,11 +101,9 @@ hostIf_IPv6Address::~hostIf_IPv6Address()
 
 void hostIf_IPv6Address::refreshInterfaceName ()
 {
-    if (if_indextoname (this->dev_id, nameOfInterface) == NULL)
-        nameOfInterface[0] = 0;
-
-    RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "[%s(),%d] Interface = %d, Name = %s\n",
-            __FUNCTION__, __LINE__, dev_id, nameOfInterface);
+    nameOfInterface[0] = 0;
+    if (NULL == hostIf_IP::getInterfaceName (dev_id, nameOfInterface))
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: error getting interface name for Device.IP.Interface.%d\n", __FUNCTION__, dev_id);
 }
 
 hostIf_IPv6Address* hostIf_IPv6Address::getInstance(int dev_id)
@@ -379,13 +378,10 @@ int hostIf_IPv6Address::getIPv6AddressAndMask (int instance, struct in6_addr& in
     if (getifaddrs (&ifa))
         return rc;
 
-    int l = strlen (nameOfInterface);
-
     int current_instance = 0;
     for (struct ifaddrs *ifa_node = ifa; ifa_node; ifa_node = ifa_node->ifa_next)
     {
-        if (ifa_node->ifa_addr->sa_family == AF_INET6 && !strncmp (ifa_node->ifa_name, nameOfInterface, l) // also check for aliases (eth1:0)
-                && (ifa_node->ifa_name[l] == 0 || ifa_node->ifa_name[l] == ':') && (++current_instance == instance))
+        if (ifa_node->ifa_addr->sa_family == AF_INET6 && !strcmp (ifa_node->ifa_name, nameOfInterface) && (++current_instance == instance))
         {
             in6_address = ((struct sockaddr_in6 *) ifa_node->ifa_addr)->sin6_addr;
             in6_mask = ((struct sockaddr_in6 *) ifa_node->ifa_netmask)->sin6_addr;

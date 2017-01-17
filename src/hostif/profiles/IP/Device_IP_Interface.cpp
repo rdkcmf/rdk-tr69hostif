@@ -60,6 +60,7 @@
 #include <net/if.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include "Device_IP.h"
 
 
 // TODO: fix potential bug with initialization, as structure definition now has a "#ifdef IPV6_SUPPORT"
@@ -130,10 +131,9 @@ int hostIf_IPInterface::set_Interface_Mtu (unsigned int value)
 
 void hostIf_IPInterface::refreshInterfaceName ()
 {
-    if (if_indextoname (dev_id, nameOfInterface) == NULL)
-        nameOfInterface[0] = 0;
-
-    RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "[%s(),%d] Interface = %d, Name = %s\n", __FUNCTION__, __LINE__, dev_id, nameOfInterface);
+    nameOfInterface[0] = 0;
+    if (NULL == hostIf_IP::getInterfaceName (dev_id, nameOfInterface))
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: error getting interface name for Device.IP.Interface.%d\n", __FUNCTION__, dev_id);
 }
 
 /**
@@ -906,12 +906,9 @@ unsigned int hostIf_IPInterface::getIPAddressNumberOfEntries (sa_family_t addres
     if (getifaddrs (&ifa))
         return 0;
 
-    int l = strlen (nameOfInterface);
-
     int ipAddressNumberOfEntries = 0;
     for (struct ifaddrs *ifa_node = ifa; ifa_node; ifa_node = ifa_node->ifa_next)
-        if (ifa_node->ifa_addr->sa_family == address_family && !strncmp (ifa_node->ifa_name, nameOfInterface, l))
-            if (ifa_node->ifa_name[l] == 0 || ifa_node->ifa_name[l] == ':') // also check for aliases (eth1:0)
+        if (ifa_node->ifa_addr->sa_family == address_family && !strcmp (ifa_node->ifa_name, nameOfInterface))
                 ipAddressNumberOfEntries++;
 
     freeifaddrs (ifa);

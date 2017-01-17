@@ -60,6 +60,7 @@
 #include "Device_IP_Interface_Stats.h"
 #include "Device_IP_Interface.h"
 #include "hostIf_utils.h"
+#include "Device_IP.h"
 
 GMutex* hostIf_IPv4Address::m_mutex = NULL;
 GHashTable *hostIf_IPv4Address::ifHash = NULL;
@@ -73,13 +74,10 @@ int hostIf_IPv4Address::getIPv4AddressAndMask (int instance, struct in_addr& in_
     if (getifaddrs (&ifa))
         return rc;
 
-    int l = strlen (nameOfInterface);
-
     int current_instance = 0;
     for (struct ifaddrs *ifa_node = ifa; ifa_node; ifa_node = ifa_node->ifa_next)
     {
-        if (ifa_node->ifa_addr->sa_family == AF_INET && !strncmp (ifa_node->ifa_name, nameOfInterface, l) // also check for aliases (eth1:0)
-                && (ifa_node->ifa_name[l] == 0 || ifa_node->ifa_name[l] == ':') && (++current_instance == instance))
+        if (ifa_node->ifa_addr->sa_family == AF_INET && !strcmp (ifa_node->ifa_name, nameOfInterface) && (++current_instance == instance))
         {
             in_address = ((struct sockaddr_in *) ifa_node->ifa_addr)->sin_addr;
             in_mask = ((struct sockaddr_in *) ifa_node->ifa_netmask)->sin_addr;
@@ -115,10 +113,9 @@ int hostIf_IPv4Address::setIpOrMask(int interfaceNo, char *value, const char* ip
 
 void hostIf_IPv4Address::refreshInterfaceName ()
 {
-    if (if_indextoname (this->dev_id, nameOfInterface) == NULL)
-        nameOfInterface[0] = 0;
-
-    RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "[%s(),%d] Interface = %d, Name = %s\n", __FUNCTION__, __LINE__, dev_id, nameOfInterface);
+    nameOfInterface[0] = 0;
+    if (NULL == hostIf_IP::getInterfaceName (dev_id, nameOfInterface))
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: error getting interface name for Device.IP.Interface.%d\n", __FUNCTION__, dev_id);
 }
 
 /**
@@ -563,9 +560,14 @@ int hostIf_IPv4Address::get_IPv4Address_AddressingType(HOSTIF_MsgData_t *stMsgDa
     {
         strcpy (addressingType, "AutoIP");
     }
-    else if (((0 == strcmp (nameOfInterface, getenvOrDefault ("MOCA_INTERFACE", ""))) &&
+    /*
+     * If a MoCA / WiFi interface (specified by MOCA_INTERFACE / WIFI_INTERFACE in /etc/device.properties)
+     * still has its default IPv4 address (specified by DEFAULT_MOCA_IFACE_IP / DEFAULT_WIFI_IFACE_IP),
+     * then IPv4 AddressingType for that interface is reported as Static. Otherwise, it is reported as DHCP.
+     */
+    else if (((hasPhysicalInterfaceAs (getenvOrDefault ("MOCA_INTERFACE", ""))) &&
               (0 == strcmp (ipv4Address, getenvOrDefault ("DEFAULT_MOCA_IFACE_IP", "")))) ||
-             ((0 == strcmp (nameOfInterface, getenvOrDefault ("WIFI_INTERFACE", ""))) &&
+             ((hasPhysicalInterfaceAs (getenvOrDefault ("WIFI_INTERFACE", ""))) &&
               (0 == strcmp (ipv4Address, getenvOrDefault ("DEFAULT_WIFI_IFACE_IP", "")))))
     {
         strcpy (addressingType, "Static");
@@ -587,6 +589,13 @@ int hostIf_IPv4Address::get_IPv4Address_AddressingType(HOSTIF_MsgData_t *stMsgDa
 
     return OK;
 }
+
+bool hostIf_IPv4Address::hasPhysicalInterfaceAs (char* phy_if_name)
+{
+    int l = strlen (phy_if_name);
+    return strncmp (nameOfInterface, phy_if_name, l) == 0 && (nameOfInterface[l] == 0 || nameOfInterface[l] == ':');
+}
+
 /****************************************************************************************************************************************************/
 // Device_IP_Interface_IPv4Address Profile. Setters:
 /****************************************************************************************************************************************************/

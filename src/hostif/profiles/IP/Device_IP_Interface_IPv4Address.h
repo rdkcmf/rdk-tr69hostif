@@ -196,6 +196,7 @@ class hostIf_IPv4Address {
     void refreshInterfaceName ();
     int getIPv4AddressAndMask (int instance, struct in_addr& in_address, struct in_addr& in_mask);
     static bool isLinkLocalAddress (const struct in_addr& in_address);
+    bool hasPhysicalInterfaceAs (char* phy_if_name);
     int setIpOrMask(int interfaceNo, char *value, const char* ipOrMask);
 
 public:

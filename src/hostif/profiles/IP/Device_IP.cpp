@@ -51,6 +51,8 @@
 
 #include "Device_IP.h"
 #include <net/if.h>
+#include <sys/types.h>
+#include <ifaddrs.h>
 
 IP hostIf_IP::stIPInstance = {TRUE,FALSE,{"Disabled"},FALSE,0,0};
 
@@ -59,41 +61,6 @@ char* hostIf_IP::cmd_NumOfActivePorts = "cat /proc/net/tcp | awk '$4 == \"0A\" |
 GMutex* hostIf_IP::m_mutex = NULL;
 
 GHashTable *hostIf_IP::ifHash = NULL;
-
-
-/** Description: Counts the number of IP
- *               interfaces present in the device.
- *
- * \Return:  Count value or '0' if error
- *
- */
-unsigned int hostIf_IP::getNumOfIPInterfaces(void)
-{
-    struct if_nameindex *ifname = NULL, *ifnp = NULL;
-    int noOfIPInterfaces = 0;
-
-    //retrieve the current interfaces
-    if ((ifname = if_nameindex()) == NULL)
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): if_nameindex Error\n", __FUNCTION__);
-        return 0;
-    }
-
-    for (ifnp = ifname; ifnp->if_index != 0; ifnp++)
-    {
-        noOfIPInterfaces++;
-    }
-
-    if (ifname)
-    {
-        if_freenameindex(ifname); /* free the dynamic memory */
-        ifname = NULL;            /* prevent use after free  */
-    }
-
-    //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s: Current IP Interfaces Count: [%u]\n", __FUNCTION__, noOfIPInterfaces);
-
-    return (noOfIPInterfaces);
-}
 
 /**
  * @brief Class Constructor of the class hostIf_IP.
@@ -188,6 +155,190 @@ void hostIf_IP::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
+/**
+ * This function's interface is just like that of the Linux API "if_indextoname" except that
+ * virtual interfaces are also reported.
+ *
+ * Maps an interface index to its corresponding name. The returned name is placed in the buffer
+ * pointed to by if_name, which must be at least IFNAMSIZ bytes in length. If the index was invalid,
+ * the function's return value is a null pointer, otherwise it is if_name.
+ *
+ * Example mapping below. All virtual interface indexes are greater than physical interface indexes.
+ * 1 - lo
+ * 2 - eth1
+ * 3 - sit0
+ * 4 - eth1:0
+ */
+char* hostIf_IP::getInterfaceName (int if_index, char* if_name)
+{
+    char* ret;
+    if ((ret = if_indextoname (if_index, if_name)) == NULL)
+    {
+        // check for virtual interfaces also
+        struct if_nameindex* phy_if_list = if_nameindex ();
+        if (phy_if_list == NULL)
+        {
+            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s(): if_nameindex Error\n", __FUNCTION__);
+            return NULL;
+        }
+
+        int phy_if_count = getPhysicalInterfaceNumberOfEntries (phy_if_list);
+        if (if_index > phy_if_count)
+        {
+            ret = getVirtualInterfaceName (phy_if_list, if_index - phy_if_count, if_name);
+        }
+
+        if_freenameindex (phy_if_list);
+    }
+
+    RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s: if_index = %d, if_name = %s\n", __FUNCTION__, if_index, if_name);
+
+    return ret;
+}
+
+/** Description: Counts the number of IP
+ *               interfaces present in the device.
+ *
+ * \Return:  Count value or '0' if error
+ *
+ */
+unsigned int hostIf_IP::getInterfaceNumberOfEntries(void)
+{
+    struct if_nameindex* phy_if_list = if_nameindex ();
+    if (phy_if_list == NULL)
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s(): if_nameindex Error\n", __FUNCTION__);
+        return 0;
+    }
+
+    unsigned int if_count = 0;
+    if_count += getPhysicalInterfaceNumberOfEntries (phy_if_list);
+    if_count += getVirtualInterfaceNumberOfEntries (phy_if_list);
+
+    if_freenameindex (phy_if_list);
+
+    RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s: if_count = [%u]\n", __FUNCTION__, if_count);
+
+    return if_count;
+}
+
+unsigned int hostIf_IP::getPhysicalInterfaceNumberOfEntries (struct if_nameindex* phy_if_list)
+{
+    unsigned int phy_if_count = 0;
+
+    for (struct if_nameindex* phy_if = phy_if_list; phy_if->if_index != 0; phy_if++)
+    {
+        phy_if_count++;
+    }
+
+    RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "%s: phy_if_count = [%u]\n", __FUNCTION__, phy_if_count);
+
+    return phy_if_count;
+}
+
+/**
+ * Returns the number of virtual interfaces on the system.
+ * Requires the list of physical interfaces as input.
+ */
+unsigned int hostIf_IP::getVirtualInterfaceNumberOfEntries (struct if_nameindex* phy_if_list)
+{
+    struct ifaddrs *ifa;
+    if (getifaddrs (&ifa))
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: getifaddrs returned error\n", __FUNCTION__);
+        return 0;
+    }
+
+    int virtual_if_count = 0;
+    char *p, *v;
+    for (struct ifaddrs *ifa_node = ifa; ifa_node; ifa_node = ifa_node->ifa_next)
+    {
+        if (ifa_node->ifa_addr->sa_family == AF_INET) // virtual interfaces are IPv4-specific, so use IPv4 address family to hunt for them.
+        {
+            for (struct if_nameindex *phy_if = phy_if_list; phy_if->if_index != 0; phy_if++)
+            {
+                for (v = ifa_node->ifa_name, p = phy_if->if_name; *v == *p && *p; v++, p++)
+                    ;
+
+                if (*v == *p) // ifa_node->ifa_name matches exactly with this physical interface
+                    break; // no need to try matching this ifa_node->ifa_name further
+
+                if (*v == ':') // ifa_node->ifa_name could be a virtual interface, so check
+                {
+                    char *tailPtr;
+                    long int value = (int) strtol (++v, &tailPtr, 10);
+                    if (*tailPtr == 0 && value >= 0) // string after ':' is an unsigned integer, virtual interface identified!
+                    {
+                        virtual_if_count++;
+                        break; // no need to try matching this ifa_node->ifa_name further
+                    }
+                }
+            }
+        }
+    }
+
+    freeifaddrs (ifa);
+
+    RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "%s: virtual_if_count = [%u]\n", __FUNCTION__, virtual_if_count);
+
+    return virtual_if_count;
+}
+
+/**
+ * Returns the virtual interface name corresponding to a virtual interface index.
+ * Requires the list of physical interfaces and the virtualInterfaceIndex as input.
+ *  where virtualInterfaceIndex 1 refers to the first virtual interface returned by
+ *  the kernel in the output from 'getifaddrs'.
+ */
+char* hostIf_IP::getVirtualInterfaceName (struct if_nameindex *phy_if_list, unsigned int virtual_if_index, char* virtual_if_name)
+{
+    char* ret = NULL;
+
+    struct ifaddrs *ifa;
+    if (getifaddrs (&ifa))
+        return ret;
+
+    int virtual_if_count = 0;
+    char *p, *v;
+    for (struct ifaddrs *ifa_node = ifa; ifa_node; ifa_node = ifa_node->ifa_next)
+    {
+        if (ifa_node->ifa_addr->sa_family == AF_INET) // virtual interfaces are IPv4-specific, so use IPv4 address family to hunt for them.
+        {
+            for (struct if_nameindex *phy_if = phy_if_list; phy_if->if_index != 0; phy_if++)
+            {
+                for (v = ifa_node->ifa_name, p = phy_if->if_name; *v == *p && *p; v++, p++)
+                    ;
+
+                if (*v == *p) // ifa_node->ifa_name matches exactly with this physical interface
+                    break; // no need to try matching ifa_node->ifa_name further
+
+                if (*v == ':') // ifa_node->ifa_name could be a virtual interface, so check
+                {
+                    char *tailPtr;
+                    long int value = (int) strtol (++v, &tailPtr, 10);
+                    if (*tailPtr == 0 && value >= 0) // string after ':' is an unsigned integer, virtual interface identified!
+                    {
+                        if (++virtual_if_count == virtual_if_index)
+                        {
+                            strcpy (virtual_if_name, ifa_node->ifa_name);
+                            ret = virtual_if_name;
+                            goto freeResources; // we have found the virtualInterfaceName no need to try any matching ifa_node->ifa_name further
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+freeResources:
+    freeifaddrs (ifa);
+
+    RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "[%s(),%d] virtual_if_index = %u, virtual_if_name = %s\n",
+            __FUNCTION__, __LINE__, virtual_if_index, virtual_if_name);
+
+    return ret;
+}
+
 /** Description: Counts the number of tcp sockets in the device
  *               in listening or established state.
  *
@@ -276,7 +427,7 @@ int hostIf_IP::get_Device_IP_Fields(EIPMembers ipMem)
         break;
     case eIpInterfaceNumberOfEntries:
         //retrieve the current interfaces
-        stIPInstance.interfaceNumberOfEntries = getNumOfIPInterfaces();
+        stIPInstance.interfaceNumberOfEntries = getInterfaceNumberOfEntries();
 
         //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): InterfaceNumberOfEntries %u \n",__FUNCTION__,stIPInstance.interfaceNumberOfEntries);
         break;
