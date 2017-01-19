@@ -55,8 +55,9 @@
 #include <sys/types.h>
 #include <net/if.h>
 #include <arpa/inet.h>
-
 #include "Device_IP_Interface_Stats.h"
+#include "Device_IP.h"
+
 
 IPInterfaceStats hostIf_IPInterfaceStats::curntIpStat = {0,};
 
@@ -65,185 +66,11 @@ GMutex* hostIf_IPInterfaceStats::m_mutex = NULL;
 GHashTable *hostIf_IPInterfaceStats::ifHash = NULL;
 
 
-int hostIf_IPInterfaceStats::readInterfacestat(int interfaceNo, EDeviceIPInterfaceStatsMembers statsMembers)
+void hostIf_IPInterfaceStats::refreshInterfaceName ()
 {
-    char nameOfInterface[IFNAMSIZ] = { 0 };
-    if_indextoname (interfaceNo, nameOfInterface);
-    getStatFields (nameOfInterface, statsMembers);
-    return 0;
-}
-
-int hostIf_IPInterfaceStats::getStatFields(char *interfaceName, EDeviceIPInterfaceStatsMembers statsMembers)
-{
-    FILE *fp = NULL;
-    int status;
-    char cmd[BUFF_LENGTH] = {'\0'};
-    char result[BUFF_LENGTH];
-
-    switch(statsMembers)
-    {
-    case eIPStatsBytesSent:
-        sprintf(cmd,"%s%s%s%s","cat ", _PATH_SYS_CLASS_NET, interfaceName, "/statistics/tx_bytes");
-        fp = popen(cmd ,"r");
-        if(fp == NULL)
-        {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n[%s(), %d] Error in popen\n",__FUNCTION__,__LINE__);
-
-            return NOK;
-        }
-
-        if(fgets(result,BUFF_LENGTH,fp)!=NULL)
-        {
-            sscanf(result,"%ld",&curntIpStat.bytesSent);
-        }
-
-        pclose(fp);
-        break;
-    case eIPStatsBytesReceived:
-        memset(cmd,'\0', sizeof(cmd));
-        sprintf(cmd,"%s%s%s%s","cat ", _PATH_SYS_CLASS_NET, interfaceName, "/statistics/rx_bytes");
-        fp = popen(cmd,"r");
-        if(fp == NULL)
-        {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n[%s(), %d] Error in popen\n",__FUNCTION__,__LINE__);
-
-            return NOK;
-        }
-
-        if(fgets(result,BUFF_LENGTH,fp)!=NULL)
-        {
-            sscanf(result,"%ld",&curntIpStat.bytesReceived);
-        }
-        pclose(fp);
-        break;
-    case eIPStatsPacketsSent:
-    case eIPStatsUnicastPacketsSent:
-    case eIPStatsMulticastPacketsSent:
-    case eIPStatsBroadcastPacketsSent:
-        memset(cmd,'\0', sizeof(cmd));
-        sprintf(cmd,"%s%s%s%s","cat ", _PATH_SYS_CLASS_NET, interfaceName, "/statistics/tx_packets");
-        fp = popen(cmd,"r");
-
-        if(fp == NULL)
-        {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n[%s(), %d] Error in popen\n",__FUNCTION__,__LINE__);
-
-            return NOK;
-        }
-
-        if(fgets(result,BUFF_LENGTH,fp)!=NULL)
-        {
-            sscanf(result,"%ld",&curntIpStat.packetsSent);
-            sscanf(result,"%ld",&curntIpStat.unicastPacketsSent);
-            sscanf(result,"%ld",&curntIpStat.multicastPacketsSent);
-            sscanf(result,"%ld",&curntIpStat.broadcastPacketsSent);
-        }
-
-        pclose(fp);
-        break;
-    case eIPStatsPacketsReceived:
-    case eIPStatsUnicastPacketsReceived:
-    case eIPStatsMulticastPacketsReceived:
-    case eIPStatsBroadcastPacketsReceived:
-        memset(cmd,'\0', sizeof(cmd));
-        sprintf(cmd,"%s%s%s%s","cat ", _PATH_SYS_CLASS_NET, interfaceName, "/statistics/rx_packets");
-        fp = popen(cmd,"r");
-        if(fp == NULL)
-        {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n[%s(), %d] Error in popen\n",__FUNCTION__,__LINE__);
-
-            return NOK;
-        }
-
-        if(fgets(result,BUFF_LENGTH,fp)!=NULL)
-        {
-            sscanf(result,"%ld",&curntIpStat.packetsReceived);
-            sscanf(result,"%ld",&curntIpStat.unicastPacketsReceived);
-            sscanf(result,"%ld",&curntIpStat.multicastPacketsReceived);
-            sscanf(result,"%ld",&curntIpStat.broadcastPacketsReceived);
-        }
-
-        pclose(fp);
-        break;
-    case eIPStatsErrorsSent:
-        memset(cmd,'\0', sizeof(cmd));
-        sprintf(cmd,"%s%s%s%s","cat ", _PATH_SYS_CLASS_NET, interfaceName, "/statistics/tx_errors");
-        fp = popen(cmd,"r");
-        if(fp == NULL)
-        {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n[%s(), %d] Error in popen\n",__FUNCTION__,__LINE__);
-
-            return NOK;
-        }
-
-        if(fgets(result,BUFF_LENGTH,fp)!=NULL)
-        {
-            sscanf(result,"%u",&curntIpStat.errorsSent);
-        }
-
-        pclose(fp);
-        break;
-    case eIPStatsErrorsReceived:
-        memset(cmd,'\0', sizeof(cmd));
-        sprintf(cmd,"%s%s%s%s","cat ", _PATH_SYS_CLASS_NET, interfaceName, "/statistics/rx_errors");
-        fp = popen(cmd,"r");
-        if(fp == NULL)
-        {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n[%s(), %d] Error in popen\n",__FUNCTION__,__LINE__);
-
-            return NOK;
-        }
-
-        if(fgets(result,BUFF_LENGTH,fp)!=NULL)
-        {
-            sscanf(result,"%u",&curntIpStat.errorsReceived);
-        }
-
-        pclose(fp);
-        break;
-    case eIPStatsDiscardPacketsSent:
-        memset(cmd,'\0', sizeof(cmd));
-        sprintf(cmd,"%s%s%s%s","cat ", _PATH_SYS_CLASS_NET, interfaceName, "/statistics/tx_dropped");
-        fp = popen(cmd,"r");
-
-        if(fp == NULL)
-        {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n[%s(), %d] Error in popen\n",__FUNCTION__,__LINE__);
-
-            return NOK;
-        }
-
-        if(fgets(result,BUFF_LENGTH,fp)!=NULL)
-        {
-            sscanf(result,"%u",&curntIpStat.discardPacketsSent);
-        }
-
-        pclose(fp);
-        break;
-    case eIPStatsDiscardPacketsReceived:
-    case eIPStatsUnknownProtoPacketsReceived:
-        memset(cmd,'\0', sizeof(cmd));
-        sprintf(cmd,"%s%s%s%s","cat ", _PATH_SYS_CLASS_NET, interfaceName, "/statistics/rx_dropped");
-        fp = popen(cmd,"r");
-
-        if(fp == NULL)
-        {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n[%s(), %d] Error in popen\n",__FUNCTION__,__LINE__);
-
-            return NOK;
-        }
-
-        if(fgets(result,BUFF_LENGTH,fp)!=NULL)
-        {
-            sscanf(result,"%u",&curntIpStat.discardPacketsReceived);
-            sscanf(result,"%u",&curntIpStat.unknownProtoPacketsReceived);
-        }
-
-        pclose(fp);
-        break;
-    }
-
-    return OK;
+    nameOfInterface[0] = 0;
+    if (NULL == hostIf_IP::getInterfaceName (dev_id, nameOfInterface))
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: error getting interface name for Device.IP.Interface.%d\n", __FUNCTION__, dev_id);
 }
 
 hostIf_IPInterfaceStats* hostIf_IPInterfaceStats::getInstance(int dev_id)
@@ -265,10 +92,15 @@ hostIf_IPInterfaceStats* hostIf_IPInterfaceStats::getInstance(int dev_id)
             pRet = new hostIf_IPInterfaceStats(dev_id);
         } catch(int e)
         {
-            RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"Caught exception, not able create MoCA Interface instance..\n");
+            RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"Caught exception, not able create hostIf_IPInterfaceStats instance..\n");
         }
         g_hash_table_insert(ifHash, (gpointer)dev_id, pRet);
     }
+
+    // make sure returned instance has interface name set
+    if (pRet)
+        pRet->refreshInterfaceName ();
+
     return pRet;
 }
 
@@ -427,6 +259,27 @@ int hostIf_IPInterfaceStats::handleGetMsg (const char* pSetting, HOSTIF_MsgData_
     return ret;
 }
 
+int hostIf_IPInterfaceStats::getSysClassNetStatistic (char* statistic, unsigned long* result)
+{
+    int ret = NOK;
+    char filename[BUFF_LENGTH_64];
+    sprintf (filename, "/sys/class/net/%s/statistics/%s", nameOfInterface, statistic);
+
+    FILE* fp = fopen (filename, "r");
+    if (fp == NULL)
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "\n[%s(), %d] Error in fopen(%s)\n", __FUNCTION__, __LINE__, filename);
+        return NOK;
+    }
+
+    if (1 == fscanf (fp, "%ld", result))
+        ret = OK;
+
+    fclose (fp);
+
+    return ret;
+}
+
 /****************************************************************************************************************************************************/
 // Device_IP_Interface_Stats Profile. Getters:
 /****************************************************************************************************************************************************/
@@ -446,8 +299,9 @@ int hostIf_IPInterfaceStats::handleGetMsg (const char* pSetting, HOSTIF_MsgData_
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BytesSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.bytesSent = 0;
+    getSysClassNetStatistic ("tx_bytes", &curntIpStat.bytesSent);
 
-    readInterfacestat(dev_id,eIPStatsBytesSent);
     if(bCalledBytesSent && pChanged && (backupBytesSent != curntIpStat.bytesSent))
     {
         *pChanged = true;
@@ -476,8 +330,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BytesSent(HOSTIF_MsgD
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BytesReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.bytesReceived = 0;
+    getSysClassNetStatistic ("rx_bytes", &curntIpStat.bytesReceived);
 
-    readInterfacestat(dev_id,eIPStatsBytesReceived);
     if(bCalledBytesReceived && pChanged && (backupBytesReceived != curntIpStat.bytesReceived))
     {
         *pChanged = true;
@@ -506,8 +361,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BytesReceived(HOSTIF_
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_PacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.packetsSent = 0;
+    getSysClassNetStatistic ("tx_packets", &curntIpStat.packetsSent);
 
-    readInterfacestat(dev_id,eIPStatsPacketsSent);
     if(bCalledPacketsSent && pChanged && (backupPacketsSent != curntIpStat.packetsSent))
     {
         *pChanged = true;
@@ -535,8 +391,12 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_PacketsSent(HOSTIF_Ms
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_PacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.packetsReceived = 0;
+    getSysClassNetStatistic ("rx_packets", &curntIpStat.packetsReceived);
+    // TODO: rx_packets only "Indicates the total number of good packets received by this network device."
+    // as per https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net-statistics but
+    // as per the TR069 spec, PacketsReceived is "The total number of packets received on the interface.".
 
-    readInterfacestat(dev_id,eIPStatsPacketsReceived);
     if(bCalledPacketsReceived && pChanged && (backupPacketsReceived != curntIpStat.packetsReceived))
     {
         *pChanged = true;
@@ -565,8 +425,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_PacketsReceived(HOSTI
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_ErrorsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.errorsSent = 0;
+    getSysClassNetStatistic ("tx_errors", &curntIpStat.errorsSent);
 
-    readInterfacestat(dev_id,eIPStatsErrorsSent);
     if(bCalledErrorsSent && pChanged && (backupErrorsSent != curntIpStat.errorsSent))
     {
         *pChanged = true;
@@ -596,8 +457,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_ErrorsSent(HOSTIF_Msg
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_ErrorsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.errorsReceived = 0;
+    getSysClassNetStatistic ("rx_errors", &curntIpStat.errorsReceived);
 
-    readInterfacestat(dev_id,eIPStatsErrorsReceived);
     if(bCalledErrorsReceived && pChanged && (backupErrorsReceived != curntIpStat.errorsReceived))
     {
         *pChanged = true;
@@ -628,8 +490,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_ErrorsReceived(HOSTIF
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnicastPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.unicastPacketsSent = 0;
+    getSysClassNetStatistic ("tx_packets", &curntIpStat.unicastPacketsSent);
 
-    readInterfacestat(dev_id,eIPStatsUnicastPacketsSent);
     if(bCalledUnicastPacketsSent && pChanged && (backupUnicastPacketsSent != curntIpStat.unicastPacketsSent))
     {
         *pChanged = true;
@@ -659,8 +522,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnicastPacketsSent(HO
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnicastPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.unicastPacketsReceived = 0;
+    getSysClassNetStatistic ("rx_packets", &curntIpStat.unicastPacketsReceived);
 
-    readInterfacestat(dev_id,eIPStatsUnicastPacketsReceived);
     if(bCalledUnicastPacketsReceived && pChanged && (backupUnicastPacketsReceived != curntIpStat.unicastPacketsReceived))
     {
         *pChanged = true;
@@ -692,8 +556,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnicastPacketsReceive
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_DiscardPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.discardPacketsSent = 0;
+    getSysClassNetStatistic ("tx_dropped", &curntIpStat.discardPacketsSent);
 
-    readInterfacestat(dev_id,eIPStatsDiscardPacketsSent);
     if(bCalledDiscardPacketsSent && pChanged && (backupDiscardPacketsSent != curntIpStat.discardPacketsSent))
     {
         *pChanged = true;
@@ -725,8 +590,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_DiscardPacketsSent(HO
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_DiscardPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.discardPacketsReceived = 0;
+    getSysClassNetStatistic ("rx_dropped", &curntIpStat.discardPacketsReceived);
 
-    readInterfacestat(dev_id,eIPStatsDiscardPacketsReceived);
     if(bCalledDiscardPacketsReceived && pChanged && (backupDiscardPacketsReceived != curntIpStat.discardPacketsReceived))
     {
         *pChanged = true;
@@ -756,8 +622,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_DiscardPacketsReceive
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_MulticastPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.multicastPacketsSent = 0;
+    getSysClassNetStatistic ("tx_packets", &curntIpStat.multicastPacketsSent);
 
-    readInterfacestat(dev_id,eIPStatsMulticastPacketsSent);
     if(bCalledMulticastPacketsSent && pChanged && (backupMulticastPacketsSent != curntIpStat.multicastPacketsSent))
     {
         *pChanged = true;
@@ -787,8 +654,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_MulticastPacketsSent(
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_MulticastPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.multicastPacketsReceived = 0;
+    getSysClassNetStatistic ("multicast", &curntIpStat.multicastPacketsReceived);
 
-    readInterfacestat(dev_id,eIPStatsMulticastPacketsReceived);
     if(bCalledMulticastPacketsReceived && pChanged && (backupMulticastPacketsReceived != curntIpStat.multicastPacketsReceived))
     {
         *pChanged = true;
@@ -820,8 +688,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_MulticastPacketsRecei
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BroadcastPacketsSent(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.broadcastPacketsSent = 0;
+    getSysClassNetStatistic ("tx_packets", &curntIpStat.broadcastPacketsSent);
 
-    readInterfacestat(dev_id,eIPStatsBroadcastPacketsSent);
     if(bCalledBroadcastPacketsSent && pChanged && (backupBroadcastPacketsSent != curntIpStat.broadcastPacketsSent))
     {
         *pChanged = true;
@@ -854,8 +723,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BroadcastPacketsSent(
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BroadcastPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.broadcastPacketsReceived = 0;
+    getSysClassNetStatistic ("rx_packets", &curntIpStat.broadcastPacketsReceived);
 
-    readInterfacestat(dev_id,eIPStatsBroadcastPacketsReceived);
     if(bCalledBroadcastPacketsReceived && pChanged && (backupBroadcastPacketsReceived != curntIpStat.broadcastPacketsReceived))
     {
         *pChanged = true;
@@ -885,8 +755,9 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BroadcastPacketsRecei
  */
 int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnknownProtoPacketsReceived(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
+    curntIpStat.unknownProtoPacketsReceived = 0;
+    getSysClassNetStatistic ("rx_dropped", &curntIpStat.unknownProtoPacketsReceived);
 
-    readInterfacestat(dev_id,eIPStatsUnknownProtoPacketsReceived);
     if(bCalledUnknownProtoPacketsReceived && pChanged && (backupUnknownProtoPacketsReceived != curntIpStat.unknownProtoPacketsReceived))
     {
         *pChanged = true;

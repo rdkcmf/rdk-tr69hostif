@@ -125,42 +125,18 @@ typedef struct Device_IP_Interface_Stats {
     unsigned long bytesReceived;
     unsigned long packetsSent;
     unsigned long packetsReceived;
-    unsigned int errorsSent;
-    unsigned int errorsReceived;
+    unsigned long errorsSent;
+    unsigned long errorsReceived;
     unsigned long unicastPacketsSent;
     unsigned long unicastPacketsReceived;
-    unsigned int discardPacketsSent;
-    unsigned int discardPacketsReceived;
+    unsigned long discardPacketsSent;
+    unsigned long discardPacketsReceived;
     unsigned long multicastPacketsSent;
     unsigned long multicastPacketsReceived;
     unsigned long broadcastPacketsSent;
     unsigned long broadcastPacketsReceived;
-    unsigned int unknownProtoPacketsReceived;
+    unsigned long unknownProtoPacketsReceived;
 } IPInterfaceStats;
-
-/**
- * @enum EDeviceIPInterfaceStatsMembers
- * @brief It contains the members variables of the EDeviceIPInterfaceStatsMembers enum.
- */
-typedef enum EDeviceIPInterfaceStatsMembers
-{
-    eIPStatsBytesSent = 0,
-    eIPStatsBytesReceived,
-    eIPStatsPacketsSent,
-    eIPStatsPacketsReceived,
-    eIPStatsErrorsSent,
-    eIPStatsErrorsReceived,
-    eIPStatsUnicastPacketsSent,
-    eIPStatsUnicastPacketsReceived,
-    eIPStatsDiscardPacketsSent,
-    eIPStatsDiscardPacketsReceived,
-    eIPStatsMulticastPacketsSent,
-    eIPStatsMulticastPacketsReceived,
-    eIPStatsBroadcastPacketsSent,
-    eIPStatsBroadcastPacketsReceived,
-    eIPStatsUnknownProtoPacketsReceived
-} EDeviceIPInterfaceStatsMembers;
-/** @} */ //End of the Doxygen tag TR69_HOSTIF_DEVICE_IP_INTERFACE_STATS_DSSTRUCT
 
 /** @defgroup TR_069_DEVICE_IP_INTERFACE_STATS_API TR-069 Device.IP.Interface.Stats object API.
  *  @ingroup TR_069_DEVICE_IP_INTERFACE_API
@@ -218,14 +194,13 @@ class hostIf_IPInterfaceStats {
     static IPInterfaceStats curntIpStat;
 
     int dev_id;
+    char nameOfInterface[IF_NAMESIZE];
 
     hostIf_IPInterfaceStats(int dev_id);
-
     ~hostIf_IPInterfaceStats() {};
 
-    static int readInterfacestat(int interfaceNo, EDeviceIPInterfaceStatsMembers statsMembers);
-
-    static int getStatFields(char *interfaceName, EDeviceIPInterfaceStatsMembers statsMembers);
+    void refreshInterfaceName ();
+    int getSysClassNetStatistic (char* statistic, unsigned long* result);
 
     int backupBytesSent;
     int backupBytesReceived;
