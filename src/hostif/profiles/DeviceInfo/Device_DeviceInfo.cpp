@@ -81,6 +81,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 #ifdef USE_MoCA_PROFILE
 #include "Device_MoCA_Interface.h"
@@ -2169,6 +2170,17 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
        {
           reverseSSHArgs += " -p " + parsedMap["sshport"];
        }
+
+       string::const_iterator it = std::find_if(reverseSSHArgs.begin(), reverseSSHArgs.end(), [](char c) {
+          return !(isalnum(c) || (c == ' ') || (c == ':') || (c == '-') || (c == '.') || (c == '@'));
+      });
+
+      if (it  != reverseSSHArgs.end())
+      {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Exception Accured... \n",__FUNCTION__);
+        reverseSSHArgs = "";
+        return NOK;
+      }
 
       RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] ReverseSSH Args = %s \n",__FUNCTION__,reverseSSHArgs.c_str());
     } catch (const std::exception e) {
