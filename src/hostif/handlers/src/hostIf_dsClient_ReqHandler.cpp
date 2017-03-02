@@ -349,6 +349,24 @@ void DSClientReqHandler::registerUpdateCallback(updateCallback cb)
     mUpdateCallback = cb;
 }
 
+int DSClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+        int ret = NOT_HANDLED;
+        hostIf_STBServiceHDMI::getLock();
+        // TODO: Retrieve notification value from DeviceInfo structure for given parameter
+    hostIf_STBServiceHDMI::releaseLock();
+        return ret;
+}
+
+int DSClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOT_HANDLED;
+    hostIf_STBServiceHDMI::getLock();
+    // TODO: Set notification value from DeviceInfo structure for given parameter
+    hostIf_STBServiceHDMI::releaseLock();
+    return ret;
+}
+
 
 
 void DSClientReqHandler::checkForUpdates()

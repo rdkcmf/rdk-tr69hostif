@@ -144,3 +144,21 @@ int StorageSrvcReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     hostIf_StorageSrvc::releaseLock();
     return ret;
 }
+
+int StorageSrvcReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOT_HANDLED;
+    hostIf_StorageSrvc::getLock();
+    // TODO: Retrieve notification value from DeviceInfo structure for given parameter
+    hostIf_StorageSrvc::releaseLock();
+    return ret;
+}
+
+int StorageSrvcReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOT_HANDLED;
+    hostIf_StorageSrvc::getLock();
+    // TODO: Set notification value from DeviceInfo structure for given parameter
+    hostIf_StorageSrvc::releaseLock();
+    return ret;
+}

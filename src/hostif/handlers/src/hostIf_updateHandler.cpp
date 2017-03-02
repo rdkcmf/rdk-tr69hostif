@@ -126,7 +126,7 @@ void updateHandler::reset()
 
 gpointer updateHandler::run(gpointer ptr)
 {
-    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FILE__, __FUNCTION__);
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] updateHandler::run Entering..\n", __FILE__, __FUNCTION__);
 //	sleep(120);
     while(!stopped)
     {
@@ -172,7 +172,7 @@ gpointer updateHandler::run(gpointer ptr)
 void updateHandler::notifyCallback(IARM_Bus_tr69HostIfMgr_EventId_t event_type, const char* paramName, const char* paramValue, HostIf_ParamType_t paramtype)
 {
     IARM_Bus_tr69HostIfMgr_EventData_t eventData;
-
+    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] updateHandler::notifyCallback for Parameter :- %s..\n", __FILE__, __FUNCTION__,paramName);
     strncpy(eventData.paramName,paramName, TR69HOSTIFMGR_MAX_PARAM_LEN);
 
     if(paramValue)

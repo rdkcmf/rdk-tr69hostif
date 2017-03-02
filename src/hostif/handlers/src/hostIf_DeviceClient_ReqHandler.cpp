@@ -484,6 +484,25 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+int DeviceClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+	int ret = NOT_HANDLED;
+	hostIf_DeviceInfo::getLock();
+	// TODO: Set notification value from DeviceInfo structure for given parameter
+        hostIf_DeviceInfo::releaseLock();
+	return ret;
+}
+
+int DeviceClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOT_HANDLED;
+    hostIf_DeviceInfo::getLock();
+    // TODO: Set notification value from DeviceInfo structure for given parameter
+    hostIf_DeviceInfo::releaseLock();
+    return ret;
+}
+
+
 void DeviceClientReqHandler::registerUpdateCallback(updateCallback cb)
 {
     mUpdateCallback = cb;
@@ -534,6 +553,7 @@ void DeviceClientReqHandler::checkForUpdates()
         hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance((int)elem->data);
         if(pIface)
         {
+	    GHashTable* notifyhash = pIface->getNotifyHash();
             memset(&msgData,0,sizeof(msgData));
             memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
             bChanged =  false;
@@ -542,7 +562,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"Manufacturer");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -555,7 +575,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"ManufacturerOUI");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -568,7 +588,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"ModelName");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -581,7 +601,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"Description");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -594,7 +614,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"ProductClass");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -607,7 +627,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"SerialNumber");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -620,7 +640,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"HardwareVersion");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -633,7 +653,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"SoftwareVersion");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -646,7 +666,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"AdditionalHardwareVersion");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -659,7 +679,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"AdditionalSoftwareVersion");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -672,7 +692,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"ProvisioningCode");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -685,7 +705,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"UpTime");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -698,7 +718,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"FirstUseDate");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -711,7 +731,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"X_COMCAST-COM_STB_MAC");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -724,7 +744,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"X_COMCAST-COM_STB_IP");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -737,7 +757,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"X_COMCAST-COM_FirmwareFilename");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -750,7 +770,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"X_COMCAST-COM_Reset");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -763,7 +783,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"VendorConfigFileNumberOfEntries");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -776,7 +796,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"SupportedDataModelNumberOfEntries");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -789,7 +809,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"VendorLogFileNumberOfEntries");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -799,9 +819,10 @@ void DeviceClientReqHandler::checkForUpdates()
 
     g_list_free(devList);
 
-
+    int instanceNumber = 0;
     devList = hostIf_DeviceProcessorInterface::getAllInstances();
-
+    hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
+    GHashTable* notifyhash = pIface->getNotifyHash();
     for(elem = devList; elem; elem = elem->next,index++)
     {
         hostIf_DeviceProcessorInterface *pIfaceProcessor = hostIf_DeviceProcessorInterface::getInstance((int)elem->data);
@@ -816,7 +837,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.Processor.%d.%s",index,"Architecture");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -843,7 +864,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.%d.%s",index,"CPUUsage");
-                if(mUpdateCallback)
+                if(mUpdateCallback&& (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -852,7 +873,7 @@ void DeviceClientReqHandler::checkForUpdates()
     }
     g_list_free(devList);
 #endif    /*HAVE_VALUE_CHANGE_EVENT*/
-
+#ifdef HAVE_VALUE_CHANGE_EVENT
 
     hostIf_DeviceProcess::getLock();
     index = 1;
@@ -883,7 +904,6 @@ void DeviceClientReqHandler::checkForUpdates()
     hostIf_DeviceProcess::releaseLock();
 
 
-#ifdef HAVE_VALUE_CHANGE_EVENT
     devList = hostIf_DeviceProcess::getAllInstances();
 
     for(elem = devList; elem; elem = elem->next,index++)
@@ -900,7 +920,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.Process.%d.%s",index,"PID");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -913,7 +933,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.Process.%d.%s",index,"Command");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -926,7 +946,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.Process.%d.%s",index,"Size");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -939,7 +959,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.Process.%d.%s",index,"Priority");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
@@ -965,7 +985,7 @@ void DeviceClientReqHandler::checkForUpdates()
             if(bChanged)
             {
                 sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.Process.%d.%s",index,"State");
-                if(mUpdateCallback)
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }

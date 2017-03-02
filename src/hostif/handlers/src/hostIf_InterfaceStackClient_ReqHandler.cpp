@@ -157,6 +157,23 @@ int InterfaceStackClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     hostif_InterfaceStack::releaseLock();
     return ret;
 }
+int InterfaceStackClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+        int ret = NOT_HANDLED;
+        hostif_InterfaceStack::getLock();
+        // TODO: Retrieve notification value from DeviceInfo structure for given parameter
+    hostif_InterfaceStack::releaseLock();
+        return ret;
+}
+
+int InterfaceStackClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOT_HANDLED;
+    hostif_InterfaceStack::getLock();
+    // TODO: Set notification value from DeviceInfo structure for given parameter
+    hostif_InterfaceStack::releaseLock();
+    return ret;
+}
 
 void InterfaceStackClientReqHandler::registerUpdateCallback(updateCallback cb)
 {

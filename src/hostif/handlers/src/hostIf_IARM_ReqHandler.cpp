@@ -51,6 +51,8 @@ static bool TR69_HostIf_Mgr_Get_RegisterCall();
 static IARM_Result_t tr69hostIfMgr_Stop(void);
 static IARM_Result_t _Gettr69HostIfMgr(void *arg);
 static IARM_Result_t _Settr69HostIfMgr(void *arg);
+static IARM_Result_t _SetAttributestr69HostIfMgr(void *arg);
+static IARM_Result_t _GetAttributestr69HostIfMgr(void *arg);
 static IARM_Result_t _RegisterForEventstr69HostIfMgr(void *arg);
 static void _hostIf_EventHandler(const char *, IARM_EventId_t, void *, size_t);
 #ifdef USE_XRDK_BT_PROFILE
@@ -91,7 +93,7 @@ static bool TR69_HostIf_Mgr_Init()
 {
     IARM_Result_t err = IARM_RESULT_SUCCESS;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
-
+RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"#######################################################");
     err = IARM_Bus_Init(IARM_BUS_TR69HOSTIFMGR_NAME);
 
     if(IARM_RESULT_SUCCESS != err)
@@ -147,6 +149,8 @@ static bool TR69_HostIf_Mgr_Get_RegisterCall()
     /* Get RPC: to get the value*/
     if( (IARM_Bus_RegisterCall(IARM_BUS_TR69HOSTIFMGR_API_GetParams, _Gettr69HostIfMgr) != IARM_RESULT_SUCCESS) ||
             (IARM_Bus_RegisterCall(IARM_BUS_TR69HOSTIFMGR_API_SetParams, _Settr69HostIfMgr) != IARM_RESULT_SUCCESS) ||
+            (IARM_Bus_RegisterCall(IARM_BUS_TR69HOSTIFMGR_API_SetAttributes, _SetAttributestr69HostIfMgr) != IARM_RESULT_SUCCESS) ||
+            (IARM_Bus_RegisterCall(IARM_BUS_TR69HOSTIFMGR_API_GetAttributes, _GetAttributestr69HostIfMgr) != IARM_RESULT_SUCCESS) ||
             (IARM_Bus_RegisterCall(IARM_BUS_TR69HOSTIFMGR_API_RegisterForEvents, _RegisterForEventstr69HostIfMgr) != IARM_RESULT_SUCCESS))
     {
         ret = false;
@@ -174,6 +178,87 @@ static bool TR69_HostIf_Mgr_Get_RegisterCall()
     return ret;
 }
 
+void hostIf_GetAttributesReqHandler(void *arg)
+{
+    int ret;
+    HOSTIF_MsgData_t *stMsgData = (HOSTIF_MsgData_t *) arg;
+    g_printf("[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+    if(stMsgData)
+    {
+        g_mutex_lock(request_handler_mutex);
+        ret = hostIf_SetAttributesMsgHandler(stMsgData);
+        g_printf("[hostIf_GetAttributesReqHandler : hostIf_MsgHandler()] Return value : %d\n", ret);
+        g_mutex_unlock(request_handler_mutex);
+        /*
+
+                if(ret == OK)
+                {
+                    hostIf_Print_msgData(stMsgData);
+        //            hostIf_Free_stMsgData(stMsgData);
+                }
+        */
+    }
+    g_printf("[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+}
+
+
+static IARM_Result_t _GetAttributestr69HostIfMgr(void *arg)
+{
+    g_printf("[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+
+
+    HOSTIF_MsgData_t *param = (HOSTIF_MsgData_t *) arg;
+    if(param)
+    {
+        // g_printf("[%s:%s] paramName :%s \n", __FUNCTION__, __FILE__, (char *)param->paramName);
+        hostIf_GetAttributesReqHandler(arg);
+    }
+
+
+    g_printf("[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+    return IARM_RESULT_SUCCESS;
+}
+
+void hostIf_SetAttributesReqHandler(void *arg)
+{
+    int ret;
+    HOSTIF_MsgData_t *stMsgData = (HOSTIF_MsgData_t *) arg;
+    g_printf("[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+    if(stMsgData)
+    {
+        g_mutex_lock(request_handler_mutex);
+        ret = hostIf_SetAttributesMsgHandler(stMsgData);
+        g_printf("[*****hostIf_SetAttributesReqHandler : hostIf_MsgHandler()] Return value : %d for Parameter %s\n", ret,stMsgData->paramName);
+        g_mutex_unlock(request_handler_mutex);
+        /*
+
+                if(ret == OK)
+                {
+                    hostIf_Print_msgData(stMsgData);
+        //            hostIf_Free_stMsgData(stMsgData);
+                }
+        */
+    }
+    g_printf("[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+}
+
+
+static IARM_Result_t _SetAttributestr69HostIfMgr(void *arg)
+{
+    g_printf("[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+
+
+    HOSTIF_MsgData_t *param = (HOSTIF_MsgData_t *) arg;
+    if(param)
+    {
+        // g_printf("[%s:%s] paramName :%s \n", __FUNCTION__, __FILE__, (char *)param->paramName);
+        hostIf_SetAttributesReqHandler(arg);
+    }
+
+
+    g_printf("[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+    return IARM_RESULT_SUCCESS;
+}
 
 
 //----------------------------------------------------------------------
@@ -217,7 +302,7 @@ void hostIf_SetReqHandler(void *arg)
     {
         g_mutex_lock(request_handler_mutex);
         ret = hostIf_SetMsgHandler(stMsgData);
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[hostIf_MsgHandler()] Return value : %d\n", ret);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[hostIf_SetReqHandler : hostIf_MsgHandler()] Return value : %d\n", ret);
         g_mutex_unlock(request_handler_mutex);
         /*
 
@@ -266,7 +351,7 @@ void hostIf_GetReqHandler(void *arg)
     {
         g_mutex_lock(request_handler_mutex);
         ret = hostIf_GetMsgHandler(stMsgData);
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[hostIf_MsgHandler()] Return value : %d\n", ret);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[hostIf_GetReqHandler : hostIf_MsgHandler()] Return value : %d\n", ret);
         g_mutex_unlock(request_handler_mutex);
 
         if(ret == OK)

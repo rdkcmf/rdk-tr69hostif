@@ -98,6 +98,38 @@ int hostIf_SetMsgHandler(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+int hostIf_GetAttributesMsgHandler(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOK;
+    //printf("[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+
+    /* Find the respective manager and forward the request*/
+    msgHandler *pMsgHandler = HostIf_GetMgr(stMsgData);
+
+    if(pMsgHandler)
+        ret = pMsgHandler->handleGetAttributesMsg(stMsgData);
+
+    //printf("[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+    return ret;
+}
+
+int hostIf_SetAttributesMsgHandler(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOK;
+    //printf("[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] Entering...\n", __FUNCTION__, __FILE__);
+    /* Find the respective manager and forward the request*/
+    msgHandler *pMsgHandler = HostIf_GetMgr(stMsgData);
+    if (NULL != pMsgHandler)
+    {
+    	RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Valid Handler for %s", __FUNCTION__, __FILE__,stMsgData->paramName);
+    }
+    if(pMsgHandler)
+        ret = pMsgHandler->handleSetAttributesMsg(stMsgData);
+
+    //printf("[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+    return ret;
+}
 
 //------------------------------------------------------------------------------
 // hostIf_Free_stMsgData: Freeing HOSTIF_MsgData_t.
@@ -255,12 +287,13 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
     const char *pParam = stMsgHandlerData->paramName;
     HostIf_ParamMgr_t mgrId;
     msgHandler* pRet = NULL;
-
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] Get proper manager for parameter :- %s \n", __FUNCTION__,stMsgHandlerData->paramName);
     if(NULL != paramMgrhash)
     {
         GList *keys = g_hash_table_get_keys(paramMgrhash);
         while(keys) {
             char *data = (char *)keys->data;
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] DATA = ",__FUNCTION__, data);
             if(strncmp(data,pParam,strlen(data)) == 0)
             {
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] pParam: %s data:%s\n", __FUNCTION__,pParam, data);
@@ -325,7 +358,14 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
                 ;
             }
         }
+        else{
+        	RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()]Not able to get Key  parameter :- %s \n", __FUNCTION__,stMsgHandlerData->paramName);
+        }
 
+    }
+    else
+    {
+    	 RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] paramMgrhash is Null  parameter :- %s \n", __FUNCTION__,stMsgHandlerData->paramName);
     }
     return pRet;
 }

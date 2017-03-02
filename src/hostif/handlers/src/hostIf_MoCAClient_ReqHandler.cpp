@@ -580,6 +580,23 @@ int MoCAClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     hostIf_MoCAInterface::releaseLock();
     return ret;
 }
+int MoCAClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{       
+    int ret = NOT_HANDLED;
+    hostIf_MoCAInterface::getLock();
+    // TODO: Retrieve notification value from DeviceInfo structure for given parameter
+    hostIf_MoCAInterface::releaseLock();
+    return ret;
+}
+            
+int MoCAClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{   
+    int ret = NOT_HANDLED;
+    hostIf_MoCAInterface::getLock();
+    // TODO: Set notification value from DeviceInfo structure for given parameter
+    hostIf_MoCAInterface::releaseLock();
+    return ret;
+}
 
 void MoCAClientReqHandler::registerUpdateCallback(updateCallback cb)
 {

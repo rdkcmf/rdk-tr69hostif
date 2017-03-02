@@ -190,7 +190,6 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         }
 
         ret = pIface->get_Device_WiFi_SSIDNumberOfEntries(stMsgData);
-
     }
     else if (strcasecmp(stMsgData->paramName,"Device.WiFi.AccessPointNumberOfEntries") == 0)
     {
@@ -491,6 +490,47 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+int WiFiReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOT_HANDLED;
+    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] TODO Entering  Parameter value = %s \n", __FILE__, __FUNCTION__,stMsgData->paramName);
+    // TODO: Retrieve notification value from DeviceInfo structure for given parameter
+    return ret;
+}
+
+int WiFiReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+
+	int ret = NOT_HANDLED;
+/*	int instanceNumber = 0;
+	hostIf_WiFi::getLock();
+	// TODO: Set notification value from DeviceInfo structure for given parameter
+	RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] WiFiReqHandler get para as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+	hostIf_WiFi *pIface = hostIf_WiFi::getInstance(instanceNumber);
+	stMsgData->instanceNum = instanceNumber;
+	if(!pIface)
+	{
+		RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] pIface is failed. For param as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+		hostIf_WiFi::releaseLock();
+			return NOK;
+	}
+
+	GHashTable* notifyhash = pIface->getNotifyHash();
+	if(notifyhash != NULL)
+	{
+		RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] notifyhash is not Null %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+	int notifyvalue = get_int(stMsgData->paramValue);
+	g_hash_table_insert(notifyhash,stMsgData->paramName,(gpointer) notifyvalue);
+	ret = OK;
+	}
+	else
+	{
+		RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] notifyhash is Null %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+	   ret = NOK;
+	}
+	hostIf_WiFi::releaseLock();*/
+	return ret;
+}
 void WiFiReqHandler::registerUpdateCallback(updateCallback cb)
 {
     mUpdateCallback = cb;

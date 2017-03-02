@@ -112,6 +112,10 @@ typedef enum _HostIf_ParamMgr
 
 int hostIf_GetMsgHandler(HOSTIF_MsgData_t *stMsgData);
 
+int hostIf_SetAttributesMsgHandler(HOSTIF_MsgData_t *stMsgData);
+
+int hostIf_GetAttributesMsgHandler(HOSTIF_MsgData_t *stMsgData);
+
 int hostIf_SetMsgHandler(HOSTIF_MsgData_t *stMsgData);
 
 void hostIf_Init_Dummy_stMsgData (HOSTIF_MsgData_t **stMsgData);
@@ -150,6 +154,9 @@ public:
  * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
  */
     virtual bool unInit() = 0;
+
+    virtual int handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData) = 0;
+    virtual int handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData) = 0;
 	
 /**
  * @brief This is a pure virtual function used to handle the set message request.

@@ -100,6 +100,8 @@ public:
     virtual bool unInit();
     virtual int handleSetMsg(HOSTIF_MsgData_t *stMsgData);
     virtual int handleGetMsg(HOSTIF_MsgData_t *stMsgData);
+    virtual int handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData);
+    virtual int handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData);
     static msgHandler* getInstance();
     static void registerUpdateCallback(updateCallback cb);
     static void checkForUpdates();

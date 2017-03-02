@@ -97,6 +97,7 @@
 #define GATEWAY_NAME_SIZE 4
 
 GHashTable* hostIf_DeviceInfo::ifHash = NULL;
+GHashTable* hostIf_DeviceInfo::m_notifyHash = NULL;
 GMutex* hostIf_DeviceInfo::m_mutex = NULL;
 
 void *ResetFunc(void *);
@@ -141,7 +142,12 @@ hostIf_DeviceInfo::hostIf_DeviceInfo(int dev_id):
     memset(backupDeviceMAC , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupX_COMCAST_COM_STB_IP , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupX_COMCAST_COM_FirmwareFilename , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-
+    //Create m_notifyHash
+    m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
+}
+hostIf_DeviceInfo::~hostIf_DeviceInfo()
+{
+	g_hash_table_destroy(m_notifyHash);
 }
 
 hostIf_DeviceInfo* hostIf_DeviceInfo::getInstance(int dev_id)
@@ -215,6 +221,13 @@ void hostIf_DeviceInfo::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
+GHashTable* hostIf_DeviceInfo::getNotifyHash()
+{
+	if(m_notifyHash)
+		return m_notifyHash;
+	else
+		return NULL;
+}
 /**
  * @brief This function provides the Identifier of the particular device that is
  * unique for the indicated class of product and manufacturer. This is the Serial Number of the box.

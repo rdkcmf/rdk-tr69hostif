@@ -185,13 +185,15 @@ class hostIf_DeviceInfo {
 
     static  GHashTable  *ifHash;
 
+    static  GHashTable  *m_notifyHash;
+
     static GMutex *m_mutex;
 
     int dev_id;
 
     hostIf_DeviceInfo(int dev_id);
 
-    ~hostIf_DeviceInfo() {};
+    ~hostIf_DeviceInfo();
 
     bool bCalledSoftwareVersion;
     bool bCalledX_COMCAST_COM_STB_IP;
@@ -231,6 +233,8 @@ public:
     static void getLock();
 
     static void releaseLock();
+
+    GHashTable* getNotifyHash();
 
 
     /**

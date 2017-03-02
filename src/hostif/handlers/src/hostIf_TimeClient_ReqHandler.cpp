@@ -167,6 +167,23 @@ void TimeClientReqHandler::registerUpdateCallback(updateCallback cb)
     mUpdateCallback = cb;
 }
 
+int TimeClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{           
+    int ret = NOT_HANDLED;
+    hostIf_Time::getLock();
+    // TODO: Retrieve notification value from DeviceInfo structure for given parameter
+    hostIf_Time::releaseLock();
+    return ret; 
+}       
+        
+int TimeClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{           
+    int ret = NOT_HANDLED;
+    hostIf_Time::getLock();
+    // TODO: Set notification value from DeviceInfo structure for given parameter
+    hostIf_Time::releaseLock();
+    return ret;
+}
 void TimeClientReqHandler::checkForUpdates()
 {
     HOSTIF_MsgData_t msgData;

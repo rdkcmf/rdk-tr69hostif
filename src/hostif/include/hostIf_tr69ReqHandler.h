@@ -93,6 +93,10 @@ void hostIf_IARM_IF_Stop();
 
 #define IARM_BUS_TR69HOSTIFMGR_API_GetParams               "tr69HostIfGetParams" /*!< Retrives parameter values fom the tr69hostIf*/
 
+#define IARM_BUS_TR69HOSTIFMGR_API_SetAttributes               "tr69HostIfGetAttributes" /*!< Retrives attribute values fom the tr69hostIf*/
+#define IARM_BUS_TR69HOSTIFMGR_API_GetAttributes               "tr69HostIfSetAttributes" /*!< Sets attribute values fom the tr69hostIf*/
+
+
 #define IARM_BUS_TR69HOSTIFMGR_API_RegisterForEvents       "tr69HostIfRegisterForEvents" /*!< Registers for events from tr69hostIf, on this call, add/remove events will be re-broadcasted*/
 
 #define TR69HOSTIFMGR_MAX_PARAM_LEN	1024
@@ -115,7 +119,9 @@ typedef enum _HostIf_ReqType
 {
     HOSTIF_INVALID_TYPE = 0,
     HOSTIF_GET = 1,
-    HOSTIF_SET = 2
+    HOSTIF_SET = 2,
+    HOSTIF_GETATTRIB = 3, 
+    HOSTIF_SETATTRIB = 4 
 } HostIf_ReqType_t;
 
 /*! Host IF Message Request data*/

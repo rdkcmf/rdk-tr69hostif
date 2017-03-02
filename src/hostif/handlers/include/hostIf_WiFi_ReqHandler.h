@@ -49,7 +49,8 @@
  * - cb:       allback function (suffix).
  * - FPD:     Front-Panel Display.
  * - HAL:     Hardware Abstraction Layer.
- * - LE:      Little-Endian.
+ * - LE:      Little-Endian.    virtual int handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData);
+    virtual int handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData);
  * - LS:      Least Significant.
  * - MBZ:     Must be zero.
  * - MS:      Most Significant.
@@ -106,6 +107,8 @@ public:
     virtual bool unInit();
     virtual int handleSetMsg(HOSTIF_MsgData_t *stMsgData);
     virtual int handleGetMsg(HOSTIF_MsgData_t *stMsgData);
+    virtual int handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData);
+    virtual int handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData);
     static msgHandler* getInstance();
     static void registerUpdateCallback(updateCallback cb);
     static void checkForUpdates();

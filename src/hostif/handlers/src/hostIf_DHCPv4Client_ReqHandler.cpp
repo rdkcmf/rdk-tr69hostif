@@ -160,6 +160,23 @@ int DHCPv4ClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     hostIf_DHCPv4Client::releaseLock();
     return ret;
 }
+int DHCPv4ClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOT_HANDLED;
+    hostIf_DHCPv4Client::getLock();
+    // TODO: Retrieve notification value from DeviceInfo structure for given parameter
+    hostIf_DHCPv4Client::releaseLock();
+    return ret;
+}
+
+int DHCPv4ClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOT_HANDLED;
+    hostIf_DHCPv4Client::getLock();
+    // TODO: Set notification value from DeviceInfo structure for given parameter
+    hostIf_DHCPv4Client::releaseLock();
+    return ret;
+}
 
 void DHCPv4ClientReqHandler::registerUpdateCallback(updateCallback cb)
 {

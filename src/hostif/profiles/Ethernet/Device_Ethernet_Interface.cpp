@@ -59,6 +59,7 @@ GMutex* hostIf_EthernetInterface::m_mutex = NULL;
 
 GHashTable *hostIf_EthernetInterface::ifHash = NULL;
 
+GHashTable* hostIf_EthernetInterface::m_notifyHash = NULL;
 
 /** Description: Counts the number of Ethernet
  *               interfaces present in the device.
@@ -143,6 +144,17 @@ void hostIf_EthernetInterface::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
+GHashTable* hostIf_EthernetInterface::getNotifyHash()
+{
+	if(m_notifyHash)
+	{
+		return m_notifyHash;
+	}
+	else
+	{
+		return m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
+	}
+}
 /**
  * @brief Class Constructor of the class hostIf_EthernetInterface.
  *
@@ -167,6 +179,12 @@ hostIf_EthernetInterface::hostIf_EthernetInterface(int dev_id):
     strcpy(backupName,"");
     strcpy(backupMACAddress,"");
     strcpy(backupDuplexMode,"");
+
+}
+
+hostIf_EthernetInterface::~hostIf_EthernetInterface()
+{
+	g_hash_table_destroy(m_notifyHash);
 }
 
 static int getEthernetInterfaceName (unsigned int ethInterfaceNum, char* name)
@@ -524,7 +542,7 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Status(HOSTIF_MsgDat
     strncpy(stMsgData->paramValue,stEthInterface.status,TR69HOSTIFMGR_MAX_PARAM_LEN );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stEthInterface.status);
-
+    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] CHANGED:- Checking Ethernet status Value changed :- %d \n", __FUNCTION__, __FILE__, __LINE__,*pChanged);
     return OK;
 }
 

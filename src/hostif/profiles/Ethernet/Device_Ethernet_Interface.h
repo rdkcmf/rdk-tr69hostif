@@ -242,9 +242,10 @@ class hostIf_EthernetInterface {
 
     hostIf_EthernetInterface(int dev_id);
 
-    ~hostIf_EthernetInterface() {};
+    ~hostIf_EthernetInterface();
 
     static  GHashTable  *ifHash;
+    static  GHashTable  *m_notifyHash;
     static GMutex *m_mutex;
 
     int dev_id;
@@ -280,6 +281,8 @@ public:
     static void getLock();
 
     static void releaseLock();
+
+    static GHashTable* getNotifyHash();
 
     /**
      * @brief    Get the number of entries in the Interface table.

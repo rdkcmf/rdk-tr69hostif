@@ -442,6 +442,23 @@ int XREClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+int XREClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOT_HANDLED;
+    getLock();
+    // TODO: Retrieve notification value from DeviceInfo structure for given parameter
+    releaseLock();
+    return ret; 
+}       
+     
+int XREClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{           
+    int ret = NOT_HANDLED;
+    getLock();
+    // TODO: Set notification value from DeviceInfo structure for given parameter
+    releaseLock();
+    return ret;
+}
 void XREClientReqHandler::registerUpdateCallback(updateCallback cb)
 {
     mUpdateCallback = cb;

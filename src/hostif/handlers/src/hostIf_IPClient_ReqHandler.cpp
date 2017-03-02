@@ -294,7 +294,23 @@ int IPClientReqHandler::handleSetMsg (HOSTIF_MsgData_t *stMsgData)
 
     return ret;
 }
-
+int IPClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{       
+    int ret = NOT_HANDLED;
+    hostIf_IPInterface::getLock();
+    // TODO: Retrieve notification value from DeviceInfo structure for given parameter
+    hostIf_IPInterface::releaseLock();
+    return ret;
+}       
+            
+int IPClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
+{   
+    int ret = NOT_HANDLED;
+    hostIf_IPInterface::getLock();
+    // TODO: Set notification value from DeviceInfo structure for given parameter
+    hostIf_IPInterface::releaseLock();
+    return ret;
+}
 void IPClientReqHandler::registerUpdateCallback(updateCallback cb)
 {
     mUpdateCallback = cb;
