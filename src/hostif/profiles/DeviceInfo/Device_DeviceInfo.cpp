@@ -2149,6 +2149,9 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
    {
        map<string,string> parsedMap;
        string inputStr(stMsgData->paramValue);
+       string ipv6_fileName = "/tmp/estb_ipv6";
+
+       bool ipv6Enabled = (!access (ipv6_fileName.c_str(), F_OK))?true:false;
        std::size_t start = inputStr.find_first_not_of(";"), end = start;
        while (start != string::npos)
        {
@@ -2165,14 +2168,27 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
        }
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] parsed Values are : %s\n",__FUNCTION__,parsedValues.c_str());
 
-       reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":" + getEstbIp() + ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
+       reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":";
+
+       if (ipv6Enabled)
+       {
+          reverseSSHArgs += "[" + getEstbIp() + "]";
+       }
+       else
+       {
+          reverseSSHArgs += getEstbIp();
+       }
+
+       reverseSSHArgs +=  ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
        if (parsedMap.find("sshport") != parsedMap.end())
        {
           reverseSSHArgs += " -p " + parsedMap["sshport"];
        }
 
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] String is  : %s\n",__FUNCTION__,reverseSSHArgs.c_str());
+
        string::const_iterator it = std::find_if(reverseSSHArgs.begin(), reverseSSHArgs.end(), [](char c) {
-          return !(isalnum(c) || (c == ' ') || (c == ':') || (c == '-') || (c == '.') || (c == '@') || (c == '_'));
+          return !(isalnum(c) || (c == ' ') || (c == ':') || (c == '-') || (c == '.') || (c == '@') || (c == '_') || (c == '[') || (c == ']'));
       });
 
       if (it  != reverseSSHArgs.end())
