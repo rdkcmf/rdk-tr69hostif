@@ -56,6 +56,10 @@ AM_CXXFLAGS += -DUSE_INTFSTACK_PROFILE
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/profiles/InterfaceStack
 endif
 
+if WITH_WEBPA_RFC
+AM_CXXFLAGS += -DWEBPA_RFC_ENABLED
+endif
+
 if XRELIB_FLAG
 AM_LDFLAGS = $(GLIB_LDFLAGS) $(GLIB_LIBS) \
 	$(G_THREAD_LIBS) -lyajl $(SOUP_LIBS) \

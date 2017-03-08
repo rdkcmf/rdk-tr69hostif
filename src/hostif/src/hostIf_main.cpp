@@ -40,7 +40,10 @@
 #include <semaphore.h>
 #include <errno.h>
 
-#define LOG_FILE "./tr69hostIflog.txt"
+#define LOG_FILE 		"./tr69hostIflog.txt"
+#ifdef WEBPA_RFC_ENABLED
+#define RFC_BUFFER_SIZE 256
+#endif
 
 //static void killAllThreads();
 
@@ -110,12 +113,37 @@ static void *shutdown_thread_entry(void *arg)
     exit_gracefully(shutdown_sig_received);
 }
 
+#ifdef WEBPA_RFC_ENABLED
+/* Utility funciton to get the console output. */
+int GetFeatureEnabled(char *cmd)
+{
+    FILE * pipeStream = NULL;
+    char buffer[RFC_BUFFER_SIZE];
+    int isFeatureEnabled = 0;
+
+    memset(buffer, 0, RFC_BUFFER_SIZE);
+    pipeStream = popen(cmd, "r");
+    if (pipeStream != NULL)
+    {
+        if (fgets(buffer, RFC_BUFFER_SIZE, pipeStream) != NULL)
+            sscanf(buffer,"%d",&isFeatureEnabled);
+        else
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s] %s End of stream.\n", __FUNCTION__, cmd);
+        pclose(pipeStream);
+    }
+    return isFeatureEnabled;
+}
+#endif
+
 //------------------------------------------------------------------------------
 // main: HostIfMgr main
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
     int ch = 0;
+#ifdef WEBPA_RFC_ENABLED
+    int retVal=0;
+#endif
     const char* debugConfigFile = NULL;
     //------------------------------------------------------------------------------
     // Signal handlers:
@@ -134,28 +162,6 @@ int main(int argc, char *argv[])
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] pthread_create() failed\n", __FUNCTION__, __FILE__);
         return 1;
     }
-
-    // The actions for SIGINT, SIGTERM, SIGSEGV, and SIGQUIT are set
-    sigemptyset(&sigact.sa_mask);
-    sigact.sa_handler = quit_handler;
-    sigact.sa_flags = SA_ONSTACK;
-
-    sigaction (SIGINT, &sigact, NULL);
-    sigaction (SIGTERM, &sigact, NULL);
-    sigaction (SIGHUP, &sigact, NULL);
-#ifndef RDK_DEVICE_CISCO_XI4
-#if 0
-    sigaction (SIGSEGV, &sigact, NULL);
-    sigaction (SIGILL, &sigact, NULL);
-    sigaction (SIGFPE, &sigact, NULL);
-    sigaction (SIGABRT, &sigact, NULL);
-    sigaction (SIGQUIT, &sigact, NULL);
-#endif
-#endif
-    signal (SIGPIPE, SIG_IGN);
-
-
-    setvbuf(stdout, NULL, _IOLBF, 0);
 
     while (1)
     {
@@ -214,6 +220,9 @@ int main(int argc, char *argv[])
         }
     }
 
+    /* Enable RDK logger.*/
+    if(rdk_logger_init(debugConfigFile) == 0) rdk_logger_enabled = 1;
+
     if (optind < argc)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"non-option ARGV-elements: ");
@@ -223,6 +232,46 @@ int main(int argc, char *argv[])
         usage();
         exit (0);
     }
+
+#ifdef WEBPA_RFC_ENABLED
+    retVal = GetFeatureEnabled(". /lib/rdk/isFeatureEnabled.sh WEBPAXG");
+    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] WEBPAXG returns %d\n", __FUNCTION__, retVal);
+    if( retVal == 0)
+        return ch;
+#endif
+
+    if (sem_init(&shutdown_thread_sem, 0, 0) == -1)
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] sem_init() failed\n", __FUNCTION__, __FILE__);
+        return 1;
+    }
+
+    if (pthread_create(&shutdown_thread, NULL, shutdown_thread_entry, NULL) != 0)
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] pthread_create() failed\n", __FUNCTION__, __FILE__);
+        return 1;
+    }
+
+    // The actions for SIGINT, SIGTERM, SIGSEGV, and SIGQUIT are set
+    sigemptyset(&sigact.sa_mask);
+    sigact.sa_handler = quit_handler;
+    sigact.sa_flags = SA_ONSTACK;
+
+    sigaction (SIGINT, &sigact, NULL);
+    sigaction (SIGTERM, &sigact, NULL);
+    sigaction (SIGHUP, &sigact, NULL);
+#ifndef RDK_DEVICE_CISCO_XI4
+#if 0
+		sigaction (SIGSEGV, &sigact, NULL);
+		sigaction (SIGILL, &sigact, NULL);
+		sigaction (SIGFPE, &sigact, NULL);
+		sigaction (SIGABRT, &sigact, NULL);
+		sigaction (SIGQUIT, &sigact, NULL);
+#endif
+#endif
+		signal (SIGPIPE, SIG_IGN);
+
+		setvbuf(stdout, NULL, _IOLBF, 0);
 
     //------------------------------------------------------------------------------
     // Initialize the glib, g_time and logger

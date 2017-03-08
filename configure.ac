@@ -201,6 +201,17 @@ AC_ARG_ENABLE([bt],
            ],
          [echo "X_RDKCENTRAL_COM BlueTooth profile is disabled"])
 
+AC_ARG_ENABLE([webpaRFC],
+        AS_HELP_STRING([--enable-webpaRFC],[enable WEBPA_RFC profile (default is no)]),
+        [
+          case "${enableval}" in
+           yes) WEBPA_RFC_ENABLE=true
+                WEBPA_RFC_FLAG="-DWEBPA_RFC_ENABLED" ;;
+           no) WEBPA_RFC_ENABLE=false AC_MSG_ERROR([WEBPA_RFC is disabled]) ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-webpaRFC ]) ;;
+           esac
+           ],
+         [echo "WEBPA_RFC is disabled"])
 
 
 AM_CONDITIONAL([WITH_MOCA_PROFILE], [test "x$enable_moca" = "xyes"])
@@ -213,6 +224,7 @@ AM_CONDITIONAL([WITH_STORAGESERVICE_PROFILE], [test x$STORAGESERVICE_PROFILE_ENA
 AM_CONDITIONAL([WITH_IPV6_SUPPORT], [test x$IPV6_SUPPORT_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_XRDK_RF4CE_PROFILE], [test x$XRDK_RF4CE_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_XRDK_BT_PROFILE], [test x$XRDK_BT_PROFILE_ENABLE = xtrue])
+AM_CONDITIONAL([WITH_WEBPA_RFC], [test x$WEBPA_RFC_ENABLE = xtrue])
 
 # Checks for programs.
 AC_PROG_CXX
