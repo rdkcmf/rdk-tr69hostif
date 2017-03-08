@@ -536,13 +536,13 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Status(HOSTIF_MsgDat
     if(bCalledStatus && pChanged && strncmp(stEthInterface.status,backupStatus,TR69HOSTIFMGR_MAX_PARAM_LEN))
     {
         *pChanged = true;
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] Ethernet Interface Status Changed..", __FUNCTION__, __FILE__, __LINE__);
     }
     bCalledStatus = true;
     strcpy(backupStatus, stEthInterface.status);
     strncpy(stMsgData->paramValue,stEthInterface.status,TR69HOSTIFMGR_MAX_PARAM_LEN );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stEthInterface.status);
-    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] CHANGED:- Checking Ethernet status Value changed :- %d \n", __FUNCTION__, __FILE__, __LINE__,*pChanged);
     return OK;
 }
 
