@@ -164,7 +164,7 @@ public:
 
 
 
-    int get_Device_DeviceInfo_Processor_Architecture(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_DeviceInfo_Processor_Architecture(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 };
 /* End of doxygen group */

@@ -160,7 +160,7 @@ public:
     static void releaseLock();
 
 
-    int get_Device_Time_Enable(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_Time_Enable(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief    Get the status of time support on the CPE.
@@ -195,7 +195,7 @@ public:
      *
      */
 
-    int get_Device_Time_Status(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_Time_Status(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief    Get the first NTP timeserver.
@@ -207,7 +207,7 @@ public:
      *
      */
 
-    int get_Device_Time_NTPServer1(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_Time_NTPServer1(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief    Get the second NTP timeserver.
@@ -219,7 +219,7 @@ public:
      *
      */
 
-    int get_Device_Time_NTPServer2(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_Time_NTPServer2(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief    Get the third NTP timeserver.
@@ -231,7 +231,7 @@ public:
      *
      */
 
-    int get_Device_Time_NTPServer3(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_Time_NTPServer3(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief    Get the fourth NTP timeserver.
@@ -243,7 +243,7 @@ public:
      *
      */
 
-    int get_Device_Time_NTPServer4(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_Time_NTPServer4(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief    Get the fifth NTP timeserver.
@@ -255,7 +255,7 @@ public:
      *
      */
 
-    int get_Device_Time_NTPServer5(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_Time_NTPServer5(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief    Get the current dates & time.
@@ -266,7 +266,7 @@ public:
      *
      */
 
-    int get_Device_Time_CurrentLocalTime(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_Time_CurrentLocalTime(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief    Get the local time zone definition.
@@ -280,7 +280,7 @@ public:
      *
      */
 
-    int get_Device_Time_LocalTimeZone(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_Time_LocalTimeZone(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /* End of TR_069_DEVICE_TIME_GETTER_API doxygen group. */
     /**

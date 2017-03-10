@@ -239,8 +239,8 @@ class hostif_InterfaceStack {
         static void closeInstance(hostif_InterfaceStack *pDev);
         static void closeAllInstances();
         static int get_Device_InterfaceStackNumberOfEntries(HOSTIF_MsgData_t *stMsgData);
-        int get_Device_InterfaceStack_HigherLayer(HOSTIF_MsgData_t *stMsgData,bool *pChanged = false);
-        int get_Device_InterfaceStack_LowerLayer(HOSTIF_MsgData_t *stMsgData,bool* pChanged = false);
+        int get_Device_InterfaceStack_HigherLayer(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
+        int get_Device_InterfaceStack_LowerLayer(HOSTIF_MsgData_t *stMsgData,bool* pChanged = NULL);
         static void getLock();
         static void releaseLock();
 

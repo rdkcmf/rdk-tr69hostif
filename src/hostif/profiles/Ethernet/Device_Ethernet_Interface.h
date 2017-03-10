@@ -294,7 +294,7 @@ public:
      */
 
 
-    static int get_Device_Ethernet_InterfaceNumberOfEntries(HOSTIF_MsgData_t *,bool *pChanged = false);
+    static int get_Device_Ethernet_InterfaceNumberOfEntries(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /* End of TR_069_DEVICE_ETHERNET_GETTER_API doxygen group */
     /**
@@ -340,7 +340,7 @@ public:
      * See @ref dev_ethernet_interface_getter
      *
      */
-    int get_Device_Ethernet_Interface_Enable(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Enable(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /**
      * @brief    Get the status of an Ethernet Interface.
@@ -388,7 +388,7 @@ public:
      * See @ref dev_ethernet_interface_getter
      *
      */
-    int get_Device_Ethernet_Interface_Status(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Status(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /**
      * @brief    Get the instance handle for an Ethernet Interface.
@@ -412,11 +412,11 @@ public:
      *
      */
 
-    int get_Device_Ethernet_Interface_Alias(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Alias(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Name(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Name(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /**
      * @brief    Get the time since an Ethernet interface's last change of status.
@@ -429,23 +429,23 @@ public:
      */
 
 	
-    int get_Device_Ethernet_Interface_LastChange(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_LastChange(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_LowerLayers(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_LowerLayers(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Upstream(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Upstream(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_MACAddress(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_MACAddress(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_MaxBitRate(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_MaxBitRate(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /**
      * @brief    Get the Duplex Mode available on an Ethernet Interface.
@@ -463,7 +463,7 @@ public:
      *
      */
 
-    int get_Device_Ethernet_Interface_DuplexMode(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_DuplexMode(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /* End of TR_069_DEVICE_ETHERNET_INTERFACE_GETTER_API doxygen group */
     /**

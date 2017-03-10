@@ -279,31 +279,31 @@ public:
 
 
 
-    int get_Device_Ethernet_Interface_Stats_BytesSent(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_BytesSent(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Stats_BytesReceived(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_BytesReceived(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Stats_PacketsSent(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_PacketsSent(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Stats_PacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_PacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Stats_ErrorsSent(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_ErrorsSent(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Stats_ErrorsReceived(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_ErrorsReceived(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Stats_UnicastPacketsSent(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_UnicastPacketsSent(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /**
      * @brief    Get the number of unicast packets received on an Ethernet Interface.
@@ -315,11 +315,11 @@ public:
      *
      */
 
-    int get_Device_Ethernet_Interface_Stats_UnicastPacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_UnicastPacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Stats_DiscardPacketsSent(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_DiscardPacketsSent(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /**
      * @brief    Get the number of discarded inbound packets on an Ethernet Interface.
@@ -334,7 +334,7 @@ public:
      *
      */
 
-    int get_Device_Ethernet_Interface_Stats_DiscardPacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_DiscardPacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /**
      * @brief    Get the number of Multicast Packets sent on an Ethernet Interface.
@@ -347,7 +347,7 @@ public:
      *
      */
 
-    int get_Device_Ethernet_Interface_Stats_MulticastPacketsSent(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_MulticastPacketsSent(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /**
      * @brief    Get the number of Multicast Packets received on an Ethernet Interface.
@@ -359,19 +359,19 @@ public:
      *
      */
 
-    int get_Device_Ethernet_Interface_Stats_MulticastPacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_MulticastPacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Stats_BroadcastPacketsSent(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_BroadcastPacketsSent(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Stats_BroadcastPacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_BroadcastPacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
 
 
-    int get_Device_Ethernet_Interface_Stats_UnknownProtoPacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_Ethernet_Interface_Stats_UnknownProtoPacketsReceived(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /* End of TR_069_DEVICE_ETHERNET_INTERFACE_STATS_GETTER_API doxygen group */
     /**

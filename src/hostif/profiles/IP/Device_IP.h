@@ -263,18 +263,18 @@ public:
     int handleGetMsg (HOSTIF_MsgData_t* stMsgData);
     int handleSetMsg (HOSTIF_MsgData_t* stMsgData);
 
-    int get_Device_IP_IPv4Capable(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_IP_IPv4Capable(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
-    int get_Device_IP_IPv4Enable(HOSTIF_MsgData_t *, bool *pChanged = false);
-
-
-
-    int get_Device_IP_IPv4Status(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_IP_IPv4Enable(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
 
-    int get_Device_IP_ULAPrefix(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_IP_IPv4Status(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+
+
+    int get_Device_IP_ULAPrefix(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief    Get the number of entries in the Interface table.

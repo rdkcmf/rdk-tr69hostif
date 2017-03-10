@@ -150,10 +150,10 @@ public:
     int handleGetMsg (const char* pSubSetting, int subInstanceNumber, HOSTIF_MsgData_t* stMsgData, bool isAddress);
     int handleSetMsg (const char* pSubSetting, int subInstanceNumber, HOSTIF_MsgData_t* stMsgData, bool isAddress);
 
-    int get_IPv6Address_Enable(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Address_Status(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Address_IPAddressStatus (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Address_Alias(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
+    int get_IPv6Address_Enable(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Address_Status(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Address_IPAddressStatus (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Address_Alias(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
     /**
      * @brief    Get an IP Interface IPv6 IP Address
@@ -166,26 +166,26 @@ public:
      * See @ref dev_ip_ipv6address_getter
      *
      */
-    int get_IPv6Address_IPAddress(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Address_Origin(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Address_Prefix (HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Address_PreferredLifetime (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Address_ValidLifetime (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Address_Anycast (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
+    int get_IPv6Address_IPAddress(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Address_Origin(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Address_Prefix (HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Address_PreferredLifetime (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Address_ValidLifetime (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Address_Anycast (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
-    int get_IPv6Prefix_Enable (HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_Status (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_PrefixStatus (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_Alias (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_Prefix (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_Origin (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_StaticType (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_ParentPrefix (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_ChildPrefixBits (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_OnLink (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_Autonomous (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_PreferredLifetime (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv6Prefix_ValidLifetime (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
+    int get_IPv6Prefix_Enable (HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_Status (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_PrefixStatus (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_Alias (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_Prefix (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_Origin (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_StaticType (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_ParentPrefix (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_ChildPrefixBits (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_OnLink (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_Autonomous (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_PreferredLifetime (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv6Prefix_ValidLifetime (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
     /* End of TR_069_DEVICE_IP_IPV6ADDRESS_GETTER_API doxygen group */
     /**

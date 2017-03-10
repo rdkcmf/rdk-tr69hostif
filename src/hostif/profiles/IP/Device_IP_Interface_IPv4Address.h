@@ -221,12 +221,12 @@ public:
      * See @ref dev_ip_ipv4address_getter
      *
      */
-    int get_IPv4Address_Enable(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged = false);
-    int get_IPv4Address_Status(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv4Address_Alias(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv4Address_IPAddress(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv4Address_SubnetMask(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
-    int get_IPv4Address_AddressingType(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = false);
+    int get_IPv4Address_Enable(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv4Address_Status(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv4Address_Alias(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv4Address_IPAddress(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv4Address_SubnetMask(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
+    int get_IPv4Address_AddressingType(HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged = NULL);
 
     /* End of TR_069_DEVICE_IP_IPV4ADDRESS_GETTER_API doxygen group */
     /**

@@ -343,21 +343,21 @@ public:
     unsigned int getIPv6AddressNumberOfEntries ();
     unsigned int getIPv6PrefixNumberOfEntries ();
 
-    int get_Interface_Enable(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_Enable(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_IPv4Enable(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_IPv4Enable(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_IPv6Enable(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_IPv6Enable(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_ULAEnable(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_ULAEnable(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_Status(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_Status(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_Alias(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_Alias(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_Name(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_Name(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_LastChange(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_LastChange(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
     /**
      * @brief    Get IP Interface LowerLayers.
@@ -375,17 +375,17 @@ public:
      * See @ref dev_ipinterface_getter
      *
      */
-    int get_Interface_LowerLayers(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_LowerLayers(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_Router(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_Router(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_Reset(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_Reset(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_MaxMTUSize(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_MaxMTUSize(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_Type(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_Type(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
-    int get_Interface_Loopback(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_Loopback(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
     int get_Interface_IPv4AddressNumberOfEntries(HOSTIF_MsgData_t *stMsgData);
 
@@ -424,7 +424,7 @@ public:
      * See @ref dev_ipinterface_getter
      *
      */
-    int get_Interface_AutoIPEnable(HOSTIF_MsgData_t *stMsgData, bool *pChanged = false);
+    int get_Interface_AutoIPEnable(HOSTIF_MsgData_t *stMsgData, bool *pChanged = NULL);
 
     /* End of TR_069_DEVICE_IP_INTERFACE_GETTER_API doxygen group */
     /**

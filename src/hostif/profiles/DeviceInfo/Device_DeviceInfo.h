@@ -258,51 +258,51 @@ public:
     */
 
 
-    int get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
-    int get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t *, bool *pChanged = false);
-
-
-
-    int get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t *, bool *pChanged = false);
-
-
-    int get_Device_DeviceInfo_Description(HOSTIF_MsgData_t *, bool *pChanged = false);
-
-
-    int get_Device_DeviceInfo_ProductClass(HOSTIF_MsgData_t *, bool *pChanged = false);
-
-
-    int get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t *, bool *pChanged = false);
-
-
-    int get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t *, bool *pChanged = false);
-
-
-    int get_Device_DeviceInfo_SoftwareVersion(HOSTIF_MsgData_t *, bool *pChanged = false);
-
-
-    int get_Device_DeviceInfo_AdditionalHardwareVersion(HOSTIF_MsgData_t *, bool *pChanged = false);
-
-
-    int get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_MsgData_t *, bool *pChanged = false);
-
-
-    int get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
 
-    int get_Device_DeviceInfo_UpTime(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
-    int get_Device_DeviceInfo_FirstUseDate(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_Description(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
-    int get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_ProductClass(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
-    int get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+
+    int get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+
+    int get_Device_DeviceInfo_SoftwareVersion(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+
+    int get_Device_DeviceInfo_AdditionalHardwareVersion(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+
+    int get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+
+    int get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+
+
+    int get_Device_DeviceInfo_UpTime(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+
+    int get_Device_DeviceInfo_FirstUseDate(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+
+    int get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+
+    int get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
     /**
@@ -319,17 +319,17 @@ public:
      * @execution Synchronous.
      *
      */
-    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareFilename(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareFilename(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
-    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
-    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadStatus(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadStatus(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadProtocol(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadProtocol(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadURL (HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadURL (HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief get_Device_DeviceInfo_X_COMCAST-COM_Reset.
@@ -345,7 +345,7 @@ public:
      *
      */
 
-    int get_Device_DeviceInfo_X_COMCAST_COM_Reset(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_X_COMCAST_COM_Reset(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief set_Device_DeviceInfo_X_COMCAST-COM_Reset.
@@ -368,11 +368,11 @@ public:
      * @execution Synchronous.
      *
      */
-    int get_Device_DeviceInfo_MemoryStatus_Total(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_MemoryStatus_Total(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    int get_Device_DeviceInfo_MemoryStatus_Free(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_MemoryStatus_Free(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_CPUTemp(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_CPUTemp(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     int set_Device_DeviceInfo_X_COMCAST_COM_Reset(HOSTIF_MsgData_t*);
 
@@ -391,7 +391,7 @@ public:
      *
      */
 
-    int get_Device_DeviceInfo_VendorConfigFileNumberOfEntries(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_VendorConfigFileNumberOfEntries(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief get_Device_DeviceInfo_SupportedDataModelNumberOfEntries.
@@ -407,7 +407,7 @@ public:
      * @execution Synchronous.
      *
      */
-    int get_Device_DeviceInfo_SupportedDataModelNumberOfEntries(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_SupportedDataModelNumberOfEntries(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
      * @brief get_Device_DeviceInfo_ProcessorNumberOfEntries.
@@ -439,7 +439,7 @@ public:
      * @execution Synchronous.
      *
      */
-    int get_Device_DeviceInfo_VendorLogFileNumberOfEntries(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_VendorLogFileNumberOfEntries(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
     * @brief get_Device_DeviceInfo_X_COMCAST_COM_PowerStatus.
@@ -460,7 +460,7 @@ public:
     * @execution Synchronous.
     *
     */
-    int get_Device_DeviceInfo_X_COMCAST_COM_PowerStatus(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_X_COMCAST_COM_PowerStatus(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
     * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus.
@@ -483,7 +483,7 @@ public:
     * @retval OK if it is successful.
     * @retval NOK if not able to fetch from device.
     */
-    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
         * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayType.
@@ -494,9 +494,9 @@ public:
         * @retval NOK if not able to fetch from device.
         */
 
-    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayType(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayType(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    int get_X_RDKCENTRAL_COM_BootTime(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_X_RDKCENTRAL_COM_BootTime(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
     * @brief get_xOpsDMLogsUploadStatus.

@@ -228,23 +228,23 @@ public:
 
     int handleGetMsg (const char* pSetting, HOSTIF_MsgData_t* stMsgData);
 
-    int get_Device_IP_ActivePort_LocalIPAddress(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_IP_ActivePort_LocalIPAddress(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
 
-    int get_Device_IP_ActivePort_LocalPort(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_IP_ActivePort_LocalPort(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
 
-    int get_Device_IP_ActivePort_RemoteIPAddress(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_IP_ActivePort_RemoteIPAddress(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
 
-    int get_Device_IP_ActivePort_RemotePort(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_IP_ActivePort_RemotePort(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
 
-    int get_Device_IP_ActivePort_Status(HOSTIF_MsgData_t *, bool *pChanged = false);
+    int get_Device_IP_ActivePort_Status(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /* End of TR_069_DEVICE_IP_ACTIVEPORT_GETTER_API doxygen group */
     /**
