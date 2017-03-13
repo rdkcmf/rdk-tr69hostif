@@ -136,6 +136,8 @@ class hostIf_Time {
 
     static GMutex *m_mutex;
 
+    static  GHashTable  *m_notifyHash;
+
     int dev_id;
 
     bool bCalledLocalTimeZone;
@@ -144,7 +146,7 @@ class hostIf_Time {
     char backupCurrentLocalTime[TR69HOSTIFMGR_MAX_PARAM_LEN];
     hostIf_Time(int dev_id);
 
-    ~hostIf_Time() {};
+    ~hostIf_Time();
 public:
 
     static hostIf_Time* getInstance(int dev_id);
@@ -158,6 +160,8 @@ public:
     static void getLock();
 
     static void releaseLock();
+
+    static GHashTable* getNotifyHash();
 
 
     int get_Device_Time_Enable(HOSTIF_MsgData_t *, bool *pChanged = false);

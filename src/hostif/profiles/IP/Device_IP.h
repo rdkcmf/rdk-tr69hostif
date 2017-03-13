@@ -21,12 +21,12 @@
  * @file Device_IP.h
  * @brief The header file provides TR069 device IP information APIs.
  */
- 
+
 /**
- * @defgroup TR69_HOSTIF_DEVICE_IP TR-069 Object (Device.IP) 
+ * @defgroup TR69_HOSTIF_DEVICE_IP TR-069 Object (Device.IP)
  * IP interface table models the layer 3 IP interface. Each IP interface can be attached to
  * the IPv4 and/or IPv6 stack. The interface's IP addresses and prefixes are listed in the IPv4Address,
- * IPv6Address and IPv6Prefix tables. 
+ * IPv6Address and IPv6Prefix tables.
  *
  * @note Note that support for manipulating Loopback interfaces is OPTIONAL, so the implementation MAY choose
  * not to create (or allow the ACS to create) Interface instances of type Loopback.
@@ -42,12 +42,12 @@
  * rather than discard it.
  *
  * @ingroup TR69_HOSTIF_PROFILE
- * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE TR-069 Object (Device.IP.Object) 
+ * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE TR-069 Object (Device.IP.Object)
  * IP object that contains the Interface, ActivePort, and Diagnostics objects.
  * @ingroup TR69_HOSTIF_DEVICE_IP
  * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE_API TR-069 Object (Device.IP.Object.{i}) Public APIs
  * Describe the details about TR69 Device IP interface APIs specifications.
- * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE 
+ * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE
  *
  * @defgroup TR69_HOSTIF_DEVICE_IP_INTERFACE_CLASSES TR-069 Object (Device.IP.Object.{i}) Public Classes
  * Describe the details about classes used in TR69 Device IP interface.
@@ -58,7 +58,7 @@
  * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE
  *
  */
- 
+
 /**
  * @file Device_IP.h
  *
@@ -135,7 +135,7 @@
  * @addtogroup TR69_HOSTIF_DEVICE_IP_INTERFACE_DSSTRUCT
  * @{
  */
- 
+
 /**
  * @enum EIPMembers
  * @brief These values are the members of the EIPMembers.
@@ -201,7 +201,7 @@ typedef struct Device_IP
  *  @{
  */
 
- 
+
 /**
  * @brief This class provides the hostIf IP interface for getting IP interface information.
  * @ingroup TR69_HOSTIF_DEVICE_IP_INTERFACE_CLASSES
@@ -216,11 +216,13 @@ class hostIf_IP {
 
     static char* cmd_NumOfActivePorts;
 
+    static  GHashTable  *m_notifyHash;
+
     int dev_id;
 
     hostIf_IP(int dev_id);
 
-    ~hostIf_IP() {};
+    ~hostIf_IP();
 
     bool bCalledIPv4Capable;
     bool bCalledIPv4Enable;
@@ -258,6 +260,8 @@ public:
     static unsigned int getNumOfActivePorts(void);
 
     static int get_Device_IP_Fields(EIPMembers ipMem);
+
+    static GHashTable* getNotifyHash();
 
 
     int handleGetMsg (HOSTIF_MsgData_t* stMsgData);

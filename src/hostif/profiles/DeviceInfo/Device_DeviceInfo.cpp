@@ -81,7 +81,6 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <algorithm>
 
 #ifdef USE_MoCA_PROFILE
 #include "Device_MoCA_Interface.h"
@@ -142,12 +141,10 @@ hostIf_DeviceInfo::hostIf_DeviceInfo(int dev_id):
     memset(backupDeviceMAC , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupX_COMCAST_COM_STB_IP , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupX_COMCAST_COM_FirmwareFilename , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    //Create m_notifyHash
-    m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
 }
 hostIf_DeviceInfo::~hostIf_DeviceInfo()
 {
-	g_hash_table_destroy(m_notifyHash);
+    g_hash_table_destroy(m_notifyHash);
 }
 
 hostIf_DeviceInfo* hostIf_DeviceInfo::getInstance(int dev_id)
@@ -221,12 +218,16 @@ void hostIf_DeviceInfo::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
-GHashTable* hostIf_DeviceInfo::getNotifyHash()
+GHashTable*  hostIf_DeviceInfo::getNotifyHash()
 {
-	if(m_notifyHash)
-		return m_notifyHash;
-	else
-		return NULL;
+    if(m_notifyHash)
+    {
+        return m_notifyHash;
+    }
+    else
+    {
+        return m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
+    }
 }
 /**
  * @brief This function provides the Identifier of the particular device that is
@@ -1111,32 +1112,32 @@ string hostIf_DeviceInfo::getEstbIp()
 
 bool hostIf_DeviceInfo::isRsshactive()
 {
-   const string pidfile("/var/tmp/rssh.pid");
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
-   bool retCode = false;
+    const string pidfile("/var/tmp/rssh.pid");
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+    bool retCode = false;
 
-   ifstream pidstrm;
-   pidstrm.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-   try {
-      pidstrm.open(pidfile.c_str());
-      int sshpid;
-      pidstrm>>sshpid;
+    ifstream pidstrm;
+    pidstrm.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try {
+        pidstrm.open(pidfile.c_str());
+        int sshpid;
+        pidstrm>>sshpid;
 
-      if (getpgid(sshpid) >= 0)
-      {
-         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session Active \n",__FUNCTION__);
-         retCode = true;
-      }
-      else
-      {
-         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive \n",__FUNCTION__);
-      }
-   } catch (const std::exception& e) {
-         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive ; Error opening pid file\n",__FUNCTION__);
-   }
+        if (getpgid(sshpid) >= 0)
+        {
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session Active \n",__FUNCTION__);
+            retCode = true;
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive \n",__FUNCTION__);
+        }
+    } catch (const std::exception& e) {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive ; Error opening pid file\n",__FUNCTION__);
+    }
 
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
-   return retCode;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
+    return retCode;
 }
 /**
  * @brief This function use to get the IPv4 Address of the eth1 interface currently.
@@ -1155,23 +1156,23 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(HOSTIF_MsgData
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]Entering..\n", __FUNCTION__);
 
     string ipaddr = getEstbIp();
-    
+
     if (ipaddr.empty())
     {
-       RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s()]Ipaddress is empty..\n", __FUNCTION__);
-       return NOK;
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s()]Ipaddress is empty..\n", __FUNCTION__);
+        return NOK;
     }
     else {
-       if(bCalledX_COMCAST_COM_STB_IP && pChanged && strncmp(ipaddr.c_str(),backupX_COMCAST_COM_STB_IP,TR69HOSTIFMGR_MAX_PARAM_LEN ))
-       {
-          *pChanged =  true;
-       }
-       bCalledX_COMCAST_COM_STB_IP = true;
-       strncpy(backupX_COMCAST_COM_STB_IP,ipaddr.c_str(),TR69HOSTIFMGR_MAX_PARAM_LEN );
-       memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
-       stMsgData->paramLen = ipaddr.length();
-       strncpy(stMsgData->paramValue, ipaddr.c_str(), stMsgData->paramLen);
-       stMsgData->paramtype = hostIf_StringType;
+        if(bCalledX_COMCAST_COM_STB_IP && pChanged && strncmp(ipaddr.c_str(),backupX_COMCAST_COM_STB_IP,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+        {
+            *pChanged =  true;
+        }
+        bCalledX_COMCAST_COM_STB_IP = true;
+        strncpy(backupX_COMCAST_COM_STB_IP,ipaddr.c_str(),TR69HOSTIFMGR_MAX_PARAM_LEN );
+        memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
+        stMsgData->paramLen = ipaddr.length();
+        strncpy(stMsgData->paramValue, ipaddr.c_str(), stMsgData->paramLen);
+        stMsgData->paramtype = hostIf_StringType;
     }
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]Exiting..\n", __FUNCTION__);
     return OK;
@@ -1751,7 +1752,7 @@ int hostIf_DeviceInfo::get_xOpsDMLogsUploadStatus(HOSTIF_MsgData_t *stMsgData)
     else
     {
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s] Successfully read from %s. The value is \'%s\'. \n", __FUNCTION__, CURRENT_LOG_UPLOAD_STATUS,
-                curLogUploadStatus);
+                 curLogUploadStatus);
         fclose (logUpfile);
     }
 
@@ -2026,11 +2027,11 @@ int hostIf_DeviceInfo::set_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
 #ifdef USE_MoCA_PROFILE
     if (IARM_Bus_BroadcastEvent(IARM_BUS_NM_SRV_MGR_NAME, (IARM_EventId_t) IARM_BUS_NETWORK_MANAGER_MOCA_TELEMETRY_LOG, (void *)&mocaLogEnabled, sizeof(mocaLogEnabled)) == IARM_RESULT_SUCCESS)
     {
-	RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging is %d \n",__FUNCTION__, mocaLogEnabled);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging is %d \n",__FUNCTION__, mocaLogEnabled);
     }
     else
     {
-	RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging IARM FAILURE \n",__FUNCTION__);
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging IARM FAILURE \n",__FUNCTION__);
     }
 #endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
@@ -2043,7 +2044,7 @@ int hostIf_DeviceInfo::set_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
     mocaLogDuration = get_int(stMsgData->paramValue);
-    
+
 #ifdef USE_MoCA_PROFILE
     if (IARM_Bus_BroadcastEvent(IARM_BUS_NM_SRV_MGR_NAME, (IARM_EventId_t) IARM_BUS_NETWORK_MANAGER_MOCA_TELEMETRY_LOG_DURATION, (void *)&mocaLogDuration, sizeof(mocaLogDuration)) == IARM_RESULT_SUCCESS)
     {
@@ -2069,7 +2070,7 @@ int hostIf_DeviceInfo::get_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
     if(retVal == IARM_RESULT_SUCCESS)
     {
         put_boolean(stMsgData->paramValue,param);
-    	stMsgData->paramtype = hostIf_BooleanType; 
+        stMsgData->paramtype = hostIf_BooleanType;
         stMsgData->paramLen=1;
     }
     else
@@ -2092,7 +2093,7 @@ int hostIf_DeviceInfo::get_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
     if(retVal == IARM_RESULT_SUCCESS)
     {
         put_int(stMsgData->paramValue,param);
-        stMsgData->paramtype = hostIf_UnsignedIntType; 
+        stMsgData->paramtype = hostIf_UnsignedIntType;
         stMsgData->paramLen=4;
     }
     else
@@ -2107,22 +2108,22 @@ int hostIf_DeviceInfo::set_xOpsReverseSshTrigger(HOSTIF_MsgData_t *stMsgData)
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
     string inputStr(stMsgData->paramValue);
     bool trigger = strncmp(inputStr.c_str(),"start",strlen("start")) == 0;
-    
+
     if (trigger)
     {
 #ifdef __SINGLE_SESSION_ONLY__
         if (!isRsshactive())
         {
 #endif
-           RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting SSH Tunnel \n",__FUNCTION__);
-           string command = sshCommand + " start " + reverseSSHArgs;
-           system(command.c_str());
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting SSH Tunnel \n",__FUNCTION__);
+            string command = sshCommand + " start " + reverseSSHArgs;
+            system(command.c_str());
 #ifdef __SINGLE_SESSION_ONLY__
         }
         else
         {
-           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "[%s] SSH Session is already active. Not starting again!",__FUNCTION__);
-           return NOK;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "[%s] SSH Session is already active. Not starting again!",__FUNCTION__);
+            return NOK;
         }
 #endif
     }
@@ -2138,80 +2139,53 @@ int hostIf_DeviceInfo::set_xOpsReverseSshTrigger(HOSTIF_MsgData_t *stMsgData)
 
 int hostIf_DeviceInfo::get_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
 {
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
 
-   memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-   stMsgData->paramtype = hostIf_StringType;
+    memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    stMsgData->paramtype = hostIf_StringType;
 
-   if (reverseSSHArgs.empty())
-   {
-       strncpy(stMsgData->paramValue, "Not Set", TR69HOSTIFMGR_MAX_PARAM_LEN );
-   }
-   else
-   {
-       strncpy(stMsgData->paramValue, reverseSSHArgs.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
-   }
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting ... \n",__FUNCTION__);
-   return OK;
+    if (reverseSSHArgs.empty())
+    {
+        strncpy(stMsgData->paramValue, "Not Set", TR69HOSTIFMGR_MAX_PARAM_LEN );
+    }
+    else
+    {
+        strncpy(stMsgData->paramValue, reverseSSHArgs.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
+    }
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting ... \n",__FUNCTION__);
+    return OK;
 }
 
 int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
 {
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
-   try
-   {
-       map<string,string> parsedMap;
-       string inputStr(stMsgData->paramValue);
-       string ipv6_fileName = "/tmp/estb_ipv6";
-
-       bool ipv6Enabled = (!access (ipv6_fileName.c_str(), F_OK))?true:false;
-       std::size_t start = inputStr.find_first_not_of(";"), end = start;
-       while (start != string::npos)
-       {
-          end = inputStr.find(";",start);
-          string chunk = inputStr.substr(start,end - start);
-          std::size_t keyEnd = chunk.find("=");
-          parsedMap[chunk.substr(0,keyEnd)] = chunk.substr(keyEnd +1);
-          start = inputStr.find_first_not_of(";",end);
-       }
-       string parsedValues;
-       for (auto &it : parsedMap)
-       {
-          parsedValues += "key = " + it.first + " value = " + it.second + ";";
-       }
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+    try
+    {
+        map<string,string> parsedMap;
+        string inputStr(stMsgData->paramValue);
+        std::size_t start = inputStr.find_first_not_of(";"), end = start;
+        while (start != string::npos)
+        {
+            end = inputStr.find(";",start);
+            string chunk = inputStr.substr(start,end - start);
+            std::size_t keyEnd = chunk.find("=");
+            parsedMap[chunk.substr(0,keyEnd)] = chunk.substr(keyEnd +1);
+            start = inputStr.find_first_not_of(";",end);
+        }
+        string parsedValues;
+        for (auto &it : parsedMap)
+        {
+            parsedValues += "key = " + it.first + " value = " + it.second + ";";
+        }
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] parsed Values are : %s\n",__FUNCTION__,parsedValues.c_str());
 
-       reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":";
+        reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":" + getEstbIp() + ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
+        if (parsedMap.find("sshport") != parsedMap.end())
+        {
+            reverseSSHArgs += " -p " + parsedMap["sshport"];
+        }
 
-       if (ipv6Enabled)
-       {
-          reverseSSHArgs += "[" + getEstbIp() + "]";
-       }
-       else
-       {
-          reverseSSHArgs += getEstbIp();
-       }
-
-       reverseSSHArgs +=  ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
-       if (parsedMap.find("sshport") != parsedMap.end())
-       {
-          reverseSSHArgs += " -p " + parsedMap["sshport"];
-       }
-
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] String is  : %s\n",__FUNCTION__,reverseSSHArgs.c_str());
-
-       string::const_iterator it = std::find_if(reverseSSHArgs.begin(), reverseSSHArgs.end(), [](char c) {
-          return !(isalnum(c) || (c == ' ') || (c == ':') || (c == '-') || (c == '.') || (c == '@') || (c == '_') || (c == '[') || (c == ']'));
-      });
-
-      if (it  != reverseSSHArgs.end())
-      {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Exception Accured... \n",__FUNCTION__);
-        reverseSSHArgs = "";
-        return NOK;
-      }
-
-      RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] ReverseSSH Args = %s \n",__FUNCTION__,reverseSSHArgs.c_str());
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] ReverseSSH Args = %s \n",__FUNCTION__,reverseSSHArgs.c_str());
     } catch (const std::exception e) {
         std::cout << __FUNCTION__ << "An exception occurred. " << e.what() << endl;
 
@@ -2226,23 +2200,23 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
 
 int hostIf_DeviceInfo::get_xOpsReverseSshStatus(HOSTIF_MsgData_t *stMsgData)
 {
-   const string activeStr("ACTIVE");
-   const string inActiveStr("INACTIVE");
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
-   memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-   stMsgData->paramtype = hostIf_StringType;
+    const string activeStr("ACTIVE");
+    const string inActiveStr("INACTIVE");
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+    memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    stMsgData->paramtype = hostIf_StringType;
 
-   if (isRsshactive())
-   {
-      strncpy(stMsgData->paramValue, activeStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
-   }
-   else
-   {
-      strncpy(stMsgData->paramValue, inActiveStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
-   }
+    if (isRsshactive())
+    {
+        strncpy(stMsgData->paramValue, activeStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
+    }
+    else
+    {
+        strncpy(stMsgData->paramValue, inActiveStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
+    }
 
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
-   return OK;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
+    return OK;
 }
 
 int hostIf_DeviceInfo::set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t * stMsgData)

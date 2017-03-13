@@ -16,16 +16,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
- /*
- * @brief Provides implementation for DHCPv4 Client Request Handler Interface
- *
- * @author vejuturu@cisco.com
- */
+/*
+* @brief Provides implementation for DHCPv4 Client Request Handler Interface
+*
+* @author vejuturu@cisco.com
+*/
 
 /**
  * @file hostIf_DHCPv4Client_ReqHandler.cpp
  * @brief The header file provides HostIf DHCPv4 client request handler information APIs.
  */
+
+//#define HAVE_VALUE_CHANGE_EVENT
+
 #include "hostIf_main.h"
 #include "hostIf_utils.h"
 #include "Device_DHCPv4_Client.h"
@@ -101,7 +104,7 @@ int DHCPv4ClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     int ret = NOT_HANDLED;
 
     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Found string as %s. Set command not supported.\n",
-             __FUNCTION__, __FILE__, stMsgData->paramName);
+            __FUNCTION__, __FILE__, stMsgData->paramName);
 
     return ret;
 }
@@ -163,8 +166,29 @@ int DHCPv4ClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 int DHCPv4ClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
+    int instanceNumber = 0;
+
     hostIf_DHCPv4Client::getLock();
-    // TODO: Retrieve notification value from DeviceInfo structure for given parameter
+    hostIf_DHCPv4Client *pIface = hostIf_DHCPv4Client::getInstance(instanceNumber);
+    stMsgData->instanceNum = instanceNumber;
+    if(!pIface)
+    {
+        hostIf_DHCPv4Client::releaseLock();
+        return NOK;
+    }
+
+    GHashTable* notifyhash = pIface->getNotifyHash();
+    if(notifyhash != NULL)
+    {
+        int* notifyvalue = (int*) g_hash_table_lookup(notifyhash,stMsgData->paramName);
+        put_int(stMsgData->paramValue, *notifyvalue);
+        stMsgData->paramtype = hostIf_IntegerType;
+        ret = OK;
+    }
+    else
+    {
+        ret = NOK;
+    }
     hostIf_DHCPv4Client::releaseLock();
     return ret;
 }
@@ -172,8 +196,45 @@ int DHCPv4ClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 int DHCPv4ClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
+    int instanceNumber = 0;
+
     hostIf_DHCPv4Client::getLock();
-    // TODO: Set notification value from DeviceInfo structure for given parameter
+    hostIf_DHCPv4Client *pIface = hostIf_DHCPv4Client::getInstance(instanceNumber);
+    stMsgData->instanceNum = instanceNumber;
+    if(!pIface)
+    {
+        hostIf_DHCPv4Client::releaseLock();
+        return NOK;
+    }
+    GHashTable* notifyhash = pIface->getNotifyHash();
+    if(notifyhash != NULL)
+    {
+        int *notifyValuePtr;
+        notifyValuePtr = (int*) malloc(1 * sizeof(int));
+
+        // Inserting Notification parameter to Notify Hash Table,
+        // Note that neither keys nor values are copied when inserted into the GHashTable, so they must exist for the lifetime of the GHashTable
+        // There for allocating a memory for both Param name and param value. This should be freed whenever we disable Notification.
+        char *notifyKey;
+        notifyKey = (char*) malloc(sizeof(char)*strlen(stMsgData->paramName)+1);
+        if(NULL != notifyValuePtr)
+        {
+            *notifyValuePtr = 1;
+            strcpy(notifyKey,stMsgData->paramName);
+            g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
+            ret = OK;
+        }
+        else
+        {
+            ret = NOK;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] EthernetClientReqHandler Not able to allocate Notify pointer %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+        }
+    }
+    else
+    {
+        ret = NOK;
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] EthernetClientReqHandler Not able to get notifyhash  %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+    }
     hostIf_DHCPv4Client::releaseLock();
     return ret;
 }
@@ -191,6 +252,8 @@ void DHCPv4ClientReqHandler::checkForUpdates()
     int index = 1;
     char tmp_buff[TR69HOSTIFMGR_MAX_PARAM_LEN];
     hostIf_DHCPv4Client::getLock();
+    int instanceNumber;
+    GHashTable* notifyhash;
 
     memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
@@ -221,61 +284,79 @@ void DHCPv4ClientReqHandler::checkForUpdates()
         curNumOfDHCPv4Clients = get_int(msgData.paramValue);
     }
 #ifdef HAVE_VALUE_CHANGE_EVENT
-    GList *devList = hostIf_DHCPv4Client::getAllInstances();
-
-    for(elem = devList; elem; elem = elem->next,index++)
+    instanceNumber = 0;
+    hostIf_DHCPv4Client *pDHCPv4Client = hostIf_DHCPv4Client::getInstance(instanceNumber);
+    if(NULL != pDHCPv4Client)
     {
-        hostIf_DHCPv4Client *pDHCPv4Client = hostIf_DHCPv4Client::getInstance((int)elem->data);
+        notifyhash = pDHCPv4Client->getNotifyHash();
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Unable to get DHCPV4Client Instance\n", __FUNCTION__, __FILE__);
+    }
 
-        if(pDHCPv4Client)
+    // Iterate through Ghash Table
+    if(NULL != notifyhash)
+    {
+        GHashTableIter notifyHashIterator;
+        gpointer paramName;
+        gpointer notifyEnable;
+        bool  bChanged;
+
+        g_hash_table_iter_init (&notifyHashIterator, notifyhash);
+        while (g_hash_table_iter_next (&notifyHashIterator, &paramName, &notifyEnable))
         {
-            memset(&msgData,0,sizeof(msgData));
-            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
-            bChanged =  false;
-            pDHCPv4Client->get_Device_DHCPv4_Client_InterfaceReference(&msgData,&bChanged);
-            if(bChanged)
+            int* isNotifyEnabled = (int *)notifyEnable;
+            instanceNumber = 0;
+            if(matchComponent((const char*)paramName,"Device.DHCPv4.Client",&pSetting,instanceNumber))
             {
-                sprintf(tmp_buff,"Device.DHCPv4.Client.%d.%s",index,"Interface");
-                if(mUpdateCallback)
+                hostIf_DHCPv4Client *pIface = hostIf_DHCPv4Client::getInstance(instanceNumber);
+                if(pIface)
                 {
-                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
-                    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] Interface change Event..\n", __FILE__, __FUNCTION__);
-                }
-            }
-
-            memset(&msgData,0,sizeof(msgData)); 
-            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
-            bChanged =  false;
-            pDHCPv4Client->get_Device_DHCPv4_Client_IPRouters(&msgData,&bChanged);
-            if(bChanged)
-            {
-                sprintf(tmp_buff,"Device.DHCPv4.Client.%d.%s",index,"IPRouters");
-                if(mUpdateCallback)
-                {
-                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
-                    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] IPRouters change Event..\n", __FILE__, __FUNCTION__);
-                }
-            }
-
-            memset(&msgData,0,sizeof(msgData));
-            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
-            bChanged =  false;
-            pDHCPv4Client->get_Device_DHCPv4_Client_DnsServer(&msgData,&bChanged);
-            if(bChanged)
-            {
-                sprintf(tmp_buff,"Device.DHCPv4.Client.%d.%s",index,"DNSServers");
-                if(mUpdateCallback)
-                {
-                    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] DNSServers change Event..\n", __FILE__, __FUNCTION__);
-                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                    if (strcasecmp(pSetting,"Interface") == 0)
+                    {
+                        memset(&msgData,0,sizeof(msgData));
+                        bChanged =  false;
+                        pIface->get_Device_DHCPv4_Client_InterfaceReference(&msgData,&bChanged);
+                        if(bChanged)
+                        {
+                            if(mUpdateCallback && (*isNotifyEnabled == 1))
+                            {
+                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
+                            }
+                        }
+                    }
+                    if (strcasecmp(pSetting,"IPRouters") == 0)
+                    {
+                        memset(&msgData,0,sizeof(msgData));
+                        bChanged =  false;
+                        pIface->get_Device_DHCPv4_Client_IPRouters(&msgData,&bChanged);
+                        if(bChanged)
+                        {
+                            if(mUpdateCallback && (*isNotifyEnabled == 1))
+                            {
+                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
+                            }
+                        }
+                    }
+                    if (strcasecmp(pSetting,"DNSServers") == 0)
+                    {
+                        memset(&msgData,0,sizeof(msgData));
+                        bChanged =  false;
+                        pIface->get_Device_DHCPv4_Client_DnsServer(&msgData,&bChanged);
+                        if(bChanged)
+                        {
+                            if(mUpdateCallback && (*isNotifyEnabled == 1))
+                            {
+                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-
-    g_list_free(devList);
 #endif
-
     hostIf_DHCPv4Client::releaseLock();
 
 }

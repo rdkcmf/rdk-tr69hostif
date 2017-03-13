@@ -78,6 +78,7 @@
 GHashTable* hostif_InterfaceStack::stIshash = NULL;
 GHashTable* hostif_InterfaceStack::stBridgeTableHash = NULL;
 GMutex* hostif_InterfaceStack::stMutex = NULL;
+GHashTable* hostif_InterfaceStack::m_notifyHash = NULL;
 
 /*
  * hostif_InterfaceStack Constructor
@@ -227,7 +228,7 @@ int hostif_InterfaceStack:: get_Device_InterfaceStackNumberOfEntries(HOSTIF_MsgD
             if(OK == hostif_InterfaceStack::createInstance(interfaceStackNumOfEntries, higherLayerPath, lowerLayerPath ))
             {
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s:%d successfully created instance [%d] with higher layer [%s] lower layer [%s]\n",
-                      __FUNCTION__, __LINE__, interfaceStackNumOfEntries, higherLayerPath, lowerLayerPath);
+                        __FUNCTION__, __LINE__, interfaceStackNumOfEntries, higherLayerPath, lowerLayerPath);
             }
         }
     } while(0);
@@ -255,6 +256,23 @@ void hostif_InterfaceStack::getLock()
 void hostif_InterfaceStack::releaseLock()
 {
     g_mutex_unlock(stMutex);
+}
+
+GHashTable* hostif_InterfaceStack::getNotifyHash()
+{
+    if(m_notifyHash)
+    {
+        return m_notifyHash;
+    }
+    else
+    {
+        return m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
+    }
+}
+
+hostif_InterfaceStack::~hostif_InterfaceStack()
+{
+    g_hash_table_destroy(m_notifyHash);
 }
 
 hostif_InterfaceStack* hostif_InterfaceStack::getInstance(int dev_id)
@@ -334,9 +352,9 @@ void hostif_InterfaceStack::closeAllInstances()
 
         while(tmp_list)
         {
-           hostif_InterfaceStack* pDev = (hostif_InterfaceStack *)tmp_list->data;
-           tmp_list = tmp_list->next;
-           closeInstance(pDev);
+            hostif_InterfaceStack* pDev = (hostif_InterfaceStack *)tmp_list->data;
+            tmp_list = tmp_list->next;
+            closeInstance(pDev);
         }
     }
 }
@@ -460,7 +478,7 @@ int hostif_InterfaceStack::insertRowIntoBridgeTable(IN char *bridge, IN char *br
     if(!stBridgeTableHash)
     {
         stBridgeTableHash = g_hash_table_new_full(NULL, NULL, (GDestroyNotify)bridgeInteface_key_data_free,
-                                                  (GDestroyNotify)bridgeInteface_value_data_free);
+                            (GDestroyNotify)bridgeInteface_value_data_free);
     }
 
     if(bridge && bridgeInterfaces)
@@ -509,7 +527,7 @@ int hostif_InterfaceStack::getLowerInterfaceNumberOfEntries()
         }
     }
 #endif
-    
+
     return(numEntries);
 }
 
@@ -531,7 +549,7 @@ std::string hostif_InterfaceStack::getInterfaceName(T* pIface)
         }
         else
         {
-                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s:%d get_Device_Ethernet_Interface_Name failed\n", __FILE__, __LINE__);
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s:%d get_Device_Ethernet_Interface_Name failed\n", __FILE__, __LINE__);
         }
     }
 #ifdef USE_MoCA_PROFILE
@@ -543,7 +561,7 @@ std::string hostif_InterfaceStack::getInterfaceName(T* pIface)
         }
         else
         {
-                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s:%d get_Device_MoCA_Interface_Name failed\n", __FILE__, __LINE__);
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s:%d get_Device_MoCA_Interface_Name failed\n", __FILE__, __LINE__);
         }
     }
 #endif
@@ -577,7 +595,7 @@ std::string hostif_InterfaceStack::getLowerLayerName(int index)
  *
  * In the example given, the buildLowerLayerInfo function builds the Interface stack table as below:
  * Note that the higherlayers have not been filled up yet.
- * InterfaceStackMap 
+ * InterfaceStackMap
  * ---------------
  * InterfaceName      HigherLayer	                   LowerLayer
  * bcm0                                       Device.Ethernet.Interface.1
@@ -614,7 +632,7 @@ int hostif_InterfaceStack::buildLowerLayerInfo (InterfaceStackMap_t &layerInfo)
 }
 
 /*
- *  This function get the list of bridge elements from the 
+ *  This function get the list of bridge elements from the
  *  CSV format for bridge elements.
  */
 std::list<std::string> hostif_InterfaceStack::getBridgeElements(char* elementsCSV)
@@ -642,7 +660,7 @@ std::list<std::string> hostif_InterfaceStack::getBridgeElements(char* elementsCS
  *
  * In the example given, the buildLowerLayerInfo function builds the Interface stack table as below:
  * Note that the higherlayers have not been filled up yet.
- * InterfaceStackMap 
+ * InterfaceStackMap
  * ---------------
  * InterfaceName      HigherLayer	                   LowerLayer
  * bcm0                                       Device.Ethernet.Interface.1
@@ -682,7 +700,7 @@ void hostif_InterfaceStack::addBridgeNameLayerInfo(InterfaceStackMap_t &layerInf
  * In the example given, the buildLowerLayerInfo function builds the Interface stack table as below:
  * The example illustrates for the one child entry only. Remaining child entries will be filled up same.
  *
- * InterfaceStackMap 
+ * InterfaceStackMap
  * ---------------
  * InterfaceName      HigherLayer	                   LowerLayer
  * bcm0               Device.Bridging.Bridge.1.Port.1  Device.Ethernet.Interface.1
@@ -730,7 +748,7 @@ int hostif_InterfaceStack::addBridgeChildLayerInfo(InterfaceStackMap_t &layerInf
  * In the example given, the buildLowerLayerInfo function builds the Interface stack table as below:
  * The example illustrates for the one child entry only. Remaining child entries will be filled up same.
  *
- * InterfaceStackMap 
+ * InterfaceStackMap
  * ---------------
  * InterfaceName      HigherLayer	                   LowerLayer
  * bcm0                                                Device.Ethernet.Interface.1
@@ -746,7 +764,7 @@ void hostif_InterfaceStack::addBridgeUnmanagedLayerInfo(InterfaceStackMap_t &lay
     std::pair<std::string, LayerInfo_t> map_element;
 
     tempLayerInfo.higherLayer = bridgeHigherLayer;
-    tempLayerInfo.lowerLayer = bridgeLowerLayer; 
+    tempLayerInfo.lowerLayer = bridgeLowerLayer;
 
     map_element.first = ifname;
     map_element.second = tempLayerInfo;
@@ -771,15 +789,15 @@ int hostif_InterfaceStack::buildBridgeTableLayerInfo(InterfaceStackMap_t &layerI
         gpointer key, value;
 
         g_hash_table_iter_init(&iter, stBridgeTableHash);
-        while (g_hash_table_iter_next (&iter, &key, &value)) 
+        while (g_hash_table_iter_next (&iter, &key, &value))
         {
-            /* 
+            /*
              * The Bridges and underlying interfaces have the ports.
              * The port number '1' is dedicated to the port number of the bridge.
              * The port numbers for the underlying bridges start from '2'.
              *
              */
-            int portNum = 1; 
+            int portNum = 1;
             std::string bridgeName;
             std::list<std::string> bridgeElements;
             std::string bridgeNameLayer; // LowerLayer string to be inserted in InterfaceStackMap
@@ -803,7 +821,7 @@ int hostif_InterfaceStack::buildBridgeTableLayerInfo(InterfaceStackMap_t &layerI
                 std::string ifname = *it;
 
                 // HigherLayer String to be inserted in InterfaceStackMap
-                std::string bridgeElementLayer = DEVICE_BRIDGING_BRIDGE(bridgeNum, portNum); 
+                std::string bridgeElementLayer = DEVICE_BRIDGING_BRIDGE(bridgeNum, portNum);
 
                 if(OK == addBridgeChildLayerInfo(layerInfo, ifname, bridgeElementLayer))
                 {
