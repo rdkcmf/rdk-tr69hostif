@@ -45,13 +45,13 @@
 IPClientReqHandler* IPClientReqHandler::pInstance = NULL;
 updateCallback IPClientReqHandler::mUpdateCallback = NULL;
 int IPClientReqHandler::curNumOfIPInterface = 0;
-int IPClientReqHandler::curNumOfInterfaceIPv4Addresses[10] = {0,};
+int IPClientReqHandler::curNumOfInterfaceIPv4Addresses[20] = {0,};
 #ifdef IPV6_SUPPORT
-int IPClientReqHandler::curNumOfInterfaceIPv6Addresses[10] = {0,};
-int IPClientReqHandler::curNumOfInterfaceIPv6Prefixes[10] = {0,};
+int IPClientReqHandler::curNumOfInterfaceIPv6Addresses[20] = {0,};
+int IPClientReqHandler::curNumOfInterfaceIPv6Prefixes[20] = {0,};
 #endif // IPV6_SUPPORT
-int IPClientReqHandler::curNumOfIPv4Interface[10] = {0,};
-int IPClientReqHandler::curNumOfActivePorts[10] = {0,};
+int IPClientReqHandler::curNumOfIPv4Interface[20] = {0,};
+int IPClientReqHandler::curNumOfActivePorts[20] = {0,};
 
 IPClientReqHandler::IPClientReqHandler ()
 {

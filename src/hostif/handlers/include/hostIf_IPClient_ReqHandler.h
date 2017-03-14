@@ -95,13 +95,13 @@ private:
     static updateCallback mUpdateCallback;
 
     static int curNumOfIPInterface;
-    static int curNumOfInterfaceIPv4Addresses[10];
+    static int curNumOfInterfaceIPv4Addresses[20];
 #ifdef IPV6_SUPPORT
-    static int curNumOfInterfaceIPv6Addresses[10];
-    static int curNumOfInterfaceIPv6Prefixes[10];
+    static int curNumOfInterfaceIPv6Addresses[20];
+    static int curNumOfInterfaceIPv6Prefixes[20];
 #endif // IPV6_SUPPORT
-    static int curNumOfIPv4Interface[10];
-    static int curNumOfActivePorts[10];
+    static int curNumOfIPv4Interface[20];
+    static int curNumOfActivePorts[20];
 
     class hostIf_IPInterfaceLocker
     {
