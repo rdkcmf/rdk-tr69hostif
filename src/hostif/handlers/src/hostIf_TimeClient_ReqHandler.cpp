@@ -28,7 +28,8 @@
 * @defgroup hostif
 * @{
 **/
-//#define HAVE_VALUE_CHANGE_EVENT
+
+
 #include "hostIf_main.h"
 #include "hostIf_TimeClient_ReqHandler.h"
 
@@ -167,93 +168,19 @@ void TimeClientReqHandler::registerUpdateCallback(updateCallback cb)
 }
 
 int TimeClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
-{
+{           
     int ret = NOT_HANDLED;
-    int instanceNumber =0;
-
     hostIf_Time::getLock();
-    hostIf_Time *pIface = hostIf_Time::getInstance(instanceNumber);
-    stMsgData->instanceNum = instanceNumber;
-    if(!pIface)
-    {
-        hostIf_Time::releaseLock();
-        return NOK;
-    }
-    GHashTable* notifyhash = pIface->getNotifyHash();
-    if(notifyhash != NULL)
-    {
-        int *notifyValuePtr;
-        notifyValuePtr = (int*) malloc(1 * sizeof(int));
-
-        // Inserting Notification parameter to Notify Hash Table,
-        // Note that neither keys nor values are copied when inserted into the GHashTable, so they must exist for the lifetime of the GHashTable
-        // There for allocating a memory for both Param name and param value. This should be freed whenever we disable Notification.
-        char *notifyKey;
-        notifyKey = (char*) malloc(sizeof(char)*strlen(stMsgData->paramName)+1);
-        if(NULL != notifyValuePtr)
-        {
-            *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
-            g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
-            ret = OK;
-        }
-        else
-        {
-            ret = NOK;
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Not able to allocate Notify pointer %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-        }
-    }
-    else
-    {
-        ret = NOK;
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d]  Not able to get notifyhash  %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-    }
+    // TODO: Retrieve notification value from DeviceInfo structure for given parameter
     hostIf_Time::releaseLock();
-    return ret;
-}
-
+    return ret; 
+}       
+        
 int TimeClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
-{
+{           
     int ret = NOT_HANDLED;
-    int instanceNumber = 0;
-
     hostIf_Time::getLock();
-    hostIf_Time *pIface = hostIf_Time::getInstance(instanceNumber);
-    stMsgData->instanceNum = instanceNumber;
-    if(!pIface)
-    {
-        hostIf_Time::releaseLock();
-        return NOK;
-    }
-    GHashTable* notifyhash = pIface->getNotifyHash();
-    if(notifyhash != NULL)
-    {
-        int *notifyValuePtr;
-        notifyValuePtr = (int*) malloc(1 * sizeof(int));
-
-        // Inserting Notification parameter to Notify Hash Table,
-        // Note that neither keys nor values are copied when inserted into the GHashTable, so they must exist for the lifetime of the GHashTable
-        // There for allocating a memory for both Param name and param value. This should be freed whenever we disable Notification.
-        char *notifyKey;
-        notifyKey = (char*) malloc(sizeof(char)*strlen(stMsgData->paramName)+1);
-        if(NULL != notifyValuePtr)
-        {
-            *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
-            g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
-            ret = OK;
-        }
-        else
-        {
-            ret = NOK;
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Not able to allocate Notify pointer %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-        }
-    }
-    else
-    {
-        ret = NOK;
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] EthernetClientReqHandler Not able to get notifyhash  %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-    }
+    // TODO: Set notification value from DeviceInfo structure for given parameter
     hostIf_Time::releaseLock();
     return ret;
 }
@@ -261,61 +188,35 @@ void TimeClientReqHandler::checkForUpdates()
 {
     HOSTIF_MsgData_t msgData;
     bool bChanged;
-    int instanceNumber;
-    GHashTable* notifyhash;
-
+    GList *elem;
+    int index = 1;
+    char tmp_buff[TR69HOSTIFMGR_MAX_PARAM_LEN];
     hostIf_Time::getLock();
+    GList *devList = hostIf_Time::getAllInstances();
 
-#ifdef HAVE_VALUE_CHANGE_EVENT
-    instanceNumber = 0;
-    hostIf_Time *pIface = hostIf_Time::getInstance(instanceNumber);
-    if(NULL != pIface)
+    for(elem = devList; elem; elem = elem->next,index++)
     {
-        notifyhash = pIface->getNotifyHash();
-    }
-    else
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Unable to get Time Instance\n", __FUNCTION__, __FILE__);
-    }
 
-// Iterate through Ghash Table
-    if(NULL != notifyhash)
-    {
-        GHashTableIter notifyHashIterator;
-        gpointer paramName;
-        gpointer notifyEnable;
-        const char *pSetting;
+        hostIf_Time *pIface = hostIf_Time::getInstance((int)elem->data);
 
-        g_hash_table_iter_init (&notifyHashIterator, notifyhash);
-        while (g_hash_table_iter_next (&notifyHashIterator, &paramName, &notifyEnable))
+        if(pIface)
         {
-            int* isNotifyEnabled = (int *)notifyEnable;
-            instanceNumber = 0;
-            if(matchComponent((const char*)paramName,"Device.Time.Interface",&pSetting,instanceNumber))
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            pIface->get_Device_Time_LocalTimeZone(&msgData,&bChanged);
+            if(bChanged)
             {
-                if(!instanceNumber)
-                {   // Time settings not found in Notify Hash Table
-                    hostIf_Time::releaseLock();
-                    continue;
-                }
-                hostIf_Time *pTimeIface = hostIf_Time::getInstance(instanceNumber);
-                if(pTimeIface)
+                sprintf(tmp_buff,"Device.Time.Interface.%d.%s",index,"Enable");
+                if(mUpdateCallback)
                 {
-                    if (strcasecmp(pSetting,"Enable") == 0)
-                    {
-                        pTimeIface->get_Device_Time_LocalTimeZone(&msgData,&bChanged);
-                        if(mUpdateCallback && (*isNotifyEnabled == 1))
-                        {
-                            mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                        }
-
-                    }
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
             }
         }
-
     }
-#endif /*HAVE_VALUE_CHANGE_EVENT */
+
+    g_list_free(devList);
 
     hostIf_Time::releaseLock();
 }

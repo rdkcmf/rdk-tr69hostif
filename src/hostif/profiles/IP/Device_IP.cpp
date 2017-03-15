@@ -62,8 +62,6 @@ GMutex* hostIf_IP::m_mutex = NULL;
 
 GHashTable *hostIf_IP::ifHash = NULL;
 
-GHashTable* hostIf_IP::m_notifyHash = NULL;
-
 /**
  * @brief Class Constructor of the class hostIf_IP.
  *
@@ -155,23 +153,6 @@ void hostIf_IP::getLock()
 void hostIf_IP::releaseLock()
 {
     g_mutex_unlock(m_mutex);
-}
-
-GHashTable* hostIf_IP::getNotifyHash()
-{
-    if(m_notifyHash)
-    {
-        return m_notifyHash;
-    }
-    else
-    {
-        return m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
-    }
-}
-
-hostIf_IP::~hostIf_IP()
-{
-    g_hash_table_destroy(m_notifyHash);
 }
 
 /**
@@ -353,7 +334,7 @@ freeResources:
     freeifaddrs (ifa);
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "[%s(),%d] virtual_if_index = %u, virtual_if_name = %s\n",
-             __FUNCTION__, __LINE__, virtual_if_index, virtual_if_name);
+            __FUNCTION__, __LINE__, virtual_if_index, virtual_if_name);
 
     return ret;
 }

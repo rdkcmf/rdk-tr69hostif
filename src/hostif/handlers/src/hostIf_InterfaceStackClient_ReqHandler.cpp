@@ -16,11 +16,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-/*
-* @brief Provides implementation for DHCPv4 Client Request Handler Interface
-*
-* @author vejuturu@cisco.com
-*/
+ /*
+ * @brief Provides implementation for DHCPv4 Client Request Handler Interface
+ *
+ * @author vejuturu@cisco.com
+ */
 
 /**
  * @file hostIf_InterfaceStackClient_ReqHandler.cpp
@@ -101,7 +101,7 @@ int InterfaceStackClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     int ret = NOT_HANDLED;
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Found string as %s. Set command not supported.\n",
-            __FUNCTION__, __FILE__, stMsgData->paramName);
+             __FUNCTION__, __FILE__, stMsgData->paramName);
 
     return ret;
 }
@@ -159,76 +159,18 @@ int InterfaceStackClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 }
 int InterfaceStackClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
-    int ret = NOT_HANDLED;
-    int instanceNumber = 0;
-
-    hostif_InterfaceStack::getLock();
-    hostif_InterfaceStack *pIface = hostif_InterfaceStack::getInstance(instanceNumber);
-    stMsgData->instanceNum = instanceNumber;
-    if(!pIface)
-    {
-        hostif_InterfaceStack::releaseLock();
-        return NOK;
-    }
-
-    GHashTable* notifyhash = pIface->getNotifyHash();
-    if(notifyhash != NULL)
-    {
-        int* notifyvalue = (int*) g_hash_table_lookup(notifyhash,stMsgData->paramName);
-        put_int(stMsgData->paramValue, *notifyvalue);
-        stMsgData->paramtype = hostIf_IntegerType;
-        ret = OK;
-    }
-    else
-    {
-        ret = NOK;
-    }
+        int ret = NOT_HANDLED;
+        hostif_InterfaceStack::getLock();
+        // TODO: Retrieve notification value from DeviceInfo structure for given parameter
     hostif_InterfaceStack::releaseLock();
-    return ret;
+        return ret;
 }
 
 int InterfaceStackClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
-    int instanceNumber = 0;
-
     hostif_InterfaceStack::getLock();
-    hostif_InterfaceStack *pIface = hostif_InterfaceStack::getInstance(instanceNumber);
-    stMsgData->instanceNum = instanceNumber;
-    if(!pIface)
-    {
-        hostif_InterfaceStack::releaseLock();
-        return NOK;
-    }
-    GHashTable* notifyhash = pIface->getNotifyHash();
-    if(notifyhash != NULL)
-    {
-        int *notifyValuePtr;
-        notifyValuePtr = (int*) malloc(1 * sizeof(int));
-
-        // Inserting Notification parameter to Notify Hash Table,
-        // Note that neither keys nor values are copied when inserted into the GHashTable, so they must exist for the lifetime of the GHashTable
-        // There for allocating a memory for both Param name and param value. This should be freed whenever we disable Notification.
-        char *notifyKey;
-        notifyKey = (char*) malloc(sizeof(char)*strlen(stMsgData->paramName)+1);
-        if(NULL != notifyValuePtr)
-        {
-            *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
-            g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
-            ret = OK;
-        }
-        else
-        {
-            ret = NOK;
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d]  Not able to allocate Notify pointer %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-        }
-    }
-    else
-    {
-        ret = NOK;
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d]  Not able to get notifyhash  %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-    }
+    // TODO: Set notification value from DeviceInfo structure for given parameter
     hostif_InterfaceStack::releaseLock();
     return ret;
 }
@@ -244,7 +186,6 @@ void InterfaceStackClientReqHandler::checkForUpdates()
     bool bChanged;
     GList *elem;
     int index = 1;
-    int instanceNumber;
     char tmp_buff[TR69HOSTIFMGR_MAX_PARAM_LEN];
     hostif_InterfaceStack::getLock();
 
@@ -278,66 +219,45 @@ void InterfaceStackClientReqHandler::checkForUpdates()
     }
 
 #ifdef HAVE_VALUE_CHANGE_EVENT
+    GList *interfaceStackList = hostif_InterfaceStack::getAllInstances();
 
-    instanceNumber = 0;
-    hostif_InterfaceStack *pInterfaceStackClient = hostif_InterfaceStack::getInstance(instanceNumber);
-    if(NULL != pInterfaceStackClient)
+    for(elem = interfaceStackList; elem; elem = elem->next, index++)
     {
-        notifyhash = pInterfaceStackClient->getNotifyHash();
-    }
-    else
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Unable to get hostif_InterfaceStack Instance\n", __FUNCTION__, __FILE__);
-    }
-    // Iterate through Ghash Table
-    if(NULL != notifyhash)
-    {
-        GHashTableIter notifyHashIterator;
-        gpointer paramName;
-        gpointer notifyEnable;
-        bool  bChanged;
-        int
+        hostif_InterfaceStack *pInterfaceStackClient = hostif_InterfaceStack::getInstance((int)elem->data);
 
-        g_hash_table_iter_init (&notifyHashIterator, notifyhash);
-        while (g_hash_table_iter_next (&notifyHashIterator, &paramName, &notifyEnable))
+        if(pInterfaceStackClient)
         {
-            int* isNotifyEnabled = (int *)notifyEnable;
-            instanceNumber = 0;
-            if(matchComponent((const char*)paramName,"Device.InterfaceStack.",&pSetting,instanceNumber))
+            memset(&msgData, 0, sizeof(msgData));
+            memset(tmp_buff, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            pInterfaceStackClient->get_Device_InterfaceStack_HigherLayer(&msgData, &bChanged);
+            if(bChanged)
             {
-                hostif_InterfaceStack *pIface = hostif_InterfaceStack::getInstance(instanceNumber);
-                if(pIface)
+                snprintf(tmp_buff, sizeof(tmp_buff), "Device.InterfaceStack.%d.%s", index, "HigherLayer");
+                if(mUpdateCallback)
                 {
-                    if (strcasecmp(pSetting,"HigherLayer") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_InterfaceStack_HigherLayer(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"LowerLayer") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_InterfaceStack_LowerLayer(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] Interface Stack HigherLayer[row = %d] changed Event..\n", __FILE__, __FUNCTION__, index);
+                }
+            }
+
+            memset(&msgData, 0, sizeof(msgData));
+            memset(tmp_buff, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            pInterfaceStackClient->get_Device_InterfaceStack_LowerLayer(&msgData, &bChanged);
+            if(bChanged)
+            {
+                snprintf(tmp_buff, sizeof(tmp_buff), "Device.InterfaceStack.%d.%s", index, "LowerLayer");
+                if(mUpdateCallback)
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] Interface Stack LowerLayer[row = %d] changed Event..\n", __FILE__, __FUNCTION__, index);
                 }
             }
         }
     }
+
+    g_list_free(interfaceStackList);
 #endif
     hostif_InterfaceStack::releaseLock();
 }

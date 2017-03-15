@@ -28,7 +28,7 @@
 * @defgroup hostif
 * @{
 **/
-//#define HAVE_VALUE_CHANGE_EVENT
+
 
 #include "hostIf_main.h"
 #include "hostIf_DeviceClient_ReqHandler.h"
@@ -486,77 +486,18 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 
 int DeviceClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
-    int ret = NOT_HANDLED;
-    int instanceNumber = 0;
-
-    hostIf_DeviceInfo::getLock();
-    stMsgData->instanceNum = instanceNumber;
-    hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
-    if(!pIface)
-    {
+	int ret = NOT_HANDLED;
+	hostIf_DeviceInfo::getLock();
+	// TODO: Set notification value from DeviceInfo structure for given parameter
         hostIf_DeviceInfo::releaseLock();
-        return NOK;
-    }
-
-    GHashTable* notifyhash = pIface->getNotifyHash();
-    if(notifyhash != NULL)
-    {
-        int* notifyvalue = (int*) g_hash_table_lookup(notifyhash,stMsgData->paramName);
-        put_int(stMsgData->paramValue, *notifyvalue);
-        stMsgData->paramtype = hostIf_IntegerType;
-        ret = OK;
-    }
-    else
-    {
-        ret = NOK;
-    }
-    hostIf_DeviceInfo::releaseLock();
-    return ret;
+	return ret;
 }
 
 int DeviceClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
-    int instanceNumber = 0;
-    const char *pSetting;
     hostIf_DeviceInfo::getLock();
-    hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
-
-    stMsgData->instanceNum = instanceNumber;
-    if(!pIface)
-    {
-        hostIf_DeviceInfo::releaseLock();
-        return NOK;
-    }
-    GHashTable* notifyhash = pIface->getNotifyHash();
-    if(notifyhash != NULL)
-    {
-        int *notifyValuePtr;
-        notifyValuePtr = (int*) malloc(1 * sizeof(int));
-
-        // Inserting Notification parameter to Notify Hash Table,
-        // Note that neither keys nor values are copied when inserted into the GHashTable, so they must exist for the lifetime of the GHashTable
-        // There for allocating a memory for both Param name and param value. This should be freed whenever we disable Notification.
-        char *notifyKey;
-        notifyKey = (char*) malloc(sizeof(char)*strlen(stMsgData->paramName)+1);
-        if(NULL != notifyValuePtr)
-        {
-            *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
-            g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
-            ret = OK;
-        }
-        else
-        {
-            ret = NOK;
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Not able to allocate Notify pointer %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-        }
-    }
-    else
-    {
-        ret = NOK;
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Not able to get notifyhash  %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-    }
+    // TODO: Set notification value from DeviceInfo structure for given parameter
     hostIf_DeviceInfo::releaseLock();
     return ret;
 }
@@ -575,12 +516,365 @@ void DeviceClientReqHandler::checkForUpdates()
     bool bChanged;
     GList *elem;
     int index = 1;
-    const char *pSetting;
-    int instanceNumber = 0;
-    GHashTable* notifyhash;
     char tmp_buff[TR69HOSTIFMGR_MAX_PARAM_LEN];
 
-    // Update ADD/REMOVE Events
+    hostIf_DeviceInfo::getLock();
+
+    memset(&msgData,0,sizeof(msgData));
+    memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+
+    if(hostIf_DeviceInfo::get_Device_DeviceInfo_ProcessorNumberOfEntries(&msgData) == OK)
+    {
+        int tmpNoDev = get_int(msgData.paramValue);
+        char tmp[TR69HOSTIFMGR_MAX_PARAM_LEN] = "";
+        sprintf(tmp_buff,"Device.DeviceInfo.Processor");
+        while(curNumOfProcessor[index] > tmpNoDev)
+        {
+            sprintf(tmp,"%s.%d.",tmp_buff,tmpNoDev);
+            if(mUpdateCallback) mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE,tmp, NULL, hostIf_IntegerType);
+            tmpNoDev++;
+//            sleep(1);
+        }
+        while(curNumOfProcessor[index] < tmpNoDev)
+        {
+            sprintf(tmp,"%s.",tmp_buff);
+            if(mUpdateCallback) mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_ADD,tmp, NULL, hostIf_IntegerType);
+            tmpNoDev--;
+//            sleep(1);
+        }
+        curNumOfProcessor[index] = get_int(msgData.paramValue);
+    }
+    hostIf_DeviceInfo::releaseLock();
+#ifdef HAVE_VALUE_CHANGE_EVENT
+    GList *devList = hostIf_DeviceInfo::getAllInstances();
+
+    for(elem = devList; elem; elem = elem->next,index++)
+    {
+        hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance((int)elem->data);
+        if(pIface)
+        {
+	    GHashTable* notifyhash = pIface->getNotifyHash();
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_Manufacturer(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"Manufacturer");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_ManufacturerOUI(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"ManufacturerOUI");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_ModelName(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"ModelName");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_Description(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"Description");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_ProductClass(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"ProductClass");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_SerialNumber(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"SerialNumber");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_HardwareVersion(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"HardwareVersion");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_SoftwareVersion(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"SoftwareVersion");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_AdditionalHardwareVersion(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"AdditionalHardwareVersion");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_AdditionalSoftwareVersion(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"AdditionalSoftwareVersion");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_ProvisioningCode(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"ProvisioningCode");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_UpTime(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"UpTime");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_FirstUseDate(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"FirstUseDate");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"X_COMCAST-COM_STB_MAC");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"X_COMCAST-COM_STB_IP");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_X_COMCAST_COM_FirmwareFilename(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"X_COMCAST-COM_FirmwareFilename");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_X_COMCAST_COM_Reset(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"X_COMCAST-COM_Reset");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_VendorConfigFileNumberOfEntries(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"VendorConfigFileNumberOfEntries");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_SupportedDataModelNumberOfEntries(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"SupportedDataModelNumberOfEntries");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIface->get_Device_DeviceInfo_VendorLogFileNumberOfEntries(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.%d.%s",index,"VendorLogFileNumberOfEntries");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+        }
+    }
+
+    g_list_free(devList);
+
+    int instanceNumber = 0;
+    devList = hostIf_DeviceProcessorInterface::getAllInstances();
+    hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
+    GHashTable* notifyhash = pIface->getNotifyHash();
+    for(elem = devList; elem; elem = elem->next,index++)
+    {
+        hostIf_DeviceProcessorInterface *pIfaceProcessor = hostIf_DeviceProcessorInterface::getInstance((int)elem->data);
+
+        if(pIfaceProcessor)
+        {
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIfaceProcessor->get_Device_DeviceInfo_Processor_Architecture(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.Processor.%d.%s",index,"Architecture");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+        }
+    }
+
+
+    g_list_free(devList);
+
+    devList = hostIf_DeviceProcessStatusInterface::getAllInstances();
+
+    for(elem = devList; elem; elem = elem->next,index++)
+    {
+        hostIf_DeviceProcessStatusInterface *pIfaceStatus = hostIf_DeviceProcessStatusInterface::getInstance((int)elem->data);
+
+        if(pIfaceStatus)
+        {
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIfaceStatus->get_Device_DeviceInfo_ProcessStatus_CPUUsage(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.%d.%s",index,"CPUUsage");
+                if(mUpdateCallback&& (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+        }
+    }
+    g_list_free(devList);
+#endif    /*HAVE_VALUE_CHANGE_EVENT*/
+#ifdef HAVE_VALUE_CHANGE_EVENT
+
     hostIf_DeviceProcess::getLock();
     index = 1;
     memset(&msgData,0,sizeof(msgData));
@@ -596,470 +890,113 @@ void DeviceClientReqHandler::checkForUpdates()
             sprintf(tmp,"%s.%d.",tmp_buff,tmpNoDev);
             if(mUpdateCallback) mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE,tmp, NULL, hostIf_IntegerType);
             tmpNoDev++;
+//            sleep(1);
         }
         while(curNumOfProcess[index] < tmpNoDev)
         {
             sprintf(tmp,"%s.",tmp_buff);
             if(mUpdateCallback) mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_ADD,tmp, NULL, hostIf_IntegerType);
             tmpNoDev--;
+//            sleep(1);
         }
         curNumOfProcess[index] = get_int(msgData.paramValue);
     }
     hostIf_DeviceProcess::releaseLock();
-    hostIf_DeviceInfo::getLock();
-    if(hostIf_DeviceInfo::get_Device_DeviceInfo_ProcessorNumberOfEntries(&msgData) == OK)
+
+
+    devList = hostIf_DeviceProcess::getAllInstances();
+
+    for(elem = devList; elem; elem = elem->next,index++)
     {
-        int tmpNoDev = get_int(msgData.paramValue);
-        char tmp[TR69HOSTIFMGR_MAX_PARAM_LEN] = "";
-        sprintf(tmp_buff,"Device.DeviceInfo.Processor");
-        while(curNumOfProcessor[index] > tmpNoDev)
+        hostIf_DeviceProcess *pIfaceProcess = hostIf_DeviceProcess::getInstance((int)elem->data);
+
+        if(pIfaceProcess)
         {
-            sprintf(tmp,"%s.%d.",tmp_buff,tmpNoDev);
-            if(mUpdateCallback) mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE,tmp, NULL, hostIf_IntegerType);
-            tmpNoDev++;
-        }
-        while(curNumOfProcessor[index] < tmpNoDev)
-        {
-            sprintf(tmp,"%s.",tmp_buff);
-            if(mUpdateCallback) mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_ADD,tmp, NULL, hostIf_IntegerType);
-            tmpNoDev--;
-        }
-        curNumOfProcessor[index] = get_int(msgData.paramValue);
-    }
-// Update for Value change events
-#ifdef HAVE_VALUE_CHANGE_EVENT
-
-    instanceNumber = 0;
-    hostIf_DeviceInfo *dIface = hostIf_DeviceInfo::getInstance(instanceNumber);
-
-    //Get Notify Hash from device Info
-    if(NULL != dIface)
-    {
-        notifyhash = dIface->getNotifyHash();
-    }
-    else
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Unable to get Device Info Instance\n", __FUNCTION__, __FILE__);
-    }
-
-    // Iterate through Ghash Table
-    if(NULL != notifyhash)
-    {
-        GHashTableIter notifyHashIterator;
-        gpointer paramName;
-        gpointer notifyEnable;
-        bool  bChanged;
-
-        g_hash_table_iter_init (&notifyHashIterator, notifyhash);
-        while (g_hash_table_iter_next (&notifyHashIterator, &paramName, &notifyEnable))
-        {
-            int* isNotifyEnabled = (int *)notifyEnable;
-            instanceNumber = 0;
-            // Getting Update for Device.DeviceInfo.ProcessStatus.Process Parameters
-            if(matchComponent((const char*)paramName,"Device.DeviceInfo.ProcessStatus.Process",&pSetting,instanceNumber))
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIfaceProcess->get_Device_DeviceInfo_ProcessStatus_Process_PID(&msgData,&bChanged);
+            if(bChanged)
             {
-                if(!instanceNumber)
-                {   // Ethernet settings not found in Notify Hash Table
-                    hostIf_DeviceInfo::releaseLock();
-                    continue;
-                }
-                hostIf_DeviceProcess *pIface = hostIf_DeviceProcess::getInstance(instanceNumber);
-                if(pIface)
+                sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.Process.%d.%s",index,"PID");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
-                    if (strcasecmp(pSetting,"PID") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_ProcessStatus_Process_PID(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"Command") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_ProcessStatus_Process_Command(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"Size") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_ProcessStatus_Process_Size(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"Size") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_ProcessStatus_Process_Size(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"Priority") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_ProcessStatus_Process_Priority(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"CPUTime") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_ProcessStatus_Process_CPUTime(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"State") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_ProcessStatus_Process_State(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
             }
-            else if(matchComponent((const char*)paramName,"Device.DeviceInfo.Processor",&pSetting,instanceNumber))
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIfaceProcess->get_Device_DeviceInfo_ProcessStatus_Process_Command(&msgData,&bChanged);
+            if(bChanged)
             {
-                hostIf_DeviceProcessorInterface *pIfaceProcessor = hostIf_DeviceProcessorInterface::getInstance(instanceNumber);
-                if(pIfaceProcessor)
+                sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.Process.%d.%s",index,"Command");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
-                    if (strcasecmp(pSetting,"Architecture") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIfaceProcessor->get_Device_DeviceInfo_Processor_Architecture(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
             }
-            else if(matchComponent((const char*)paramName,"Device.DeviceInfo.ProcessStatus",&pSetting,instanceNumber))
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIfaceProcess->get_Device_DeviceInfo_ProcessStatus_Process_Size(&msgData,&bChanged);
+            if(bChanged)
             {
-                hostIf_DeviceProcessStatusInterface *pIfaceStatus = hostIf_DeviceProcessStatusInterface::getInstance(instanceNumber);
-                if(pIfaceStatus)
+                sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.Process.%d.%s",index,"Size");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
-                    if (strcasecmp(pSetting,"CPUUsage") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIfaceStatus->get_Device_DeviceInfo_ProcessStatus_CPUUsage(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
             }
-            else if(matchComponent((const char*)paramName,"Device.DeviceInfo",&pSetting,instanceNumber))
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIfaceProcess->get_Device_DeviceInfo_ProcessStatus_Process_Priority(&msgData,&bChanged);
+            if(bChanged)
             {
-                hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
-                if(pIface)
+                sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.Process.%d.%s",index,"Priority");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
                 {
-                    if (strcasecmp(pSetting,"Manufacturer") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_Manufacturer(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"ModelName") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_ModelName(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"Description") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_Description(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"ProductClass") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_ProductClass(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"SerialNumber") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_SerialNumber(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"HardwareVersion") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_HardwareVersion(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"SoftwareVersion") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_SoftwareVersion(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"AdditionalSoftwareVersion") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_AdditionalSoftwareVersion(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"ProvisioningCode") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_ProvisioningCode(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"UpTime") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_UpTime(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"FirstUseDate") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_FirstUseDate(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"X_COMCAST-COM_STB_MAC") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"X_COMCAST-COM_STB_IP") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"X_COMCAST-COM_FirmwareFilename") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_X_COMCAST_COM_FirmwareFilename(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"X_COMCAST-COM_Reset") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_X_COMCAST_COM_Reset(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"VendorConfigFileNumberOfEntries") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_VendorConfigFileNumberOfEntries(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"SupportedDataModelNumberOfEntries") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_SupportedDataModelNumberOfEntries(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"VendorLogFileNumberOfEntries") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_VendorLogFileNumberOfEntries(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    if (strcasecmp(pSetting,"VendorLogFileNumberOfEntries") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Device_DeviceInfo_VendorLogFileNumberOfEntries(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
                 }
             }
-
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIfaceProcess->get_Device_DeviceInfo_ProcessStatus_Process_CPUTime(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.Process.%d.%s",index,"CPUTime");
+                if(mUpdateCallback)
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
+            memset(&msgData,0,sizeof(msgData));
+            memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
+            bChanged =  false;
+            msgData.instanceNum=(int)elem->data;
+            pIfaceProcess->get_Device_DeviceInfo_ProcessStatus_Process_State(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(tmp_buff,"Device.DeviceInfo.ProcessStatus.Process.%d.%s",index,"State");
+                if(mUpdateCallback && (g_hash_table_lookup(notifyhash,tmp_buff) > 0))
+                {
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+                }
+            }
         }
     }
+
     hostIf_DeviceInfo::releaseLock();
-#endif /*HAVE_VALUE_CHANGE_EVENT*/
+#endif    /*HAVE_VALUE_CHANGE_EVENT*/
 }
+
 
 
 

@@ -16,10 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-/**
-* @file Device_DHCPv4_Client.cpp
-* @brief This source file contains the APIs of device DHCPv4 client.
-*/
+ /**
+ * @file Device_DHCPv4_Client.cpp
+ * @brief This source file contains the APIs of device DHCPv4 client.
+ */
 #include <net/if.h>
 #include <string.h>
 #include "Device_DHCPv4_Client.h"
@@ -33,7 +33,7 @@
 DHCPv4Client hostIf_DHCPv4Client::dhcpClient = {{'\0'}, {'\0'}, {'\0'}};
 GHashTable *hostIf_DHCPv4Client::dhcpv4ClientHash = NULL;
 GMutex *hostIf_DHCPv4Client::m_mutex = NULL;
-GHashTable* hostIf_DHCPv4Client::m_notifyHash = NULL;
+
 /* Constructor for hostIf_DHCPv4Client*/
 
 /**
@@ -47,7 +47,7 @@ hostIf_DHCPv4Client::hostIf_DHCPv4Client(int dev_id):dev_id(dev_id)
 {
     FILE* cmdOP;
     int len;
-    char buffer[MAX_BUF_LEN]= {'\0'};
+    char buffer[MAX_BUF_LEN]={'\0'};
     bBackUpFlags.interface=0;
     bBackUpFlags.dnsservers=0;
     bBackUpFlags.ipRouters=0;
@@ -67,18 +67,6 @@ void hostIf_DHCPv4Client::getLock()
 void hostIf_DHCPv4Client::releaseLock()
 {
     g_mutex_unlock(m_mutex);
-}
-
-GHashTable* hostIf_DHCPv4Client::getNotifyHash()
-{
-    if(m_notifyHash)
-    {
-        return m_notifyHash;
-    }
-    else
-    {
-        return m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
-    }
 }
 
 hostIf_DHCPv4Client* hostIf_DHCPv4Client::getInstance(int dev_id)
@@ -125,10 +113,6 @@ void hostIf_DHCPv4Client::closeInstance(hostIf_DHCPv4Client *pDev)
     }
 }
 
-hostIf_DHCPv4Client::~hostIf_DHCPv4Client()
-{
-    g_hash_table_destroy(m_notifyHash);
-}
 
 void hostIf_DHCPv4Client::closeAllInstances()
 {
@@ -138,9 +122,9 @@ void hostIf_DHCPv4Client::closeAllInstances()
 
         while(tmp_list)
         {
-            hostIf_DHCPv4Client* pDev = (hostIf_DHCPv4Client *)tmp_list->data;
-            tmp_list = tmp_list->next;
-            closeInstance(pDev);
+           hostIf_DHCPv4Client* pDev = (hostIf_DHCPv4Client *)tmp_list->data;
+           tmp_list = tmp_list->next;
+           closeInstance(pDev);
         }
     }
 }
@@ -248,9 +232,9 @@ int hostIf_DHCPv4Client::get_Device_DHCPv4_Client_IPRouters(HOSTIF_MsgData_t *st
 int hostIf_DHCPv4Client::get_Device_DHCPv4_ClientNumberOfEntries(HOSTIF_MsgData_t *stMsgData)
 {
     int num=1;
-    char cmd[MAX_CMD_LEN]= {'\0'};
+    char cmd[MAX_CMD_LEN]={'\0'};
     FILE* cmdOP=NULL;
-    char buffer[MAX_BUF_LEN]= {'\0'};
+    char buffer[MAX_BUF_LEN]={'\0'};
     int ret=NOK;
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Entering [%s]\n", __FUNCTION__);
     snprintf(cmd,MAX_CMD_LEN -1,"ip r | grep default|wc -l");
@@ -270,8 +254,8 @@ int hostIf_DHCPv4Client::get_Device_DHCPv4_ClientNumberOfEntries(HOSTIF_MsgData_
 
 bool hostIf_DHCPv4Client::isIfnameInroutetoDNSServer(char* dnsServer, char* ifName)
 {
-    char cmd[MAX_CMD_LEN]= {'\0'};
-    char opIfName[8]= {'\0'};
+    char cmd[MAX_CMD_LEN]={'\0'};
+    char opIfName[8]={'\0'};
     FILE* cmdOP;
 
     snprintf(cmd,MAX_CMD_LEN -1, "ip route get %s | grep %s | awk 'BEGIN {FR=\" \"} {printf $5}'", dnsServer, dnsServer);
@@ -293,10 +277,10 @@ int hostIf_DHCPv4Client::get_Device_DHCPv4_Client_Fields(DHCPv4ClientMembers dhc
     FILE* cmdOP;
     int ret=NOK;
     int len;
-    char ifname[IFNAMSIZ]= {'\0'};
-    char buffer[MAX_BUF_LEN]= {'\0'};
-    char dupbuf[MAX_BUF_LEN]= {'\0'};
-    char cmd[MAX_CMD_LEN]= {'\0'};
+    char ifname[IFNAMSIZ]={'\0'};
+    char buffer[MAX_BUF_LEN]={'\0'};
+    char dupbuf[MAX_BUF_LEN]={'\0'};
+    char cmd[MAX_CMD_LEN]={'\0'};
     char *token=NULL;
     char *savePtr=NULL;
     int ipNumOfEntries=0;
@@ -314,81 +298,81 @@ int hostIf_DHCPv4Client::get_Device_DHCPv4_Client_Fields(DHCPv4ClientMembers dhc
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Entering [%s] asking for member %d\n", __FUNCTION__, dhclientMember);
     switch(dhclientMember)
     {
-    case eDHCPv4Interface:
-        /* Get the number of IP interfaces, loop through the objects match the dev_id which matches the ifname and name the interface */
-        hostIf_IP::get_Device_IP_InterfaceNumberOfEntries(&msgData);
-        ipNumOfEntries=get_int(msgData.paramValue);
-        for(index = 1; index<=ipNumOfEntries; index++)
-        {
-            hostIf_IPInterface *pIface = hostIf_IPInterface::getInstance(index);
-            pIface->get_Interface_Name(&msgData);
-            if(strncmp(msgData.paramValue, ifname, strlen(ifname))==0)
+        case eDHCPv4Interface:
+            /* Get the number of IP interfaces, loop through the objects match the dev_id which matches the ifname and name the interface */
+            hostIf_IP::get_Device_IP_InterfaceNumberOfEntries(&msgData);
+            ipNumOfEntries=get_int(msgData.paramValue);
+            for(index = 1; index<=ipNumOfEntries; index++)
             {
-                snprintf(dhcpClient.interface, MAX_IF_LEN - 1, "Device.IP.Interface.%d", index);
-                ret=OK;
-                break;
-            }
-
-        }
-        break;
-    case eDHCPv4Dnsservers:
-        memset(dhcpClient.dnsservers, '\0', sizeof dhcpClient.dnsservers);
-        /* Get the name server from resolv.conf and check if they belong to the interface address*/
-        snprintf(cmd, MAX_CMD_LEN - 1, "cat /etc/resolv.conf  |  grep nameserver | cut -f2 -d' '|awk 'BEGIN { RS=\"\"; FS=\"\\n\"}{ for (i=1; i<=NF; i++)  printf $i\",\" }'");
-        cmdOP=popen(cmd, "r");
-        if (cmdOP)
-        {
-            fgets(buffer, MAX_BUF_LEN, cmdOP);
-            strncpy(dupbuf, buffer, MAX_BUF_LEN - 1);
-            dupbuf[MAX_BUF_LEN-1]='\0';
-            memset(dhcpClient.dnsservers, 0, sizeof(dhcpClient.dnsservers));
-            token=(char *)strtok_r(dupbuf, ",", &savePtr);
-            len=0;
-            /*check if we have a valid token and if the token is a valid IP address*/
-            if(token!=NULL && isValidIPAddr(token))
-            {
-                if((isIfnameInroutetoDNSServer(token, ifname)))
+                hostIf_IPInterface *pIface = hostIf_IPInterface::getInstance(index);
+                pIface->get_Interface_Name(&msgData);
+                if(strncmp(msgData.paramValue, ifname, strlen(ifname))==0)
                 {
-                    snprintf(dhcpClient.dnsservers, sizeof(dhcpClient.dnsservers), "%s,", token);
-                    len=strlen(token)+1;
+                    snprintf(dhcpClient.interface, MAX_IF_LEN - 1, "Device.IP.Interface.%d", index);
+                    ret=OK;
+                    break;
                 }
-                while(token=strtok_r(NULL, ",", &savePtr))
+
+            }
+            break;
+        case eDHCPv4Dnsservers:
+            memset(dhcpClient.dnsservers, '\0', sizeof dhcpClient.dnsservers);
+            /* Get the name server from resolv.conf and check if they belong to the interface address*/
+            snprintf(cmd, MAX_CMD_LEN - 1, "cat /etc/resolv.conf  |  grep nameserver | cut -f2 -d' '|awk 'BEGIN { RS=\"\"; FS=\"\\n\"}{ for (i=1; i<=NF; i++)  printf $i\",\" }'");
+            cmdOP=popen(cmd, "r");
+            if (cmdOP)
+            {
+                fgets(buffer, MAX_BUF_LEN, cmdOP);
+                strncpy(dupbuf, buffer, MAX_BUF_LEN - 1);
+                dupbuf[MAX_BUF_LEN-1]='\0';
+                memset(dhcpClient.dnsservers, 0, sizeof(dhcpClient.dnsservers));
+                token=(char *)strtok_r(dupbuf, ",", &savePtr);
+                len=0;
+                /*check if we have a valid token and if the token is a valid IP address*/
+                if(token!=NULL && isValidIPAddr(token))
                 {
                     if((isIfnameInroutetoDNSServer(token, ifname)))
                     {
-                        snprintf(dhcpClient.dnsservers+len, sizeof(dhcpClient.dnsservers)-len, "%s,", token);
-                        len+=strlen(token)+1;
+                        snprintf(dhcpClient.dnsservers, sizeof(dhcpClient.dnsservers), "%s,", token);
+                        len=strlen(token)+1;
                     }
+                    while(token=strtok_r(NULL, ",", &savePtr))
+                    {
+                        if((isIfnameInroutetoDNSServer(token, ifname)))
+                        {
+                            snprintf(dhcpClient.dnsservers+len, sizeof(dhcpClient.dnsservers)-len, "%s,", token);
+                            len+=strlen(token)+1;
+                        }
+                    }
+                    len=strlen(dhcpClient.dnsservers);
+                    if(len > 0)
+                    {
+                        dhcpClient.dnsservers[len-1]='\0';
+                    }
+                    ret=OK;
                 }
-                len=strlen(dhcpClient.dnsservers);
-                if(len > 0)
+                pclose(cmdOP);
+            }
+            break;
+        case eDHCPv4Iprouters:
+            memset(dhcpClient.ipRouters, '\0', sizeof(dhcpClient.ipRouters));
+            memset(cmd, 0, sizeof cmd);
+            /*Get the default interface name and its gateway. If the interface name matches with the class interface, then fill iprouters */
+            snprintf(cmd, MAX_CMD_LEN - 1 ,"ip r|grep default| grep %s |awk '{printf $3}'",ifname);
+            cmdOP=popen(cmd, "r");
+            if (cmdOP)
+            {
+                fgets(buffer, MAX_BUF_LEN, cmdOP);
+                if(buffer[0]!='\0')
                 {
-                    dhcpClient.dnsservers[len-1]='\0';
+                    snprintf(dhcpClient.ipRouters, sizeof(dhcpClient.ipRouters), "%s",  buffer);
                 }
                 ret=OK;
+                pclose(cmdOP);
             }
-            pclose(cmdOP);
-        }
-        break;
-    case eDHCPv4Iprouters:
-        memset(dhcpClient.ipRouters, '\0', sizeof(dhcpClient.ipRouters));
-        memset(cmd, 0, sizeof cmd);
-        /*Get the default interface name and its gateway. If the interface name matches with the class interface, then fill iprouters */
-        snprintf(cmd, MAX_CMD_LEN - 1 ,"ip r|grep default| grep %s |awk '{printf $3}'",ifname);
-        cmdOP=popen(cmd, "r");
-        if (cmdOP)
-        {
-            fgets(buffer, MAX_BUF_LEN, cmdOP);
-            if(buffer[0]!='\0')
-            {
-                snprintf(dhcpClient.ipRouters, sizeof(dhcpClient.ipRouters), "%s",  buffer);
-            }
-            ret=OK;
-            pclose(cmdOP);
-        }
-        break;
-    default:
-        ret=NOT_HANDLED;
+            break;
+        default:
+            ret=NOT_HANDLED;
     }
     return ret;
 }
@@ -397,7 +381,7 @@ bool hostIf_DHCPv4Client::isValidIPAddr(char* addr)
 {
     int i, count=0;
     int retVal=1;
-    char temp[MAX_IP_LEN]= {0};
+    char temp[MAX_IP_LEN]={0};
     char *tptr, *tptr1, *savePtr;
     int val=0;
     int alpha=0;
@@ -460,9 +444,9 @@ bool hostIf_DHCPv4Client::isValidIPAddr(char* addr)
     } while(0);
     return retVal;
 }
-int hostIf_DHCPv4Client::getInterfaceName(char* ifname) {
-    char cmd[MAX_CMD_LEN]= {'\0'};
-    char opIfName[IFNAMSIZ+1]= {'\0'};
+int hostIf_DHCPv4Client::getInterfaceName(char* ifname){
+    char cmd[MAX_CMD_LEN]={'\0'};
+    char opIfName[IFNAMSIZ+1]={'\0'};
     FILE* cmdOP=NULL;
     int retVal=NOK;
 

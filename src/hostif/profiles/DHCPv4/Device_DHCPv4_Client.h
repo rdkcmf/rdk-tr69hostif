@@ -16,10 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-/**
-* FileName  : Device_DHCPv4_Client.h
-* Purpose   : This class gives details that are required for filling Device.DHCPv4.Client
-*/
+ /**
+ * FileName  : Device_DHCPv4_Client.h
+ * Purpose   : This class gives details that are required for filling Device.DHCPv4.Client
+ */
 
 /**
  * @file Device_DHCPv4_Client.h
@@ -124,7 +124,7 @@ typedef struct DHCPv4Client {
     char interface[MAX_IF_LEN];
     char dnsservers[MAX_DNS_SERVER_LEN];
     char ipRouters[MAX_IP_ROUTER_LEN];
-} DHCPv4Client;
+}DHCPv4Client;
 
 /**
  * @brief These values are the members variables of the DHCPv4ClientParamBackUpFlag structure.
@@ -133,7 +133,7 @@ typedef struct DHCPv4ClientParamBackUpFlag {
     unsigned int interface:1;
     unsigned int dnsservers:1;
     unsigned int ipRouters:1;
-} DHCPv4ClientParamBackUpFlag;
+}DHCPv4ClientParamBackUpFlag;
 
 /**
  * @enum DHCPv4ClientMembers
@@ -143,7 +143,7 @@ typedef enum DHCPv4ClientMembers {
     eDHCPv4Interface,
     eDHCPv4Dnsservers,
     eDHCPv4Iprouters
-} DHCPv4ClientMembers;
+}DHCPv4ClientMembers;
 
 /** @} */ //End of the Doxygen tag TR69_HOSTIF_DHCPv4_CLIENT_DSSTRUCT
 
@@ -155,9 +155,7 @@ class hostIf_DHCPv4Client {
     int dev_id;
     static  GHashTable  *dhcpv4ClientHash;
     static GMutex *m_mutex;
-    static  GHashTable  *m_notifyHash;
     hostIf_DHCPv4Client(int dev_id);
-    ~hostIf_DHCPv4Client();
     static DHCPv4Client dhcpClient;
     DHCPv4Client backupDhcpClient;
     DHCPv4ClientParamBackUpFlag bBackUpFlags;
@@ -165,19 +163,18 @@ class hostIf_DHCPv4Client {
     bool isIfnameInroutetoDNSServer(char* dnsServer, char* ifName);
     bool isValidIPAddr(char* addr);
     int getInterfaceName(char* ifname);
-public:
-    static hostIf_DHCPv4Client* getInstance(int dev_id);
-    static GList* getAllInstances();
-    static void closeInstance(hostIf_DHCPv4Client *pDev);
-    static void closeAllInstances();
-    static int get_Device_DHCPv4_ClientNumberOfEntries(HOSTIF_MsgData_t *stMsgData);
-    int get_Device_DHCPv4_Client_InterfaceReference(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
-    int get_Device_DHCPv4_Client_DnsServer(HOSTIF_MsgData_t *stMsgData,bool* pChanged=NULL);
-    int get_Device_DHCPv4_Client_IPRouters(HOSTIF_MsgData_t *stMsgData,bool* pChanged=NULL);
-    static void getLock();
-    static void releaseLock();
-    static GHashTable* getNotifyHash();
-
+    public:
+        static hostIf_DHCPv4Client* getInstance(int dev_id);
+        static GList* getAllInstances();
+        static void closeInstance(hostIf_DHCPv4Client *pDev);
+        static void closeAllInstances();
+        static int get_Device_DHCPv4_ClientNumberOfEntries(HOSTIF_MsgData_t *stMsgData);
+        int get_Device_DHCPv4_Client_InterfaceReference(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
+        int get_Device_DHCPv4_Client_DnsServer(HOSTIF_MsgData_t *stMsgData,bool* pChanged=NULL);
+        int get_Device_DHCPv4_Client_IPRouters(HOSTIF_MsgData_t *stMsgData,bool* pChanged=NULL);
+        static void getLock();
+        static void releaseLock();
+        
 };
 #endif
 

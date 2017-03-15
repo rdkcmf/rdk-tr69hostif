@@ -29,7 +29,7 @@
 * @{
 **/
 
-//#define HAVE_VALUE_CHANGE_EVENT
+
 #include "hostIf_main.h"
 #include "hostIf_IPClient_ReqHandler.h"
 #include "Device_IP_ActivePort.h"
@@ -295,78 +295,19 @@ int IPClientReqHandler::handleSetMsg (HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 int IPClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
-{
+{       
     int ret = NOT_HANDLED;
-    int instanceNumber = 0;
-
     hostIf_IPInterface::getLock();
-    hostIf_IP *pIface = hostIf_IP::getInstance(instanceNumber);
-    stMsgData->instanceNum = instanceNumber;
-    if(!pIface)
-    {
-        hostIf_IPInterface::releaseLock();
-        return NOK;
-    }
-
-    GHashTable* notifyhash = pIface->getNotifyHash();
-    if(notifyhash != NULL)
-    {
-        int* notifyvalue = (int*) g_hash_table_lookup(notifyhash,stMsgData->paramName);
-        put_int(stMsgData->paramValue, *notifyvalue);
-        stMsgData->paramtype = hostIf_IntegerType;
-        ret = OK;
-    }
-    else
-    {
-        ret = NOK;
-    }
-
+    // TODO: Retrieve notification value from DeviceInfo structure for given parameter
     hostIf_IPInterface::releaseLock();
     return ret;
-}
-
+}       
+            
 int IPClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
-{
+{   
     int ret = NOT_HANDLED;
-    int instanceNumber = 0;
-
     hostIf_IPInterface::getLock();
-    hostIf_IP *pIface = hostIf_IP::getInstance(instanceNumber);
-    stMsgData->instanceNum = instanceNumber;
-    if(!pIface)
-    {
-        hostIf_IPInterface::releaseLock();
-        return NOK;
-    }
-    GHashTable* notifyhash = pIface->getNotifyHash();
-    if(notifyhash != NULL)
-    {
-        int *notifyValuePtr;
-        notifyValuePtr = (int*) malloc(1 * sizeof(int));
-
-        // Inserting Notification parameter to Notify Hash Table,
-        // Note that neither keys nor values are copied when inserted into the GHashTable, so they must exist for the lifetime of the GHashTable
-        // There for allocating a memory for both Param name and param value. This should be freed whenever we disable Notification.
-        char *notifyKey;
-        notifyKey = (char*) malloc(sizeof(char)*strlen(stMsgData->paramName)+1);
-        if(NULL != notifyValuePtr)
-        {
-            *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
-            g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
-            ret = OK;
-        }
-        else
-        {
-            ret = NOK;
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] EthernetClientReqHandler Not able to allocate Notify pointer %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-        }
-    }
-    else
-    {
-        ret = NOK;
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] EthernetClientReqHandler Not able to get notifyhash  %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-    }
+    // TODO: Set notification value from DeviceInfo structure for given parameter
     hostIf_IPInterface::releaseLock();
     return ret;
 }
@@ -381,7 +322,7 @@ void IPClientReqHandler::sendAddRemoveEvents (int newValue, int& savedValue, cha
     {
         sprintf (instancePath, "%s%d.", objectPath, savedValue);
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE %s\n",
-                 __FILE__, __FUNCTION__, __LINE__, instancePath);
+                __FILE__, __FUNCTION__, __LINE__, instancePath);
         mUpdateCallback (IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE, instancePath, NULL, hostIf_IntegerType);
         savedValue--;
 //        sleep(1);
@@ -389,7 +330,7 @@ void IPClientReqHandler::sendAddRemoveEvents (int newValue, int& savedValue, cha
     while (savedValue < newValue)
     {
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] IARM_BUS_TR69HOSTIFMGR_EVENT_ADD %s\n",
-                 __FILE__, __FUNCTION__, __LINE__, objectPath);
+                __FILE__, __FUNCTION__, __LINE__, objectPath);
         mUpdateCallback (IARM_BUS_TR69HOSTIFMGR_EVENT_ADD, objectPath, NULL, hostIf_IntegerType);
         savedValue++;
 //        sleep(1);
@@ -419,7 +360,7 @@ void IPClientReqHandler::checkForUpdates()
     {
         interfaceNumberOfEntries = get_int (msgData.paramValue);
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] interfaceNumberOfEntries = %d, curNumOfIPInterface = %d\n",
-                 __FILE__, __FUNCTION__, __LINE__, interfaceNumberOfEntries, curNumOfIPInterface);
+                __FILE__, __FUNCTION__, __LINE__, interfaceNumberOfEntries, curNumOfIPInterface);
         sprintf (objectPath, "Device.IP.Interface.");
         sendAddRemoveEvents (interfaceNumberOfEntries, curNumOfIPInterface, objectPath, instancePath);
     }
@@ -428,20 +369,20 @@ void IPClientReqHandler::checkForUpdates()
     {
         int ipv4AddressNumberOfEntries = hostIf_IPInterface::getInstance (i)->getIPv4AddressNumberOfEntries ();
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] ipv4AddressNumberOfEntries = %d, curNumOfInterfaceIPv4Addresses[%d] = %d\n",
-                 __FILE__, __FUNCTION__, __LINE__, ipv4AddressNumberOfEntries, i, curNumOfInterfaceIPv4Addresses[i]);
+                __FILE__, __FUNCTION__, __LINE__, ipv4AddressNumberOfEntries, i, curNumOfInterfaceIPv4Addresses[i]);
         sprintf (objectPath, "Device.IP.Interface.%d.IPv4Address.", i);
         sendAddRemoveEvents (ipv4AddressNumberOfEntries, curNumOfInterfaceIPv4Addresses[i], objectPath, instancePath);
 
 #ifdef IPV6_SUPPORT
         int ipv6AddressNumberOfEntries = hostIf_IPInterface::getInstance (i)->getIPv6AddressNumberOfEntries ();
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] ipv6AddressNumberOfEntries = %d, curNumOfInterfaceIPv6Addresses[%d] = %d\n",
-                 __FILE__, __FUNCTION__, __LINE__, ipv6AddressNumberOfEntries, i, curNumOfInterfaceIPv6Addresses[i]);
+                __FILE__, __FUNCTION__, __LINE__, ipv6AddressNumberOfEntries, i, curNumOfInterfaceIPv6Addresses[i]);
         sprintf (objectPath, "Device.IP.Interface.%d.IPv6Address.", i);
         sendAddRemoveEvents (ipv6AddressNumberOfEntries, curNumOfInterfaceIPv6Addresses[i], objectPath, instancePath);
 
         int ipv6PrefixNumberOfEntries = hostIf_IPInterface::getInstance (i)->getIPv6PrefixNumberOfEntries ();
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] ipv6PrefixNumberOfEntries = %d, curNumOfInterfaceIPv6Prefixes[%d] = %d\n",
-                 __FILE__, __FUNCTION__, __LINE__, ipv6PrefixNumberOfEntries, i, curNumOfInterfaceIPv6Prefixes[i]);
+                __FILE__, __FUNCTION__, __LINE__, ipv6PrefixNumberOfEntries, i, curNumOfInterfaceIPv6Prefixes[i]);
         sprintf (objectPath, "Device.IP.Interface.%d.IPv6Prefix.", i);
         sendAddRemoveEvents (ipv6PrefixNumberOfEntries, curNumOfInterfaceIPv6Prefixes[i], objectPath, instancePath);
 
@@ -471,722 +412,462 @@ void IPClientReqHandler::checkForUpdates()
 
 #ifdef HAVE_VALUE_CHANGE_EVENT
     hostIf_IPInterface::getLock();
-    int instanceNumber = 0;
-    GHashTable* notifyhash;
+    GList *devList = hostIf_IPInterface::getAllInstances();
 
-
-    //Get Notify Hash from device Info
-    hostIf_IP *dIface = hostIf_IP::getInstance(instanceNumber);
-    if(NULL != dIface)
+    for(elem = devList; elem; elem = elem->next,index++)
     {
-        notifyhash = dIface->getNotifyHash();
-    }
-    else
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Unable to get Device IP Instance\n", __FUNCTION__, __FILE__);
-    }
+        hostIf_IPInterface *pIface = hostIf_IPInterface::getInstance((int)elem->data);
 
-    // Iterate through Ghash Table
-    if(NULL != notifyhash)
-    {
-        GHashTableIter notifyHashIterator;
-        gpointer paramName;
-        gpointer notifyEnable;
-        bool  bChanged;
-        const char *pSetting;
-        int instanceNumber;
-        const char *positionAfterSubInstanceNumber = 0;
-        const char *positionAfterInstanceNumber = 0;
-        int subInstanceNumber;
-
-        g_hash_table_iter_init (&notifyHashIterator, notifyhash);
-        while (g_hash_table_iter_next (&notifyHashIterator, &paramName, &notifyEnable))
+        if(pIface)
         {
-            int* isNotifyEnabled = (int *)notifyEnable;
-            instanceNumber = 0;
-            if(matchComponent((const char*)paramName,"Device.IP.Interface",&pSetting,instanceNumber))
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_Enable(&msgData,&bChanged);
+            if(bChanged)
             {
-                if(!instanceNumber)
-                {   // Ethernet settings not found in Notify Hash Table
-                    hostIf_IPInterface::releaseLock();
-                    continue;
-                }
-                hostIf_IPInterface *pIface = hostIf_IPInterface::getInstance(instanceNumber);
-                if(pIface)
-                {
-                    if (strcasecmp(pSetting,"Enable") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_Enable(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"IPv4Enable") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_IPv4Enable(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"IPv6Enable") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_IPv6Enable(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"ULAEnable") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_ULAEnable(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-
-                    else if (strcasecmp(pSetting,"Status") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_Status(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"Alias") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_Alias(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"Name") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_Name(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"LastChange") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_LastChange(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"LowerLayers") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_LowerLayers(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"Router") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_Router(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"Reset") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_Reset(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if(strcasecmp(pSetting,"MaxMTUSize") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_MaxMTUSize(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if(strcasecmp(pSetting,"Type") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_Type(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if(strcasecmp(pSetting,"Loopback") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_Loopback(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if(strcasecmp(pSetting,"AutoIPEnable") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIface->get_Interface_AutoIPEnable(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if(strncasecmp (pSetting, "Stats", strlen ("Stats")) == 0)
-                    {
-                        hostIf_IPInterfaceStats *pIfaceStats = hostIf_IPInterfaceStats::getInstance(instanceNumber);
-                        if(strcasecmp(pSetting,"Stats.BytesSent") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_BytesSent(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.BytesReceived") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_BytesReceived(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.PacketsSent") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_PacketsSent(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.PacketsReceived") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_PacketsReceived(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.ErrorsSent") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_ErrorsSent(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.ErrorsReceived") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_ErrorsReceived(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.UnicastPacketsSent") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_UnicastPacketsSent(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.UnicastPacketsSent") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_UnicastPacketsSent(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.UnicastPacketsReceived") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_UnicastPacketsReceived(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.DiscardPacketsSent") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_DiscardPacketsSent(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.DiscardPacketsReceived") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_DiscardPacketsReceived(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.MulticastPacketsSent") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_MulticastPacketsSent(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.MulticastPacketsReceived") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_MulticastPacketsReceived(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.PacketsSent") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_BroadcastPacketsSent(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.BroadcastPacketsReceived") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_BroadcastPacketsSent(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-                        else if(strcasecmp(pSetting,"Stats.UnknownProtoPacketsReceived") == 0)
-                        {
-                            memset(&msgData,0,sizeof(msgData));
-                            bChanged =  false;
-                            pIfaceStats->get_Device_IP_Interface_Stats_UnknownProtoPacketsReceived(&msgData,&bChanged);
-                            if(bChanged)
-                            {
-                                if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                {
-                                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                }
-                            }
-                        }
-
-                    }
-                    else if(matchComponent(positionAfterInstanceNumber, "IPv4Address", &positionAfterSubInstanceNumber, subInstanceNumber))
-                    {
-                        hostIf_IPv4Address *pIfaceIPv4 = hostIf_IPv4Address::getInstance(instanceNumber);
-                        if(pIfaceIPv4)
-                        {
-                            if(strcasecmp(pSetting,"Enable") == 0)
-                            {
-                                memset(&msgData,0,sizeof(msgData));
-                                bChanged =  false;
-                                pIfaceIPv4->get_IPv4Address_Enable(&msgData,subInstanceNumber,&bChanged);
-                                if(bChanged)
-                                {
-                                    if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                    {
-                                        mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                    }
-                                }
-                                else if(strcasecmp(pSetting,"Status") == 0)
-                                {
-                                    memset(&msgData,0,sizeof(msgData));
-                                    bChanged =  false;
-                                    pIfaceIPv4->get_IPv4Address_Status(&msgData,subInstanceNumber,&bChanged);
-                                    if(bChanged)
-                                    {
-                                        if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                        {
-                                            mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                        }
-                                    }
-                                }
-                                else if(strcasecmp(pSetting,"Alias") == 0)
-                                {
-                                    memset(&msgData,0,sizeof(msgData));
-                                    bChanged =  false;
-                                    pIfaceIPv4->get_IPv4Address_Alias(&msgData,subInstanceNumber,&bChanged);
-                                    if(bChanged)
-                                    {
-                                        if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                        {
-                                            mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                        }
-                                    }
-                                }
-                                else if(strcasecmp(pSetting,"SubnetMask") == 0)
-                                {
-                                    memset(&msgData,0,sizeof(msgData));
-                                    bChanged =  false;
-                                    pIfaceIPv4->get_IPv4Address_SubnetMask(&msgData,subInstanceNumber,&bChanged);
-                                    if(bChanged)
-                                    {
-                                        if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                        {
-                                            mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                        }
-                                    }
-                                }
-                                else if(strcasecmp(pSetting,"AddressingType") == 0)
-                                {
-                                    memset(&msgData,0,sizeof(msgData));
-                                    bChanged =  false;
-                                    pIfaceIPv4->get_IPv4Address_AddressingType(&msgData,subInstanceNumber,&bChanged);
-                                    if(bChanged)
-                                    {
-                                        if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                        {
-                                            mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                        }
-                                    }
-                                }
-                                else if(strcasecmp(pSetting,"IPAddress") == 0)
-                                {
-                                    memset(&msgData,0,sizeof(msgData));
-                                    bChanged =  false;
-                                    pIfaceIPv4->get_IPv4Address_IPAddress(&msgData,subInstanceNumber,&bChanged);
-                                    if(bChanged)
-                                    {
-                                        if(mUpdateCallback && (*isNotifyEnabled == 1))
-                                        {
-                                            mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                                        }
-                                    }
-                                }
-
-                            }
-
-                        }
-                    }
-                    memset(&msgData,0,sizeof(msgData));
-                    if(pIface->get_Interface_IPv4AddressNumberOfEntries(&msgData) == OK)
-                    {
-                        int tmpNoDev = get_int(msgData.paramValue);
-                        char tmp[TR69HOSTIFMGR_MAX_PARAM_LEN] = "";
-                        sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"IPv4AddressNumberOfEntries");
-                        while(curNumOfIPv4Interface[index] > tmpNoDev)
-                        {
-                            sprintf(tmp,"%s.%d.",objectPath,tmpNoDev);
-                            mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE,tmp, NULL, hostIf_IntegerType);
-                            tmpNoDev++;
-                        }
-                        while(curNumOfIPv4Interface[index] < tmpNoDev)
-                        {
-                            sprintf(tmp,"%s.",objectPath);
-                            mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_ADD,tmp, NULL, hostIf_IntegerType);
-                            tmpNoDev--;
-                        }
-                        curNumOfIPv4Interface[index] = get_int(msgData.paramValue);
-                    }
-
-                }
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Enable");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
             }
-            else if(matchComponent((const char*)paramName,"Device.IP.ActivePort",&pSetting,instanceNumber))
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_IPv4Enable(&msgData,&bChanged);
+            if(bChanged)
             {
-                hostIf_IPActivePort *pIfaceActive = hostIf_IPActivePort::getInstance(instanceNumber);
-                if(pIfaceActive)
-                {
-                    if (strcasecmp(pSetting,"LocalIPAddress") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIfaceActive->get_Device_IP_ActivePort_LocalIPAddress(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"LocalPort") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIfaceActive->get_Device_IP_ActivePort_LocalPort(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"RemoteIPAddress") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIfaceActive->get_Device_IP_ActivePort_RemoteIPAddress(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"RemotePort") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIfaceActive->get_Device_IP_ActivePort_RemotePort(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"Status") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIfaceActive->get_Device_IP_ActivePort_Status(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-
-                }
-
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"IPv4Enable");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
             }
-            else if(matchComponent((const char*)paramName,"Device.IP",&pSetting,instanceNumber))
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_IPv6Enable(&msgData,&bChanged);
+            if(bChanged)
             {
-                hostIf_IP *pIPIface = hostIf_IP::getInstance(instanceNumber);
-                if(pIPIface)
-                {
-                    if (strcasecmp(pSetting,"IPv4Capable") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIPIface->get_Device_IP_IPv4Capable(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"IPv4Enable") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIPIface->get_Device_IP_IPv4Enable(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"IPv4Status") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIPIface->get_Device_IP_IPv4Status(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-                    else if (strcasecmp(pSetting,"ULAPrefix") == 0)
-                    {
-                        memset(&msgData,0,sizeof(msgData));
-                        bChanged =  false;
-                        pIPIface->get_Device_IP_ULAPrefix(&msgData,&bChanged);
-                        if(bChanged)
-                        {
-                            if(mUpdateCallback && (*isNotifyEnabled == 1))
-                            {
-                                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
-                            }
-                        }
-                    }
-
-
-                }
-
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"IPv6Enable");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
             }
-
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_ULAEnable(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"ULAEnable");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_Status(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Status");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_Alias(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Alias");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_Name(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Name");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_LastChange(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"LastChange");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_LowerLayers(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"LowerLayers");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_Router(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Router");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_Reset(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Reset");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_MaxMTUSize(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"MaxMTUSize");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_Type(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Type");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_Loopback(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Loopback");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            if(pIface->get_Interface_IPv4AddressNumberOfEntries(&msgData) == OK)
+            {
+                int tmpNoDev = get_int(msgData.paramValue);
+                char tmp[TR69HOSTIFMGR_MAX_PARAM_LEN] = "";
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"IPv4AddressNumberOfEntries");
+                while(curNumOfIPv4Interface[index] > tmpNoDev)
+                {
+                    sprintf(tmp,"%s.%d.",objectPath,tmpNoDev);
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE,tmp, NULL, hostIf_IntegerType);
+                    tmpNoDev++;
+                }
+                while(curNumOfIPv4Interface[index] < tmpNoDev)
+                {
+                    sprintf(tmp,"%s.",objectPath);
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_ADD,tmp, NULL, hostIf_IntegerType);
+                    tmpNoDev--;
+                }
+                curNumOfIPv4Interface[index] = get_int(msgData.paramValue);
+            }
+            // TODO: similarly for IPv6AddressNumberOfEntries
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIface->get_Interface_AutoIPEnable(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"AutoIPEnable");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
         }
     }
 
+    g_list_free(devList);
 
-    /*
-               // TODO: Device.IP.IPv6Enable
-               #ifdef IPV6_SUPPORT
-                           memset(&msgData,0,sizeof(msgData));
-                           bChanged =  false;
-                           pIPIface->get_Device_IP_IPv6Enable(&msgData,&bChanged);
-                           if(bChanged)
-                           {
-                               sprintf(objectPath,"Device.IP.%d.%s",index,"IPv6Enable");
-                               mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
-                           }
-               #endif // IPV6_SUPPORT
-           */
+    devList = hostIf_IPInterfaceStats::getAllInstances();
+
+    for(elem = devList; elem; elem = elem->next,index++)
+    {
+        hostIf_IPInterfaceStats *pIfaceStats = hostIf_IPInterfaceStats::getInstance((int)elem->data);
+        if(pIfaceStats)
+        {
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_BytesSent(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.BytesSent");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_BytesReceived(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.BytesReceived");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_PacketsSent(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.PacketsSent");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_PacketsReceived(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.PacketsReceived");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_ErrorsSent(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.ErrorsSent");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_ErrorsReceived(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.ErrorsReceived");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_UnicastPacketsSent(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.UnicastPacketsSent");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_UnicastPacketsReceived(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.UnicastPacketsReceived");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_DiscardPacketsSent(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.DiscardPacketsSent");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_DiscardPacketsReceived(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.DiscardPacketsReceived");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_MulticastPacketsSent(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.MulticastPacketsSent");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_MulticastPacketsReceived(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.MulticastPacketsReceived");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_BroadcastPacketsSent(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.PacketsSent");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_BroadcastPacketsReceived(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.BroadcastPacketsReceived");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceStats->get_Device_IP_Interface_Stats_UnknownProtoPacketsReceived(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.Interface.%d.%s",index,"Stats.UnknownProtoPacketsReceived");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+        }
+    }
+
+    g_list_free(devList);
+
+    devList = hostIf_IPActivePort::getAllInstances();
+
+    for(elem = devList; elem; elem = elem->next,index++)
+    {
+        hostIf_IPActivePort *pIfaceActive = hostIf_IPActivePort::getInstance((int)elem->data);
+        if(pIfaceActive)
+        {
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceActive->get_Device_IP_ActivePort_LocalIPAddress(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.ActivePort.%d.%s",index,"LocalIPAddress");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceActive->get_Device_IP_ActivePort_LocalPort(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.ActivePort.%d.%s",index,"LocalPort");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceActive->get_Device_IP_ActivePort_RemoteIPAddress(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.ActivePort.%d.%s",index,"RemoteIPAddress");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceActive->get_Device_IP_ActivePort_RemotePort(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.ActivePort.%d.%s",index,"RemotePort");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIfaceActive->get_Device_IP_ActivePort_Status(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.ActivePort.%d.%s",index,"Status");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+        }
+    }
+
+    g_list_free(devList);
+
+    devList = hostIf_IP::getAllInstances();
+
+    for(elem = devList; elem; elem = elem->next,index++)
+    {
+        hostIf_IP *pIPIface = hostIf_IP::getInstance((int)elem->data);
+        if(pIPIface)
+        {
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIPIface->get_Device_IP_IPv4Capable(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.%d.%s",index,"IPv4Capable");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIPIface->get_Device_IP_IPv4Enable(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.%d.%s",index,"IPv4Enable");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+/*
+// TODO: Device.IP.IPv6Enable
+#ifdef IPV6_SUPPORT
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIPIface->get_Device_IP_IPv6Enable(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.%d.%s",index,"IPv6Enable");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+#endif // IPV6_SUPPORT
+*/
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIPIface->get_Device_IP_IPv4Status(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.%d.%s",index,"IPv4Status");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+            memset(&msgData,0,sizeof(msgData));
+            bChanged =  false;
+            pIPIface->get_Device_IP_ULAPrefix(&msgData,&bChanged);
+            if(bChanged)
+            {
+                sprintf(objectPath,"Device.IP.%d.%s",index,"ULAPrefix");
+                mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+            }
+        }
+    }
+
+    g_list_free(devList);
+
+    devList = hostIf_IPv4Address::getAllInstances();
+    for(elem = devList; elem; elem = elem->next,index++)
+    {
+        hostIf_IPv4Address *pIfaceIPv4 = hostIf_IPv4Address::getInstance(int(elem->data));
+        if(pIfaceIPv4)
+        {
+            for(int devNum = 1; devNum <= curNumOfIPInterface; devNum++)
+            {
+                memset(&msgData,0,sizeof(msgData));
+                bChanged = false;
+                pIfaceIPv4->get_IPv4Address_Enable(&msgData,devNum,&bChanged);
+                if(bChanged)
+                {
+                    sprintf(objectPath,"Device.IP.Interface.%d.IPv4Address.%d.%s",index,devNum,"Enable");
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+                }
+                memset(&msgData,0,sizeof(msgData));
+                bChanged = false;
+                pIfaceIPv4->get_IPv4Address_Status(&msgData,devNum,&bChanged);
+                if(bChanged)
+                {
+                    sprintf(objectPath,"Device.IP.Interface.%d.IPv4Address.%d.%s",index,devNum,"Status");
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+                }
+                memset(&msgData,0,sizeof(msgData));
+                bChanged = false;
+                pIfaceIPv4->get_IPv4Address_Alias(&msgData,devNum,&bChanged);
+                if(bChanged)
+                {
+                    sprintf(objectPath,"Device.IP.Interface.%d.IPv4Address.%d.%s",index,devNum,"Alias");
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+                }
+                memset(&msgData,0,sizeof(msgData));
+                bChanged = false;
+                pIfaceIPv4->get_IPv4Address_SubnetMask(&msgData,devNum,&bChanged);
+                if(bChanged)
+                {
+                    sprintf(objectPath,"Device.IP.Interface.%d.IPv4Address.%d.%s",index,devNum,"SubnetMask");
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+                }
+                memset(&msgData,0,sizeof(msgData));
+                bChanged = false;
+                pIfaceIPv4->get_IPv4Address_AddressingType(&msgData,devNum,&bChanged);
+                if(bChanged)
+                {
+                    sprintf(objectPath,"Device.IP.Interface.%d.IPv4Address.%d.%s",index,devNum,"AddressingType");
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+                }
+                memset(&msgData,0,sizeof(msgData));
+                bChanged = false;
+                pIfaceIPv4->get_IPv4Address_IPAddress(&msgData,devNum,&bChanged);
+                if(bChanged)
+                {
+                    sprintf(objectPath,"Device.IP.Interface.%d.IPv4Address.%d.%s",index,devNum,"IPAddress");
+                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,objectPath, msgData.paramValue, msgData.paramtype);
+                }
+            }
+        }
+    }
+
+    g_list_free(devList);
 
     hostIf_IPInterface::releaseLock();
 #endif  /* HAVE_VALUE_CHANGE_EVENT */

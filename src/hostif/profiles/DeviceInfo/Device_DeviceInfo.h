@@ -216,7 +216,7 @@ class hostIf_DeviceInfo {
     char backupHardwareVersion[TR69HOSTIFMGR_MAX_PARAM_LEN];
     char backupDeviceMAC[TR69HOSTIFMGR_MAX_PARAM_LEN];
     char backupAdditionalSoftwareVersion[TR69HOSTIFMGR_MAX_PARAM_LEN];
-
+    
     string getEstbIp();
     bool isRsshactive();
 
@@ -552,7 +552,7 @@ public:
     *
     * @retval OK if it is successful.
     * @retval NOK if not able to fetch from device.
-    */
+    */ 
     int get_xOpsDMMoCALogPeriod(HOSTIF_MsgData_t *);
     /**
      * Helper methods
@@ -599,7 +599,7 @@ public:
     *
     * @retval OK if it is successful.
     * @retval NOK if not able to fetch from device.
-    */
+    */ 
     int set_xOpsDMMoCALogPeriod(HOSTIF_MsgData_t *);
     /**
     * @brief set_xOpsReverseSshTrigger

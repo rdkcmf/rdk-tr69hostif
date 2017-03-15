@@ -28,7 +28,6 @@
 * @defgroup hostif
 * @{
 **/
-
 //#define HAVE_VALUE_CHANGE_EVENT
 
 #include "hostIf_main.h"
@@ -295,7 +294,6 @@ int EthernetClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData
     int ret = NOT_HANDLED;
     int instanceNumber = 0;
 
-    hostIf_EthernetInterface::getLock();
     hostIf_EthernetInterface *pIface = hostIf_EthernetInterface::getInstance(instanceNumber);
     stMsgData->instanceNum = instanceNumber;
     if(!pIface)
@@ -324,7 +322,7 @@ int EthernetClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData
 {
     int ret = NOT_HANDLED;
     int instanceNumber = 0;
-
+    const char *pSetting;
     hostIf_EthernetInterface::getLock();
     hostIf_EthernetInterface *pIface = hostIf_EthernetInterface::getInstance(instanceNumber);
     stMsgData->instanceNum = instanceNumber;
@@ -349,6 +347,7 @@ int EthernetClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData
             *notifyValuePtr = 1;
             strcpy(notifyKey,stMsgData->paramName);
             g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
+            int* notifyvalue = (int*) g_hash_table_lookup(notifyhash,stMsgData->paramName);
             ret = OK;
         }
         else

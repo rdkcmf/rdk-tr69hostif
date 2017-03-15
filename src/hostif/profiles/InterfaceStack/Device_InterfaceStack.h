@@ -163,12 +163,12 @@ typedef enum EDeviceInterfaceStackMembers
 {
     eHigherLayer,
     eLowerLayer
-} EInterfaceStackMembers;
+}EInterfaceStackMembers;
 
 /**
  * @brief It contains the members variables of the LayerInfo_t structure.
  */
-typedef struct
+typedef struct 
 {
     std::string higherLayer;
     std::string lowerLayer;
@@ -190,17 +190,12 @@ class hostif_InterfaceStack {
      */
     static  GHashTable  *stIshash;
 
-    /*
-     * Holds Notification Hash table
+     /*
+     * Contains the details about the bridges and its related bridge interfaces in CPE
+     *
+     * Key is the bridge name
+     * Value is the comma separated bride interfaces
      */
-    static  GHashTable  *m_notifyHash;
-
-    /*
-    * Contains the details about the bridges and its related bridge interfaces in CPE
-    *
-    * Key is the bridge name
-    * Value is the comma separated bride interfaces
-    */
     static  GHashTable  *stBridgeTableHash;
 
     static  GMutex *stMutex;
@@ -215,7 +210,6 @@ class hostif_InterfaceStack {
     char    backupLowerLayer[MAX_LOWERLAYER_LEN];
 
     hostif_InterfaceStack(int dev_id, char *higherLayer, char *lowerLayer);
-    ~hostif_InterfaceStack();
     static int createInstance(int dev_id, char *higherLayer, char *lowerLayer);
     static int populateBridgeTable();
     static void deleteBridgeTable();
@@ -225,7 +219,7 @@ class hostif_InterfaceStack {
 
     template<typename T> static int getLowerInterfaceNumberOfEntries();
     template<typename T> static std::string getInterfaceName(T* pIface);
-    template<typename T> static std::string getLowerLayerName(int index);
+    template<typename T> static std::string getLowerLayerName(int index); 
     template<typename T> static int buildLowerLayerInfo(InterfaceStackMap_t &layerInfo);
     static int buildBridgeTableLayerInfo(InterfaceStackMap_t &layerInfo);
 
@@ -239,17 +233,16 @@ class hostif_InterfaceStack {
     static void fillHigherLayersWithIP(InterfaceStackMap_t &layerInfo, IPInterfacesMap_t& ipInterfaceMap);
     static void print_map(InterfaceStackMap_t &layerInfo);
 
-public:
-    static hostif_InterfaceStack* getInstance(int dev_id);
-    static GList* getAllInstances();
-    static void closeInstance(hostif_InterfaceStack *pDev);
-    static void closeAllInstances();
-    static int get_Device_InterfaceStackNumberOfEntries(HOSTIF_MsgData_t *stMsgData);
-    int get_Device_InterfaceStack_HigherLayer(HOSTIF_MsgData_t *stMsgData,bool *pChanged = false);
-    int get_Device_InterfaceStack_LowerLayer(HOSTIF_MsgData_t *stMsgData,bool* pChanged = false);
-    static void getLock();
-    static void releaseLock();
-    static GHashTable* getNotifyHash();
+    public:
+        static hostif_InterfaceStack* getInstance(int dev_id);
+        static GList* getAllInstances();
+        static void closeInstance(hostif_InterfaceStack *pDev);
+        static void closeAllInstances();
+        static int get_Device_InterfaceStackNumberOfEntries(HOSTIF_MsgData_t *stMsgData);
+        int get_Device_InterfaceStack_HigherLayer(HOSTIF_MsgData_t *stMsgData,bool *pChanged = false);
+        int get_Device_InterfaceStack_LowerLayer(HOSTIF_MsgData_t *stMsgData,bool* pChanged = false);
+        static void getLock();
+        static void releaseLock();
 
 };
 /* End of TR_069_DEVICE_INTERFACESTACK_GETTER_API doxygen group */
