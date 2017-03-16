@@ -33,7 +33,7 @@
 DHCPv4Client hostIf_DHCPv4Client::dhcpClient = {{'\0'}, {'\0'}, {'\0'}};
 GHashTable *hostIf_DHCPv4Client::dhcpv4ClientHash = NULL;
 GMutex *hostIf_DHCPv4Client::m_mutex = NULL;
-
+GHashTable* hostIf_DHCPv4Client::m_notifyHash = NULL;
 /* Constructor for hostIf_DHCPv4Client*/
 
 /**
@@ -67,6 +67,18 @@ void hostIf_DHCPv4Client::getLock()
 void hostIf_DHCPv4Client::releaseLock()
 {
     g_mutex_unlock(m_mutex);
+}
+
+GHashTable* hostIf_DHCPv4Client::getNotifyHash()
+{
+    if(m_notifyHash)
+    {
+        return m_notifyHash;
+    }
+    else
+    {
+        return m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
+    }
 }
 
 hostIf_DHCPv4Client* hostIf_DHCPv4Client::getInstance(int dev_id)
@@ -113,6 +125,13 @@ void hostIf_DHCPv4Client::closeInstance(hostIf_DHCPv4Client *pDev)
     }
 }
 
+hostIf_DHCPv4Client::~hostIf_DHCPv4Client()
+{
+    if(m_notifyHash)
+    {
+        g_hash_table_destroy(m_notifyHash);
+    }
+}
 
 void hostIf_DHCPv4Client::closeAllInstances()
 {

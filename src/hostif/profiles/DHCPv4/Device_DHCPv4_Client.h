@@ -155,7 +155,9 @@ class hostIf_DHCPv4Client {
     int dev_id;
     static  GHashTable  *dhcpv4ClientHash;
     static GMutex *m_mutex;
+    static  GHashTable  *m_notifyHash;
     hostIf_DHCPv4Client(int dev_id);
+    ~hostIf_DHCPv4Client();
     static DHCPv4Client dhcpClient;
     DHCPv4Client backupDhcpClient;
     DHCPv4ClientParamBackUpFlag bBackUpFlags;
@@ -174,6 +176,7 @@ class hostIf_DHCPv4Client {
         int get_Device_DHCPv4_Client_IPRouters(HOSTIF_MsgData_t *stMsgData,bool* pChanged=NULL);
         static void getLock();
         static void releaseLock();
+        static GHashTable* getNotifyHash();
         
 };
 #endif

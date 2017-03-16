@@ -142,12 +142,13 @@ hostIf_DeviceInfo::hostIf_DeviceInfo(int dev_id):
     memset(backupDeviceMAC , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupX_COMCAST_COM_STB_IP , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupX_COMCAST_COM_FirmwareFilename , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    //Create m_notifyHash
-    m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
 }
 hostIf_DeviceInfo::~hostIf_DeviceInfo()
 {
-	g_hash_table_destroy(m_notifyHash);
+    if(m_notifyHash)
+    {
+        g_hash_table_destroy(m_notifyHash);
+    }
 }
 
 hostIf_DeviceInfo* hostIf_DeviceInfo::getInstance(int dev_id)
@@ -221,12 +222,16 @@ void hostIf_DeviceInfo::releaseLock()
     g_mutex_unlock(m_mutex);
 }
 
-GHashTable* hostIf_DeviceInfo::getNotifyHash()
+GHashTable*  hostIf_DeviceInfo::getNotifyHash()
 {
-	if(m_notifyHash)
-		return m_notifyHash;
-	else
-		return NULL;
+    if(m_notifyHash)
+    {
+        return m_notifyHash;
+    }
+    else
+    {
+        return m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
+    }
 }
 /**
  * @brief This function provides the Identifier of the particular device that is

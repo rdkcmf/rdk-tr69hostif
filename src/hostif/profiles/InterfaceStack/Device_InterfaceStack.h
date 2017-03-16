@@ -190,12 +190,17 @@ class hostif_InterfaceStack {
      */
     static  GHashTable  *stIshash;
 
-     /*
-     * Contains the details about the bridges and its related bridge interfaces in CPE
-     *
-     * Key is the bridge name
-     * Value is the comma separated bride interfaces
+    /*
+     * Holds Notification Hash table
      */
+    static  GHashTable  *m_notifyHash;
+
+    /*
+    * Contains the details about the bridges and its related bridge interfaces in CPE
+    *
+    * Key is the bridge name
+    * Value is the comma separated bride interfaces
+    */
     static  GHashTable  *stBridgeTableHash;
 
     static  GMutex *stMutex;
@@ -210,6 +215,7 @@ class hostif_InterfaceStack {
     char    backupLowerLayer[MAX_LOWERLAYER_LEN];
 
     hostif_InterfaceStack(int dev_id, char *higherLayer, char *lowerLayer);
+    ~hostif_InterfaceStack();
     static int createInstance(int dev_id, char *higherLayer, char *lowerLayer);
     static int populateBridgeTable();
     static void deleteBridgeTable();
@@ -243,6 +249,7 @@ class hostif_InterfaceStack {
         int get_Device_InterfaceStack_LowerLayer(HOSTIF_MsgData_t *stMsgData,bool* pChanged = NULL);
         static void getLock();
         static void releaseLock();
+        static GHashTable* getNotifyHash();
 
 };
 /* End of TR_069_DEVICE_INTERFACESTACK_GETTER_API doxygen group */

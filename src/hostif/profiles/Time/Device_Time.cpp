@@ -52,6 +52,8 @@
 
 GHashTable* hostIf_Time::ifHash = NULL;
 GMutex* hostIf_Time::m_mutex = NULL;
+GHashTable* hostIf_Time::m_notifyHash = NULL;
+
 /****************************************************************************************************************************************************/
 // Device.DeviceInfo Profile. Getters:
 /****************************************************************************************************************************************************/
@@ -133,6 +135,26 @@ void hostIf_Time::getLock()
 void hostIf_Time::releaseLock()
 {
     g_mutex_unlock(m_mutex);
+}
+
+GHashTable* hostIf_Time::getNotifyHash()
+{
+    if(m_notifyHash)
+    {
+        return m_notifyHash;
+    }
+    else
+    {
+        return m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
+    }
+}
+
+hostIf_Time::~hostIf_Time()
+{
+    if(m_notifyHash)
+    {
+        g_hash_table_destroy(m_notifyHash);
+    }
 }
 
 int hostIf_Time::get_Device_Time_LocalTimeZone(HOSTIF_MsgData_t *stMsgData, bool *pChanged )

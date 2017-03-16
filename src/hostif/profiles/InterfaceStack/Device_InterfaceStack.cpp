@@ -78,6 +78,7 @@
 GHashTable* hostif_InterfaceStack::stIshash = NULL;
 GHashTable* hostif_InterfaceStack::stBridgeTableHash = NULL;
 GMutex* hostif_InterfaceStack::stMutex = NULL;
+GHashTable* hostif_InterfaceStack::m_notifyHash = NULL;
 
 /*
  * hostif_InterfaceStack Constructor
@@ -255,6 +256,26 @@ void hostif_InterfaceStack::getLock()
 void hostif_InterfaceStack::releaseLock()
 {
     g_mutex_unlock(stMutex);
+}
+
+GHashTable* hostif_InterfaceStack::getNotifyHash()
+{
+    if(m_notifyHash)
+    {
+        return m_notifyHash;
+    }
+    else
+    {
+        return m_notifyHash = g_hash_table_new(g_str_hash, g_str_equal);
+    }
+}
+
+hostif_InterfaceStack::~hostif_InterfaceStack()
+{
+    if(m_notifyHash)
+    {
+        g_hash_table_destroy(m_notifyHash);
+    }
 }
 
 hostif_InterfaceStack* hostif_InterfaceStack::getInstance(int dev_id)

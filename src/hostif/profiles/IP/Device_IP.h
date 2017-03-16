@@ -216,11 +216,13 @@ class hostIf_IP {
 
     static char* cmd_NumOfActivePorts;
 
+    static  GHashTable  *m_notifyHash;
+
     int dev_id;
 
     hostIf_IP(int dev_id);
 
-    ~hostIf_IP() {};
+    ~hostIf_IP();
 
     bool bCalledIPv4Capable;
     bool bCalledIPv4Enable;
@@ -258,6 +260,8 @@ public:
     static unsigned int getNumOfActivePorts(void);
 
     static int get_Device_IP_Fields(EIPMembers ipMem);
+
+    static GHashTable* getNotifyHash();
 
 
     int handleGetMsg (HOSTIF_MsgData_t* stMsgData);

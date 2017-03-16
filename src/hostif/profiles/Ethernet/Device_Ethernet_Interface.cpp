@@ -184,7 +184,10 @@ hostIf_EthernetInterface::hostIf_EthernetInterface(int dev_id):
 
 hostIf_EthernetInterface::~hostIf_EthernetInterface()
 {
-	g_hash_table_destroy(m_notifyHash);
+    if(m_notifyHash)
+    {
+        g_hash_table_destroy(m_notifyHash);
+    }
 }
 
 static int getEthernetInterfaceName (unsigned int ethInterfaceNum, char* name)
