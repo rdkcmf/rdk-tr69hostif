@@ -237,7 +237,10 @@ int main(int argc, char *argv[])
     retVal = GetFeatureEnabled(". /lib/rdk/isFeatureEnabled.sh WEBPAXG");
     RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] WEBPAXG returns %d\n", __FUNCTION__, retVal);
     if( retVal == 0)
+    {
+        system("systemctl stop tr69hostif.service");
         return ch;
+    }
 #endif
 
     if (sem_init(&shutdown_thread_sem, 0, 0) == -1)
