@@ -577,7 +577,7 @@ void DeviceClientReqHandler::checkForUpdates()
     int index = 1;
     const char *pSetting;
     int instanceNumber = 0;
-    GHashTable* notifyhash;
+    GHashTable* notifyhash = NULL;
     char tmp_buff[TR69HOSTIFMGR_MAX_PARAM_LEN];
 
     // Update ADD/REMOVE Events

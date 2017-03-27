@@ -246,7 +246,7 @@ void InterfaceStackClientReqHandler::checkForUpdates()
     GList *elem;
     int index = 1;
     int instanceNumber;
-    GHashTable* notifyhash;
+    GHashTable* notifyhash = NULL;
     const char *pSetting;
 
     char tmp_buff[TR69HOSTIFMGR_MAX_PARAM_LEN];
@@ -295,7 +295,7 @@ void InterfaceStackClientReqHandler::checkForUpdates()
     }
     // Iterate through Ghash Table
     if(NULL != notifyhash)
-    {
+    { 
         GHashTableIter notifyHashIterator;
         gpointer paramName;
         gpointer notifyEnable;

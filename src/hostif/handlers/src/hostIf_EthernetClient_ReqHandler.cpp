@@ -28,6 +28,7 @@
 * @defgroup hostif
 * @{
 **/
+
 //#define HAVE_VALUE_CHANGE_EVENT
 
 #include "hostIf_main.h"
@@ -374,7 +375,7 @@ void EthernetClientReqHandler::checkForUpdates()
 {
     const char *pSetting;
     int instanceNumber = 0;
-    GHashTable* notifyhash;
+    GHashTable* notifyhash = NULL;
 
     HOSTIF_MsgData_t msgData;
     int index = 1;
@@ -404,7 +405,6 @@ void EthernetClientReqHandler::checkForUpdates()
     }
 
 #ifdef HAVE_VALUE_CHANGE_EVENT
-
     //Get Notify Hash from device Info
     hostIf_EthernetInterface *dIface = hostIf_EthernetInterface::getInstance(instanceNumber);
     if(NULL != dIface)

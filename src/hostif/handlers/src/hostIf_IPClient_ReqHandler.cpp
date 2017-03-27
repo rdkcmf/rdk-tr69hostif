@@ -470,9 +470,10 @@ void IPClientReqHandler::checkForUpdates()
 #endif /*HAVE_ADD_REMOVE_EVENT */
 
 #ifdef HAVE_VALUE_CHANGE_EVENT
+
     hostIf_IPInterface::getLock();
     int instanceNumber = 0;
-    GHashTable* notifyhash;
+    GHashTable* notifyhash = NULL;
 
 
     //Get Notify Hash from device Info

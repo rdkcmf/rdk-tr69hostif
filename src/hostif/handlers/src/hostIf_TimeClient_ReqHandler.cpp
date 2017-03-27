@@ -262,7 +262,7 @@ void TimeClientReqHandler::checkForUpdates()
     HOSTIF_MsgData_t msgData;
     bool bChanged;
     int instanceNumber;
-    GHashTable* notifyhash;
+    GHashTable* notifyhash = NULL;
 
     hostIf_Time::getLock();
 

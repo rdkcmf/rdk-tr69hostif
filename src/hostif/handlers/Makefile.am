@@ -72,6 +72,7 @@ AM_CXXFLAGS += -DBTMGR_ENABLE_IARM_INTERFACE
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/profiles/DeviceInfo
 endif
 
+
 AM_LDFLAGS = $(GLIB_LIBS) $(G_THREAD_LIBS) $(SOUP_LIBS) -lproc-3.2.8 -lIARMBus -lyajl -ldirect -lfusion -lds -ldshalcli -ldbus-1
 
 noinst_LTLIBRARIES = libMsgHandlers.la
@@ -102,4 +103,8 @@ endif
 
 if WITH_IPV6_SUPPORT
 AM_CXXFLAGS += $(IPV6_SUPPORT_FLAG)
+endif
+
+if WITH_NOTIFICATION_SUPPORT
+AM_CXXFLAGS += $(HAVE_VALUE_CHANGE_EVENT_FLAG)
 endif

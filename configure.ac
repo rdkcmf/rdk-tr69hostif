@@ -45,7 +45,7 @@ STORAGESERVICE_PROFILE_FLAG=" "
 INTFSTACK_PROFILE_FLAG=" "
 XRDK_RF4CE_PROFILE_FLAG=" "
 XRDK_BT_PROFILE_FLAG=" "
-
+HAVE_VALUE_CHANGE_EVENT_FLAG=" "
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
 [AM_DEFAULT_VERBOSITY=1
 AC_SUBST(AM_DEFAULT_VERBOSITY)]) 
@@ -177,6 +177,20 @@ AC_ARG_ENABLE([IPv6],
            ],
          [echo "IPv6 support is disabled"])
 
+
+AC_ARG_ENABLE([notification],
+        AS_HELP_STRING([--enable-notification],[enable notification support support for all profiles (default is no)]),
+        [
+          case "${enableval}" in
+           yes) HAVE_VALUE_CHANGE_EVENT_ENABLE=true
+                HAVE_VALUE_CHANGE_EVENT_FLAG="-DHAVE_VALUE_CHANGE_EVENT" ;;
+           no) HAVE_VALUE_CHANGE_EVENT_ENABLE=false AC_MSG_ERROR([Notification support is disabled]) ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-notification ]) ;;
+           esac
+           ],
+         [echo "Notification support is disabled"])
+
+
 AC_ARG_ENABLE([rf4ce],
         AS_HELP_STRING([--enable-rf4ce],[enable X_RDKCENTRAL_COM RF4CE profile (default is no)]),
         [
@@ -225,6 +239,7 @@ AM_CONDITIONAL([WITH_IPV6_SUPPORT], [test x$IPV6_SUPPORT_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_XRDK_RF4CE_PROFILE], [test x$XRDK_RF4CE_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_XRDK_BT_PROFILE], [test x$XRDK_BT_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_WEBPA_RFC], [test x$WEBPA_RFC_ENABLE = xtrue])
+AM_CONDITIONAL([WITH_NOTIFICATION_SUPPORT], [test x$HAVE_VALUE_CHANGE_EVENT_ENABLE = xtrue])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -265,6 +280,7 @@ AC_SUBST(INTFSTACK_PROFILE_FLAG)
 AC_SUBST(XRDK_RF4CE_PROFILE_FLAG)
 AC_SUBST(XRDK_BT_PROFILE_FLAG)
 AC_SUBST(IPV6_SUPPORT_FLAG)
+AC_SUBST(HAVE_VALUE_CHANGE_EVENT_FLAG)
 
 # files to generate via autotools (.am or .in source files)
 AC_CONFIG_FILES([Makefile])

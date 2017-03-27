@@ -251,8 +251,8 @@ void DHCPv4ClientReqHandler::checkForUpdates()
     int index = 1;
     char tmp_buff[TR69HOSTIFMGR_MAX_PARAM_LEN];
     hostIf_DHCPv4Client::getLock();
-    int instanceNumber;
-    GHashTable* notifyhash;
+    int instanceNumber = 0;
+    GHashTable* notifyhash = NULL;
 
     memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
