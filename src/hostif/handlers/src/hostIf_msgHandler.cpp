@@ -56,6 +56,9 @@
 #ifdef USE_INTFSTACK_PROFILE
 #include "hostIf_InterfaceStackClient_ReqHandler.h"
 #endif /* USE_INTFSTACK_PROFILE */
+#ifdef SNMP_ADAPTER_ENABLED
+#include "hostIf_SNMPClient_ReqHandler.h"
+#endif
 
 
 extern GHashTable* paramMgrhash;
@@ -269,6 +272,12 @@ bool hostIf_initalize_ConfigManger()
                 mgrName = HOSTIF_StorageSrvcMgr;
             }
 #endif /* USE_STORAGESERVICE_PROFILE */
+#ifdef SNMP_ADAPTER_ENABLED
+            else if(strcasecmp(mgr, "snmpAdapterMgr") == 0)
+            {
+                mgrName = HOSTIF_SNMPAdapterMgr;
+            }
+#endif
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"param: %s \tMgr: [%s => %d]\n", param, mgr, mgrName);
             g_hash_table_insert(paramMgrhash, (gpointer)g_strdup(param), (gpointer)mgrName);
         }
@@ -354,6 +363,11 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
                 pRet = StorageSrvcReqHandler::getInstance();
                 break;
 #endif /* USE_STORAGESERVICE_PROFILE */
+#ifdef SNMP_ADAPTER_ENABLED
+            case HOSTIF_SNMPAdapterMgr:
+                pRet = SNMPClientReqHandler::getInstance();
+                break;
+#endif
             default:
                 ;
             }
@@ -463,7 +477,13 @@ bool hostIf_ConfigProperties_Init()
                             mgrName = HOSTIF_StorageSrvcMgr;
                         }
 #endif /* USE_STORAGESERVICE_PROFILE */
-					RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"param: %s \tMgr: [%s => %d]\n", keys[key], value, mgrName);
+#ifdef SNMP_ADAPTER_ENABLED
+                        else if(strcasecmp(value, "snmpAdapterMgr") == 0)
+                        {
+                            mgrName = HOSTIF_SNMPAdapterMgr;
+                        }
+#endif
+                        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"param: %s \tMgr: [%s => %d]\n", keys[key], value, mgrName);
                         g_hash_table_insert(paramMgrhash, (gpointer)g_strdup(keys[key]), (gpointer)mgrName);
 
                         g_free(value);

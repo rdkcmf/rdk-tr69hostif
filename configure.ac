@@ -46,6 +46,8 @@ INTFSTACK_PROFILE_FLAG=" "
 XRDK_RF4CE_PROFILE_FLAG=" "
 XRDK_BT_PROFILE_FLAG=" "
 HAVE_VALUE_CHANGE_EVENT_FLAG=" "
+SNMP_ADAPTER_FLAG=" "
+
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
 [AM_DEFAULT_VERBOSITY=1
 AC_SUBST(AM_DEFAULT_VERBOSITY)]) 
@@ -227,6 +229,20 @@ AC_ARG_ENABLE([webpaRFC],
            ],
          [echo "WEBPA_RFC is disabled"])
 
+AC_ARG_ENABLE([snmpAdapter],
+        AS_HELP_STRING([--enable-snmpAdapter],[enable SNMP_ADAPTER (default is no)]),
+        [
+          case "${enableval}" in
+           yes) SNMP_ADAPTER_ENABLE=true
+                SNMP_ADAPTER_FLAG="-DSNMP_ADAPTER_ENABLED"
+                m4_syscmd([test -d src/hostif/snmpAdapter])
+                m4_if(m4_sysval,[0],[AC_CONFIG_FILES([src/hostif/snmpAdapter/Makefile])])
+                m4_if(m4_sysval,[0],[SUBDIRS_SNMPADAPTER="src/hostif/snmpAdapter"])  ;;
+           no) SNMP_ADAPTER_ENABLE=false AC_MSG_ERROR([SNMP_ADAPTER is disabled]) ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-snmpAdapter ]) ;;
+           esac
+           ],
+         [echo "SNMP_ADAPTER profile is disabled"])
 
 AM_CONDITIONAL([WITH_MOCA_PROFILE], [test "x$enable_moca" = "xyes"])
 AM_CONDITIONAL([WITH_MOCA20], [test "x$enable_moca2" = "xyes"])
@@ -240,6 +256,7 @@ AM_CONDITIONAL([WITH_XRDK_RF4CE_PROFILE], [test x$XRDK_RF4CE_PROFILE_ENABLE = xt
 AM_CONDITIONAL([WITH_XRDK_BT_PROFILE], [test x$XRDK_BT_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_WEBPA_RFC], [test x$WEBPA_RFC_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_NOTIFICATION_SUPPORT], [test x$HAVE_VALUE_CHANGE_EVENT_ENABLE = xtrue])
+AM_CONDITIONAL([WITH_SNMP_ADAPTER], [test x$SNMP_ADAPTER_ENABLE = xtrue])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -281,6 +298,7 @@ AC_SUBST(XRDK_RF4CE_PROFILE_FLAG)
 AC_SUBST(XRDK_BT_PROFILE_FLAG)
 AC_SUBST(IPV6_SUPPORT_FLAG)
 AC_SUBST(HAVE_VALUE_CHANGE_EVENT_FLAG)
+AC_SUBST(SNMP_ADAPTER_FLAG)
 
 # files to generate via autotools (.am or .in source files)
 AC_CONFIG_FILES([Makefile])

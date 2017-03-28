@@ -44,6 +44,9 @@
 #include "btmgr_iarm_interface.h"
 #include "XrdkBlueTooth.h"
 #endif
+#ifdef SNMP_ADAPTER_ENABLED
+#include "hostIf_SNMPClient_ReqHandler.h"
+#endif
 
 static bool TR69_HostIf_Mgr_Init();
 static bool TR69_HostIf_Mgr_Connect();
@@ -79,6 +82,10 @@ bool hostIf_IARM_IF_Start()
         pMsgHandler = DeviceClientReqHandler::getInstance();
         pMsgHandler->init();
 
+#ifdef SNMP_ADAPTER_ENABLED
+        pMsgHandler = SNMPClientReqHandler::getInstance();
+        pMsgHandler->init();
+#endif
     }
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);

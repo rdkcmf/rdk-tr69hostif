@@ -107,6 +107,9 @@ typedef enum _HostIf_ParamMgr
     HOSTIF_DHCPv4,
     HOSTIF_InterfaceStack,
     HOSTIF_StorageSrvcMgr
+#ifdef SNMP_ADAPTER_ENABLED
+    , HOSTIF_SNMPAdapterMgr
+#endif
 } HostIf_ParamMgr_t;
 
 

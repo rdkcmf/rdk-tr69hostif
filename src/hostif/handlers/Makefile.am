@@ -72,6 +72,9 @@ AM_CXXFLAGS += -DBTMGR_ENABLE_IARM_INTERFACE
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/profiles/DeviceInfo
 endif
 
+if WITH_SNMP_ADAPTER
+AM_CXXFLAGS += -DSNMP_ADAPTER_ENABLED -I$(top_srcdir)/src/hostif/snmpAdapter
+endif
 
 AM_LDFLAGS = $(GLIB_LIBS) $(G_THREAD_LIBS) $(SOUP_LIBS) -lproc-3.2.8 -lIARMBus -lyajl -ldirect -lfusion -lds -ldshalcli -ldbus-1
 
@@ -99,6 +102,10 @@ endif
 
 if WITH_STORAGESERVICE_PROFILE
 libMsgHandlers_la_SOURCES +=     src/hostIf_StorageService_ReqHandler.cpp
+endif
+
+if WITH_SNMP_ADAPTER
+libMsgHandlers_la_SOURCES +=     src/hostIf_SNMPClient_ReqHandler.cpp
 endif
 
 if WITH_IPV6_SUPPORT

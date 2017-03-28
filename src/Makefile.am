@@ -20,6 +20,10 @@
 
 SUBDIRS = hostif/profiles hostif/handlers
 DIST_SUBDIRS = hostif/profiles hostif/handlers
+if WITH_SNMP_ADAPTER
+SUBDIRS += hostif/snmpAdapter
+DIST_SUBDIRS += hostif/snmpAdapter
+endif
 
 AM_CXXFLAGS = $(GLIB_CFLAGS) $(GTHREAD_CFLAGS) \
 	$(SOUP_CFLAGS) $(DIRECTFB_CFLAGS) \
@@ -58,6 +62,11 @@ endif
 
 if WITH_WEBPA_RFC
 AM_CXXFLAGS += -DWEBPA_RFC_ENABLED
+endif
+
+if WITH_SNMP_ADAPTER
+AM_CXXFLAGS += -DSNMP_ADAPTER_ENABLED
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/snmpAdapter
 endif
 
 if XRELIB_FLAG
@@ -117,4 +126,8 @@ endif
 
 if WITH_WIFI_PROFILE
 tr69hostif_LDADD += $(top_builddir)/soc/hostif/profiles/wifi/libhostIfWiFi.la
+endif
+
+if WITH_SNMP_ADAPTER
+tr69hostif_LDADD += $(top_builddir)/src/hostif/snmpAdapter/libSNMPAdapter.la
 endif
