@@ -297,5 +297,34 @@ int read_command_output (char* cmd, char* resultBuff, int length)
     return OK;
 }
 
+/**
+ * @brief This function reads the complete output(upto 1k bytes) as string and return to caller.
+ * It returns output with new line character \n if the console output has new line.
+ */
+int GetStdoutFromCommand(char *cmd, string &consoleString)
+{
+    FILE * stream;
+    char buffer[BUFF_LENGTH_1024];
+
+    memset(buffer, 0, sizeof(buffer));
+    consoleString.clear();
+    stream = popen(cmd, "r");
+    if (stream == NULL) {
+        return -1;
+    }
+    else
+    {
+        while (!feof(stream))
+        {
+            if (fgets(buffer, BUFF_LENGTH_1024, stream) != NULL)
+            {
+                consoleString.append(buffer);
+            }
+        }
+        pclose(stream);
+    }
+    return 0;
+}
+
 /** @} */
 /** @} */

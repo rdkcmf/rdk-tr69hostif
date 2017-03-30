@@ -133,6 +133,7 @@ bool get_GatewayConnStatus();
 char* getenvOrDefault (const char* name, char* defaultValue);
 
 int read_command_output (char* cmd, char* resultBuff, int length);
+int GetStdoutFromCommand(char *cmd, string &consoleString);
 
 #endif /* HOSTIF_UTILS_H_*/
 

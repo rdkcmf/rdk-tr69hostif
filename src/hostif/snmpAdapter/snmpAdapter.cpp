@@ -223,6 +223,7 @@ int hostIf_snmpAdapter::get_ValueFromSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
     char resultBuff[BUFF_LENGTH_256] = { 0 };
     char delimeter[] = " \t\n\r\f\v";
     map<string,string>::iterator it;
+    string consoleString("");
 
     if(stMsgData)
     {
@@ -235,15 +236,13 @@ int hostIf_snmpAdapter::get_ValueFromSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
                 it->second.c_str());
 
             RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] %s\n", __FUNCTION__, cmd);
-            ret = read_command_output (cmd, resultBuff, BUFF_LENGTH_256);
+            ret = GetStdoutFromCommand( cmd, consoleString);
             if (ret == OK)
             {
-                resultBuff[BUFF_LENGTH_256]='\0';
-                string tmp_str = resultBuff;
-                int pos = tmp_str.find('=');
+                int pos = consoleString.find('=');
                 if(pos != string::npos)
                 {
-                    string subStr = tmp_str.substr(pos + 1);
+                    string subStr = consoleString.substr(pos + 1);
                     subStr.erase(0, subStr.find_first_not_of(delimeter));
                     subStr.erase(subStr.find_last_not_of(delimeter) + 1);
                     strcpy(stMsgData->paramValue, subStr.c_str());
