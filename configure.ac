@@ -117,12 +117,14 @@ AC_ARG_ENABLE([sdcard],
         [
           case "${enableval}" in
            yes) XRDK_SDCARD_PROFILE_ENABLE=true
-                XRDK_SDCARD_PROFILE_FLAG="-DUSE_XRDK_SDCARD_PROFILE" ;;	
-           no) XRDK_SDCARD_PROFILE_ENABLE=false AC_MSG_ERROR([X_RDKCENTRAL_COM SDcard profile is disabled]) ;;
+                XRDK_SDCARD_PROFILE_FLAG="-DUSE_XRDK_SDCARD_PROFILE" ;;
+           no)  XRDK_SDCARD_PROFILE_ENABLE=false
+                [echo "X_RDKCENTRAL_COM SDcard profile is disabled"] ;;
           *) AC_MSG_ERROR([bad value ${enableval} for --enable-sdcard ]) ;;
            esac
            ],
          [echo "X_RDKCENTRAL_COM SDcard  profile is disabled"])
+
 AC_ARG_ENABLE([DHCPv4],
         AS_HELP_STRING([--enable-DHCPv4],[enable DHCPv4 profile (default is no)]),
         [
