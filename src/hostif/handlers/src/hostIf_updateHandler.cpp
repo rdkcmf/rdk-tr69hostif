@@ -35,24 +35,32 @@
 #include "hostIf_TimeClient_ReqHandler.h"
 #include "hostIf_dsClient_ReqHandler.h"
 #include "hostIf_DeviceClient_ReqHandler.h"
+#include <mutex>
+
 #ifdef USE_WIFI_PROFILE
 #include "hostIf_WiFi_ReqHandler.h"
 #endif
+
 #ifdef USE_DHCPv4_PROFILE
 #include "hostIf_DHCPv4Client_ReqHandler.h"
 #endif /* WITH_DHCP_PROFILE*/
+
 #ifdef USE_STORAGESERVICE_PROFILE
 #include "hostIf_StorageSrvc_ReqHandler.h"
 #endif /* USE_STORAGESERVICE_PROFILE */
+
 #ifdef USE_INTFSTACK_PROFILE
 #include "hostIf_InterfaceStackClient_ReqHandler.h"
 #endif /* USE_INTFSTACK_PROFILE */
+
 #ifdef USE_XRESRC
 #include "Device_XComcast_Xcalibur_Client_XRE_ConnectionTable.h"
 #endif
+
 #ifdef USE_XRDK_BT_PROFILE
 #include "XrdkBlueTooth.h"
 #endif
+
 GThread * updateHandler::thread = NULL;
 bool updateHandler::stopped = false;
 
@@ -186,8 +194,32 @@ void updateHandler::notifyCallback(IARM_Bus_tr69HostIfMgr_EventId_t event_type, 
 
 }
 
+void sendAddRemoveEvents (updateCallback callbackFn, int newValue, int& savedValue, char* objectPath)
+{
+    // function lock to serialize sending add/remove events
+    static std::mutex m;
 
+    static char instancePath[TR69HOSTIFMGR_MAX_PARAM_LEN];
 
+    // grab function lock
+    std::lock_guard<std::mutex> lg(m);
+
+    while (savedValue > newValue)
+    {
+        sprintf (instancePath, "%s%d.", objectPath, savedValue);
+        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s] IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE %s\n", __FUNCTION__, instancePath);
+        callbackFn (IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE, instancePath, NULL, hostIf_IntegerType);
+        savedValue--;
+//        sleep(1);
+    }
+    while (savedValue < newValue)
+    {
+        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s] IARM_BUS_TR69HOSTIFMGR_EVENT_ADD %s\n", __FUNCTION__, objectPath);
+        callbackFn (IARM_BUS_TR69HOSTIFMGR_EVENT_ADD, objectPath, NULL, hostIf_IntegerType);
+        savedValue++;
+//        sleep(1);
+    }
+}
 
 /** @} */
 /** @} */

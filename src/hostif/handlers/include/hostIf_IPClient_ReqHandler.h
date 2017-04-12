@@ -80,6 +80,7 @@
 
 #include "hostIf_msgHandler.h"
 #include "hostIf_updateHandler.h"
+#include <mutex>
 
 /**
  * @brief This class provides the interface for getting IP client request handler information.
@@ -91,6 +92,7 @@ private:
     IPClientReqHandler ();
     ~IPClientReqHandler ();
 
+    static std::mutex m_mutex;
     static class IPClientReqHandler *pInstance;
     static updateCallback mUpdateCallback;
 
@@ -102,15 +104,6 @@ private:
 #endif // IPV6_SUPPORT
     static int curNumOfIPv4Interface[20];
     static int curNumOfActivePorts[20];
-
-    class hostIf_IPInterfaceLocker
-    {
-    public:
-        hostIf_IPInterfaceLocker ();
-        ~hostIf_IPInterfaceLocker ();
-    };
-
-    static void sendAddRemoveEvents (int newValue, int& savedValue, char* objectPath, char* instancePath);
 
 public:
     virtual bool init();

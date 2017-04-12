@@ -70,8 +70,6 @@ IPInterface hostIf_IPInterface::stIPInterfaceInstance = {FALSE,FALSE,FALSE,FALSE
 #endif
         FALSE };
 
-GMutex* hostIf_IPInterface::m_mutex = NULL;
-
 GHashTable *hostIf_IPInterface::ifHash = NULL;
 
 int hostIf_IPInterface::set_Interface_Enable (int value)
@@ -237,20 +235,6 @@ void hostIf_IPInterface::closeAllInstances()
             closeInstance(pDev);
         }
     }
-}
-
-void hostIf_IPInterface::getLock()
-{
-    if(!m_mutex)
-    {
-        m_mutex = g_mutex_new();
-    }
-    g_mutex_lock(m_mutex);
-}
-
-void hostIf_IPInterface::releaseLock()
-{
-    g_mutex_unlock(m_mutex);
 }
 
 int hostIf_IPInterface::handleGetMsg (const char* pSetting, HOSTIF_MsgData_t* stMsgData)

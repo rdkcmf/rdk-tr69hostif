@@ -49,6 +49,8 @@ public:
     static void notifyCallback(IARM_Bus_tr69HostIfMgr_EventId_t, const char* paramName, const char* paramVal, HostIf_ParamType_t paramtype);
 };
 
+void sendAddRemoveEvents (updateCallback callbackFn, int newValue, int& savedValue, char* objectPath);
+
 #endif //_HOSTIF_UPDATE_HANDLER_H_
 
 

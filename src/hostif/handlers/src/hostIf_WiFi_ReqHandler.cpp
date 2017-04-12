@@ -41,7 +41,6 @@
 #include "Device_WiFi_Radio_Stats.h"
 #include "Device_WiFi_EndPoint.h"
 #include "Device_WiFi_EndPoint_WPS.h"
-#include "Device_WiFi_EndPoint_Stats.h"
 #include "Device_WiFi_EndPoint_Security.h"
 #include "Device_WiFi_EndPoint_Profile.h"
 #include "Device_WiFi_EndPoint_Profile_Security.h"
@@ -54,9 +53,11 @@
 
 WiFiReqHandler* WiFiReqHandler::pInstance = NULL;
 updateCallback WiFiReqHandler::mUpdateCallback = NULL;
-int WiFiReqHandler::ssidTotalEntries = 0;
-int WiFiReqHandler::radioTotalEntries = 0;
+int WiFiReqHandler::savedSSIDNumberOfEntries = 0;
+int WiFiReqHandler::savedRadioNumberOfEntries = 0;
+int WiFiReqHandler::savedEndPointNumberOfEntries = 0;
 static bool bfirstInstance=false;
+
 msgHandler* WiFiReqHandler::getInstance()
 {
     if(!pInstance)
@@ -82,8 +83,9 @@ bool WiFiReqHandler::init()
 void WiFiReqHandler::reset()
 {
     bfirstInstance=false;
-    ssidTotalEntries = 0;
-    radioTotalEntries = 0;
+    savedSSIDNumberOfEntries = 0;
+    savedRadioNumberOfEntries = 0;
+    savedEndPointNumberOfEntries = 0;
 }
 
 /**
@@ -117,7 +119,6 @@ bool WiFiReqHandler::unInit()
 
     hostIf_WiFi_EndPoint::closeAllInstances();
     hostIf_WiFi_EndPoint_WPS::closeAllInstances();
-    hostIf_WiFi_EndPoint_Stats::closeAllInstances();
 //    hostIf_WiFi_EndPoint_Security::closeAllInstances();
     hostIf_WiFi_EndPoint_Profile::closeAllInstances();
     hostIf_WiFi_EndPoint_Profile_Security::closeAllInstances();
@@ -205,8 +206,7 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     }
     else if (strcasecmp(stMsgData->paramName,"Device.WiFi.EndPointNumberOfEntries") == 0)
     {
-        stMsgData->instanceNum = 0;
-        hostIf_WiFi *pIface = hostIf_WiFi::getInstance(stMsgData->instanceNum);
+        hostIf_WiFi *pIface = hostIf_WiFi::getInstance (1);
 
         if(!pIface)
         {
@@ -383,10 +383,9 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     {
         stMsgData->instanceNum = instanceNum;
         hostIf_WiFi_EndPoint *pWifiEndPoint = hostIf_WiFi_EndPoint::getInstance(stMsgData->instanceNum);
-        hostIf_WiFi_EndPoint_Stats *pWifiEndPointStats = hostIf_WiFi_EndPoint_Stats::getInstance(stMsgData->instanceNum);
         hostIf_WiFi_EndPoint_WPS *pWifiEndPointWps  = hostIf_WiFi_EndPoint_WPS::getInstance(stMsgData->instanceNum);
 
-        if ((!pWifiEndPoint) || (!pWifiEndPointStats) || (!pWifiEndPointWps))
+        if ((!pWifiEndPoint) || (!pWifiEndPointWps))
         {
             return NOK;
         }
@@ -417,19 +416,19 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         }
         else if (strcasecmp(pSetting,"Stats.LastDataDownlinkRate") == 0)
         {
-            ret = pWifiEndPointStats->get_Device_WiFi_EndPoint_Stats_LastDataDownlinkRate(stMsgData);
+            ret = pWifiEndPoint->get_Device_WiFi_EndPoint_Stats_LastDataDownlinkRate(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.LastDataUplinkRate") == 0)
         {
-            ret = pWifiEndPointStats->get_Device_WiFi_EndPoint_Stats_LastDataUplinkRate(stMsgData);
+            ret = pWifiEndPoint->get_Device_WiFi_EndPoint_Stats_LastDataUplinkRate(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.SignalStrength") == 0)
         {
-            ret = pWifiEndPointStats->get_Device_WiFi_EndPoint_Stats_SignalStrength(stMsgData);
+            ret = pWifiEndPoint->get_Device_WiFi_EndPoint_Stats_SignalStrength(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.Retransmissions") == 0)
         {
-            ret = pWifiEndPointStats->get_Device_WiFi_EndPoint_Stats_Retransmissions(stMsgData);
+            ret = pWifiEndPoint->get_Device_WiFi_EndPoint_Stats_Retransmissions(stMsgData);
         }
     }
     else if (matchComponent(stMsgData->paramName, "Device.WiFi.AccessPoint", &pSetting, instanceNum))
@@ -538,83 +537,47 @@ void WiFiReqHandler::registerUpdateCallback(updateCallback cb)
 
 void WiFiReqHandler::checkForUpdates()
 {
+    LOG_ENTRY_EXIT;
+
+    if (NULL == mUpdateCallback)
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s:%s] mUpdateCallback is NULL\n", __FILE__, __FUNCTION__);
+        return;
+    }
+
+    hostIf_WiFi *pIface = hostIf_WiFi::getInstance(1);
+    if (NULL == pIface)
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s:%s] hostIf_WiFi::getInstance(1) returned NULL\n", __FILE__, __FUNCTION__);
+        return;
+    }
+
     HOSTIF_MsgData_t stMsgData;
-    int index = 1;
-    const int maxSSID_Instances = 1;
-    const int maxRadio_Instances = 1;
-    hostIf_WiFi *pIface;
-//    hostIf_MoCAInterface::getLock();
 
-    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s]Entering \n", __FILE__, __FUNCTION__ );
-
-    pIface = hostIf_WiFi::getInstance(maxSSID_Instances);
-
-    if(pIface)
+    if (OK == pIface->get_Device_WiFi_SSIDNumberOfEntries(&stMsgData))
     {
-        memset(&stMsgData,0,sizeof(stMsgData));
-
-        if(pIface->get_Device_WiFi_SSIDNumberOfEntries(&stMsgData) == OK)
-        {
-            int ssidEntries = get_int(stMsgData.paramValue);
-            char profilePath[TR69HOSTIFMGR_MAX_PARAM_LEN] = {'\0'};
-
-            while(WiFiReqHandler::ssidTotalEntries > ssidEntries)
-            {
-                sprintf(profilePath,"%s.%d.",DEVICE_WIFI_SSID_PROFILE, ssidEntries);
-                if(mUpdateCallback) {
-                    mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE, profilePath, NULL, hostIf_IntegerType);
-                    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s]Sending Remove Event for profile : [%s] \n", __FILE__, __FUNCTION__ ,DEVICE_WIFI_SSID_PROFILE);
-                }
-                ssidEntries++;
-            }
-
-            while(WiFiReqHandler::ssidTotalEntries < ssidEntries)
-            {
-                if(mUpdateCallback) mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_ADD, DEVICE_WIFI_SSID_PROFILE, NULL, hostIf_IntegerType);
-                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s]Sending ADD Event for params: [%s] \n", __FILE__, __FUNCTION__ ,DEVICE_WIFI_SSID_PROFILE);
-                ssidEntries--;
-            }
-
-            WiFiReqHandler::ssidTotalEntries = get_int(stMsgData.paramValue);
-        }
-    }
-    if(!bfirstInstance)
-    {
-        pIface = hostIf_WiFi::getInstance(maxRadio_Instances);
-
-        if(pIface)
-        {
-            memset(&stMsgData,0,sizeof(stMsgData));
-
-            if(pIface->get_Device_WiFi_RadioNumberOfEntries(&stMsgData) == OK)
-            {
-                bfirstInstance=true;
-                int radioEntries = get_int(stMsgData.paramValue);
-                char profilePath[TR69HOSTIFMGR_MAX_PARAM_LEN] = {'\0'};
-
-                while(WiFiReqHandler::radioTotalEntries > radioEntries)
-                {
-                    sprintf(profilePath,"%s.%d.",DEVICE_WIFI_RADIO_PROFILE, radioEntries);
-                    if(mUpdateCallback) {
-                        mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE, profilePath, NULL, hostIf_IntegerType);
-                        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s]Sending Remove Event for profile : [%s] \n", __FILE__, __FUNCTION__ ,DEVICE_WIFI_RADIO_PROFILE);
-                    }
-                    radioEntries++;
-                }
-
-                while(WiFiReqHandler::radioTotalEntries < radioEntries)
-                {
-                    if(mUpdateCallback) mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_ADD, DEVICE_WIFI_RADIO_PROFILE, NULL, hostIf_IntegerType);
-                    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s]Sending ADD Event for params: [%s] \n", __FILE__, __FUNCTION__ ,DEVICE_WIFI_RADIO_PROFILE);
-                    radioEntries--;
-                }
-
-                WiFiReqHandler::radioTotalEntries = get_int(stMsgData.paramValue);
-            }
-        }
+        int currentSSIDNumberOfEntries = get_int (stMsgData.paramValue);
+        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s] currentSSIDNumberOfEntries = %d, savedSSIDNumberOfEntries = %d\n",
+                __FILE__, __FUNCTION__, currentSSIDNumberOfEntries, savedSSIDNumberOfEntries);
+        sendAddRemoveEvents (mUpdateCallback, currentSSIDNumberOfEntries, savedSSIDNumberOfEntries, DEVICE_WIFI_SSID_PROFILE);
     }
 
-    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s]Exiting \n", __FILE__, __FUNCTION__ );
+    if (!bfirstInstance && (OK == pIface->get_Device_WiFi_RadioNumberOfEntries (&stMsgData)))
+    {
+        bfirstInstance = true;
+        int currentRadioNumberOfEntries = get_int (stMsgData.paramValue);
+        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s] currentRadioNumberOfEntries = %d, savedRadioNumberOfEntries = %d\n",
+                __FILE__, __FUNCTION__, currentRadioNumberOfEntries, savedRadioNumberOfEntries);
+        sendAddRemoveEvents (mUpdateCallback, currentRadioNumberOfEntries, savedRadioNumberOfEntries, DEVICE_WIFI_RADIO_PROFILE);
+    }
+
+    if (OK == pIface->get_Device_WiFi_EndPointNumberOfEntries (&stMsgData))
+    {
+        int currentEndPointNumberOfEntries = get_int (stMsgData.paramValue);
+        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s] currentEndPointNumberOfEntries = %d, savedEndPointNumberOfEntries = %d\n",
+                __FILE__, __FUNCTION__, currentEndPointNumberOfEntries, savedEndPointNumberOfEntries);
+        sendAddRemoveEvents (mUpdateCallback, currentEndPointNumberOfEntries, savedEndPointNumberOfEntries, DEVICE_WIFI_ENDPOINT_PROFILE);
+    }
 }
 
 #endif /* #ifdef USE_WIFI_PROFILE */

@@ -85,8 +85,10 @@
 #include "hostIf_updateHandler.h"
 
 
-#define DEVICE_WIFI_SSID_PROFILE	"Device.WiFi.SSID."
-#define DEVICE_WIFI_RADIO_PROFILE      "Device.WiFi.Radio."
+#define DEVICE_WIFI_SSID_PROFILE        "Device.WiFi.SSID."
+#define DEVICE_WIFI_RADIO_PROFILE       "Device.WiFi.Radio."
+#define DEVICE_WIFI_ENDPOINT_PROFILE    "Device.WiFi.EndPoint."
+
 /**
  * @brief This class provides the interface for getting WiFi request handler information.
  * @ingroup TR-069HOSTIF_WIFI_REQHANDLER_CLASSES
@@ -99,8 +101,9 @@ class WiFiReqHandler : public msgHandler
     static class WiFiReqHandler *pInstance;
     static updateCallback mUpdateCallback;
 private:
-    static int ssidTotalEntries;
-    static int radioTotalEntries;
+    static int savedSSIDNumberOfEntries;
+    static int savedRadioNumberOfEntries;
+    static int savedEndPointNumberOfEntries;
 
 public:
     virtual bool init();

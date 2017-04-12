@@ -66,6 +66,8 @@ class hostIf_WiFi_EndPoint {
     hostIf_WiFi_EndPoint(int dev_id);
     ~hostIf_WiFi_EndPoint() {};
 
+    int refreshCache ();
+
 public:
     static class hostIf_WiFi_EndPoint *getInstance(int dev_id);
     static GList* getAllInstances();
@@ -76,8 +78,14 @@ public:
     char Status[64];
     char Alias[64];
     char ProfileReference[256];
-    char SSIDReference[256];
+    char SSIDReference[256]; // value of WiFi_EndPoint_Diag_Params.SSIDReference returned by IARM call to netsrvmgr
     unsigned int ProfileNumberOfEntries;
+    struct {
+        unsigned long LastDataDownlinkRate;
+        unsigned long LastDataUplinkRate;
+        int  SignalStrength;
+        unsigned long Retransmissions;
+    } stats;
 
    /**
     * @ingroup TR69_HOSTIF_WIFI_ENDPOINT
@@ -148,7 +156,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-     int set_Device_WiFi_EndPoint_Alias(HOSTIF_MsgData_t *stMsgData );
+    int set_Device_WiFi_EndPoint_Alias (HOSTIF_MsgData_t *stMsgData);
 
     /*
     * @brief Get the path name of a row in the profile table.
@@ -157,7 +165,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_WiFi_EndPoint_ProfileReference(HOSTIF_MsgData_t *stMsgData );
+    int get_Device_WiFi_EndPoint_ProfileReference (HOSTIF_MsgData_t *stMsgData);
 
    /**
     * @brief Set the value MUST be the path name of a row in the Profile table.
@@ -168,7 +176,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int set_Device_WiFi_EndPoint_ProfileReference(HOSTIF_MsgData_t *stMsgData );
+    int set_Device_WiFi_EndPoint_ProfileReference (HOSTIF_MsgData_t *stMsgData);
 
     /*
     * @brief Get the wireless endpoint reference. The value MUST be the path name of a row in the SSID table.
@@ -181,7 +189,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_WiFi_EndPoint_SSIDReference(HOSTIF_MsgData_t *stMsgData );
+    int get_Device_WiFi_EndPoint_SSIDReference (HOSTIF_MsgData_t *stMsgData);
 
     /*
     * @brief Get the number of entries in the wireless endpoint Profile table.
@@ -190,16 +198,52 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_WiFi_EndPoint_ProfileNumberOfEntries(HOSTIF_MsgData_t *stMsgData );
+    int get_Device_WiFi_EndPoint_ProfileNumberOfEntries (HOSTIF_MsgData_t *stMsgData);
+
+    /**
+     * @brief Get the data transmit rate in kbps that was most recently used for transmission from the access point
+     * to the end point device.
+     *
+     * @param[out] stMsgData TR-069 Host interface message request.
+     *
+     * @return Returns 0 on success, otherwise will return the appropriate error code.
+     */
+    int get_Device_WiFi_EndPoint_Stats_LastDataDownlinkRate (HOSTIF_MsgData_t *stMsgData);
+
+    /**
+     * @brief The data transmit rate in kbps that was most recently used for transmission from the end point
+     * to the access point device.
+     *
+     * @param[out] stMsgData TR-069 Host interface message request.
+     *
+     * @return Returns 0 on success, otherwise will return the appropriate error code.
+     */
+    int get_Device_WiFi_EndPoint_Stats_LastDataUplinkRate (HOSTIF_MsgData_t *stMsgData);
+
+    /**
+     * @brief This function provide an indicator of radio signal strength of the downlink from the
+     * access point to the end point, measured in dBm, as an average of the last 100 packets received from the device..
+     *
+     * @param[out] stMsgData TR-069 Host interface message request.
+     *
+     * @return Returns 0 on success, otherwise will return the appropriate error code.
+     */
+    int get_Device_WiFi_EndPoint_Stats_SignalStrength (HOSTIF_MsgData_t *stMsgData);
+
+    /**
+     * @brief Get the number of packets that had to be re-transmitted, from the last 100 packets sent
+     * to the access point. Multiple re-transmissions of the same packet count as one.
+     *
+     * @param[out] stMsgData TR-069 Host interface message request.
+     *
+     * @return Returns 0 on success, otherwise will return the appropriate error code.
+     */
+    int get_Device_WiFi_EndPoint_Stats_Retransmissions (HOSTIF_MsgData_t *stMsgData);
 
     /** @} */ //End of doxygen tag TR69_HOSTIF_WIFI_ENDPOINT
 };
 
-
-
-
 #endif /* DEVICE_WIFI_ENDPOINT_H_ */
-
 
 /** @} */
 /** @} */

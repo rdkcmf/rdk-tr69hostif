@@ -47,9 +47,12 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
         -I=/usr/include/rdk/ds-hal/ \
 	$(XRDK_RF4CE_PROFILE_FLAG)
 
+AM_CXXFLAGS += "-std=c++11"
+
 if WITH_XRDK_SDCARD_PROFILE
 AM_CXXFLAGS += $(XRDK_SDCARD_PROFILE_FLAG)
 endif
+
 if WITH_INTFSTACK_PROFILE
 AM_CXXFLAGS += $(INTFSTACK_PROFILE_FLAG) -I$(top_srcdir)/src/hostif/profiles/InterfaceStack
 endif

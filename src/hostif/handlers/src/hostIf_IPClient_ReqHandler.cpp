@@ -40,8 +40,9 @@
 #endif // IPV6_SUPPORT
 #include "Device_IP_Interface_Stats.h"
 #include "Device_IP.h"
+#include <mutex>
 
-
+std::mutex IPClientReqHandler::m_mutex;
 IPClientReqHandler* IPClientReqHandler::pInstance = NULL;
 updateCallback IPClientReqHandler::mUpdateCallback = NULL;
 int IPClientReqHandler::curNumOfIPInterface = 0;
@@ -68,19 +69,10 @@ msgHandler* IPClientReqHandler::getInstance()
     return pInstance;
 }
 
-IPClientReqHandler::hostIf_IPInterfaceLocker::hostIf_IPInterfaceLocker ()
-{
-    hostIf_IPInterface::getLock ();
-}
-
-IPClientReqHandler::hostIf_IPInterfaceLocker::~hostIf_IPInterfaceLocker ()
-{
-    hostIf_IPInterface::releaseLock ();
-}
-
 void IPClientReqHandler::reset()
 {
-    hostIf_IPInterfaceLocker l;
+    std::lock_guard<std::mutex> lg (m_mutex);
+
     curNumOfIPInterface = 0;
     memset (curNumOfInterfaceIPv4Addresses, 0, sizeof(curNumOfInterfaceIPv4Addresses));
 #ifdef IPV6_SUPPORT
@@ -151,7 +143,7 @@ int IPClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     const char *positionAfterInstanceNumber = 0;
     int instanceNumber = 0;
 
-    hostIf_IPInterfaceLocker locker;
+    std::lock_guard<std::mutex> lg (m_mutex);
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
 
@@ -244,7 +236,7 @@ int IPClientReqHandler::handleSetMsg (HOSTIF_MsgData_t *stMsgData)
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
 
-    hostIf_IPInterfaceLocker l;
+    std::lock_guard<std::mutex> lg (m_mutex);
 
     if (matchComponent (stMsgData->paramName, "Device.IP.Interface", &positionAfterInstanceNumber, instanceNumber))
     {
@@ -294,17 +286,18 @@ int IPClientReqHandler::handleSetMsg (HOSTIF_MsgData_t *stMsgData)
 
     return ret;
 }
+
 int IPClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
     int instanceNumber = 0;
 
-    hostIf_IPInterface::getLock();
+    std::lock_guard<std::mutex> lg (m_mutex);
+
     hostIf_IP *pIface = hostIf_IP::getInstance(instanceNumber);
     stMsgData->instanceNum = instanceNumber;
     if(!pIface)
     {
-        hostIf_IPInterface::releaseLock();
         return NOK;
     }
 
@@ -321,7 +314,6 @@ int IPClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         ret = NOK;
     }
 
-    hostIf_IPInterface::releaseLock();
     return ret;
 }
 
@@ -330,12 +322,12 @@ int IPClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
     int ret = NOT_HANDLED;
     int instanceNumber = 0;
 
-    hostIf_IPInterface::getLock();
+    std::lock_guard<std::mutex> lg (m_mutex);
+
     hostIf_IP *pIface = hostIf_IP::getInstance(instanceNumber);
     stMsgData->instanceNum = instanceNumber;
     if(!pIface)
     {
-        hostIf_IPInterface::releaseLock();
         return NOK;
     }
     GHashTable* notifyhash = pIface->getNotifyHash();
@@ -367,33 +359,11 @@ int IPClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         ret = NOK;
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] EthernetClientReqHandler Not able to get notifyhash  %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
     }
-    hostIf_IPInterface::releaseLock();
     return ret;
 }
 void IPClientReqHandler::registerUpdateCallback(updateCallback cb)
 {
     mUpdateCallback = cb;
-}
-
-void IPClientReqHandler::sendAddRemoveEvents (int newValue, int& savedValue, char* objectPath, char* instancePath)
-{
-    while (savedValue > newValue)
-    {
-        sprintf (instancePath, "%s%d.", objectPath, savedValue);
-        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE %s\n",
-                __FILE__, __FUNCTION__, __LINE__, instancePath);
-        mUpdateCallback (IARM_BUS_TR69HOSTIFMGR_EVENT_REMOVE, instancePath, NULL, hostIf_IntegerType);
-        savedValue--;
-//        sleep(1);
-    }
-    while (savedValue < newValue)
-    {
-        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] IARM_BUS_TR69HOSTIFMGR_EVENT_ADD %s\n",
-                __FILE__, __FUNCTION__, __LINE__, objectPath);
-        mUpdateCallback (IARM_BUS_TR69HOSTIFMGR_EVENT_ADD, objectPath, NULL, hostIf_IntegerType);
-        savedValue++;
-//        sleep(1);
-    }
 }
 
 void IPClientReqHandler::checkForUpdates()
@@ -406,7 +376,6 @@ void IPClientReqHandler::checkForUpdates()
     GList *elem;
     int index = 1;
     char objectPath[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char instancePath[TR69HOSTIFMGR_MAX_PARAM_LEN];
 
     hostIf_IP::getLock();
 
@@ -421,7 +390,7 @@ void IPClientReqHandler::checkForUpdates()
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] interfaceNumberOfEntries = %d, curNumOfIPInterface = %d\n",
                 __FILE__, __FUNCTION__, __LINE__, interfaceNumberOfEntries, curNumOfIPInterface);
         sprintf (objectPath, "Device.IP.Interface.");
-        sendAddRemoveEvents (interfaceNumberOfEntries, curNumOfIPInterface, objectPath, instancePath);
+        sendAddRemoveEvents (mUpdateCallback, interfaceNumberOfEntries, curNumOfIPInterface, objectPath);
     }
 
     for (int i = 1; i <= interfaceNumberOfEntries; i++)
@@ -430,20 +399,20 @@ void IPClientReqHandler::checkForUpdates()
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] ipv4AddressNumberOfEntries = %d, curNumOfInterfaceIPv4Addresses[%d] = %d\n",
                 __FILE__, __FUNCTION__, __LINE__, ipv4AddressNumberOfEntries, i, curNumOfInterfaceIPv4Addresses[i]);
         sprintf (objectPath, "Device.IP.Interface.%d.IPv4Address.", i);
-        sendAddRemoveEvents (ipv4AddressNumberOfEntries, curNumOfInterfaceIPv4Addresses[i], objectPath, instancePath);
+        sendAddRemoveEvents (mUpdateCallback, ipv4AddressNumberOfEntries, curNumOfInterfaceIPv4Addresses[i], objectPath);
 
 #ifdef IPV6_SUPPORT
         int ipv6AddressNumberOfEntries = hostIf_IPInterface::getInstance (i)->getIPv6AddressNumberOfEntries ();
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] ipv6AddressNumberOfEntries = %d, curNumOfInterfaceIPv6Addresses[%d] = %d\n",
                 __FILE__, __FUNCTION__, __LINE__, ipv6AddressNumberOfEntries, i, curNumOfInterfaceIPv6Addresses[i]);
         sprintf (objectPath, "Device.IP.Interface.%d.IPv6Address.", i);
-        sendAddRemoveEvents (ipv6AddressNumberOfEntries, curNumOfInterfaceIPv6Addresses[i], objectPath, instancePath);
+        sendAddRemoveEvents (mUpdateCallback, ipv6AddressNumberOfEntries, curNumOfInterfaceIPv6Addresses[i], objectPath);
 
         int ipv6PrefixNumberOfEntries = hostIf_IPInterface::getInstance (i)->getIPv6PrefixNumberOfEntries ();
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s:%d] ipv6PrefixNumberOfEntries = %d, curNumOfInterfaceIPv6Prefixes[%d] = %d\n",
                 __FILE__, __FUNCTION__, __LINE__, ipv6PrefixNumberOfEntries, i, curNumOfInterfaceIPv6Prefixes[i]);
         sprintf (objectPath, "Device.IP.Interface.%d.IPv6Prefix.", i);
-        sendAddRemoveEvents (ipv6PrefixNumberOfEntries, curNumOfInterfaceIPv6Prefixes[i], objectPath, instancePath);
+        sendAddRemoveEvents (mUpdateCallback, ipv6PrefixNumberOfEntries, curNumOfInterfaceIPv6Prefixes[i], objectPath);
 
 #endif // IPV6_SUPPORT
     }
@@ -462,7 +431,7 @@ void IPClientReqHandler::checkForUpdates()
     {
         int activePortNumberOfEntries = get_int (msgData.paramValue);
         sprintf (objectPath, "Device.IP.ActivePort.");
-        sendAddRemoveEvents (activePortNumberOfEntries, curNumOfActivePorts[index], objectPath, instancePath);
+        sendAddRemoveEvents (mUpdateCallback, activePortNumberOfEntries, curNumOfActivePorts[index], objectPath);
     }
 
     hostIf_IP::releaseLock();
@@ -471,7 +440,8 @@ void IPClientReqHandler::checkForUpdates()
 
 #ifdef HAVE_VALUE_CHANGE_EVENT
 
-    hostIf_IPInterface::getLock();
+    std::lock_guard<std::mutex> lg (m_mutex);
+
     int instanceNumber = 0;
     GHashTable* notifyhash = NULL;
 
@@ -509,7 +479,6 @@ void IPClientReqHandler::checkForUpdates()
             {
                 if(!instanceNumber)
                 {   // Ethernet settings not found in Notify Hash Table
-                    hostIf_IPInterface::releaseLock();
                     continue;
                 }
                 hostIf_IPInterface *pIface = hostIf_IPInterface::getInstance(instanceNumber);
@@ -1189,7 +1158,6 @@ void IPClientReqHandler::checkForUpdates()
                #endif // IPV6_SUPPORT
            */
 
-    hostIf_IPInterface::releaseLock();
 #endif  /* HAVE_VALUE_CHANGE_EVENT */
 }
 

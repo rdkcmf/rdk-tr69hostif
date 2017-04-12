@@ -268,27 +268,19 @@ typedef enum EDeviceIPInterfaceMembers
 class hostIf_IPInterface {
 
     static  GHashTable  *ifHash;
-
-    static GMutex *m_mutex;
-
     static IPInterface stIPInterfaceInstance;
 
     int dev_id;
-
     char nameOfInterface[IF_NAMESIZE];
 
     hostIf_IPInterface(int dev_id);
-
     ~hostIf_IPInterface() {};
 
     void refreshInterfaceName ();
 
     unsigned int getIPAddressNumberOfEntries (sa_family_t address_family);
-
     int set_Interface_Reset (unsigned int value);
-
     int set_Interface_Enable (int value);
-
     int set_Interface_Mtu (unsigned int value);
 
     bool bCalledEnable;
@@ -319,16 +311,9 @@ class hostIf_IPInterface {
 public:
 
     static hostIf_IPInterface* getInstance(int dev_id);
-
     static void closeInstance(hostIf_IPInterface*);
-
     static GList* getAllInstances();
-
     static void closeAllInstances();
-
-    static void getLock();
-
-    static void releaseLock();
 
     int handleGetMsg (const char* pSetting, HOSTIF_MsgData_t* stMsgData);
     int handleSetMsg (const char* pSetting, HOSTIF_MsgData_t* stMsgData);
