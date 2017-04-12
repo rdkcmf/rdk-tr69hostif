@@ -278,6 +278,12 @@ AC_CHECK_LIB(gthread-2.0, g_thread_init)
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 
+# Checks for Storage Manager header file.
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADERS([rdkStorageMgr.h], [HAVE_RDK_STMGR_V2_H=yes], [HAVE_RDK_STMGR_V2_H=no], [])
+AC_LANG_POP
+AM_CONDITIONAL([ENABLE_RDK_STMGR_V2], [test "x$HAVE_RDK_STMGR_V2_H" = "xyes" -a "x$XRDK_SDCARD_PROFILE_ENABLE" = "xtrue"])
+
 # Checks for library functions.
 AC_FUNC_MALLOC
 

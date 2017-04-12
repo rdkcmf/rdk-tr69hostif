@@ -35,7 +35,38 @@
 #include "rdk_debug.h" 
 #include "hostIf_main.h"
 #include "Components_XrdkSDCard.h"
+
+#ifdef USE_RDK_STORAGE_MANAGER_V2
+#include "rdkStorageMgr.h"
+/* Declare variable types that can be used to reduce amount change */
+typedef union _uSDCardParamValue {
+    char uchVal[128];
+    unsigned int ui32Val;
+    int iVal;
+    bool bVal;
+} uSDCard_Param_Val;
+
+typedef enum _eSD_PROPERTY_Type {
+    SD_Capacity,
+    SD_CardFailed,
+    SD_LifeElapsed,
+    SD_LotID,
+    SD_Manufacturer,
+    SD_Model,
+    SD_ReadOnly,
+    SD_SerialNumber,
+    SD_TSBQualified,
+    SD_Status
+} eSD_ParamPropertyType;
+
+typedef struct _strMgrSDcardPropParam_t {
+    uSDCard_Param_Val sdCardProp;
+    eSD_ParamPropertyType eSDPropType;
+} strMgrSDcardPropParam_t;
+
+#else
 #include "storageMgr.h"
+#endif /* USE_RDK_STORAGE_MANAGER_V2 */
 
 static bool getSDCardProperties(strMgrSDcardPropParam_t *);
 
@@ -524,6 +555,153 @@ int hostIf_STBServiceXSDCard::getStatus(HOSTIF_MsgData_t *stMsgData)
 
 bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
 {
+#ifdef USE_RDK_STORAGE_MANAGER_V2
+    bool rc = true;
+    static char sdCardDeviceID[RDK_STMGR_MAX_STRING_LENGTH] = "";
+
+    eSTMGRReturns stRet;
+    if ('\0' == sdCardDeviceID[0])
+    {
+        eSTMGRDeviceInfoList deviceInfoList;
+        memset (&deviceInfoList, 0, sizeof(deviceInfoList));
+        stRet = rdkStorage_getDeviceInfoList(&deviceInfoList);
+        for (int i = 0; i < deviceInfoList.m_numOfDevices; i++)
+        {
+            if (RDK_STMGR_DEVICE_TYPE_SDCARD == deviceInfoList.m_devices[i].m_type)
+            {
+                memcpy (&sdCardDeviceID, &deviceInfoList.m_devices[i].m_deviceID, RDK_STMGR_MAX_STRING_LENGTH);
+                break;
+            }
+        }
+    }
+
+    if ('\0' != sdCardDeviceID[0])
+    {
+        if (sdCardParam->eSDPropType == SD_LifeElapsed)
+        {
+            eSTMGRHealthInfo healthInfo;
+            memset (&healthInfo, 0 , sizeof(healthInfo));
+            if (RDK_STMGR_RETURN_SUCCESS == rdkStorage_getHealth (sdCardDeviceID, &healthInfo))
+            {
+                sdCardParam->sdCardProp.iVal = -1;
+                /* FIXME: Update string from "used" to a proper proposed value */
+                for (int i = 0; i < healthInfo.m_diagnosticsList.m_numOfAttributes; i++)
+                {
+                    if (0 == strcmp (healthInfo.m_diagnosticsList.m_diagnostics[i].m_name, "used"))
+                    {
+                        sdCardParam->sdCardProp.iVal = atoi (healthInfo.m_diagnosticsList.m_diagnostics[i].m_value);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                sdCardParam->sdCardProp.iVal = -1;
+            }
+        }
+        else if (sdCardParam->eSDPropType == SD_TSBQualified)
+        {
+            /* Note: rdkStorage_isTSBEnabled() is good now.. as this will is there any memory found that supports TSB. May be we can enhance it by querying SD partitions */
+            sdCardParam->sdCardProp.bVal = rdkStorage_isTSBEnabled();
+        }
+        else
+        {
+            eSTMGRDeviceInfo deviceInfo;
+            memset (&deviceInfo, 0 , sizeof(deviceInfo));
+            if (RDK_STMGR_RETURN_SUCCESS == rdkStorage_getDeviceInfo (sdCardDeviceID, &deviceInfo))
+            {
+                switch(sdCardParam->eSDPropType)
+                {
+                    case SD_Capacity:
+                        sdCardParam->sdCardProp.ui32Val = deviceInfo.m_capacity;
+                        break;
+                    case SD_CardFailed:
+                        /* FIXME: The original code always returns false. so #defined it */
+#if 0
+                        if(deviceInfo.status == SM_DEV_STATUS_NOT_QUALIFIED || deviceInfo.status == SM_DEV_STATUS_NOT_PRESENT)
+                        {
+                            sdCardParam->sdCardProp.bVal = false;
+                        }
+                        else
+                        {
+                            sdCardParam->sdCardProp.bVal = false;
+                        }
+#else
+                        sdCardParam->sdCardProp.bVal = false;
+#endif
+                        break;
+                    case SD_LotID:
+                        /* FIXME: STMgr has to be updated with Lot ID in the device info */
+                        strcpy (sdCardParam->sdCardProp.uchVal, deviceInfo.m_serialNumber);
+                        break;
+                    case SD_Manufacturer:
+                        sdCardParam->sdCardProp.ui32Val = (unsigned int) atoi (deviceInfo.m_manufacturer);
+                        break;
+                    case SD_Model:
+                        strcpy (sdCardParam->sdCardProp.uchVal, deviceInfo.m_model);
+                        break;
+                    case SD_ReadOnly:
+                        sdCardParam->sdCardProp.bVal = (deviceInfo.m_status == RDK_STMGR_DEVICE_STATUS_READ_ONLY) ? true : false;
+                        break;
+                    case SD_SerialNumber:
+                        sdCardParam->sdCardProp.ui32Val = (unsigned int) deviceInfo.m_serialNumber;
+                        break;
+                    case SD_Status:
+                    {
+                        switch (deviceInfo.m_status)
+                        {
+                            case RDK_STMGR_DEVICE_STATUS_OK:
+                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_OK");
+                                break;
+                            case RDK_STMGR_DEVICE_STATUS_READ_ONLY:
+                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_READ_ONLY");
+                                break;
+                            case RDK_STMGR_DEVICE_STATUS_NOT_PRESENT:
+                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_NOT_PRESENT");
+                                break;
+                            case RDK_STMGR_DEVICE_STATUS_NOT_QUALIFIED:
+                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_NOT_QUALIFIED");
+                                break;
+                            case RDK_STMGR_DEVICE_STATUS_DISK_FULL:
+                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_DISK_FULL");
+                                break;
+                            case RDK_STMGR_DEVICE_STATUS_READ_FAILURE:
+                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_READ_FAILURE");
+                                break;
+                            case RDK_STMGR_DEVICE_STATUS_WRITE_FAILURE:
+                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_WRITE_FAILURE");
+                                break;
+                        }
+                        break;
+                   }
+                }
+            }
+            else
+            {
+                RDK_LOG(RDK_LOG_WARN, LOG_TR69HOSTIF, "[%s] Gettng the device specific information failed\n",__FUNCTION__);
+                switch(sdCardParam->eSDPropType)
+                {
+                    case SD_Status:
+                        strcpy(sdCardParam->sdCardProp.uchVal, (const char*)"None");
+                        break;
+                }
+            }
+        }
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_WARN, LOG_TR69HOSTIF, "[%s] This platform does not have SD card\n",__FUNCTION__);
+        switch(sdCardParam->eSDPropType)
+        {
+            case SD_Status:
+                strcpy(sdCardParam->sdCardProp.uchVal, (const char*)"None");
+                break;
+        }
+    }
+
+
+    return rc;
+#else
     IARM_Result_t retVal = IARM_RESULT_SUCCESS;
     IARM_Bus_STRMgr_Param_t param;
     bool ret = true;
@@ -554,6 +732,7 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
     }
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
     return ret;
+#endif
 }
 
 

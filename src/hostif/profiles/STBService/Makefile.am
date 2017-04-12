@@ -33,7 +33,6 @@ if WITH_XRDK_RF4CE_PROFILE
 AM_CXXFLAGS += $(XRDK_RF4CE_PROFILE_FLAG)
 endif
 
-
 noinst_LTLIBRARIES = libstbservice.la
 libstbservice_la_SOURCES =	Components_AudioOutput.cpp \
 				Components_SPDIF.cpp \
@@ -45,3 +44,7 @@ if WITH_XRDK_SDCARD_PROFILE
 libstbservice_la_SOURCES += Components_XrdkSDCard.cpp
 endif
 
+if ENABLE_RDK_STMGR_V2
+AM_CXXFLAGS += "-DUSE_RDK_STORAGE_MANAGER_V2"
+libstbservice_la_LDFLAGS = -lrdkstmgr
+endif
