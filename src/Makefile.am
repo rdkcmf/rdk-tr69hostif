@@ -93,7 +93,9 @@ AM_CPPFLAGS =  $(GLIB_CFLAGS) $(GTHREAD_CFLAGS)
 #ifeq ($(ENABLE_WITH_DS_CLIENT),yes)
 #        WITH_DS_CLIENT=TRUE
 #endif
-
+# Enabled SD_NOTIFY
+AM_CXXFLAGS += $(SYSTEMD_SDNOTIFY_CFLAGS)
+AM_LDFLAGS += $(SYSTEMD_SDNOTIFY_LDFLAGS)
 
 bin_PROGRAMS = tr69hostif
 tr69hostif_SOURCES = $(top_srcdir)/src/hostif/src/hostIf_main.cpp $(top_srcdir)/src/hostif/src/hostIf_utils.cpp

@@ -47,6 +47,8 @@ XRDK_RF4CE_PROFILE_FLAG=" "
 XRDK_BT_PROFILE_FLAG=" "
 HAVE_VALUE_CHANGE_EVENT_FLAG=" "
 SNMP_ADAPTER_FLAG=" "
+SYSTEMD_SDNOTIFY_CFLAGS=" "
+SYSTEMD_SDNOTIFY_LDFLAGS=" "
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
 [AM_DEFAULT_VERBOSITY=1
@@ -246,6 +248,20 @@ AC_ARG_ENABLE([snmpAdapter],
            ],
          [echo "SNMP_ADAPTER profile is disabled"])
 
+AC_ARG_ENABLE([systemd-notify],
+        AS_HELP_STRING([--enable-systemd-notify],[enable systemd sd notify]),
+        [
+                case "${enableval}" in
+                yes) SYSTEMD_SDNOTIFY_CFLAGS="-DENABLE_SD_NOTIFY"
+                     SYSTEMD_SDNOTIFY_LDFLAGS="-lsystemd" ;;
+                no) AC_MSG_ERROR([systemd sd notify  is disabled]) ;;
+                *) AC_MSG_ERROR([bad value ${enableval} for --enable-systemd ]) ;;
+                esac
+                ],
+        [echo "systemd sd notify  is disable"])
+
+
+
 AM_CONDITIONAL([WITH_MOCA_PROFILE], [test "x$enable_moca" = "xyes"])
 AM_CONDITIONAL([WITH_MOCA20], [test "x$enable_moca2" = "xyes"])
 AM_CONDITIONAL([WITH_WIFI_PROFILE], [test x$WIFI_PROFILE_ENABLE = xtrue])
@@ -307,6 +323,8 @@ AC_SUBST(XRDK_BT_PROFILE_FLAG)
 AC_SUBST(IPV6_SUPPORT_FLAG)
 AC_SUBST(HAVE_VALUE_CHANGE_EVENT_FLAG)
 AC_SUBST(SNMP_ADAPTER_FLAG)
+AC_SUBST(SYSTEMD_SDNOTIFY_CFLAGS)
+AC_SUBST(SYSTEMD_SDNOTIFY_LDFLAGS)
 
 # files to generate via autotools (.am or .in source files)
 AC_CONFIG_FILES([Makefile])

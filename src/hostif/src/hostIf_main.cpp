@@ -45,6 +45,10 @@
 #define RFC_BUFFER_SIZE 256
 #endif
 
+#ifdef ENABLE_SD_NOTIFY
+#include <systemd/sd-daemon.h>
+#endif
+
 //static void killAllThreads();
 
 //------------------------------------------------------------------------------
@@ -344,6 +348,14 @@ int main(int argc, char *argv[])
         g_critical("Thread create failed: %s!!\n", err1->message );
         g_error_free (err1);
     }
+
+    #ifdef ENABLE_SD_NOTIFY
+        sd_notifyf(0, "READY=1\n"
+           "STATUS=tr69hostif is Successfully Initialized\n"
+              "MAINPID=%lu", (unsigned long) getpid());
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"tr69hostif sd notify envent  is sent  Successfully\n");
+    #endif
+
 
     //------------------------------------------------------------------------------
     // updateHandler::init :  Update handler thread for polling table profiles
