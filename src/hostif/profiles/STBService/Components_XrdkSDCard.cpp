@@ -631,8 +631,7 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
 #endif
                         break;
                     case SD_LotID:
-                        /* FIXME: STMgr has to be updated with Lot ID in the device info */
-                        strcpy (sdCardParam->sdCardProp.uchVal, deviceInfo.m_serialNumber);
+                        strcpy (sdCardParam->sdCardProp.uchVal, deviceInfo.m_hwVersion);
                         break;
                     case SD_Manufacturer:
                         sdCardParam->sdCardProp.ui32Val = (unsigned int) atoi (deviceInfo.m_manufacturer);
