@@ -471,9 +471,9 @@ int hostIf_STBServiceXSDCard::getSerialNumber(HOSTIF_MsgData_t *stMsgData)
         memset(&param, '\0', sizeof(param));
         param.eSDPropType = SD_SerialNumber;
         if(getSDCardProperties(&param) ) {
-            put_int(stMsgData->paramValue, param.sdCardProp.ui32Val);
+            sprintf(stMsgData->paramValue,"%s" ,param.sdCardProp.uchVal);
         }
-        stMsgData->paramtype=hostIf_UnsignedIntType;
+        stMsgData->paramtype=hostIf_StringType;
     }
     catch (const std::exception& e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception : %s\r\n",__FUNCTION__, e.what());
@@ -643,7 +643,8 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
                         sdCardParam->sdCardProp.bVal = (deviceInfo.m_status == RDK_STMGR_DEVICE_STATUS_READ_ONLY) ? true : false;
                         break;
                     case SD_SerialNumber:
-                        sdCardParam->sdCardProp.ui32Val = (unsigned int) deviceInfo.m_serialNumber;
+                        //sdCardParam->sdCardProp.ui32Val = (unsigned int) deviceInfo.m_serialNumber;
+                        strcpy(sdCardParam->sdCardProp.uchVal, deviceInfo.m_serialNumber);
                         break;
                     case SD_Status:
                     {
