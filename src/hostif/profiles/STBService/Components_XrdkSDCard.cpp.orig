@@ -634,7 +634,7 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
                         strcpy (sdCardParam->sdCardProp.uchVal, deviceInfo.m_hwVersion);
                         break;
                     case SD_Manufacturer:
-                        strcpy(sdCardParam->sdCardProp.uchVal,deviceInfo.m_manufacturer);
+                        sdCardParam->sdCardProp.ui32Val = (unsigned int) atoi (deviceInfo.m_manufacturer);
                         break;
                     case SD_Model:
                         strcpy (sdCardParam->sdCardProp.uchVal, deviceInfo.m_model);
