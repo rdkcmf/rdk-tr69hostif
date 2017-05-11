@@ -18,8 +18,8 @@
 ##########################################################################
 [Unit]
 Description=TR69 Host Interface Daemon
-After=lighttpd.service mfrmgr.service tr69bus.service dsmgr.service
-Requires=mfrmgr.service tr69bus.service
+After=lighttpd.service tr69bus.service dsmgr.service
+Requires=tr69bus.service
 
 [Service]
 Type=notify
