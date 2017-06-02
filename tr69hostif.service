@@ -24,7 +24,7 @@ Requires=tr69bus.service
 [Service]
 Type=notify
 EnvironmentFile=/etc/device.properties
-ExecStart=/bin/sh -c 'source /lib/rdk/opt-override.sh;/usr/bin/tr69hostif -c /etc/mgrlist.conf -p 10999 -d $DEBUGINIFILE'
+ExecStart=/bin/sh -c 'source /lib/rdk/opt-override.sh; exec /usr/bin/tr69hostif -c /etc/mgrlist.conf -p 10999 -d $DEBUGINIFILE'
 ExecStop=/bin/kill -15 $MAINPID
 RestartSec=10s
 Restart=always
