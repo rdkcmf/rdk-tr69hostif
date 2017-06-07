@@ -118,6 +118,10 @@ if WITH_STORAGESERVICE_PROFILE
 tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/StorageService/libstorageservice.la
 endif
 
+if WITH_HWSELFTEST_PROFILE
+tr69hostif_LDADD += -ltr69ProfileHwSelfTest
+endif
+
 if WITH_MOCA_PROFILE
 tr69hostif_LDADD += $(top_builddir)/soc/hostif/profiles/moca/libhostIfMoCA.la
 endif

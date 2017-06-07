@@ -667,6 +667,46 @@ public:
     */
     int set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t *);
 
+#ifdef USE_HWSELFTEST_PROFILE
+    /**
+    * @brief set_xOpsDeviceMgmt_hwHealthTest_Enable
+    *
+    * This method is used to enable/disable the harware health test functionality.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.Enable
+    *   Data type: boolean - Setting this will enable/disable health test functionality.
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xOpsDeviceMgmt_hwHealthTest_Enable(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xOpsDeviceMgmt_hwHealthTest_ExecuteTest
+    *
+    * This method is used to trigger hardware health test on the STB.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.ExecuteTest
+    *   Data type: integer - Setting this parameter will schedule a new test run
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xOpsDeviceMgmt_hwHealthTest_ExecuteTest(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xOpsDeviceMgmt_hwHealthTest_Results
+    *
+    * This method is used to retrieve the most recent harware health test results.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.Results
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int get_xOpsDeviceMgmt_hwHealthTest_Results(HOSTIF_MsgData_t *);
+#endif /* USE_HWSELFTEST_PROFILE */
+
     int readFirmwareInfo(char *, HOSTIF_MsgData_t *);
     int writeFirmwareInfo(char *, HOSTIF_MsgData_t *);
 };

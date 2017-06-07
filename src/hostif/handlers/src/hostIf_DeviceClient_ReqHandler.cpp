@@ -203,6 +203,16 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
             ret = pIface->handleSetMsg(stMsgData);
         }
 #endif
+#ifdef USE_HWSELFTEST_PROFILE
+        else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.ExecuteTest"))
+        {
+            ret = pIface->set_xOpsDeviceMgmt_hwHealthTest_ExecuteTest(stMsgData);
+        }
+        else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.Enable"))
+        {
+            ret = pIface->set_xOpsDeviceMgmt_hwHealthTest_Enable(stMsgData);
+        }
+#endif /* USE_HWSELFTEST_PROFILE */
     }
     hostIf_DeviceInfo::releaseLock();
     return ret;
@@ -479,6 +489,12 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->get_X_RDKCENTRAL_COM_BootTime(stMsgData);
         }
+#ifdef USE_HWSELFTEST_PROFILE
+        else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.Results"))
+        {
+            ret = pIface->get_xOpsDeviceMgmt_hwHealthTest_Results(stMsgData);
+        }
+#endif /* USE_HWSELFTEST_PROFILE */
     }
     hostIf_DeviceInfo::releaseLock();
     return ret;

@@ -75,6 +75,10 @@ AM_CXXFLAGS += -DBTMGR_ENABLE_IARM_INTERFACE
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/profiles/DeviceInfo
 endif
 
+if WITH_HWSELFTEST_PROFILE
+AM_CXXFLAGS += $(HWSELFTEST_PROFILE_FLAG)
+endif
+
 if WITH_SNMP_ADAPTER
 AM_CXXFLAGS += -DSNMP_ADAPTER_ENABLED -I$(top_srcdir)/src/hostif/snmpAdapter
 endif

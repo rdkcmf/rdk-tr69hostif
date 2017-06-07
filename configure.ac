@@ -49,6 +49,7 @@ HAVE_VALUE_CHANGE_EVENT_FLAG=" "
 SNMP_ADAPTER_FLAG=" "
 SYSTEMD_SDNOTIFY_CFLAGS=" "
 SYSTEMD_SDNOTIFY_LDFLAGS=" "
+HWSELFTEST_PROFILE_FLAG=" "
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
 [AM_DEFAULT_VERBOSITY=1
@@ -260,6 +261,17 @@ AC_ARG_ENABLE([systemd-notify],
                 ],
         [echo "systemd sd notify  is disable"])
 
+AC_ARG_ENABLE([hwselftest],
+        AS_HELP_STRING([--enable-hwselftest],[enable HW Self Test profile (default is no)]),
+        [
+          case "${enableval}" in
+           yes) HWSELFTEST_PROFILE_ENABLE=true
+                HWSELFTEST_PROFILE_FLAG="-DUSE_HWSELFTEST_PROFILE" ;;
+           no) HWSELFTEST_PROFILE_ENABLE=false AC_MSG_ERROR([HW Self Test is disabled]) ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-hwselftest ]) ;;
+           esac
+           ],
+         [echo "HW Self Test profile is disabled"])
 
 
 AM_CONDITIONAL([WITH_MOCA_PROFILE], [test "x$enable_moca" = "xyes"])
@@ -269,6 +281,7 @@ AM_CONDITIONAL([WITH_XRDK_SDCARD_PROFILE], [test x$XRDK_SDCARD_PROFILE_ENABLE = 
 AM_CONDITIONAL([WITH_DHCP_PROFILE], [test x$DHCPv4_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_INTFSTACK_PROFILE], [test x$INTFSTACK_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_STORAGESERVICE_PROFILE], [test x$STORAGESERVICE_PROFILE_ENABLE = xtrue])
+AM_CONDITIONAL([WITH_HWSELFTEST_PROFILE], [test x$HWSELFTEST_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_IPV6_SUPPORT], [test x$IPV6_SUPPORT_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_XRDK_RF4CE_PROFILE], [test x$XRDK_RF4CE_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_XRDK_BT_PROFILE], [test x$XRDK_BT_PROFILE_ENABLE = xtrue])
@@ -325,6 +338,7 @@ AC_SUBST(HAVE_VALUE_CHANGE_EVENT_FLAG)
 AC_SUBST(SNMP_ADAPTER_FLAG)
 AC_SUBST(SYSTEMD_SDNOTIFY_CFLAGS)
 AC_SUBST(SYSTEMD_SDNOTIFY_LDFLAGS)
+AC_SUBST(HWSELFTEST_PROFILE_FLAG)
 
 # files to generate via autotools (.am or .in source files)
 AC_CONFIG_FILES([Makefile])

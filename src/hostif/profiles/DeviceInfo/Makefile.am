@@ -37,6 +37,10 @@ AM_CXXFLAGS += $(XRDK_BT_PROFILE_FLAG)
 AM_LDFLAGS += -lBTMgr
 endif
 
+if WITH_HWSELFTEST_PROFILE
+AM_CXXFLAGS += $(HWSELFTEST_PROFILE_FLAG)
+endif
+
 noinst_LTLIBRARIES = libdeviceinfo.la
 libdeviceinfo_la_SOURCES = 	Device_DeviceInfo.cpp\
 				Device_DeviceInfo_Processor.cpp\

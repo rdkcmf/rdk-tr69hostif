@@ -89,6 +89,9 @@
 #ifdef USE_XRESRC
 #include "Device_XComcast_Xcalibur_Client_XRE_ConnectionTable.h"
 #endif
+#if USE_HWSELFTEST_PROFILE
+#include "DeviceInfo_hwHealthTest.h"
+#endif
 
 #define VERSION_FILE 		"/version.txt"
 
@@ -2272,6 +2275,23 @@ int hostIf_DeviceInfo::set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t * stMsgD
 
     return OK;
 }
+
+#ifdef USE_HWSELFTEST_PROFILE
+int hostIf_DeviceInfo::set_xOpsDeviceMgmt_hwHealthTest_Enable(HOSTIF_MsgData_t *stMsgData)
+{
+    return hwselftest::set_Device_DeviceInfo_xOpsDeviceMgmt_hwHealthTest_Enable(LOG_TR69HOSTIF, stMsgData)? OK : NOK;
+}
+
+int hostIf_DeviceInfo::set_xOpsDeviceMgmt_hwHealthTest_ExecuteTest(HOSTIF_MsgData_t *stMsgData)
+{
+    return hwselftest::set_Device_DeviceInfo_xOpsDeviceMgmt_hwHealthTest_ExecuteTest(LOG_TR69HOSTIF, stMsgData)? OK : NOK;
+}
+
+int hostIf_DeviceInfo::get_xOpsDeviceMgmt_hwHealthTest_Results(HOSTIF_MsgData_t *stMsgData)
+{
+    return hwselftest::get_Device_DeviceInfo_xOpsDeviceMgmt_hwHealthTest_Results(LOG_TR69HOSTIF, stMsgData)? OK : NOK;
+}
+#endif /* USE_HWSELFTEST_PROFILE */
 
 int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
 {
