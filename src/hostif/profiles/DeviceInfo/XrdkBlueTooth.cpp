@@ -1899,7 +1899,7 @@ void hostIf_DeviceInfoRdk_xBT::notifyAddDelEvent(unsigned short numOfDevEntry, c
             }
             noOfPairedDevice = pairedDevList.m_numOfDevices;
         }
-        else if((NULL != tblObj) && (0 == strcasecmp(X_BT_DISCOVERED_DEV_OBJ, tblObj)))
+        else if((NULL != tblObj) && (0 == strcasecmp(X_BT_CONNECTED_DEV_OBJ, tblObj)))
         {
             fetch_Bluetooth_ConnectedDevicesList();
             unsigned short connDevCnt = connectedDevList.m_numOfDevices;
