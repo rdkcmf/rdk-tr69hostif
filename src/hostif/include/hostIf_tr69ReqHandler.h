@@ -99,7 +99,12 @@ void hostIf_IARM_IF_Stop();
 
 #define IARM_BUS_TR69HOSTIFMGR_API_RegisterForEvents       "tr69HostIfRegisterForEvents" /*!< Registers for events from tr69hostIf, on this call, add/remove events will be re-broadcasted*/
 
-#define TR69HOSTIFMGR_MAX_PARAM_LEN	1024
+#ifdef USE_HWSELFTEST_PROFILE
+/* HW Self Test profile sends back results with descriptions, thus needs bigger message to fit them in */
+#define TR69HOSTIFMGR_MAX_PARAM_LEN     (2*1024)
+#else
+#define TR69HOSTIFMGR_MAX_PARAM_LEN     (1024)
+#endif
 
 /*! Parameter for Getpowerstate call*/
 /*! Host IF Message Parameter data-type*/
