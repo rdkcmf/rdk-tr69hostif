@@ -102,7 +102,7 @@
 GHashTable* hostIf_DeviceInfo::ifHash = NULL;
 GHashTable* hostIf_DeviceInfo::m_notifyHash = NULL;
 GMutex* hostIf_DeviceInfo::m_mutex = NULL;
-
+bool hostIf_DeviceInfo::m_telemetryRFCEnable=false;
 void *ResetFunc(void *);
 
 
@@ -110,7 +110,10 @@ static int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t *);
 static char stbMacCache[TR69HOSTIFMGR_MAX_PARAM_LEN] = {'\0'};
 static string reverseSSHArgs;
 const string sshCommand = "/lib/rdk/startTunnel.sh";
-
+#if defined(ENABLE_TELEMETRY_LOGGER)
+extern pthread_cond_t cond_telemetry;
+extern pthread_mutex_t mutex_telemetry;
+#endif
 /****************************************************************************************************************************************************/
 // Device.DeviceInfo Profile. Getters:
 /****************************************************************************************************************************************************/
@@ -2292,6 +2295,31 @@ int hostIf_DeviceInfo::get_xOpsDeviceMgmt_hwHealthTest_Results(HOSTIF_MsgData_t 
     return hwselftest::get_Device_DeviceInfo_xOpsDeviceMgmt_hwHealthTest_Results(LOG_TR69HOSTIF, stMsgData)? OK : NOK;
 }
 #endif /* USE_HWSELFTEST_PROFILE */
+
+int hostIf_DeviceInfo::set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOK;
+    LOG_ENTRY_EXIT;
+    if(stMsgData->paramtype == hostIf_BooleanType)
+    {
+    	m_telemetryRFCEnable = get_boolean(stMsgData->paramValue);
+    	RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully set \"%s\" to \"%d\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, m_telemetryRFCEnable);
+#if defined(ENABLE_TELEMETRY_LOGGER)
+    	pthread_mutex_lock(&mutex_telemetry);
+    	pthread_cond_signal(&cond_telemetry);
+    	RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Send Signal to wake up telemetry Thread. \n", __FUNCTION__, __LINE__);
+    	pthread_mutex_unlock(&mutex_telemetry);
+#endif
+    	ret = OK;
+    }
+    else
+    {
+    	RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong data type for %s, please use boolean(0/1) to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
+    }
+
+    return ret;
+}
+
 
 int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
 {

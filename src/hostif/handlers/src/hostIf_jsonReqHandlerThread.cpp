@@ -80,11 +80,11 @@ static int process_string(void * ctx, const unsigned char * stringVal, unsigned 
     parser_state_t  *context = (parser_state_t *) ctx;
     char        *string = NULL;
 
-    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Process string: %d\n", context->state);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Process string: %d\n", context->state);
     if ((context->state == STATE_PROCESSING) && (context->grabString))
     {
         string = strndup((const char *)stringVal, stringLen);
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Adding string %s\n", string);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Adding string %s\n", string);
         context->list = g_list_append(context->list, string);
         context->grabString = FALSE;
     }

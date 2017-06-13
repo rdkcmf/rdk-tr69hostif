@@ -289,10 +289,8 @@ void InterfaceStackClientReqHandler::checkForUpdates()
     {
         notifyhash = pInterfaceStackClient->getNotifyHash();
     }
-    else
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Unable to get hostif_InterfaceStack Instance\n", __FUNCTION__, __FILE__);
-    }
+
+
     // Iterate through Ghash Table
     if(NULL != notifyhash)
     { 

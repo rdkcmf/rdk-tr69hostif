@@ -177,6 +177,7 @@
 
 #define xOpsRPCRebootNow "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.RebootNow"
 
+#define TELEMETRY_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RF_Telemetry.Enable"
 /**
  * @brief This class provides the interface for getting device information.
  * @ingroup TR69_HOSTIF_DEVICEINFO_CLASSES
@@ -236,7 +237,7 @@ public:
 
     GHashTable* getNotifyHash();
 
-
+    static bool m_telemetryRFCEnable;
     /**
     * Description. This is the getter api for DeviceInfo for
     *  Device.DeviceInfo Profile.
@@ -707,6 +708,7 @@ public:
     int get_xOpsDeviceMgmt_hwHealthTest_Results(HOSTIF_MsgData_t *);
 #endif /* USE_HWSELFTEST_PROFILE */
 
+    int set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *);
     int readFirmwareInfo(char *, HOSTIF_MsgData_t *);
     int writeFirmwareInfo(char *, HOSTIF_MsgData_t *);
 };

@@ -68,6 +68,10 @@ void init_request_handler_mutex (void);
 T_ARGLIST argList = {{'\0'}, 0};
 
 char *hostIf_JsonIfMsg = (char *)"hostIf_JsonIfThread";
+#if defined(ENABLE_TELEMETRY_LOGGER)
+pthread_t telemetery_tid;
+char *telemetryLoggerThread = (char *)"telemetryLoggerThread";
+#endif
 GError *err1 = NULL ;
 
 /* Globals associated with the shutdown thread which frees all resources and exits the process
@@ -78,6 +82,12 @@ static  sem_t       shutdown_thread_sem;                /* Semaphore used to sig
 static  int         shutdown_sig_received = 0;          /* The signal that triggered the shutdown */
 
 #define UNUSED(x)   ((void)(x))
+
+#if defined(ENABLE_TELEMETRY_LOGGER)
+/* Telemetry thread condition mutex */
+pthread_cond_t cond_telemetry = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t mutex_telemetry = PTHREAD_MUTEX_INITIALIZER;
+#endif
 
 //------------------------------------------------------------------------------
 // shutdown_thread_entry: frees all resources and exits the process
@@ -362,6 +372,19 @@ int main(int argc, char *argv[])
     //------------------------------------------------------------------------------
     updateHandler::Init();
 
+	//------------------------------------------------------------------------------
+	// Telemetry logger start
+	//------------------------------------------------------------------------------
+#if defined(ENABLE_TELEMETRY_LOGGER)
+    if(0 == pthread_create(&telemetery_tid, NULL, telemetryLogger_thFunc, NULL))
+    {
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"TelemetryThread created Successfully\n");
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"TelemetryThread create failed\n");
+    }
+#endif
     main_loop = g_main_loop_new (NULL, FALSE);
 
     g_main_loop_run(main_loop);
@@ -417,6 +440,9 @@ void exit_gracefully (int sig_received)
     WiFiDevice::shutdown();
 #endif
 
+#if defined(ENABLE_TELEMETRY_LOGGER)
+    pthread_kill(telemetery_tid, sig_received);
+#endif
     /*Stop libSoup server and exit Json Thread */
     hostIf_HttpServerStop();
 

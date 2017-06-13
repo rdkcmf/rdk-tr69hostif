@@ -93,14 +93,14 @@
  */
 class hostIf_snmpAdapter {
 
-    static  GHashTable  *ifHash;
+//    static  GHashTable  *m_ifHash;
 
     static GMutex *m_mutex;
 
     static  GHashTable  *m_notifyHash;
 
-    int dev_id;
-	static map<string, string> tr181SNMPMap;
+    int m_dev_id;
+    static map<string, string> m_tr181SNMPMap;
 
     hostIf_snmpAdapter(int dev_id);
 
@@ -109,13 +109,14 @@ class hostIf_snmpAdapter {
 public:
     static void init(void);
     static void unInit(void);
-    static hostIf_snmpAdapter *getInstance(int dev_id);
+//    static hostIf_snmpAdapter *getInstance(int dev_id);
+    static hostIf_snmpAdapter *getInstance(int dev_id=0);
 
     static void closeInstance(hostIf_snmpAdapter *);
 
-    static GList* getAllInstances();
-
-    static void closeAllInstances();
+//    static GList* getAllInstances();
+//
+//    static void closeAllInstances();
 
     static void getLock();
 

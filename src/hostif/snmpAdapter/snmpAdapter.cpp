@@ -54,11 +54,11 @@
 #define SNMP_AGENT_IP_ADDRESS           "192.168.100.1" //"127.0.0.1"
 #define SNMP_COMMUNITY                  "hDaFHJG7"
 
-GHashTable* hostIf_snmpAdapter::ifHash = NULL;
+//GHashTable* hostIf_snmpAdapter::m_ifHash = NULL;
 GHashTable* hostIf_snmpAdapter::m_notifyHash = NULL;
 GMutex* hostIf_snmpAdapter::m_mutex = NULL;
-map<string, string> hostIf_snmpAdapter::tr181SNMPMap;
-
+map<string, string> hostIf_snmpAdapter::m_tr181SNMPMap;
+//void log_doscif_parameters();
 /****************************************************************************************************************************************************/
 // Device.X_RDKCENTRAL Profile. Getters:
 /****************************************************************************************************************************************************/
@@ -68,7 +68,7 @@ map<string, string> hostIf_snmpAdapter::tr181SNMPMap;
  *
  */
 hostIf_snmpAdapter::hostIf_snmpAdapter(int dev_id):
-    dev_id(dev_id)
+    m_dev_id(dev_id)
 {
 
 }
@@ -83,6 +83,7 @@ hostIf_snmpAdapter::~hostIf_snmpAdapter()
     {
         g_hash_table_destroy(m_notifyHash);
     }
+    unInit();
 }
 
 /**
@@ -96,7 +97,7 @@ void hostIf_snmpAdapter::init(void)
     ifstream fileStream (TR181_SNMPOID_FILE);
     char delimeter[] = " \t\n\r\f\v";
 
-    tr181SNMPMap.clear();
+    m_tr181SNMPMap.clear();
     if (fileStream.is_open())
     {
         while(getline(fileStream, line))
@@ -112,17 +113,17 @@ void hostIf_snmpAdapter::init(void)
                 value.erase(0, value.find_first_not_of(delimeter));
                 value.erase(value.find_last_not_of(delimeter) + 1);
 
-                tr181SNMPMap[key] = value;
+                m_tr181SNMPMap[key] = value;
             }
         }
     }
     else
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Error opening %s fileStream.", __FUNCTION__, __LINE__, TR181_SNMPOID_FILE );
 
-    if (!tr181SNMPMap.empty())
+    if (!m_tr181SNMPMap.empty())
     {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] %s count %d\n", __FUNCTION__, TR181_SNMPOID_FILE, tr181SNMPMap.size());
-        for(map<string, string>::iterator it = tr181SNMPMap.begin(); it != tr181SNMPMap.end(); it++)
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] %s count %d\n", __FUNCTION__, TR181_SNMPOID_FILE, m_tr181SNMPMap.size());
+        for(map<string, string>::iterator it = m_tr181SNMPMap.begin(); it != m_tr181SNMPMap.end(); it++)
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] %s : %s\n", __FUNCTION__, it->first.c_str(), it->second.c_str());
     }
 }
@@ -132,18 +133,18 @@ void hostIf_snmpAdapter::init(void)
  * 
  */
 void hostIf_snmpAdapter::unInit(void)
-{    
-    tr181SNMPMap.clear();
+{
+    m_tr181SNMPMap.clear();
 }
 
 hostIf_snmpAdapter* hostIf_snmpAdapter::getInstance(int dev_id)
 {
     hostIf_snmpAdapter* pRet = NULL;
 
-    if(ifHash)
-        pRet = (hostIf_snmpAdapter *)g_hash_table_lookup(ifHash,(gpointer) dev_id);
-    else
-        ifHash = g_hash_table_new(NULL,NULL);
+//    if(m_ifHash)
+//        pRet = (hostIf_snmpAdapter *)g_hash_table_lookup(m_ifHash,(gpointer) dev_id);
+//    else
+//        m_ifHash = g_hash_table_new(NULL,NULL);
 
     if(!pRet)
     {
@@ -153,41 +154,42 @@ hostIf_snmpAdapter* hostIf_snmpAdapter::getInstance(int dev_id)
         {
             RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"Caught exception, not able create SNMP Device RDK Central instance..\n");
         }
-        g_hash_table_insert(ifHash, (gpointer)dev_id, pRet);
+//        g_hash_table_insert(m_ifHash, (gpointer)dev_id, pRet);
+        init();
     }
     return pRet;
 }
 
-GList* hostIf_snmpAdapter::getAllInstances()
-{
-    if(ifHash)
-        return g_hash_table_get_keys(ifHash);
-    return NULL;
-}
+//GList* hostIf_snmpAdapter::getAllInstances()
+//{
+//    if(m_ifHash)
+//        return g_hash_table_get_keys(m_ifHash);
+//    return NULL;
+//}
 
 void hostIf_snmpAdapter::closeInstance(hostIf_snmpAdapter *pDev)
 {
     if(pDev)
     {
-        g_hash_table_remove(ifHash, (gconstpointer)pDev->dev_id);
+//        g_hash_table_remove(m_ifHash, (gconstpointer)pDev->m_dev_id);
         delete pDev;
     }
 }
 
-void hostIf_snmpAdapter::closeAllInstances()
-{
-    if(ifHash)
-    {
-        GList* tmp_list = g_hash_table_get_values (ifHash);
-
-        while(tmp_list)
-        {
-            hostIf_snmpAdapter* pDev = (hostIf_snmpAdapter *)tmp_list->data;
-            tmp_list = tmp_list->next;
-            closeInstance(pDev);
-        }
-    }
-}
+//void hostIf_snmpAdapter::closeAllInstances()
+//{
+//    if(m_ifHash)
+//    {
+//        GList* tmp_list = g_hash_table_get_values (m_ifHash);
+//
+//        while(tmp_list)
+//        {
+//            hostIf_snmpAdapter* pDev = (hostIf_snmpAdapter *)tmp_list->data;
+//            tmp_list = tmp_list->next;
+//            closeInstance(pDev);
+//        }
+//    }
+//}
 
 void hostIf_snmpAdapter::getLock()
 {
@@ -227,13 +229,13 @@ int hostIf_snmpAdapter::get_ValueFromSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
 
     if(stMsgData)
     {
-        it = tr181SNMPMap.find(stMsgData->paramName);
-        if (it != tr181SNMPMap.end())
+        it = m_tr181SNMPMap.find(stMsgData->paramName);
+        if (it != m_tr181SNMPMap.end())
         {
             snprintf (cmd, BUFF_LENGTH_256, "snmpget -OQ -Ir -v 2c -c %s %s %s",
-                SNMP_COMMUNITY,
-                SNMP_AGENT_IP_ADDRESS,
-                it->second.c_str());
+                      SNMP_COMMUNITY,
+                      SNMP_AGENT_IP_ADDRESS,
+                      it->second.c_str());
 
             RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] %s\n", __FUNCTION__, cmd);
             ret = GetStdoutFromCommand( cmd, consoleString);
@@ -278,39 +280,39 @@ int hostIf_snmpAdapter::set_ValueToSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
 
     if(stMsgData)
     {
-        it = tr181SNMPMap.find(stMsgData->paramName);
-        if (it != tr181SNMPMap.end())
+        it = m_tr181SNMPMap.find(stMsgData->paramName);
+        if (it != m_tr181SNMPMap.end())
         {
             switch(stMsgData->paramtype)
             {
-                case hostIf_StringType:
-                    snprintf (cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s s %s", 
-                        SNMP_COMMUNITY, SNMP_AGENT_IP_ADDRESS, 
-                        it->second.c_str(),
-                        stMsgData->paramValue);
-                    break;
+            case hostIf_StringType:
+                snprintf (cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s s %s",
+                          SNMP_COMMUNITY, SNMP_AGENT_IP_ADDRESS,
+                          it->second.c_str(),
+                          stMsgData->paramValue);
+                break;
 
-                case hostIf_IntegerType:
-                    snprintf (cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s i %d",
-                        SNMP_COMMUNITY, SNMP_AGENT_IP_ADDRESS,
-                        it->second.c_str(),
-                        stMsgData->paramValue);
-                    break;
+            case hostIf_IntegerType:
+                snprintf (cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s i %d",
+                          SNMP_COMMUNITY, SNMP_AGENT_IP_ADDRESS,
+                          it->second.c_str(),
+                          stMsgData->paramValue);
+                break;
 
-                case hostIf_UnsignedIntType:
-                    snprintf (cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s u %d",
-                        SNMP_COMMUNITY,
-                        SNMP_AGENT_IP_ADDRESS,
-                        it->second.c_str(),
-                        stMsgData->paramValue);
-                    break;
+            case hostIf_UnsignedIntType:
+                snprintf (cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s u %d",
+                          SNMP_COMMUNITY,
+                          SNMP_AGENT_IP_ADDRESS,
+                          it->second.c_str(),
+                          stMsgData->paramValue);
+                break;
 
-                case hostIf_BooleanType:
-                case hostIf_DateTimeType:
-                case hostIf_UnsignedLongType:
-                default:			
-                    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] %s not supported type %d\n", __FUNCTION__, __LINE__, stMsgData->paramName, stMsgData->paramtype);
-                    return NOK;
+            case hostIf_BooleanType:
+            case hostIf_DateTimeType:
+            case hostIf_UnsignedLongType:
+            default:
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] %s not supported type %d\n", __FUNCTION__, __LINE__, stMsgData->paramName, stMsgData->paramtype);
+                return NOK;
             }
 
             RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] %s\n", __FUNCTION__, cmd);

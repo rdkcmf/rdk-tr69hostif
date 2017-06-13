@@ -49,7 +49,7 @@ msgHandler* SNMPClientReqHandler::getInstance()
  */
 bool SNMPClientReqHandler::init()
 {
-    hostIf_snmpAdapter::init();
+//    hostIf_snmpAdapter::init();
     return true;
 }
 
@@ -64,7 +64,7 @@ bool SNMPClientReqHandler::init()
  */
 bool SNMPClientReqHandler::unInit()
 {
-    hostIf_snmpAdapter::unInit();
+//    hostIf_snmpAdapter::unInit();
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] SNMP manager DeInitializing\n", __FUNCTION__);
     return true;
 }

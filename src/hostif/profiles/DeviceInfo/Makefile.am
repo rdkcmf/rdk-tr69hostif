@@ -41,6 +41,10 @@ if WITH_HWSELFTEST_PROFILE
 AM_CXXFLAGS += $(HWSELFTEST_PROFILE_FLAG)
 endif
 
+if WITH_TELEMETRY_LOGGER
+AM_CXXFLAGS += $(TELEMETRY_LOGGER_FLAG)
+endif
+
 noinst_LTLIBRARIES = libdeviceinfo.la
 libdeviceinfo_la_SOURCES = 	Device_DeviceInfo.cpp\
 				Device_DeviceInfo_Processor.cpp\

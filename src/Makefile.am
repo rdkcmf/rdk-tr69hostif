@@ -83,6 +83,10 @@ AM_LDFLAGS = $(GLIB_LDFLAGS) $(GLIB_LIBS) \
 	-lds -ldshalcli
 endif
 
+if WITH_TELEMETRY_LOGGER
+AM_CXXFLAGS += $(TELEMETRY_LOGGER_FLAG)
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/profiles/DeviceInfo
+endif
 
 AM_CFLAGS =  $(GLIB_CFLAGS) $(GTHREAD_CFLAGS)
 AM_CPPFLAGS =  $(GLIB_CFLAGS) $(GTHREAD_CFLAGS)
@@ -95,10 +99,16 @@ AM_CPPFLAGS =  $(GLIB_CFLAGS) $(GTHREAD_CFLAGS)
 #endif
 # Enabled SD_NOTIFY
 AM_CXXFLAGS += $(SYSTEMD_SDNOTIFY_CFLAGS)
-AM_LDFLAGS += $(SYSTEMD_SDNOTIFY_LDFLAGS)
+AM_LDFLAGS += $(SYSTEMD_SDNOTIFY_LDFLAGS) -lcjson
 
 bin_PROGRAMS = tr69hostif
-tr69hostif_SOURCES = $(top_srcdir)/src/hostif/src/hostIf_main.cpp $(top_srcdir)/src/hostif/src/hostIf_utils.cpp
+tr69hostif_SOURCES = $(top_srcdir)/src/hostif/src/hostIf_main.cpp
+tr69hostif_SOURCES += $(top_srcdir)/src/hostif/src/hostIf_utils.cpp
+
+if WITH_TELEMETRY_LOGGER
+tr69hostif_SOURCES += $(top_srcdir)/src/hostif/src/telemetry_logger.cpp
+endif
+
 tr69hostif_LDADD = $(top_builddir)/src/hostif/handlers/libMsgHandlers.la
 tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/STBService/libstbservice.la
 tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/IP/libhostIfIP.la

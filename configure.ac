@@ -50,6 +50,7 @@ SNMP_ADAPTER_FLAG=" "
 SYSTEMD_SDNOTIFY_CFLAGS=" "
 SYSTEMD_SDNOTIFY_LDFLAGS=" "
 HWSELFTEST_PROFILE_FLAG=" "
+TELEMETRY_LOGGER_FLAG=" "
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
 [AM_DEFAULT_VERBOSITY=1
@@ -273,6 +274,19 @@ AC_ARG_ENABLE([hwselftest],
            ],
          [echo "HW Self Test profile is disabled"])
 
+AC_ARG_ENABLE([telemetrylogger],
+	AS_HELP_STRING([--enable-telemetrylogger],[enable TELEMETRY LOGGER (default is no)]),
+	[
+	case "${enableval}" in
+	yes) TELEMETRY_LOGGER_ENABLE=true
+		TELEMETRY_LOGGER_FLAG="-DENABLE_TELEMETRY_LOGGER";;
+	no) TELEMETRY_LOGGER_ENABLE=false AC_MSG_ERROR([TELEMETRY LOGGER is disabled]) ;;
+	*) AC_MSG_ERROR([bad value ${enableval} for --enable-telemetrylogger ]) ;;
+	esac
+	],
+	[echo "TELEMETRY LOGGER is disabled"])
+
+
 
 AM_CONDITIONAL([WITH_MOCA_PROFILE], [test "x$enable_moca" = "xyes"])
 AM_CONDITIONAL([WITH_MOCA20], [test "x$enable_moca2" = "xyes"])
@@ -288,6 +302,7 @@ AM_CONDITIONAL([WITH_XRDK_BT_PROFILE], [test x$XRDK_BT_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_WEBPA_RFC], [test x$WEBPA_RFC_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_NOTIFICATION_SUPPORT], [test x$HAVE_VALUE_CHANGE_EVENT_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_SNMP_ADAPTER], [test x$SNMP_ADAPTER_ENABLE = xtrue])
+AM_CONDITIONAL([WITH_TELEMETRY_LOGGER], [test x$TELEMETRY_LOGGER_ENABLE = xtrue])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -339,7 +354,7 @@ AC_SUBST(SNMP_ADAPTER_FLAG)
 AC_SUBST(SYSTEMD_SDNOTIFY_CFLAGS)
 AC_SUBST(SYSTEMD_SDNOTIFY_LDFLAGS)
 AC_SUBST(HWSELFTEST_PROFILE_FLAG)
-
+AC_SUBST(TELEMETRY_LOGGER_FLAG)
 # files to generate via autotools (.am or .in source files)
 AC_CONFIG_FILES([Makefile])
 

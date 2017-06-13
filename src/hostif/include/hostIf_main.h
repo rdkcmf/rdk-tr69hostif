@@ -137,6 +137,9 @@ void exit_gracefully (int sig_received);
 
 void *tr69IfHandlerThread(void *);
 void *jsonIfHandlerThread(void *);
+#if defined(ENABLE_TELEMETRY_LOGGER)
+void *telemetryLogger_thFunc(void *);
+#endif
 pid_t getTid();
 
 
