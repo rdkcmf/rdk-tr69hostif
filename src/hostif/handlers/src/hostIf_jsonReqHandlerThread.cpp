@@ -314,6 +314,7 @@ void hostIf_HTTPJsonMsgHandler(
 
     // TODO: What is the correct MIME type?
     soup_message_set_response(msg, (const char *) "application/json", SOUP_MEMORY_COPY, (const char *) buf, len);
+    soup_message_set_status (msg, SOUP_STATUS_OK);
 
     yajl_gen_free(json);
 
