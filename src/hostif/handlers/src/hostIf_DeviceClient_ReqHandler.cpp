@@ -431,6 +431,10 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadProtocol(stMsgData);
         }
+        else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadPercent") == 0)
+        {
+            ret = pIface->get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadPercent (stMsgData);
+        }
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_RDKVersion") == 0)
         {
             ret = pIface->get_Device_DeviceInfo_SoftwareVersion(stMsgData);

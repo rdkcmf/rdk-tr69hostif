@@ -284,16 +284,19 @@ int read_command_output (char* cmd, char* resultBuff, int length)
     FILE* fp = popen (cmd, "r");
     if (fp == NULL)
     {
-        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s(): cannot run command '%s'\n", __FUNCTION__, cmd);
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]: cannot run command [%s]\n", __FUNCTION__, cmd);
         return NOK;
     }
     if (fgets (resultBuff, length, fp) == NULL)
     {
-        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s(): cannot read output from command '%s'\n", __FUNCTION__, cmd);
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]: cannot read output from command [%s]\n", __FUNCTION__, cmd);
         pclose (fp);
         return NOK;
     }
     pclose (fp);
+
+    RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s]: command [%s] returned [%s]\n", __FUNCTION__, cmd, resultBuff);
+
     return OK;
 }
 

@@ -1395,6 +1395,30 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadURL (
         return NOK;
 }
 
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadPercent (HOSTIF_MsgData_t* stMsgData, bool *pChanged)
+{
+    LOG_ENTRY_EXIT;
+
+    int firmwareDownloadPercent = -1;
+    char output[8];
+    if (OK == read_command_output ("cat /opt/curl_progress | tr -s '\r' '\n' | tail -n 1 | sed 's/^ *//g' | tr -s ' ' | cut -d ' ' -f3", output, 8))
+    {
+        output[strcspn(output, "\n")] = 0;
+        if (*output)
+        {
+            firmwareDownloadPercent = strtol (output, NULL, 10);
+        }
+    }
+
+    RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] FirmwareDownloadPercent = [%d]\n", __FUNCTION__, firmwareDownloadPercent);
+
+    put_int (stMsgData->paramValue, firmwareDownloadPercent);
+    stMsgData->paramtype = hostIf_IntegerType;
+    stMsgData->paramLen = sizeof(int);
+
+    return OK;
+}
+
 /**
  * @brief This function gets the number of entries in the VendorConfigFile table.
  * Currently not implemented.

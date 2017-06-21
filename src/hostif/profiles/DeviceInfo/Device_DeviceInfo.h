@@ -332,6 +332,8 @@ public:
 
     int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadURL (HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
+    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadPercent (HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
     /**
      * @brief get_Device_DeviceInfo_X_COMCAST-COM_Reset.
      *
