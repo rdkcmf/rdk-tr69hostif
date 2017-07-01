@@ -307,7 +307,7 @@ public:
 
 
     /**
-     * @brief get_Device_DeviceInfo_X_COMCAST_COM_FirmwareFilename.
+     * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename.
      *
      * Filename of the firmware currently running on the device.
      *
@@ -320,13 +320,13 @@ public:
      * @execution Synchronous.
      *
      */
-    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareFilename(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
-    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
 
-    int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadStatus(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadStatus(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadProtocol(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
@@ -335,9 +335,9 @@ public:
     int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadPercent (HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
-     * @brief get_Device_DeviceInfo_X_COMCAST-COM_Reset.
+     * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset.
      *
-     * This is get X_COMCAST-COM_Reset returns an empty string.
+     * Returns an empty string.
      *
      * @return The status of the operation.
      *
@@ -348,16 +348,21 @@ public:
      *
      */
 
-    int get_Device_DeviceInfo_X_COMCAST_COM_Reset(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+    int get_Device_DeviceInfo_MemoryStatus_Total(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+    int get_Device_DeviceInfo_MemoryStatus_Free(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_CPUTemp(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     /**
-     * @brief set_Device_DeviceInfo_X_COMCAST-COM_Reset.
+     * @brief set_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset.
      *
-     * This is set X_COMCAST-COM_Reset as setting this parameter results in
-     * the reset being performed on the device. The level of reset performed
-     * is defined by the value that is written into this parameter.
+     * Setting this parameter results in a reset being performed on the device.
+     * The level of reset performed is defined by the value written into this parameter.
      * Enumeration of:
-     *         Cold
+     *        Cold
      *        Factory
      *        Warehouse
      *        Customer
@@ -371,13 +376,8 @@ public:
      * @execution Synchronous.
      *
      */
-    int get_Device_DeviceInfo_MemoryStatus_Total(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
-    int get_Device_DeviceInfo_MemoryStatus_Free(HOSTIF_MsgData_t *, bool *pChanged = NULL);
-
-    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_CPUTemp(HOSTIF_MsgData_t *, bool *pChanged = NULL);
-
-    int set_Device_DeviceInfo_X_COMCAST_COM_Reset(HOSTIF_MsgData_t*);
+    int set_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(HOSTIF_MsgData_t*);
 
     /**
      * @brief get_Device_DeviceInfo_VendorConfigFileNumberOfEntries.
@@ -560,8 +560,8 @@ public:
     /**
      * Helper methods
      */
-    int set_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(HOSTIF_MsgData_t *);
-    int set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadStatus(HOSTIF_MsgData_t *);
+    int set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(HOSTIF_MsgData_t *);
+    int set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadStatus(HOSTIF_MsgData_t *);
     int set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadProtocol(HOSTIF_MsgData_t *);
     int set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadURL (HOSTIF_MsgData_t *);
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayType(HOSTIF_MsgData_t *);

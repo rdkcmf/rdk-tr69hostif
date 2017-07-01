@@ -1257,7 +1257,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_PowerStatus(HOSTIF_Ms
  * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
  * @ingroup TR69_HOSTIF_DEVICEINFO_API
  */
-int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareFilename(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     string line;
     bool curFileFlag = true;
@@ -1355,7 +1355,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareFilename(HOST
  * @retval ERR_INTERNAL_ERROR if not able to fetch data from the device.
  * @ingroup TR69_HOSTIF_DEVICEINFO_API
  */
-int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret = NOK;
     try
@@ -1371,7 +1371,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(HO
     return ret;
 }
 
-int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadStatus(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadStatus(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     if(OK == readFirmwareInfo((char *)"Status", stMsgData))
         return OK;
@@ -1514,7 +1514,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_VendorLogFileNumberOfEntries(HOSTIF
  * @return Returns integer '-1' on method completion
  * @ingroup TR69_HOSTIF_DEVICEINFO_API
  */
-int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_Reset(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     return NOK;
 }
@@ -1878,7 +1878,7 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayTy
  * @retval ERR_INTERNAL_ERROR if not able to fetch the data from device.
  * @ingroup TR69_HOSTIF_DEVICEINFO_API
  */
-int hostIf_DeviceInfo::set_Device_DeviceInfo_X_COMCAST_COM_Reset(HOSTIF_MsgData_t *stMsgData)
+int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOK;
     char scriptbuff[100] = {'\0'};
@@ -1949,7 +1949,7 @@ void *ResetFunc( void *)
  * @retval NOK if not able to fetch the data from device.
  * @ingroup TR69_HOSTIF_DEVICEINFO_API
  */
-int hostIf_DeviceInfo::set_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(HOSTIF_MsgData_t *stMsgData)
+int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOK;
     writeFirmwareInfo((char *)"DnldFile",stMsgData);
@@ -1968,7 +1968,7 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(HO
  * @retval NOK if not able to fetch the data from device.
  * @ingroup TR69_HOSTIF_DEVICEINFO_API
  */
-int hostIf_DeviceInfo::set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadStatus(HOSTIF_MsgData_t *stMsgData)
+int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadStatus(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOK;
 #define STATUS_STRING_INPROGRESS "InProgress"

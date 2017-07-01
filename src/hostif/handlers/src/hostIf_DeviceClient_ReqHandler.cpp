@@ -138,31 +138,30 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
             return NOK;
         }
 
-        if ((strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_Reset") == 0) ||
-                (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM.Reset") == 0))
+        if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_Reset") == 0 ||
+                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_Reset") == 0)
         {
-            ret = pIface->set_Device_DeviceInfo_X_COMCAST_COM_Reset(stMsgData);
+            ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(stMsgData);
         }
-        if ((strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareToDownload") == 0) ||
-                (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM.FirmwareToDownload") == 0))
+        else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareToDownload") == 0 ||
+                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareToDownload") == 0)
         {
-            ret = pIface->set_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(stMsgData);
+            ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(stMsgData);
         }
-        if ((strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareDownloadStatus") == 0)||
-                (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM.FirmwareDownloadStatus") == 0))
+        else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareDownloadStatus") == 0 ||
+                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadStatus") == 0)
         {
-            ret = pIface->set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadStatus(stMsgData);
+            ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadStatus(stMsgData);
         }
-
         /* Added as per RDK Requirement RDK-12720 */
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadProtocol") == 0)
+        {
             ret = pIface->set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadProtocol (stMsgData);
+        }
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadURL") == 0)
+        {
             ret = pIface->set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadURL (stMsgData);
-        else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareToDownload") == 0)
-            ret = pIface->set_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(stMsgData);
-        else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadStatus") == 0)
-            ret = pIface->set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadStatus (stMsgData);
+        }
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_PreferredGatewayType") == 0)
         {
             ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayType(stMsgData);
@@ -405,23 +404,20 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(stMsgData);
         }
-        else if ((strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareFilename") == 0) ||
-                 (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM.FirmwareFilename") == 0) ||
-                 (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareFilename") == 0))
+        else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareFilename") == 0 ||
+                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareFilename") == 0)
         {
-            ret = pIface->get_Device_DeviceInfo_X_COMCAST_COM_FirmwareFilename(stMsgData);
+            ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(stMsgData);
         }
-        else if ((strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareToDownload") == 0) ||
-                 (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM.FirmwareToDownload") == 0) ||
-                 (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareToDownload") == 0))
+        else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareToDownload") == 0 ||
+                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareToDownload") == 0)
         {
-            ret = pIface->get_Device_DeviceInfo_X_COMCAST_COM_FirmwareToDownload(stMsgData);
+            ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(stMsgData);
         }
-        else if ((strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareDownloadStatus") == 0) ||
-                 (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM.FirmwareDownloadStatus") == 0) ||
-                 (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadStatus") == 0))
+        else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareDownloadStatus") == 0 ||
+                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadStatus") == 0)
         {
-            ret = pIface->get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadStatus(stMsgData);
+            ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadStatus(stMsgData);
         }
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadURL") == 0)
         {
@@ -439,11 +435,10 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->get_Device_DeviceInfo_SoftwareVersion(stMsgData);
         }
-        else if ((strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_Reset") == 0) ||
-                 (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM.Reset") == 0) ||
-                 (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_Reset") == 0))
+        else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_Reset") == 0 ||
+                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_Reset") == 0)
         {
-            ret = pIface->get_Device_DeviceInfo_X_COMCAST_COM_Reset(stMsgData);
+            ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(stMsgData);
         }
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_PowerStatus") == 0)
         {
@@ -992,11 +987,12 @@ void DeviceClientReqHandler::checkForUpdates()
                             }
                         }
                     }
-                    if (strcasecmp(pSetting,"X_COMCAST-COM_FirmwareFilename") == 0)
+                    if (strcasecmp(pSetting,"X_COMCAST-COM_FirmwareFilename") == 0 ||
+                            strcasecmp(pSetting,"X_RDKCENTRAL-COM_FirmwareFilename") == 0)
                     {
                         memset(&msgData,0,sizeof(msgData));
                         bChanged =  false;
-                        pIface->get_Device_DeviceInfo_X_COMCAST_COM_FirmwareFilename(&msgData,&bChanged);
+                        pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(&msgData,&bChanged);
                         if(bChanged)
                         {
                             if(mUpdateCallback && (*isNotifyEnabled == 1))
@@ -1005,11 +1001,12 @@ void DeviceClientReqHandler::checkForUpdates()
                             }
                         }
                     }
-                    if (strcasecmp(pSetting,"X_COMCAST-COM_Reset") == 0)
+                    if (strcasecmp(pSetting,"X_COMCAST-COM_Reset") == 0 ||
+                            strcasecmp(pSetting,"X_RDKCENTRAL-COM_Reset") == 0)
                     {
                         memset(&msgData,0,sizeof(msgData));
                         bChanged =  false;
-                        pIface->get_Device_DeviceInfo_X_COMCAST_COM_Reset(&msgData,&bChanged);
+                        pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(&msgData,&bChanged);
                         if(bChanged)
                         {
                             if(mUpdateCallback && (*isNotifyEnabled == 1))
