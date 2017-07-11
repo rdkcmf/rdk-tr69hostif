@@ -49,6 +49,7 @@
 
 #include "snmpAdapter.h"
 #include <fstream>
+#include <algorithm>
 
 #define TR181_SNMPOID_FILE              "/etc/tr181_snmpOID.conf"
 #define SNMP_AGENT_IP_ADDRESS           "192.168.100.1" //"127.0.0.1"
@@ -247,6 +248,7 @@ int hostIf_snmpAdapter::get_ValueFromSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
                     string subStr = consoleString.substr(pos + 1);
                     subStr.erase(0, subStr.find_first_not_of(delimeter));
                     subStr.erase(subStr.find_last_not_of(delimeter) + 1);
+                    subStr.erase(std::remove(subStr.begin(), subStr.end(), '\n'), subStr.end());
                     strcpy(stMsgData->paramValue, subStr.c_str());
                 }
                 else
