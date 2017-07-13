@@ -178,6 +178,9 @@
 #define xOpsRPCRebootNow "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.RebootNow"
 
 #define TELEMETRY_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RF_Telemetry.Enable"
+
+#define xFirmwareDownloadNow_STR	"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadNow" /* boolean [w] Trigger download on set true. */
+
 /**
  * @brief This class provides the interface for getting device information.
  * @ingroup TR69_HOSTIF_DEVICEINFO_CLASSES
@@ -217,7 +220,12 @@ class hostIf_DeviceInfo {
     char backupHardwareVersion[TR69HOSTIFMGR_MAX_PARAM_LEN];
     char backupDeviceMAC[TR69HOSTIFMGR_MAX_PARAM_LEN];
     char backupAdditionalSoftwareVersion[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    
+
+    static string m_xFirmwareDownloadProtocol;
+    static string m_xFirmwareDownloadURL;
+    static string m_xFirmwareToDownload;
+    static bool m_xFirmwareDownloadNow;
+
     string getEstbIp();
     bool isRsshactive();
 
@@ -555,7 +563,7 @@ public:
     *
     * @retval OK if it is successful.
     * @retval NOK if not able to fetch from device.
-    */ 
+    */
     int get_xOpsDMMoCALogPeriod(HOSTIF_MsgData_t *);
     /**
      * Helper methods
@@ -602,7 +610,7 @@ public:
     *
     * @retval OK if it is successful.
     * @retval NOK if not able to fetch from device.
-    */ 
+    */
     int set_xOpsDMMoCALogPeriod(HOSTIF_MsgData_t *);
     /**
     * @brief set_xOpsReverseSshTrigger
@@ -711,8 +719,12 @@ public:
 #endif /* USE_HWSELFTEST_PROFILE */
 
     int set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *);
+
     int readFirmwareInfo(char *, HOSTIF_MsgData_t *);
     int writeFirmwareInfo(char *, HOSTIF_MsgData_t *);
+
+    int set_xFirmwareDownloadNow(HOSTIF_MsgData_t *);
+
 };
 /* End of doxygen group */
 /**

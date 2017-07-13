@@ -110,6 +110,13 @@ static int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t *);
 static char stbMacCache[TR69HOSTIFMGR_MAX_PARAM_LEN] = {'\0'};
 static string reverseSSHArgs;
 const string sshCommand = "/lib/rdk/startTunnel.sh";
+
+string hostIf_DeviceInfo::m_xFirmwareDownloadProtocol;
+string hostIf_DeviceInfo::m_xFirmwareDownloadURL;
+string hostIf_DeviceInfo::m_xFirmwareToDownload;
+bool hostIf_DeviceInfo::m_xFirmwareDownloadNow;
+
+
 #if defined(ENABLE_TELEMETRY_LOGGER)
 extern pthread_cond_t cond_telemetry;
 extern pthread_mutex_t mutex_telemetry;
@@ -138,16 +145,16 @@ hostIf_DeviceInfo::hostIf_DeviceInfo(int dev_id):
     bCalledDeviceMAC(false)
 {
 
-    memset(backupSoftwareVersion , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupSerialNumber , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupManufacturer , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupManufacturerOUI , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupModelName , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupHardwareVersion , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    memset(backupSoftwareVersion, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    memset(backupSerialNumber, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    memset(backupManufacturer, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    memset(backupManufacturerOUI, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    memset(backupModelName, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    memset(backupHardwareVersion, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupAdditionalSoftwareVersion, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupDeviceMAC , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupX_COMCAST_COM_STB_IP , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupX_COMCAST_COM_FirmwareFilename , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    memset(backupDeviceMAC, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    memset(backupX_COMCAST_COM_STB_IP, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    memset(backupX_COMCAST_COM_FirmwareFilename, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
 }
 hostIf_DeviceInfo::~hostIf_DeviceInfo()
 {
@@ -279,7 +286,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t * stM
                     *pChanged =  true;
                 }
                 bCalledSerialNumber = true;
-                strncpy(backupSerialNumber ,stMsgData->paramValue ,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupSerialNumber,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
                 stMsgData->paramtype = hostIf_StringType;
                 ret = OK;
             }
@@ -293,7 +300,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t * stM
     }
     else
     {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName ,param.type, ret);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
     return ret;
@@ -375,14 +382,14 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SoftwareVersion(HOSTIF_MsgData_t * 
         }
 
 
-        if(bCalledSoftwareVersion && pChanged && strncmp(version ,backupSoftwareVersion,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+        if(bCalledSoftwareVersion && pChanged && strncmp(version,backupSoftwareVersion,TR69HOSTIFMGR_MAX_PARAM_LEN ))
         {
             *pChanged =  true;
         }
         bCalledSoftwareVersion = true;
-        strncpy(backupSoftwareVersion ,version ,TR69HOSTIFMGR_MAX_PARAM_LEN );
+        strncpy(backupSoftwareVersion,version,TR69HOSTIFMGR_MAX_PARAM_LEN );
         stMsgData->paramLen = strlen(version);
-        strncpy(stMsgData->paramValue ,version, stMsgData->paramLen);
+        strncpy(stMsgData->paramValue,version, stMsgData->paramLen);
         stMsgData->paramtype = hostIf_StringType;
     }
     catch (const std::exception e) {
@@ -424,12 +431,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t * stM
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
-                if(bCalledManufacturer && pChanged && strncmp(stMsgData->paramValue ,backupManufacturer,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledManufacturer && pChanged && strncmp(stMsgData->paramValue,backupManufacturer,TR69HOSTIFMGR_MAX_PARAM_LEN ))
                 {
                     *pChanged =  true;
                 }
                 bCalledManufacturer = true;
-                strncpy(backupManufacturer ,stMsgData->paramValue ,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupManufacturer,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
                 stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
@@ -444,7 +451,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t * stM
     }
     else
     {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName ,param.type, ret);
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
 
@@ -487,12 +494,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t * 
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
-                if(bCalledManufacturerOUI && pChanged && strncmp(stMsgData->paramValue ,backupManufacturerOUI,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledManufacturerOUI && pChanged && strncmp(stMsgData->paramValue,backupManufacturerOUI,TR69HOSTIFMGR_MAX_PARAM_LEN ))
                 {
                     *pChanged =  true;
                 }
                 bCalledManufacturerOUI = true;
-                strncpy(backupManufacturerOUI ,stMsgData->paramValue ,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupManufacturerOUI,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
                 stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
@@ -507,7 +514,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t * 
     }
     else
     {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName ,param.type, ret);
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
 
@@ -547,12 +554,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgD
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
-                if(bCalledModelName && pChanged && strncmp(stMsgData->paramValue ,backupModelName,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledModelName && pChanged && strncmp(stMsgData->paramValue,backupModelName,TR69HOSTIFMGR_MAX_PARAM_LEN ))
                 {
                     *pChanged =  true;
                 }
                 bCalledModelName = true;
-                strncpy(backupModelName ,stMsgData->paramValue ,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupModelName,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
                 stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
@@ -567,7 +574,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgD
     }
     else
     {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName ,param.type, ret);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
 
@@ -644,12 +651,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t * 
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
-                if(bCalledHardwareVersion && pChanged && strncmp(stMsgData->paramValue ,backupHardwareVersion,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledHardwareVersion && pChanged && strncmp(stMsgData->paramValue,backupHardwareVersion,TR69HOSTIFMGR_MAX_PARAM_LEN ))
                 {
                     *pChanged =  true;
                 }
                 bCalledHardwareVersion = true;
-                strncpy(backupHardwareVersion ,stMsgData->paramValue ,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupHardwareVersion,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
                 stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
@@ -665,7 +672,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t * 
     }
     else
     {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName ,param.type, ret);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
 
@@ -727,12 +734,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_Ms
             if(param.buffer && param.bufLen) {
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
-                if(bCalledAdditionalSoftwareVersion && pChanged && strncmp(stMsgData->paramValue ,backupAdditionalSoftwareVersion,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledAdditionalSoftwareVersion && pChanged && strncmp(stMsgData->paramValue,backupAdditionalSoftwareVersion,TR69HOSTIFMGR_MAX_PARAM_LEN ))
                 {
                     *pChanged =  true;
                 }
                 bCalledAdditionalSoftwareVersion = true;
-                strncpy(backupAdditionalSoftwareVersion ,stMsgData->paramValue ,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupAdditionalSoftwareVersion,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
 
                 stMsgData->paramLen = param.bufLen;
                 stMsgData->paramtype = hostIf_StringType;
@@ -749,7 +756,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_Ms
     }
     else
     {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName ,param.type, ret);
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
     return ret;
@@ -807,7 +814,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t *
     }
     else
     {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName ,param.type, ret);
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
 
@@ -866,13 +873,13 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t *
             }
             else
             {
-                g_printf ( "Failed in IARM_Bus_Call() for parameter : %s [param.type:%s with error code:%d]\n",stMsgData->paramName ,param.type, iarm_ret);
+                g_printf ( "Failed in IARM_Bus_Call() for parameter : %s [param.type:%s with error code:%d]\n",stMsgData->paramName,param.type, iarm_ret);
                 return NOK;
             }
         }
 
         stMsgData->paramLen = strlen(socId);
-        strncpy(stMsgData->paramValue ,socId, stMsgData->paramLen);
+        strncpy(stMsgData->paramValue,socId, stMsgData->paramLen);
         stMsgData->paramtype = hostIf_StringType;
     }
     catch (const std::exception e) {
@@ -977,12 +984,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgDat
                     strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                     stMsgData->paramValue[param.bufLen+1] = '\0';
                     stMsgData->paramLen = param.bufLen;
-                    if(bCalledDeviceMAC && pChanged && strncmp(stMsgData->paramValue ,backupDeviceMAC,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                    if(bCalledDeviceMAC && pChanged && strncmp(stMsgData->paramValue,backupDeviceMAC,TR69HOSTIFMGR_MAX_PARAM_LEN ))
                     {
                         *pChanged =  true;
                     }
                     bCalledDeviceMAC = true;
-                    strncpy(backupDeviceMAC ,stMsgData->paramValue ,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                    strncpy(backupDeviceMAC,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
                     memset(stbMacCache, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
                     strncpy(stbMacCache, param.buffer, param.bufLen);
                     stMsgData->paramtype = hostIf_StringType;
@@ -994,7 +1001,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgDat
                 }
             }
             else {
-                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName ,param.type, ret);
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
                 ret = NOK;
             }
         }
@@ -1122,32 +1129,32 @@ string hostIf_DeviceInfo::getEstbIp()
 
 bool hostIf_DeviceInfo::isRsshactive()
 {
-   const string pidfile("/var/tmp/rssh.pid");
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
-   bool retCode = false;
+    const string pidfile("/var/tmp/rssh.pid");
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+    bool retCode = false;
 
-   ifstream pidstrm;
-   pidstrm.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-   try {
-      pidstrm.open(pidfile.c_str());
-      int sshpid;
-      pidstrm>>sshpid;
+    ifstream pidstrm;
+    pidstrm.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try {
+        pidstrm.open(pidfile.c_str());
+        int sshpid;
+        pidstrm>>sshpid;
 
-      if (getpgid(sshpid) >= 0)
-      {
-         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session Active \n",__FUNCTION__);
-         retCode = true;
-      }
-      else
-      {
-         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive \n",__FUNCTION__);
-      }
-   } catch (const std::exception& e) {
-         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive ; Error opening pid file\n",__FUNCTION__);
-   }
+        if (getpgid(sshpid) >= 0)
+        {
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session Active \n",__FUNCTION__);
+            retCode = true;
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive \n",__FUNCTION__);
+        }
+    } catch (const std::exception& e) {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] SSH Session inactive ; Error opening pid file\n",__FUNCTION__);
+    }
 
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
-   return retCode;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
+    return retCode;
 }
 /**
  * @brief This function use to get the IPv4 Address of the eth1 interface currently.
@@ -1166,23 +1173,23 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(HOSTIF_MsgData
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]Entering..\n", __FUNCTION__);
 
     string ipaddr = getEstbIp();
-    
+
     if (ipaddr.empty())
     {
-       RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s()]Ipaddress is empty..\n", __FUNCTION__);
-       return NOK;
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s()]Ipaddress is empty..\n", __FUNCTION__);
+        return NOK;
     }
     else {
-       if(bCalledX_COMCAST_COM_STB_IP && pChanged && strncmp(ipaddr.c_str(),backupX_COMCAST_COM_STB_IP,TR69HOSTIFMGR_MAX_PARAM_LEN ))
-       {
-          *pChanged =  true;
-       }
-       bCalledX_COMCAST_COM_STB_IP = true;
-       strncpy(backupX_COMCAST_COM_STB_IP,ipaddr.c_str(),TR69HOSTIFMGR_MAX_PARAM_LEN );
-       memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
-       stMsgData->paramLen = ipaddr.length();
-       strncpy(stMsgData->paramValue, ipaddr.c_str(), stMsgData->paramLen);
-       stMsgData->paramtype = hostIf_StringType;
+        if(bCalledX_COMCAST_COM_STB_IP && pChanged && strncmp(ipaddr.c_str(),backupX_COMCAST_COM_STB_IP,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+        {
+            *pChanged =  true;
+        }
+        bCalledX_COMCAST_COM_STB_IP = true;
+        strncpy(backupX_COMCAST_COM_STB_IP,ipaddr.c_str(),TR69HOSTIFMGR_MAX_PARAM_LEN );
+        memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
+        stMsgData->paramLen = ipaddr.length();
+        strncpy(stMsgData->paramValue, ipaddr.c_str(), stMsgData->paramLen);
+        stMsgData->paramtype = hostIf_StringType;
     }
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]Exiting..\n", __FUNCTION__);
     return OK;
@@ -1786,7 +1793,7 @@ int hostIf_DeviceInfo::get_xOpsDMLogsUploadStatus(HOSTIF_MsgData_t *stMsgData)
     else
     {
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s] Successfully read from %s. The value is \'%s\'. \n", __FUNCTION__, CURRENT_LOG_UPLOAD_STATUS,
-                curLogUploadStatus);
+                 curLogUploadStatus);
         fclose (logUpfile);
     }
 
@@ -1951,8 +1958,10 @@ void *ResetFunc( void *)
  */
 int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(HOSTIF_MsgData_t *stMsgData)
 {
-    int ret = NOK;
-    writeFirmwareInfo((char *)"DnldFile",stMsgData);
+//    int ret = NOK;
+    m_xFirmwareToDownload = stMsgData->paramValue;
+//    ret = writeFirmwareInfo((char *)"DnldFile",stMsgData);
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s]Successfully set \"%s\" to \"%s\". \n", __FUNCTION__, stMsgData->paramName, m_xFirmwareToDownload.c_str() );
     return OK;
 }
 
@@ -2013,15 +2022,19 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadSt
 
 int hostIf_DeviceInfo::set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadProtocol (HOSTIF_MsgData_t *stMsgData)
 {
-    int ret = NOK;
-    writeFirmwareInfo((char *)"Proto",stMsgData);
+//    int ret = NOK;
+    m_xFirmwareDownloadProtocol = stMsgData->paramValue;
+//    ret = writeFirmwareInfo((char *)"Proto",stMsgData);
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s]Successfully set \"%s\" to \"%s\". \n", __FUNCTION__, stMsgData->paramName, m_xFirmwareDownloadProtocol.c_str() );
     return OK;
 }
 
 int hostIf_DeviceInfo::set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadURL (HOSTIF_MsgData_t *stMsgData)
 {
-    int ret = NOK;
-    writeFirmwareInfo((char *)"DnldURL",stMsgData);
+//    int ret = NOK;
+    m_xFirmwareDownloadURL = stMsgData->paramValue;
+//    ret = writeFirmwareInfo((char *)"DnldURL",stMsgData);
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s]Successfully set \"%s\" to \"%s\". \n", __FUNCTION__, stMsgData->paramName, m_xFirmwareDownloadURL.c_str() );
     return OK;
 }
 
@@ -2061,11 +2074,11 @@ int hostIf_DeviceInfo::set_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
 #ifdef USE_MoCA_PROFILE
     if (IARM_Bus_BroadcastEvent(IARM_BUS_NM_SRV_MGR_NAME, (IARM_EventId_t) IARM_BUS_NETWORK_MANAGER_MOCA_TELEMETRY_LOG, (void *)&mocaLogEnabled, sizeof(mocaLogEnabled)) == IARM_RESULT_SUCCESS)
     {
-	RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging is %d \n",__FUNCTION__, mocaLogEnabled);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging is %d \n",__FUNCTION__, mocaLogEnabled);
     }
     else
     {
-	RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging IARM FAILURE \n",__FUNCTION__);
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] MoCA Telemetry Logging IARM FAILURE \n",__FUNCTION__);
     }
 #endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
@@ -2078,7 +2091,7 @@ int hostIf_DeviceInfo::set_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
     mocaLogDuration = get_int(stMsgData->paramValue);
-    
+
 #ifdef USE_MoCA_PROFILE
     if (IARM_Bus_BroadcastEvent(IARM_BUS_NM_SRV_MGR_NAME, (IARM_EventId_t) IARM_BUS_NETWORK_MANAGER_MOCA_TELEMETRY_LOG_DURATION, (void *)&mocaLogDuration, sizeof(mocaLogDuration)) == IARM_RESULT_SUCCESS)
     {
@@ -2104,7 +2117,7 @@ int hostIf_DeviceInfo::get_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
     if(retVal == IARM_RESULT_SUCCESS)
     {
         put_boolean(stMsgData->paramValue,param);
-    	stMsgData->paramtype = hostIf_BooleanType; 
+        stMsgData->paramtype = hostIf_BooleanType;
         stMsgData->paramLen=1;
     }
     else
@@ -2127,7 +2140,7 @@ int hostIf_DeviceInfo::get_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
     if(retVal == IARM_RESULT_SUCCESS)
     {
         put_int(stMsgData->paramValue,param);
-        stMsgData->paramtype = hostIf_UnsignedIntType; 
+        stMsgData->paramtype = hostIf_UnsignedIntType;
         stMsgData->paramLen=4;
     }
     else
@@ -2142,22 +2155,22 @@ int hostIf_DeviceInfo::set_xOpsReverseSshTrigger(HOSTIF_MsgData_t *stMsgData)
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
     string inputStr(stMsgData->paramValue);
     bool trigger = strncmp(inputStr.c_str(),"start",strlen("start")) == 0;
-    
+
     if (trigger)
     {
 #ifdef __SINGLE_SESSION_ONLY__
         if (!isRsshactive())
         {
 #endif
-           RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting SSH Tunnel \n",__FUNCTION__);
-           string command = sshCommand + " start " + reverseSSHArgs;
-           system(command.c_str());
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting SSH Tunnel \n",__FUNCTION__);
+            string command = sshCommand + " start " + reverseSSHArgs;
+            system(command.c_str());
 #ifdef __SINGLE_SESSION_ONLY__
         }
         else
         {
-           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "[%s] SSH Session is already active. Not starting again!",__FUNCTION__);
-           return NOK;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "[%s] SSH Session is already active. Not starting again!",__FUNCTION__);
+            return NOK;
         }
 #endif
     }
@@ -2173,80 +2186,80 @@ int hostIf_DeviceInfo::set_xOpsReverseSshTrigger(HOSTIF_MsgData_t *stMsgData)
 
 int hostIf_DeviceInfo::get_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
 {
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
 
-   memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-   stMsgData->paramtype = hostIf_StringType;
+    memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    stMsgData->paramtype = hostIf_StringType;
 
-   if (reverseSSHArgs.empty())
-   {
-       strncpy(stMsgData->paramValue, "Not Set", TR69HOSTIFMGR_MAX_PARAM_LEN );
-   }
-   else
-   {
-       strncpy(stMsgData->paramValue, reverseSSHArgs.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
-   }
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting ... \n",__FUNCTION__);
-   return OK;
+    if (reverseSSHArgs.empty())
+    {
+        strncpy(stMsgData->paramValue, "Not Set", TR69HOSTIFMGR_MAX_PARAM_LEN );
+    }
+    else
+    {
+        strncpy(stMsgData->paramValue, reverseSSHArgs.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
+    }
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting ... \n",__FUNCTION__);
+    return OK;
 }
 
 int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
 {
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
-   try
-   {
-       map<string,string> parsedMap;
-       string inputStr(stMsgData->paramValue);
-       string ipv6_fileName = "/tmp/estb_ipv6";
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+    try
+    {
+        map<string,string> parsedMap;
+        string inputStr(stMsgData->paramValue);
+        string ipv6_fileName = "/tmp/estb_ipv6";
 
-       bool ipv6Enabled = (!access (ipv6_fileName.c_str(), F_OK))?true:false;
-       std::size_t start = inputStr.find_first_not_of(";"), end = start;
-       while (start != string::npos)
-       {
-          end = inputStr.find(";",start);
-          string chunk = inputStr.substr(start,end - start);
-          std::size_t keyEnd = chunk.find("=");
-          parsedMap[chunk.substr(0,keyEnd)] = chunk.substr(keyEnd +1);
-          start = inputStr.find_first_not_of(";",end);
-       }
-       string parsedValues;
-       for (auto &it : parsedMap)
-       {
-          parsedValues += "key = " + it.first + " value = " + it.second + ";";
-       }
+        bool ipv6Enabled = (!access (ipv6_fileName.c_str(), F_OK))?true:false;
+        std::size_t start = inputStr.find_first_not_of(";"), end = start;
+        while (start != string::npos)
+        {
+            end = inputStr.find(";",start);
+            string chunk = inputStr.substr(start,end - start);
+            std::size_t keyEnd = chunk.find("=");
+            parsedMap[chunk.substr(0,keyEnd)] = chunk.substr(keyEnd +1);
+            start = inputStr.find_first_not_of(";",end);
+        }
+        string parsedValues;
+        for (auto &it : parsedMap)
+        {
+            parsedValues += "key = " + it.first + " value = " + it.second + ";";
+        }
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] parsed Values are : %s\n",__FUNCTION__,parsedValues.c_str());
 
-       reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":";
+        reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":";
 
-       if (ipv6Enabled)
-       {
-          reverseSSHArgs += "[" + getEstbIp() + "]";
-       }
-       else
-       {
-          reverseSSHArgs += getEstbIp();
-       }
+        if (ipv6Enabled)
+        {
+            reverseSSHArgs += "[" + getEstbIp() + "]";
+        }
+        else
+        {
+            reverseSSHArgs += getEstbIp();
+        }
 
-       reverseSSHArgs +=  ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
-       if (parsedMap.find("sshport") != parsedMap.end())
-       {
-          reverseSSHArgs += " -p " + parsedMap["sshport"];
-       }
+        reverseSSHArgs +=  ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
+        if (parsedMap.find("sshport") != parsedMap.end())
+        {
+            reverseSSHArgs += " -p " + parsedMap["sshport"];
+        }
 
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] String is  : %s\n",__FUNCTION__,reverseSSHArgs.c_str());
 
-       string::const_iterator it = std::find_if(reverseSSHArgs.begin(), reverseSSHArgs.end(), [](char c) {
-          return !(isalnum(c) || (c == ' ') || (c == ':') || (c == '-') || (c == '.') || (c == '@') || (c == '_') || (c == '[') || (c == ']'));
-      });
+        string::const_iterator it = std::find_if(reverseSSHArgs.begin(), reverseSSHArgs.end(), [](char c) {
+            return !(isalnum(c) || (c == ' ') || (c == ':') || (c == '-') || (c == '.') || (c == '@') || (c == '_') || (c == '[') || (c == ']'));
+        });
 
-      if (it  != reverseSSHArgs.end())
-      {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Exception Accured... \n",__FUNCTION__);
-        reverseSSHArgs = "";
-        return NOK;
-      }
+        if (it  != reverseSSHArgs.end())
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Exception Accured... \n",__FUNCTION__);
+            reverseSSHArgs = "";
+            return NOK;
+        }
 
-      RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] ReverseSSH Args = %s \n",__FUNCTION__,reverseSSHArgs.c_str());
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] ReverseSSH Args = %s \n",__FUNCTION__,reverseSSHArgs.c_str());
     } catch (const std::exception e) {
         std::cout << __FUNCTION__ << "An exception occurred. " << e.what() << endl;
 
@@ -2261,23 +2274,23 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
 
 int hostIf_DeviceInfo::get_xOpsReverseSshStatus(HOSTIF_MsgData_t *stMsgData)
 {
-   const string activeStr("ACTIVE");
-   const string inActiveStr("INACTIVE");
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
-   memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-   stMsgData->paramtype = hostIf_StringType;
+    const string activeStr("ACTIVE");
+    const string inActiveStr("INACTIVE");
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+    memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    stMsgData->paramtype = hostIf_StringType;
 
-   if (isRsshactive())
-   {
-      strncpy(stMsgData->paramValue, activeStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
-   }
-   else
-   {
-      strncpy(stMsgData->paramValue, inActiveStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
-   }
+    if (isRsshactive())
+    {
+        strncpy(stMsgData->paramValue, activeStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
+    }
+    else
+    {
+        strncpy(stMsgData->paramValue, inActiveStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
+    }
 
-   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
-   return OK;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
+    return OK;
 }
 
 int hostIf_DeviceInfo::set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t * stMsgData)
@@ -2326,19 +2339,19 @@ int hostIf_DeviceInfo::set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *st
     LOG_ENTRY_EXIT;
     if(stMsgData->paramtype == hostIf_BooleanType)
     {
-    	m_telemetryRFCEnable = get_boolean(stMsgData->paramValue);
-    	RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully set \"%s\" to \"%d\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, m_telemetryRFCEnable);
+        m_telemetryRFCEnable = get_boolean(stMsgData->paramValue);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully set \"%s\" to \"%d\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, m_telemetryRFCEnable);
 #if defined(ENABLE_TELEMETRY_LOGGER)
-    	pthread_mutex_lock(&mutex_telemetry);
-    	pthread_cond_signal(&cond_telemetry);
-    	RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Send Signal to wake up telemetry Thread. \n", __FUNCTION__, __LINE__);
-    	pthread_mutex_unlock(&mutex_telemetry);
+        pthread_mutex_lock(&mutex_telemetry);
+        pthread_cond_signal(&cond_telemetry);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Send Signal to wake up telemetry Thread. \n", __FUNCTION__, __LINE__);
+        pthread_mutex_unlock(&mutex_telemetry);
 #endif
-    	ret = OK;
+        ret = OK;
     }
     else
     {
-    	RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong data type for %s, please use boolean(0/1) to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong data type for %s, please use boolean(0/1) to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
     }
 
     return ret;
@@ -2498,6 +2511,70 @@ int hostIf_DeviceInfo::writeFirmwareInfo(char *param, HOSTIF_MsgData_t * stMsgDa
     }
     return (ret = OK);
 }
+
+
+int hostIf_DeviceInfo::set_xFirmwareDownloadNow(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOK;
+    const char *userTriggerDwScr = "/lib/rdk/userInitiatedFWDnld.sh";
+
+    LOG_ENTRY_EXIT;
+
+    if(stMsgData->paramtype == hostIf_BooleanType)
+    {
+        bool xDwnldTrigger = get_boolean(stMsgData->paramValue);
+
+
+        if(m_xFirmwareDownloadNow) {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed to trigger Download, since download already in progress ....\n", __FUNCTION__, __LINE__);
+            return ret;
+        }
+        else if (hostIf_DeviceInfo::m_xFirmwareDownloadNow == false && xDwnldTrigger) {
+            if(xDwnldTrigger && (!m_xFirmwareDownloadProtocol.empty()) &&
+                    (!m_xFirmwareDownloadURL.empty()) && (!m_xFirmwareToDownload.empty())) {
+
+                char cmd[200] = {'\0'};
+                sprintf(cmd, "%s %s %s %s &",userTriggerDwScr, m_xFirmwareDownloadProtocol.c_str(), m_xFirmwareDownloadURL.c_str(), m_xFirmwareToDownload.c_str() );
+
+                ret = system (cmd);
+
+                if (ret != 0) {
+                    RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Failed to trigger Download, \'system (\"%s\")\' returned error code '%d'\n", __FUNCTION__, cmd, ret);
+                    return NOK;
+                }
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF, "[%s:%d] Yw.. Successfully executed (\'%s\')Triggered Download.\n",__FUNCTION__,__LINE__, cmd);
+
+                /*Reset all cache parameter values for download trigger on successfully executed*/
+                m_xFirmwareDownloadProtocol.clear();
+                m_xFirmwareToDownload.clear();
+                m_xFirmwareDownloadURL.clear();
+                m_xFirmwareDownloadNow = false;
+                ret = OK;
+            }
+            else {
+                if(m_xFirmwareDownloadProtocol.empty())
+                    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed to trigger Download, since \"FirmwareDownloadProtocols\" is not set/configured.\n", __FUNCTION__, __LINE__);
+                if(m_xFirmwareDownloadURL.empty())
+                    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed to trigger Download, since \"m_xFirmwareDownloadURL\" is not set/configured.\n", __FUNCTION__, __LINE__);
+                if(m_xFirmwareToDownload.empty())
+                    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed to trigger Download, since \"FirmwareToDownload\" is not set/configured. \n", __FUNCTION__, __LINE__);
+
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Please configure other parameters, then trigger download. \n", __FUNCTION__, __LINE__);
+                return ret;
+            }
+        }
+        else {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed to trigger Download, since \"FirmwareToDownload\" is not set. \n", __FUNCTION__, __LINE__);
+        }
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong data type for %s, please use boolean(0/1) to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
+    }
+
+    return ret;
+}
+
 
 /* End of doxygen group */
 /**

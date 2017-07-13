@@ -216,6 +216,10 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
             ret = pIface->set_xOpsDeviceMgmt_hwHealthTest_Enable(stMsgData);
         }
 #endif /* USE_HWSELFTEST_PROFILE */
+        else if (!strcasecmp(stMsgData->paramName, xFirmwareDownloadNow_STR))
+        {
+        	ret = pIface->set_xFirmwareDownloadNow(stMsgData);
+        }
     }
     hostIf_DeviceInfo::releaseLock();
     return ret;
