@@ -49,16 +49,16 @@
 
 #ifdef USE_XRDK_BT_PROFILE
 
-#define BTMGR_QUERY_INTERVAL 5
+#define BTRMGR_QUERY_INTERVAL 5
 
 #include "XrdkBlueTooth.h"
 extern "C" {
 #include "btmgr.h"
 }
 
-static BTMGR_DiscoveredDevicesList_t disDevList;
-static BTMGR_PairedDevicesList_t pairedDevList;
-static BTMGR_ConnectedDevicesList_t connectedDevList;
+static BTRMGR_DiscoveredDevicesList_t disDevList;
+static BTRMGR_PairedDevicesList_t pairedDevList;
+static BTRMGR_ConnectedDevicesList_t connectedDevList;
 
 static time_t firstExTimeDisList = 0;
 static time_t firstExTimePairedList = 0;
@@ -67,8 +67,8 @@ static time_t firstExTimeConnList = 0;
 static void fetch_Bluetooth_DiscoveredDevicesList();
 static void fetch_Bluetooth_PairedDevicesList();
 static void fetch_Bluetooth_ConnectedDevicesList();
-static BTMGR_DevicesProperty_t deviceProperty;
-static BTMgrDeviceHandle handle_devInfo = 0;
+static BTRMGR_DevicesProperty_t deviceProperty;
+static BTRMgrDeviceHandle handle_devInfo = 0;
 
 GMutex* hostIf_DeviceInfoRdk_xBT::m_mutex = NULL;
 hostIf_DeviceInfoRdk_xBT* hostIf_DeviceInfoRdk_xBT::m_instance = NULL;
@@ -76,7 +76,7 @@ hostIf_DeviceInfoRdk_xBT* hostIf_DeviceInfoRdk_xBT::m_instance = NULL;
 short hostIf_DeviceInfoRdk_xBT::noOfDiscoveredDevice=0;
 short hostIf_DeviceInfoRdk_xBT::noOfPairedDevice=0;
 short hostIf_DeviceInfoRdk_xBT::noOfConnectedDevices=0;
-void BTMgr_EventCallback(BTMGR_EventMessage_t );
+void BTRMgr_EventCallback(BTRMGR_EventMessage_t );
 
 hostIf_DeviceInfoRdk_xBT* hostIf_DeviceInfoRdk_xBT::getInstance()
 {
@@ -137,17 +137,17 @@ void hostIf_DeviceInfoRdk_xBT::XrdkBlueTooth_init()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering...  \n", __FUNCTION__, __LINE__);
 
-    if (BTMGR_RESULT_SUCCESS != BTMGR_Init()) {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed in BTMGR_Init() \n", __FUNCTION__, __LINE__);
+    if (BTRMGR_RESULT_SUCCESS != BTRMGR_Init()) {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed in BTRMGR_Init() \n", __FUNCTION__, __LINE__);
     }
     else {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%d] xBlueTooth: Successfully: BTMGR_Init()  \n", __FUNCTION__, __LINE__);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%d] xBlueTooth: Successfully: BTRMGR_Init()  \n", __FUNCTION__, __LINE__);
 
-        if(BTMGR_RESULT_SUCCESS != BTMGR_RegisterEventCallback(BTMgr_EventCallback)) {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed in BTMGR_RegisterEventCallback() \n", __FUNCTION__, __LINE__);
+        if(BTRMGR_RESULT_SUCCESS != BTRMGR_RegisterEventCallback(BTRMgr_EventCallback)) {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed in BTRMGR_RegisterEventCallback() \n", __FUNCTION__, __LINE__);
         }
         else {
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Successfully : BTMGR_RegisterEventCallback() \n", __FUNCTION__, __LINE__);
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Successfully : BTRMGR_RegisterEventCallback() \n", __FUNCTION__, __LINE__);
         }
     }
 
@@ -432,13 +432,13 @@ int hostIf_DeviceInfoRdk_xBT::isEnabled(HOSTIF_MsgData_t *stMsgData)
     try {
         /* BLUETOOTH_DISABLED, BLUETOOTH_ENABLED, BLUETOOTH_INPUT_ENABLED */
         unsigned char power_status = 0;
-        if (BTMGR_RESULT_SUCCESS != BTMGR_GetAdapterPowerStatus (0, &power_status)) {
+        if (BTRMGR_RESULT_SUCCESS != BTRMGR_GetAdapterPowerStatus (0, &power_status)) {
             strncpy(stMsgData->paramValue, "BLUETOOTH_DISABLED", TR69HOSTIFMGR_MAX_PARAM_LEN);
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed in get BTMGR_GetAdapterPowerStatus, so BLUETOOTH_DISABLED. \n", __FUNCTION__, __LINE__);
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed in get BTRMGR_GetAdapterPowerStatus, so BLUETOOTH_DISABLED. \n", __FUNCTION__, __LINE__);
         }
         else {
             strncpy(stMsgData->paramValue, "BLUETOOTH_ENABLED", TR69HOSTIFMGR_MAX_PARAM_LEN);
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s]xBlueTooth: Successfully get BTMGR_GetAdapterPowerStatus (%u), so BLUETOOTH_ENABLED. \n",
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s]xBlueTooth: Successfully get BTRMGR_GetAdapterPowerStatus (%u), so BLUETOOTH_ENABLED. \n",
                     __FUNCTION__, power_status);
         }
     } catch (const std::exception& e) {
@@ -469,7 +469,7 @@ int hostIf_DeviceInfoRdk_xBT::isDiscoveryEnabled(HOSTIF_MsgData_t *stMsgData)
 
     try {
         unsigned char power_status = 0;
-        isDisEnable = (BTMGR_RESULT_SUCCESS == BTMGR_IsAdapterDiscoverable(0, &power_status))? true:false;
+        isDisEnable = (BTRMGR_RESULT_SUCCESS == BTRMGR_IsAdapterDiscoverable(0, &power_status))? true:false;
         RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: isDiscoveryEnabled \'%d\' with  %s power_status as \'%u\'\r\n",
                 __FUNCTION__, isDisEnable, power_status);
     } catch (const std::exception& e) {
@@ -663,7 +663,7 @@ int hostIf_DeviceInfoRdk_xBT::getDiscoveredDevice_DeviceType(HOSTIF_MsgData_t *s
     try {
         int devIndex = stMsgData->instanceNum;
         if((devIndex && disDevList.m_numOfDevices) && (devIndex <= disDevList.m_numOfDevices)) {
-            const char *pType = BTMGR_GetDeviceTypeAsString (disDevList.m_deviceProperty[devIndex-1].m_deviceType);
+            const char *pType = BTRMGR_GetDeviceTypeAsString (disDevList.m_deviceProperty[devIndex-1].m_deviceType);
             if (pType)
             {
                 RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: The Discovered Devices (index : %d) device type is \'%s\'.\n", __FUNCTION__, devIndex-1, pType);
@@ -811,7 +811,7 @@ int hostIf_DeviceInfoRdk_xBT::getDiscoveredDevice_Manufacturer(HOSTIF_MsgData_t 
 int hostIf_DeviceInfoRdk_xBT::getDiscoveredDevice_Connected(HOSTIF_MsgData_t *stMsgData)
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering..\n", __FUNCTION__, __LINE__);
-    BTMGR_DevicesProperty_t deviceProperty;
+    BTRMGR_DevicesProperty_t deviceProperty;
     memset (&deviceProperty, 0, sizeof (deviceProperty));
 
     try {
@@ -819,7 +819,7 @@ int hostIf_DeviceInfoRdk_xBT::getDiscoveredDevice_Connected(HOSTIF_MsgData_t *st
         if((devIndex && disDevList.m_numOfDevices) && (devIndex <= disDevList.m_numOfDevices)) {
 
             /* Get the signal level */
-            BTMGR_GetDeviceProperties(0, disDevList.m_deviceProperty[devIndex-1].m_deviceHandle, &deviceProperty);
+            BTRMGR_GetDeviceProperties(0, disDevList.m_deviceProperty[devIndex-1].m_deviceHandle, &deviceProperty);
             RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: The Discovered Devices (index : %d) Connection Status is \'%d\'.\n", __FUNCTION__, devIndex-1, deviceProperty.m_isConnected);
 
             put_boolean(stMsgData->paramValue, deviceProperty.m_isConnected);
@@ -1084,7 +1084,7 @@ int hostIf_DeviceInfoRdk_xBT::getPairedDevice_DeviceType(HOSTIF_MsgData_t *stMsg
     try {
         int devIndex = stMsgData->instanceNum;
         if((devIndex && pairedDevList.m_numOfDevices) && (devIndex <= pairedDevList.m_numOfDevices)) {
-            const char *pType = BTMGR_GetDeviceTypeAsString (pairedDevList.m_deviceProperty[devIndex-1].m_deviceType);
+            const char *pType = BTRMGR_GetDeviceTypeAsString (pairedDevList.m_deviceProperty[devIndex-1].m_deviceType);
             if (pType)
             {
                 RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: The Paired Devices (index : %d) device type is \'%s\'.\n", __FUNCTION__, devIndex-1, pType);
@@ -1203,11 +1203,11 @@ int hostIf_DeviceInfoRdk_xBT::getConnectedDevice_Active(HOSTIF_MsgData_t *stMsgD
         int devIndex = stMsgData->instanceNum;
         if((devIndex && connectedDevList.m_numOfDevices) && (devIndex <= connectedDevList.m_numOfDevices)) {
             RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: The Connected Device (index : %d) active status \'%d\'.\n", __FUNCTION__, devIndex-1, connectedDevList.m_deviceProperty[devIndex-1].m_powerStatus);
-            if (BTMGR_DEVICE_POWER_ACTIVE == connectedDevList.m_deviceProperty[devIndex-1].m_powerStatus)
+            if (BTRMGR_DEVICE_POWER_ACTIVE == connectedDevList.m_deviceProperty[devIndex-1].m_powerStatus)
                 strncpy(stMsgData->paramValue, "ACTIVE", TR69HOSTIFMGR_MAX_PARAM_LEN);
-            else if (BTMGR_DEVICE_POWER_LOW == connectedDevList.m_deviceProperty[devIndex-1].m_powerStatus)
+            else if (BTRMGR_DEVICE_POWER_LOW == connectedDevList.m_deviceProperty[devIndex-1].m_powerStatus)
                 strncpy(stMsgData->paramValue, "LOW_POWER", TR69HOSTIFMGR_MAX_PARAM_LEN);
-            else if (BTMGR_DEVICE_POWER_STANDBY == connectedDevList.m_deviceProperty[devIndex-1].m_powerStatus)
+            else if (BTRMGR_DEVICE_POWER_STANDBY == connectedDevList.m_deviceProperty[devIndex-1].m_powerStatus)
                 strncpy(stMsgData->paramValue, "STANDBY", TR69HOSTIFMGR_MAX_PARAM_LEN);
             else
                 strncpy(stMsgData->paramValue, "UNKNOWN", TR69HOSTIFMGR_MAX_PARAM_LEN);
@@ -1468,7 +1468,7 @@ int hostIf_DeviceInfoRdk_xBT::getConnectedDevice_DeviceType(HOSTIF_MsgData_t *st
     try {
         int devIndex = stMsgData->instanceNum;
         if((devIndex && connectedDevList.m_numOfDevices) && (devIndex <= connectedDevList.m_numOfDevices)) {
-            const char *pType = BTMGR_GetDeviceTypeAsString (connectedDevList.m_deviceProperty[devIndex-1].m_deviceType);
+            const char *pType = BTRMGR_GetDeviceTypeAsString (connectedDevList.m_deviceProperty[devIndex-1].m_deviceType);
             if (pType)
             {
                 RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: The Connected Devices (index : %d) device type is \'%s\'.\n", __FUNCTION__, devIndex-1, pType);
@@ -1591,7 +1591,7 @@ int hostIf_DeviceInfoRdk_xBT::setDeviceInfo (HOSTIF_MsgData_t *stMsgData)
     try {
 
         if(stMsgData->paramValue[0] != '\0') {
-            BTMgrDeviceHandle handle = 0;
+            BTRMgrDeviceHandle handle = 0;
             int base = 16;
             char *stopstring = NULL;
 
@@ -1602,15 +1602,15 @@ int hostIf_DeviceInfoRdk_xBT::setDeviceInfo (HOSTIF_MsgData_t *stMsgData)
 
             memset (&deviceProperty, 0, sizeof (deviceProperty));
 
-            if (BTMGR_RESULT_SUCCESS != BTMGR_GetDeviceProperties(0, handle, &deviceProperty))
+            if (BTRMGR_RESULT_SUCCESS != BTRMGR_GetDeviceProperties(0, handle, &deviceProperty))
             {
-                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed in  BTMGR_GetDeviceProperties for \'%s\'.\n", __FUNCTION__, __LINE__, stMsgData->paramValue);
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed in  BTRMGR_GetDeviceProperties for \'%s\'.\n", __FUNCTION__, __LINE__, stMsgData->paramValue);
                 return NOK;
             }
             else
             {
                 handle_devInfo = handle;
-                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Successfully BTMGR_GetDeviceProperties.\n", __FUNCTION__, __LINE__);
+                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Successfully BTRMGR_GetDeviceProperties.\n", __FUNCTION__, __LINE__);
             }
         }
         else
@@ -1642,16 +1642,16 @@ void fetch_Bluetooth_DiscoveredDevicesList()
     time_t currExTime = time (NULL);
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering..\n", __FUNCTION__, __LINE__);
 
-    if ((currExTime - firstExTimeDisList ) > BTMGR_QUERY_INTERVAL)
+    if ((currExTime - firstExTimeDisList ) > BTRMGR_QUERY_INTERVAL)
     {
         memset (&disDevList, '\0', sizeof(disDevList));
-        if (BTMGR_RESULT_SUCCESS != BTMGR_GetDiscoveredDevices(0, &disDevList)) {
-            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]xBlueTooth: Failed in BTMGR_GetDiscoveredDevices. \n", __FUNCTION__);
+        if (BTRMGR_RESULT_SUCCESS != BTRMGR_GetDiscoveredDevices(0, &disDevList)) {
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]xBlueTooth: Failed in BTRMGR_GetDiscoveredDevices. \n", __FUNCTION__);
         } else
         {
 
             if(disDevList.m_numOfDevices >= MAX_DISCOVERY_DEVICE_NUM) {
-                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]xBlueTooth: Successfully in BTMGR_GetDiscoveredDevices, Failed due to Invalid  device count (%d). \n", __FUNCTION__, disDevList.m_numOfDevices);
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]xBlueTooth: Successfully in BTRMGR_GetDiscoveredDevices, Failed due to Invalid  device count (%d). \n", __FUNCTION__, disDevList.m_numOfDevices);
             }
             else
             {
@@ -1686,17 +1686,17 @@ void fetch_Bluetooth_PairedDevicesList()
     time_t currExTime = time (NULL);
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering..\n", __FUNCTION__, __LINE__);
 
-    if ((currExTime - firstExTimePairedList ) > BTMGR_QUERY_INTERVAL)
+    if ((currExTime - firstExTimePairedList ) > BTRMGR_QUERY_INTERVAL)
     {
         memset (&pairedDevList, 0, sizeof(pairedDevList));
 
-        if (BTMGR_RESULT_SUCCESS != BTMGR_GetPairedDevices(0, &pairedDevList)) {
-            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]xBlueTooth: Failed in BTMGR_GetPairedDevices. \n", __FUNCTION__);
+        if (BTRMGR_RESULT_SUCCESS != BTRMGR_GetPairedDevices(0, &pairedDevList)) {
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]xBlueTooth: Failed in BTRMGR_GetPairedDevices. \n", __FUNCTION__);
         }
         else
         {
             if(disDevList.m_numOfDevices >= MAX_PAIRED_DEVICE_NUM) {
-                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]xBlueTooth: Successfully in BTMGR_GetPairedDevices, Failed due to Invalid  device count (%d). \n", __FUNCTION__, pairedDevList.m_numOfDevices);
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]xBlueTooth: Successfully in BTRMGR_GetPairedDevices, Failed due to Invalid  device count (%d). \n", __FUNCTION__, pairedDevList.m_numOfDevices);
             }
             else
             {
@@ -1730,17 +1730,17 @@ void fetch_Bluetooth_ConnectedDevicesList()
 {
     time_t currExTime = time (NULL);
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering..\n", __FUNCTION__, __LINE__);
-    if ((currExTime - firstExTimeConnList ) > BTMGR_QUERY_INTERVAL)
+    if ((currExTime - firstExTimeConnList ) > BTRMGR_QUERY_INTERVAL)
     {
         memset (&connectedDevList, 0, sizeof(connectedDevList));
 
-        if (BTMGR_RESULT_SUCCESS != BTMGR_GetConnectedDevices(0, &connectedDevList)) {
-            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s:%d]xBlueTooth: Failed in BTMGR_GetConnectedDevices. \n", __FUNCTION__, __LINE__);
+        if (BTRMGR_RESULT_SUCCESS != BTRMGR_GetConnectedDevices(0, &connectedDevList)) {
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s:%d]xBlueTooth: Failed in BTRMGR_GetConnectedDevices. \n", __FUNCTION__, __LINE__);
         }
         else
         {
             if(disDevList.m_numOfDevices >= MAX_CONNECTED_DEVICE_NUM) {
-                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]xBlueTooth: Successfully in BTMGR_GetConnectedDevices, Failed due to Invalid  device count (%d). \n", __FUNCTION__, connectedDevList.m_numOfDevices);
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]xBlueTooth: Successfully in BTRMGR_GetConnectedDevices, Failed due to Invalid  device count (%d). \n", __FUNCTION__, connectedDevList.m_numOfDevices);
             }
             else {
                 int j = 0;
@@ -1760,7 +1760,7 @@ void fetch_Bluetooth_ConnectedDevicesList()
 }
 
 /************************************************************
- * Description  : This method is register to BTMGR_RegisterEventCallback method.
+ * Description  : This method is register to BTRMGR_RegisterEventCallback method.
  * 				  It gives the all the events and device count details with additional details.
  *
  * Precondition : Bluetooth stack should be present.
@@ -1771,33 +1771,33 @@ void fetch_Bluetooth_ConnectedDevicesList()
                   value -> Event data for bluetooth connected devices
 ************************************************************/
 #if 0
-void BTMgr_EventCallback(BTMGR_EventMessage_t eventData)
+void BTRMgr_EventCallback(BTRMGR_EventMessage_t eventData)
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering..\n", __FUNCTION__, __LINE__);
-    BTMGR_Events_t eventType = eventData.m_eventType;
+    BTRMGR_Events_t eventType = eventData.m_eventType;
     unsigned short numOfDevices = eventData.m_numOfDevices;
 
     switch (eventType) {
-    case BTMGR_EVENT_DEVICE_DISCOVERY_COMPLETE :
+    case BTRMGR_EVENT_DEVICE_DISCOVERY_COMPLETE :
         hostIf_DeviceInfoRdk_xBT::notifyAddDelEvent(numOfDevices, (char *)X_BT_DISCOVERED_DEV_OBJ);
-        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Received \"BTMGR_EVENT_DEVICE_DISCOVERY_COMPLETE\" (%d).\n", __FUNCTION__, __LINE__, eventType);
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Received \"BTRMGR_EVENT_DEVICE_DISCOVERY_COMPLETE\" (%d).\n", __FUNCTION__, __LINE__, eventType);
         break;
-    case BTMGR_EVENT_DEVICE_PAIRING_COMPLETE :
-    case BTMGR_EVENT_DEVICE_UNPAIRING_COMPLETE :
+    case BTRMGR_EVENT_DEVICE_PAIRING_COMPLETE :
+    case BTRMGR_EVENT_DEVICE_UNPAIRING_COMPLETE :
         RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Received \"%s\" (%d).\n", __FUNCTION__, __LINE__,
-                BTMGR_EVENT_DEVICE_PAIRING_COMPLETE?"BTMGR_EVENT_DEVICE_PAIRING_COMPLETE":"BTMGR_EVENT_DEVICE_UPAIRING_COMPLETE",
+                BTRMGR_EVENT_DEVICE_PAIRING_COMPLETE?"BTRMGR_EVENT_DEVICE_PAIRING_COMPLETE":"BTRMGR_EVENT_DEVICE_UPAIRING_COMPLETE",
                 eventType);
         hostIf_DeviceInfoRdk_xBT::notifyAddDelEvent(numOfDevices, X_BT_PAIRED_DEV_OBJ);
         break;
-    case BTMGR_EVENT_DEVICE_CONNECTION_COMPLETE :
-    case BTMGR_EVENT_DEVICE_DISCONNECT_COMPLETE :
+    case BTRMGR_EVENT_DEVICE_CONNECTION_COMPLETE :
+    case BTRMGR_EVENT_DEVICE_DISCONNECT_COMPLETE :
         RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Received \"%s\" (%d).\n", __FUNCTION__, __LINE__,
-                BTMGR_EVENT_DEVICE_CONNECTION_COMPLETE?"BTMGR_EVENT_DEVICE_CONNECTION_COMPLETE":"BTMGR_EVENT_DEVICE_DISCONNECT_COMPLETE",
+                BTRMGR_EVENT_DEVICE_CONNECTION_COMPLETE?"BTRMGR_EVENT_DEVICE_CONNECTION_COMPLETE":"BTRMGR_EVENT_DEVICE_DISCONNECT_COMPLETE",
                 eventType);
         hostIf_DeviceInfoRdk_xBT::notifyAddDelEvent(numOfDevices, X_BT_CONNECTED_DEV_OBJ);
         break;
     default:
-        RDK_LOG(RDK_LOG_WARN, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Invalid BTMGR_Event (%d) received.\n",	__FUNCTION__, __LINE__, eventType);
+        RDK_LOG(RDK_LOG_WARN, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Invalid BTRMGR_Event (%d) received.\n",	__FUNCTION__, __LINE__, eventType);
         break;
     }
 
