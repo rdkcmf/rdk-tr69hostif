@@ -94,8 +94,7 @@ int SNMPClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         stMsgData->instanceNum = instanceNumber;
         if(pIfaceStatus)
         {
-            if(strcasecmp(stMsgData->paramName,"Device.X_RDKCENTRAL-COM_DocsIf.docsIfCmStatusTxPower")==0)
-                ret = pIfaceStatus->set_ValueToSNMPAdapter(stMsgData);
+            ret = pIfaceStatus->set_ValueToSNMPAdapter(stMsgData);
         }
         else
         {
