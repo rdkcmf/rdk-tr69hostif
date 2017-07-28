@@ -144,6 +144,9 @@ bool WiFiReqHandler::unInit()
 int WiFiReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Found string as %s. Set command not supported.\n",
+             __FUNCTION__, __FILE__, stMsgData->paramName);
+    stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
     return ret;
 }
 

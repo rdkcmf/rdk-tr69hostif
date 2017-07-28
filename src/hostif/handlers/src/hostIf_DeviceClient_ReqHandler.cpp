@@ -220,6 +220,14 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
         	ret = pIface->set_xFirmwareDownloadNow(stMsgData);
         }
+        else
+        {
+           ret = NOK;
+           stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
+           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Failed, since Attempt To Set a NonWritable Parameter \"%s\"\n", __FUNCTION__, stMsgData->paramName);
+        }
+        stMsgData->faultCode = (OK == ret)?fcNoFault:fcRequestDenied;
+
     }
     hostIf_DeviceInfo::releaseLock();
     return ret;

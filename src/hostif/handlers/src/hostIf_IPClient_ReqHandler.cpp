@@ -283,7 +283,7 @@ int IPClientReqHandler::handleSetMsg (HOSTIF_MsgData_t *stMsgData)
             return NOK;
         ret = pIPIface->handleSetMsg (stMsgData);
     }
-
+    stMsgData->faultCode = (OK == ret)?fcNoFault:fcRequestDenied;
     return ret;
 }
 

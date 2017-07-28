@@ -126,23 +126,28 @@ int EthernetClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_Device_Ethernet_Interface_Enable(stMsgData);
         }
-        if (strcasecmp(pSetting,"Alias") == 0)
+        else if (strcasecmp(pSetting,"Alias") == 0)
         {
             ret = pIface->set_Device_Ethernet_Interface_Alias(stMsgData);
         }
-        if (strcasecmp(pSetting,"LowerLayers") == 0)
+        else if (strcasecmp(pSetting,"LowerLayers") == 0)
         {
             ret = pIface->set_Device_Ethernet_Interface_LowerLayers(stMsgData);
         }
-        if (strcasecmp(pSetting,"MaxBitRate") == 0)
+        else if (strcasecmp(pSetting,"MaxBitRate") == 0)
         {
             ret = pIface->set_Device_Ethernet_Interface_Enable(stMsgData);
         }
-        if (strcasecmp(pSetting,"DuplexMode") == 0)
+        else if (strcasecmp(pSetting,"DuplexMode") == 0)
         {
             ret = pIface->set_Device_Ethernet_Interface_DuplexMode(stMsgData);
         }
-
+        else
+        {
+            ret = NOK;
+            stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Failed, since Attempt To Set a NonWritable Parameter \"%s\"\n", __FUNCTION__, stMsgData->paramName);
+        }
     }
     hostIf_EthernetInterface::releaseLock();
     return ret;

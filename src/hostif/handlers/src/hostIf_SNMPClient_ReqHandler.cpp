@@ -102,6 +102,12 @@ int SNMPClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] hostIf_snmpAdapter::getInstance is NULL for %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
         }
     }
+    else
+    {
+        ret = NOK;
+        stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Failed, since Attempt To Set a NonWritable Parameter \"%s\"\n", __FUNCTION__, stMsgData->paramName);
+    }
     hostIf_snmpAdapter::releaseLock();
     return ret;
 }
@@ -163,13 +169,13 @@ int SNMPClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         }
         else
         {
-            ret = NOK;	        
+            ret = NOK;
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Not able to get notifyhash  %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
         }
     }
     else
     {
-        ret = NOK;	    
+        ret = NOK;
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] hostIf_snmpAdapter::getInstance is NULL for %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
     }
 

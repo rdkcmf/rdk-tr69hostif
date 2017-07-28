@@ -103,7 +103,7 @@ int InterfaceStackClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Found string as %s. Set command not supported.\n",
              __FUNCTION__, __FILE__, stMsgData->paramName);
-
+    stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
     return ret;
 }
 

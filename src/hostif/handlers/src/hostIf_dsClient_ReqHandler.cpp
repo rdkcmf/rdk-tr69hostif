@@ -177,6 +177,12 @@ int DSClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         stMsgData->instanceNum = instanceNumber;
 		ret = pIfaceSpdif->handleSetMsg(pSetting, stMsgData);
     }
+    else
+    {
+        ret = NOK;
+        stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Failed, since Attempt To Set a NonWritable Parameter \"%s\"\n", __FUNCTION__, stMsgData->paramName);
+    }
     hostIf_STBServiceHDMI::releaseLock();
     return ret;
 }

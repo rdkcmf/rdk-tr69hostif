@@ -319,6 +319,7 @@ int hostIf_snmpAdapter::set_ValueToSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
 
             RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] %s\n", __FUNCTION__, cmd);
             ret = read_command_output (cmd, resultBuff, BUFF_LENGTH_256);
+            stMsgData->faultCode = (OK == ret)?fcNoFault:fcRequestDenied;
         }
         else
         {

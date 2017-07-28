@@ -179,6 +179,16 @@ int MoCAClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_Device_MoCA_Interface_BeaconPowerLimit(stMsgData);
         }
+        else
+        {
+            ret = NOK;
+            stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Failed, since Attempt To Set a NonWritable Parameter \"%s\"\n", __FUNCTION__, stMsgData->paramName);
+        }
+
+        if(OK == ret) {
+            stMsgData->faultCode = fcNoFault;
+        }
     }
     hostIf_MoCAInterface::releaseLock();
     return ret;
@@ -215,15 +225,15 @@ int MoCAClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         stMsgData->instanceNum = instanceNumber;
         hostIf_MoCAInterface *pIface = hostIf_MoCAInterface::getInstance(instanceNumber);
         hostIf_MoCAInterfaceStats *pIfaceStats
-        = hostIf_MoCAInterfaceStats::getInstance(instanceNumber);
+            = hostIf_MoCAInterfaceStats::getInstance(instanceNumber);
         hostIf_MoCAInterfaceQoS *pIfaceQoS = hostIf_MoCAInterfaceQoS::getInstance(instanceNumber);
         hostIf_MoCAInterfaceQoSFlowStats *pIfaceQoSFS
-        = hostIf_MoCAInterfaceQoSFlowStats::getInstance(instanceNumber);
+            = hostIf_MoCAInterfaceQoSFlowStats::getInstance(instanceNumber);
         hostIf_MoCAInterfaceAssociatedDevice *pIfaceAsstDev
-        = hostIf_MoCAInterfaceAssociatedDevice::getInstance(instanceNumber);
+            = hostIf_MoCAInterfaceAssociatedDevice::getInstance(instanceNumber);
 
         hostIf_MoCAInterfaceMeshTable *pIfaceMeshTableDev
-        = hostIf_MoCAInterfaceMeshTable::getInstance(instanceNumber);
+            = hostIf_MoCAInterfaceMeshTable::getInstance(instanceNumber);
 
         if(!pIface)
         {
@@ -380,9 +390,9 @@ int MoCAClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             ret = pIface->get_Device_MoCA_Interface_AssociatedDeviceNumberOfEntries(stMsgData);
         }
         else if (strcasecmp(pSetting,"X_RDKCENTRAL-COM_MeshTableNumberOfEntries") == 0)
-		{
-			ret = pIface->get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTableNumberOfEntries(stMsgData);
-		}
+        {
+            ret = pIface->get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTableNumberOfEntries(stMsgData);
+        }
         else if (strcasecmp(pSetting,"Stats.BytesSent") == 0)
         {
             ret = pIfaceStats->get_Device_MoCA_Interface_Stats_BytesSent(stMsgData);
@@ -581,16 +591,16 @@ int MoCAClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 int MoCAClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
-{       
+{
     int ret = NOT_HANDLED;
     hostIf_MoCAInterface::getLock();
     // TODO: Retrieve notification value from DeviceInfo structure for given parameter
     hostIf_MoCAInterface::releaseLock();
     return ret;
 }
-            
+
 int MoCAClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
-{   
+{
     int ret = NOT_HANDLED;
     hostIf_MoCAInterface::getLock();
     // TODO: Set notification value from DeviceInfo structure for given parameter

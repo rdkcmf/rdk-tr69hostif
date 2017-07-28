@@ -120,9 +120,25 @@ typedef enum _HostIf_ReqType
     HOSTIF_INVALID_TYPE = 0,
     HOSTIF_GET = 1,
     HOSTIF_SET = 2,
-    HOSTIF_GETATTRIB = 3, 
-    HOSTIF_SETATTRIB = 4 
+    HOSTIF_GETATTRIB = 3,
+    HOSTIF_SETATTRIB = 4
 } HostIf_ReqType_t;
+
+/*! Host IF Error Fault Code type*/
+typedef enum _faultCodes
+{
+    fcNoFault = 0,
+    fcMethodNotSupported = 9000,
+    fcRequestDenied,
+    fcInternalError,
+    fcInvalidArguments,
+    fcResourcesExceeded,
+    fcInvalidParameterName,
+    fcInvalidParameterType,
+    fcInvalidParameterValue,
+    fcAttemptToSetaNonWritableParameter = 9008,
+} faultCode_t;
+
 
 /*! Host IF Message Request data*/
 typedef struct _HostIf_MsgData_t {
@@ -132,6 +148,7 @@ typedef struct _HostIf_MsgData_t {
     short instanceNum;              /*!< Instances number of Response parameter data*/
     HostIf_ParamType_t paramtype;	/*!< Parameter type */
     HostIf_ReqType_t reqType;		/*!< Host interface request type [HOSTIF_GET/HOSTIF_SET]*/
+    faultCode_t faultCode;          /*!< Fault codes as per BroadBand cwmp amendment*/
 } HOSTIF_MsgData_t;
 
 /*! Events published from TR69 host interface */
