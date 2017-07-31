@@ -228,6 +228,7 @@ class hostIf_DeviceInfo {
 
     string getEstbIp();
     bool isRsshactive();
+    size_t findIgnoreCase (std::string haystack, std::string needle, size_t pos = 0);
 
 public:
 

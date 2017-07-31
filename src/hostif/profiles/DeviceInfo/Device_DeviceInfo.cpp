@@ -2417,8 +2417,8 @@ int hostIf_DeviceInfo::readFirmwareInfo(char *param, HOSTIF_MsgData_t * stMsgDat
     try {
         if (fwDwnfile.is_open()) {
             while ( getline (fwDwnfile,line) ) {
-                size_t found = line.find(param);
-                if (found!=string::npos) break;
+                if (string::npos != findIgnoreCase (line, param))
+                    break;
             }
             fwDwnfile.close();
         } else {
@@ -2575,6 +2575,21 @@ int hostIf_DeviceInfo::set_xFirmwareDownloadNow(HOSTIF_MsgData_t *stMsgData)
     return ret;
 }
 
+/**
+ * @brief Finds if one string occurs within another string. The search is case-insensitive.
+ *
+ * @param[in] haystack the string within which the search is to be performed.
+ * @param[in] needle   the string to be searched for.
+ * @param[in] pos      the index within 'haystack' from where the search for 'needle' is to be started.
+ *
+ * @return the index of where the 'needle' is found in the 'haystack', or npos if 'needle' is not found.
+ */
+size_t hostIf_DeviceInfo::findIgnoreCase (std::string haystack, std::string needle, size_t pos)
+{
+    std::transform (haystack.begin(), haystack.end(), haystack.begin(), ::tolower); // convert haystack to lower case
+    std::transform (needle.begin(), needle.end(), needle.begin(), ::tolower); // convert needle to lower case
+    return haystack.find (needle, pos); // find and return the location of the needle hidden in the haystack
+}
 
 /* End of doxygen group */
 /**
