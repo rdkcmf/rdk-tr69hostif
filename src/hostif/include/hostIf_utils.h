@@ -34,7 +34,7 @@
 #include <string>
 #include "hostIf_main.h"
 
-#define REBOOT_SCR "sh /rebootNow.sh"
+#define REBOOT_SCR "sh /rebootNow.sh -s hostIf_utils"
 #define SCR_PATH "/lib/rdk"
 #define NTP_FILE_NAME "/opt/persistent/firstNtpTime"
 #define FW_DWN_FILE_PATH "/opt/fwdnldstatus.txt"
