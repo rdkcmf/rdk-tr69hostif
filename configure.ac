@@ -82,8 +82,6 @@ AC_ARG_ENABLE([moca],
 	[
 	AC_MSG_NOTICE([moca11 profile is disabled])])
 
-
-
 AC_ARG_ENABLE([moca2],
 	[AS_HELP_STRING([--enable-moca2],[enable moca20 profile (default is yes)])],
 	[
@@ -96,6 +94,13 @@ AC_ARG_ENABLE([moca2],
 	[
 	AC_MSG_NOTICE([moca20 profile is disabled])])
 
+AC_ARG_ENABLE([morty],
+        [AS_HELP_STRING([--enable-morty],[enable morty (default is yes)])],
+        [
+        PKG_CHECK_MODULES([PROCPS], [libprocps >= 3.2.8])
+        ],
+        [
+        PKG_CHECK_MODULES([PROCPS], [libproc >= 3.2.8])])
 
 m4_syscmd([test -d soc/hostif/profiles/moca])
 m4_if(m4_sysval,[0],[AC_CONFIG_FILES([soc/hostif/profiles/moca/Makefile])])

@@ -47,7 +47,7 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
         -I=/usr/include/rdk/ds-hal/ \
 	$(XRDK_RF4CE_PROFILE_FLAG)
 
-AM_CXXFLAGS += "-std=c++11"
+AM_CXXFLAGS += "-std=c++11" $(PROCPS_CFLAGS)
 
 if WITH_XRDK_SDCARD_PROFILE
 AM_CXXFLAGS += $(XRDK_SDCARD_PROFILE_FLAG)
@@ -83,7 +83,7 @@ if WITH_SNMP_ADAPTER
 AM_CXXFLAGS += -DSNMP_ADAPTER_ENABLED -I$(top_srcdir)/src/hostif/snmpAdapter
 endif
 
-AM_LDFLAGS = $(GLIB_LIBS) $(G_THREAD_LIBS) $(SOUP_LIBS) -lproc-3.2.8 -lIARMBus -lyajl -ldirect -lfusion -lds -ldshalcli -ldbus-1
+AM_LDFLAGS = $(GLIB_LIBS) $(G_THREAD_LIBS) $(SOUP_LIBS) $(PROCPS_LIBS) -lIARMBus -lyajl -ldirect -lfusion -lds -ldshalcli -ldbus-1
 
 noinst_LTLIBRARIES = libMsgHandlers.la
 libMsgHandlers_la_SOURCES =	src/hostIf_IARM_ReqHandler.cpp \

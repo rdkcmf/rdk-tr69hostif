@@ -25,12 +25,12 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
 -I$(top_srcdir)/soc/hostif/profiles/moca \
 -I$(top_srcdir)/src/hostif/profiles/X_COMCAST-COM/X_COMCAST-COM_Xcalibur/include \
 -I$(top_srcdir)/src/hostif/profiles/moca/include \
-$(GLIB_CFLAGS) $(G_THREAD_CFLAGS) $(XREMGR_FLAGS) $(MOCAMGR_FLAGS) \
+$(GLIB_CFLAGS) $(G_THREAD_CFLAGS) $(XREMGR_FLAGS) $(MOCAMGR_FLAGS) $(PROCPS_CFLAGS) \
 -I=/usr/include/rdk/iarmbus/ \
 -I=/usr/include/rdk/iarmmgrs/mfr/ \
 -I=/usr/include/rdk/iarmmgrs-hal/
 
-AM_LDFLAGS = -lproc-3.2.8 -lIARMBus -lyajl -ldirect -lfusion -lds -ldshalcli -ldbus-1
+AM_LDFLAGS = $(PROCPS_LIBS) -lIARMBus -lyajl -ldirect -lfusion -lds -ldshalcli -ldbus-1
 
 if WITH_XRDK_BT_PROFILE
 AM_CXXFLAGS += $(XRDK_BT_PROFILE_FLAG)
