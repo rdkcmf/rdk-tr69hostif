@@ -25,8 +25,6 @@
 * @defgroup hostif
 * @{
 **/
-
-
 #include "hostIf_main.h"
 #include "hostIf_tr69ReqHandler.h"
 //#include "hostIf_dsClient_ReqHandler.h"
@@ -35,6 +33,10 @@
 
 #if defined(USE_WIFI_PROFILE)
 #include "Device_WiFi.h"
+#endif
+
+#if defined(PARODUS_ENABLE)
+#include "libpd.h"
 #endif
 
 #include <semaphore.h>
@@ -66,6 +68,12 @@ GHashTable* paramMgrhash;
 static void usage();
 void init_request_handler_mutex (void);
 T_ARGLIST argList = {{'\0'}, 0};
+
+#if defined(PARODUS_ENABLE)
+// Parodus Init Thread
+pthread_t parodus_init_tid;
+#endif
+
 
 char *hostIf_JsonIfMsg = (char *)"hostIf_JsonIfThread";
 #if defined(ENABLE_TELEMETRY_LOGGER)
@@ -159,6 +167,7 @@ int main(int argc, char *argv[])
     int retVal=0;
 #endif
     const char* debugConfigFile = NULL;
+    const char* webpaNotifyConfigFile = NULL;
     //------------------------------------------------------------------------------
     // Signal handlers:
     //------------------------------------------------------------------------------
@@ -188,15 +197,15 @@ int main(int argc, char *argv[])
             {"conffile",     	required_argument, 0, 'c'},
             {"port",       		required_argument, 0, 'p'},
             {"debugconfig",     required_argument, 0, 'd'},
+	    {"notifyconfig",    required_argument, 0, 'w'},
             {0, 0, 0, 0}
         };
 
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        ch = getopt_long (argc, argv, "hHl:c:p:d:",
+        ch = getopt_long (argc, argv, "hHl:c:p:d:w:",
                           long_options, &option_index);
-
         /* Detect the end of the options. */
         if (ch == -1)
             break;
@@ -218,6 +227,12 @@ int main(int argc, char *argv[])
 		debugConfigFile = optarg;
             }
             break;
+        case 'w':
+	    if(optarg)
+	    {
+		webpaNotifyConfigFile = optarg;
+            }
+	    break;
 
         case 'p':
             if(optarg)
@@ -385,6 +400,23 @@ int main(int argc, char *argv[])
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"TelemetryThread create failed\n");
     }
 #endif
+
+    //------------------------------------------------------------------------------
+    // Initialize WebPA Module 
+    //------------------------------------------------------------------------------
+#if defined(PARODUS_ENABLE)
+
+RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Starting WEBPA Parodus Connections\n");
+libpd_set_notifyConfigFile(webpaNotifyConfigFile);
+if(0 == pthread_create(&parodus_init_tid, NULL, libpd_client_mgr, NULL))
+{
+	RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Initiating Connection with PARODUS success.. \n");
+}
+else
+{
+	RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Parodus init thread create failed\n");
+}
+#endif
     main_loop = g_main_loop_new (NULL, FALSE);
 
     g_main_loop_run(main_loop);
@@ -442,6 +474,11 @@ void exit_gracefully (int sig_received)
 
 #if defined(ENABLE_TELEMETRY_LOGGER)
     pthread_kill(telemetery_tid, sig_received);
+#endif
+
+#if defined(PARODUS_ENABLE)
+    // Kill Parodus Thread
+    pthread_kill(parodus_init_tid, sig_received);
 #endif
     /*Stop libSoup server and exit Json Thread */
     hostIf_HttpServerStop();

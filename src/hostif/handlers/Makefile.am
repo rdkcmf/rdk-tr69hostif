@@ -122,3 +122,12 @@ endif
 if WITH_NOTIFICATION_SUPPORT
 AM_CXXFLAGS += $(HAVE_VALUE_CHANGE_EVENT_FLAG)
 endif
+
+if WITH_PARODUS_SUPPORT
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/parodusClient/pal \
+               -I$(top_srcdir)/src/hostif/parodusClient/waldb \
+                $(PARODUS_ENABLE_FLAG)
+libMsgHandlers_la_SOURCES += src/hostIf_NotificationHandler.cpp
+include_HEADERS = include/hostIf_msgHandler.h \
+                  include/hostIf_NotificationHandler.h
+endif

@@ -16,19 +16,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##########################################################################
-[Unit]
-Description=TR69 Host Interface Daemon
-After=lighttpd.service tr69bus.service dsmgr.service
-Requires=tr69bus.service
 
-[Service]
-Type=notify
-EnvironmentFile=/etc/device.properties
-ExecStartPre=/bin/sh -c 'if [ "$BUILD_TYPE" != "prod" ];then /lib/rdk/opt-override.sh; fi'
-ExecStart=/usr/bin/tr69hostif -c /etc/mgrlist.conf -p 10999 -d $DEBUGINIFILE -w $WEBPANOTIFYINCFG 
-ExecStop=/bin/kill -15 $MAINPID
-RestartSec=10s
-Restart=always
 
-[Install]
-WantedBy=multi-user.target
+lib_LTLIBRARIES = libpal.la
+AM_CXXFLAGS=  -I$(top_srcdir)/src/hostif/parodusClient/pal \
+            -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/libparodus \
+            -I$(top_srcdir)/src/hostif/include  \
+            -I$(top_srcdir)/src/hostif/handlers/include \
+            -I$(top_srcdir)/src/hostif/parodusClient/waldb \
+            -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/wdmp-c \
+            -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/wrp-c $(GLIB_CFLAGS)
+
+libpal_la_LDFLAGS= -llibparodus -lrdkloggers -lwdmp-c -lwrp-c  -lcjson -lpthread
+libpal_la_LIBADD = $(top_builddir)/src/hostif/parodusClient/waldb/libwaldb.la \
+                   $(top_builddir)/src/hostif/handlers/libMsgHandlers.la 
+libpal_la_SOURCES = webpa_notification.cpp libpd.cpp webpa_parameter.cpp webpa_adapter.cpp webpa_attribute.cpp 
+include_HEADERS=libpd.h 
+
+

@@ -1,0 +1,11 @@
+{
+	"EnablePa": "true",
+	"file-version": 1,
+	"ServerIP": "fabric.webpa.comcast.net",
+	"ServerPort": 8080,
+	"DeviceNetworkInterface": "",
+	"RetryIntervalInSec": 10,
+        "ParodusURL" : "tcp://127.0.0.1:6666",
+        "ParodusClientURL": "tcp://127.0.0.1:6667",
+	"MaxPingWaitTimeInSec": 180
+}

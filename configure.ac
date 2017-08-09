@@ -51,6 +51,7 @@ SYSTEMD_SDNOTIFY_CFLAGS=" "
 SYSTEMD_SDNOTIFY_LDFLAGS=" "
 HWSELFTEST_PROFILE_FLAG=" "
 TELEMETRY_LOGGER_FLAG=" "
+PAROUDS_ENABLE_FLAG=" "
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
 [AM_DEFAULT_VERBOSITY=1
@@ -291,6 +292,21 @@ AC_ARG_ENABLE([telemetrylogger],
 	],
 	[echo "TELEMETRY LOGGER is disabled"])
 
+AC_ARG_ENABLE([parodus],
+        AS_HELP_STRING([--enable-parodus],[enable Parodus Support (default is no)]),
+        [
+          case "${enableval}" in
+           yes) PARODUS_SUPPORT_ENABLED=true
+                PARODUS_ENABLE_FLAG="-DPARODUS_ENABLE" 
+                m4_syscmd([test -d src/hostif/parodusClient])
+                m4_if(m4_sysval,[0],[AC_CONFIG_FILES([src/hostif/parodusClient/pal/Makefile])])
+                m4_if(m4_sysval,[0],[AC_CONFIG_FILES([src/hostif/parodusClient/Makefile])])
+                m4_if(m4_sysval,[0],[AC_CONFIG_FILES([src/hostif/parodusClient/waldb/Makefile])]);;
+           no) PARODUS_SUPPORT_ENABLED=false AC_MSG_ERROR([Parodus support is disabled]) ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-parodus ]) ;;
+           esac
+           ],
+         [echo "Parodus support is disabled"])
 
 
 AM_CONDITIONAL([WITH_MOCA_PROFILE], [test "x$enable_moca" = "xyes"])
@@ -308,6 +324,7 @@ AM_CONDITIONAL([WITH_WEBPA_RFC], [test x$WEBPA_RFC_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_NOTIFICATION_SUPPORT], [test x$HAVE_VALUE_CHANGE_EVENT_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_SNMP_ADAPTER], [test x$SNMP_ADAPTER_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_TELEMETRY_LOGGER], [test x$TELEMETRY_LOGGER_ENABLE = xtrue])
+AM_CONDITIONAL([WITH_PARODUS_SUPPORT], [test x$PARODUS_SUPPORT_ENABLED = xtrue])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -360,10 +377,10 @@ AC_SUBST(SYSTEMD_SDNOTIFY_CFLAGS)
 AC_SUBST(SYSTEMD_SDNOTIFY_LDFLAGS)
 AC_SUBST(HWSELFTEST_PROFILE_FLAG)
 AC_SUBST(TELEMETRY_LOGGER_FLAG)
+AC_SUBST(PARODUS_ENABLE_FLAG)
+
 # files to generate via autotools (.am or .in source files)
 AC_CONFIG_FILES([Makefile])
-
-
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([src/hostif/handlers/Makefile])
 AC_CONFIG_FILES([src/hostif/profiles/Makefile ])

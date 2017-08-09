@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2016 RDK Management
+# Copyright 2017 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,19 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##########################################################################
-[Unit]
-Description=TR69 Host Interface Daemon
-After=lighttpd.service tr69bus.service dsmgr.service
-Requires=tr69bus.service
-
-[Service]
-Type=notify
-EnvironmentFile=/etc/device.properties
-ExecStartPre=/bin/sh -c 'if [ "$BUILD_TYPE" != "prod" ];then /lib/rdk/opt-override.sh; fi'
-ExecStart=/usr/bin/tr69hostif -c /etc/mgrlist.conf -p 10999 -d $DEBUGINIFILE -w $WEBPANOTIFYINCFG 
-ExecStop=/bin/kill -15 $MAINPID
-RestartSec=10s
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
+noinst_LTLIBRARIES=libwaldb.la
+libwaldb_la_SOURCES=waldb.cpp
+libwaldb_la_LDFLAGS=-ltinyxml -lIARMBus
+AM_CXXFLAGS = -I$(top_srcdir)/include \
+              -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/wdmp-c \
+              -I$(top_srcdir)/src/hostif/parodusClient/waldb \
+              -I$(top_srcdir)/src/hostif/parodusClient/pal $(GLIB_CFLAGS)

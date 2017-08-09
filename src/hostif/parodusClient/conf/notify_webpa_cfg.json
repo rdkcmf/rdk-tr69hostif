@@ -1,0 +1,5 @@
+{
+    "Notify": [
+            "Device.Ethernet.Interface.1.Status"
+     ]
+}

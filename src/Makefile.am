@@ -18,11 +18,16 @@
 ##########################################################################
 #####################################################################
 
-SUBDIRS = hostif/profiles hostif/handlers
-DIST_SUBDIRS = hostif/profiles hostif/handlers
+SUBDIRS = hostif/handlers hostif/profiles 
+DIST_SUBDIRS = hostif/handlers hostif/profiles 
 if WITH_SNMP_ADAPTER
 SUBDIRS += hostif/snmpAdapter
 DIST_SUBDIRS += hostif/snmpAdapter
+endif
+
+if WITH_PARODUS_SUPPORT
+SUBDIRS +=hostif/parodusClient
+DIST_SUBDIRS += hostif/parodusClient
 endif
 
 AM_CXXFLAGS = $(GLIB_CFLAGS) $(GTHREAD_CFLAGS) \
@@ -33,6 +38,11 @@ AM_CXXFLAGS = $(GLIB_CFLAGS) $(GTHREAD_CFLAGS) \
 	-I$(top_srcdir)/src/hostif/profiles/Ethernet \
 	-I$(top_srcdir)/src/hostif/profiles/IP \
 	-I$(top_srcdir)/src/hostif/profiles/Time
+
+if WITH_PARODUS_SUPPORT
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/parodusClient/pal \
+               -I$(top_srcdir)/src/hostif/parodusClient/waldb 
+endif
 
 if WITH_MOCA_PROFILE
 NEXUS_LIB = -lnexus
@@ -146,4 +156,13 @@ endif
 
 if WITH_SNMP_ADAPTER
 tr69hostif_LDADD += $(top_builddir)/src/hostif/snmpAdapter/libSNMPAdapter.la
+endif
+
+if WITH_PARODUS_SUPPORT
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/parodusClient/pal 
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/parodusClient/waldb
+AM_CXXFLAGS += $(PARODUS_ENABLE_FLAG)
+tr69hostif_LDADD += $(top_builddir)/src/hostif/parodusClient/waldb/libwaldb.la
+tr69hostif_LDADD += $(top_builddir)/src/hostif/parodusClient/pal/libpal.la
+
 endif
