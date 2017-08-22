@@ -343,6 +343,8 @@ public:
 
     int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadPercent (HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareUpdateState (HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
     /**
      * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset.
      *

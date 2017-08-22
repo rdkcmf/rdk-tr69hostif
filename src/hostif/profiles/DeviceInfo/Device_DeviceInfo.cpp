@@ -1426,6 +1426,14 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadPerce
     return OK;
 }
 
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareUpdateState(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
+{
+    if(OK == readFirmwareInfo((char *)"fwUpdateState", stMsgData))
+        return OK;
+    else
+        return NOK;
+}
+
 /**
  * @brief This function gets the number of entries in the VendorConfigFile table.
  * Currently not implemented.
