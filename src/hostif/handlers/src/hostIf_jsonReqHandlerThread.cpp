@@ -49,7 +49,6 @@ typedef  struct {
 
 SoupServer  *server = NULL;
 
-extern GMutex *request_handler_mutex;
 
 /*
  * YAJL Parsing functions
@@ -254,7 +253,6 @@ void hostIf_HTTPJsonMsgHandler(
     yajl_gen_array_open(json);
 
     GList *l = params;
-    g_mutex_lock(request_handler_mutex);
     while (l)
     {
         HOSTIF_MsgData_t *param = (HOSTIF_MsgData_t *) g_malloc0(sizeof(HOSTIF_MsgData_t));
@@ -298,7 +296,6 @@ void hostIf_HTTPJsonMsgHandler(
 
         l = l->next;
     }
-    g_mutex_unlock(request_handler_mutex);
     // Free the list, but do NOT deallocate the strings.  They're now in the requestList
     g_list_free(params);
     params = NULL;

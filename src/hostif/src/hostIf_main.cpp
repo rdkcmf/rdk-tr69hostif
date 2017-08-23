@@ -57,7 +57,6 @@
 // Initialize global variables and functions.
 //------------------------------------------------------------------------------
 GThread *hostIf_JsonIfThread = NULL;
-GMutex *request_handler_mutex = NULL;
 //GTimeVal timeval;
 static GMainLoop *main_loop = NULL;
 gchar *date_str = NULL;
@@ -66,7 +65,6 @@ FILE *logfile = NULL;
 int rdk_logger_enabled = 0;
 GHashTable* paramMgrhash;
 static void usage();
-void init_request_handler_mutex (void);
 T_ARGLIST argList = {{'\0'}, 0};
 
 #if defined(PARODUS_ENABLE)
@@ -341,10 +339,6 @@ int main(int argc, char *argv[])
     RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"Starting tr69HostIf Service\n");
 
 
-    //------------------------------------------------------------------------------
-    // Initialize the mutex for request_handler_mutex, G_hash_table
-    //------------------------------------------------------------------------------
-    init_request_handler_mutex ();
 
     /*Commented: This function will replace hostIf_initalize_ConfigManger()
      This shall read all configuration properties of hostif like, profile Manager List,
@@ -425,15 +419,6 @@ else
     return ch;
 }
 
-
-//------------------------------------------------------------------------------
-// init_request_handler_mutex: Initialize Mutex
-//------------------------------------------------------------------------------
-void init_request_handler_mutex (void)
-{
-    g_assert (request_handler_mutex == NULL);
-    request_handler_mutex = g_mutex_new ();
-}
 //------------------------------------------------------------------------------
 // returns id of current thread, which called this function
 //------------------------------------------------------------------------------
@@ -486,7 +471,6 @@ void exit_gracefully (int sig_received)
 
     updateHandler::stop();
 
-    if(request_handler_mutex) g_mutex_free(request_handler_mutex);
     if(logfile) fclose (logfile);
 
     if(paramMgrhash) {

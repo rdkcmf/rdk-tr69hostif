@@ -29,7 +29,7 @@
 * @{
 **/
 
-
+#include <mutex>
 #include "hostIf_main.h"
 #include "hostIf_msgHandler.h"
 #include "hostIf_utils.h"
@@ -63,13 +63,15 @@
 
 extern GHashTable* paramMgrhash;
 extern T_ARGLIST argList;
+static std::mutex get_handler_mutex;
+static std::mutex set_handler_mutex;
 
 int hostIf_GetMsgHandler(HOSTIF_MsgData_t *stMsgData)
 {
     LOG_ENTRY_EXIT;
 
     int ret = NOK;
-
+    std::lock_guard<std::mutex> lock(get_handler_mutex);
     try
     {
         /* Find the respective manager and forward the request*/
@@ -89,6 +91,8 @@ int hostIf_GetMsgHandler(HOSTIF_MsgData_t *stMsgData)
 int hostIf_SetMsgHandler(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOK;
+    
+    std::lock_guard<std::mutex> lock(set_handler_mutex);
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
 
     /* Find the respective manager and forward the request*/

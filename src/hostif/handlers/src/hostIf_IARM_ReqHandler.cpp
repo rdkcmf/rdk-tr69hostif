@@ -192,10 +192,8 @@ void hostIf_GetAttributesReqHandler(void *arg)
     g_printf("[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     if(stMsgData)
     {
-        g_mutex_lock(request_handler_mutex);
         ret = hostIf_SetAttributesMsgHandler(stMsgData);
         g_printf("[hostIf_GetAttributesReqHandler : hostIf_MsgHandler()] Return value : %d\n", ret);
-        g_mutex_unlock(request_handler_mutex);
         /*
 
                 if(ret == OK)
@@ -233,10 +231,8 @@ void hostIf_SetAttributesReqHandler(void *arg)
     g_printf("[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     if(stMsgData)
     {
-        g_mutex_lock(request_handler_mutex);
         ret = hostIf_SetAttributesMsgHandler(stMsgData);
         g_printf("[*****hostIf_SetAttributesReqHandler : hostIf_MsgHandler()] Return value : %d for Parameter %s\n", ret,stMsgData->paramName);
-        g_mutex_unlock(request_handler_mutex);
         /*
 
                 if(ret == OK)
@@ -307,10 +303,8 @@ void hostIf_SetReqHandler(void *arg)
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     if(stMsgData)
     {
-        g_mutex_lock(request_handler_mutex);
         ret = hostIf_SetMsgHandler(stMsgData);
         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[hostIf_SetReqHandler : hostIf_MsgHandler()] Return value : %d\n", ret);
-        g_mutex_unlock(request_handler_mutex);
         /*
 
                 if(ret == OK)
@@ -356,10 +350,8 @@ void hostIf_GetReqHandler(void *arg)
 
     if(stMsgData)
     {
-        g_mutex_lock(request_handler_mutex);
         ret = hostIf_GetMsgHandler(stMsgData);
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[hostIf_GetReqHandler : hostIf_MsgHandler()] Return value : %d\n", ret);
-        g_mutex_unlock(request_handler_mutex);
 
         if(ret == OK)
         {
