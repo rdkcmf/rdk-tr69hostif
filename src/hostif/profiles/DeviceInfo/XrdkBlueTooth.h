@@ -52,6 +52,10 @@
 #include "hostIf_tr69ReqHandler.h"
 #include "hostIf_updateHandler.h"
 #include "hostIf_main.h"
+#include <mutex>
+extern "C" {
+#include "btmgr.h"
+}
 
 #define X_BT_ROOT_OBJ 			"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth."
 #define BT_ENABLE_STRING 							"enable"
@@ -80,25 +84,28 @@
 #define BT_DEV_INFO_RSSI_STRING             "DeviceInfo.RSSI"
 #define BT_DEV_INFO_SIGNALLEVEL_STRING		"DeviceInfo.SignalStrength"
 
-#define MAX_DISCOVERY_DEVICE_NUM		32
-#define MAX_PAIRED_DEVICE_NUM			32
-#define MAX_CONNECTED_DEVICE_NUM		32
-
 /**
  * @brief This class provides the TR-069 components Bluetooth devices information.
  * @ingroup TR69_HOSTIF_X_RDKCENTRAL-COM_xBlueTooth_CLASSES
  */
 class hostIf_DeviceInfoRdk_xBT
 {
+private:
     hostIf_DeviceInfoRdk_xBT();
     ~hostIf_DeviceInfoRdk_xBT() {};
-    static GMutex *m_mutex;
 
-private:
+    static std::mutex m;
+
     static hostIf_DeviceInfoRdk_xBT* m_instance;
-    static short noOfDiscoveredDevice;
-    static short noOfPairedDevice;
-    static short noOfConnectedDevices;
+    static int noOfDiscoveredDevice;
+    static int noOfPairedDevice;
+    static int noOfConnectedDevices;
+
+    static BTRMGR_DiscoveredDevicesList_t disDevList;
+    static BTRMGR_PairedDevicesList_t pairedDevList;
+    static BTRMGR_ConnectedDevicesList_t connectedDevList;
+
+    static updateCallback mUpdateCallback;
 
     int isEnabled(HOSTIF_MsgData_t *);
     int isDiscoveryEnabled(HOSTIF_MsgData_t *);
@@ -143,20 +150,21 @@ private:
     int getDeviceInfo(HOSTIF_MsgData_t *);
     int setDeviceInfo(HOSTIF_MsgData_t *);
 
+    static void fetch_Bluetooth_DiscoveredDevicesList();
+    static void fetch_Bluetooth_PairedDevicesList();
+    static void fetch_Bluetooth_ConnectedDevicesList();
+
     void notifyValueChangeEvent(updateCallback mUpdateCallback);
 
 public:
-//    static updateCallback mUpdateCallback;
-//    static void XrdkBlueTooth_init();
-    static void getLock();
-    static void releaseLock();
     static void reset();
     static hostIf_DeviceInfoRdk_xBT *getInstance();
     static void closeInstance();
     int handleGetMsg(HOSTIF_MsgData_t *);
     int handleSetMsg(HOSTIF_MsgData_t *);
-//    static void registerUpdateCallback(updateCallback cb);
-    static void notifyAddDelEvent(unsigned short noOfBTDevice, char* tblObj);
+
+    static void registerUpdateCallback(updateCallback cb);
+    static void checkForUpdates();
 };
 
 #endif /*#USE_XRDK_BLUETOOTH_PROFILE*/

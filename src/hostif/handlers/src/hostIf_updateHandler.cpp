@@ -94,6 +94,11 @@ int updateHandler::Init()
 #ifdef USE_XRESRC
     XREClientReqHandler::registerUpdateCallback(notifyCallback);
 #endif
+
+#ifdef USE_XRDK_BT_PROFILE
+    hostIf_DeviceInfoRdk_xBT::registerUpdateCallback(notifyCallback);
+#endif // USE_XRDK_BT_PROFILE
+
     thread=g_thread_create(run,NULL,TRUE,NULL);
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FILE__, __FUNCTION__);
 }
@@ -139,7 +144,7 @@ gpointer updateHandler::run(gpointer ptr)
 //	sleep(120);
     while(!stopped)
     {
-    	RDK_LOG(RDK_LOG_TRACE2,LOG_TR69HOSTIF,"[%s:%s:%d] Entering..\n", __FILE__, __FUNCTION__, __LINE__);
+        RDK_LOG(RDK_LOG_TRACE2,LOG_TR69HOSTIF,"[%s:%s:%d] Entering..\n", __FILE__, __FUNCTION__, __LINE__);
 #ifdef USE_MoCA_PROFILE
         MoCAClientReqHandler::checkForUpdates();
 #endif /* USE_MoCA_PROFILE*/
@@ -149,8 +154,6 @@ gpointer updateHandler::run(gpointer ptr)
 #ifdef USE_WIFI_PROFILE
         WiFiReqHandler::checkForUpdates();
 #endif
-
-
 #ifdef USE_DHCPv4_PROFILE
         DHCPv4ClientReqHandler::checkForUpdates();
 #endif /* USE_DHCPv4_PROFILE*/	
@@ -171,6 +174,10 @@ gpointer updateHandler::run(gpointer ptr)
         XREClientReqHandler::checkForUpdates();
 #endif
 #endif
+#ifdef USE_XRDK_BT_PROFILE
+        hostIf_DeviceInfoRdk_xBT::checkForUpdates();
+#endif
+
         sleep(60);
         RDK_LOG(RDK_LOG_TRACE2,LOG_TR69HOSTIF,"[%s:%s:%d] Exiting..\n", __FILE__, __FUNCTION__, __LINE__);
     }

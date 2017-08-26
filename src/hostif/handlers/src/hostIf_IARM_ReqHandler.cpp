@@ -39,11 +39,6 @@
 #ifdef MEDIA_CLIENT
 #include "integrationSettings.h"
 #endif
-#ifdef USE_XRDK_BT_PROFILE
-#include "btmgr.h"
-#include "btmgr_iarm_interface.h"
-#include "XrdkBlueTooth.h"
-#endif
 #ifdef SNMP_ADAPTER_ENABLED
 #include "hostIf_SNMPClient_ReqHandler.h"
 #endif
@@ -58,9 +53,6 @@ static IARM_Result_t _SetAttributestr69HostIfMgr(void *arg);
 static IARM_Result_t _GetAttributestr69HostIfMgr(void *arg);
 static IARM_Result_t _RegisterForEventstr69HostIfMgr(void *arg);
 static void _hostIf_EventHandler(const char *, IARM_EventId_t, void *, size_t);
-#ifdef USE_XRDK_BT_PROFILE
-static void BTRMgr_EventHandler(const char *, IARM_EventId_t , void *, size_t );
-#endif
 //----------------------------------------------------------------------
 // hostIf_IARM_IF_Start: This shall be use to initialize and register
 // the  hostIf application to IARM bus.
@@ -172,14 +164,6 @@ static bool TR69_HostIf_Mgr_Get_RegisterCall()
 #endif
     /* Register Sys manager Event Handler for IARM_TR69_CLIENT for ACS Connection status */
     IARM_Bus_RegisterEventHandler(IARM_BUS_SYSMGR_NAME, IARM_BUS_SYSMGR_SYSSTATE_GATEWAY_CONNECTION, _hostIf_EventHandler);
-
-#ifdef USE_XRDK_BT_PROFILE
-    IARM_Bus_RegisterEventHandler(IARM_BUS_BTRMGR_NAME, BTRMGR_IARM_EVENT_DEVICE_DISCOVERY_COMPLETE, BTRMgr_EventHandler);
-    IARM_Bus_RegisterEventHandler(IARM_BUS_BTRMGR_NAME, BTRMGR_IARM_EVENT_DEVICE_PAIRING_COMPLETE, BTRMgr_EventHandler);
-    IARM_Bus_RegisterEventHandler(IARM_BUS_BTRMGR_NAME, BTRMGR_IARM_EVENT_DEVICE_UNPAIRING_COMPLETE, BTRMgr_EventHandler);
-    IARM_Bus_RegisterEventHandler(IARM_BUS_BTRMGR_NAME, BTRMGR_IARM_EVENT_DEVICE_CONNECTION_COMPLETE, BTRMgr_EventHandler);
-    IARM_Bus_RegisterEventHandler(IARM_BUS_BTRMGR_NAME, BTRMGR_IARM_EVENT_DEVICE_DISCONNECT_COMPLETE, BTRMgr_EventHandler);
-#endif /*	#ifdef USE_XRDK_BT_PROFILE*/
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
     return ret;
@@ -419,49 +403,5 @@ static void _hostIf_EventHandler(const char *owner, IARM_EventId_t eventId, void
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
 }
 
-#ifdef USE_XRDK_BT_PROFILE
-void BTRMgr_EventHandler(const char *owner, IARM_EventId_t eventId, void *data, size_t len)
-{
-    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
-
-    if (0 == strcmp(owner, IARM_BUS_BTRMGR_NAME)) {
-        if (NULL == data)
-        {
-            RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF, "%s : Input is invalid\n", __FUNCTION__);
-        }
-        else
-        {
-//            BTRMGR_EventMessage_t eventType = eventId ;
-            unsigned short numOfDevices = 0;
-
-            switch (eventId) {
-            case BTRMGR_IARM_EVENT_DEVICE_DISCOVERY_COMPLETE :
-                hostIf_DeviceInfoRdk_xBT::notifyAddDelEvent(numOfDevices, (char *)X_BT_DISCOVERED_DEV_OBJ);
-                RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s:%d] Received \"BTRMGR_IARM_EVENT_DEVICE_DISCOVERY_COMPLETE\" (%d).\n", __FUNCTION__, __LINE__, eventId);
-                break;
-            case BTRMGR_IARM_EVENT_DEVICE_PAIRING_COMPLETE :
-            case BTRMGR_IARM_EVENT_DEVICE_UNPAIRING_COMPLETE :
-                RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s:%d] Received \"%s\" (%d).\n", __FUNCTION__, __LINE__,
-                        BTRMGR_EVENT_DEVICE_PAIRING_COMPLETE?"BTRMGR_EVENT_DEVICE_PAIRING_COMPLETE":"BTRMGR_EVENT_DEVICE_UPAIRING_COMPLETE",
-                        		eventId);
-                hostIf_DeviceInfoRdk_xBT::notifyAddDelEvent(numOfDevices, (char *)X_BT_PAIRED_DEV_OBJ);
-                break;
-            case BTRMGR_IARM_EVENT_DEVICE_CONNECTION_COMPLETE :
-            case BTRMGR_IARM_EVENT_DEVICE_DISCONNECT_COMPLETE :
-                RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s:%d] Received \"%s\" (%d).\n", __FUNCTION__, __LINE__,
-                        BTRMGR_IARM_EVENT_DEVICE_CONNECTION_COMPLETE?"BTRMGR_IARM_EVENT_DEVICE_CONNECTION_COMPLETE":"BTRMGR_IARM_EVENT_DEVICE_DISCONNECT_COMPLETE",
-                        		eventId);
-                hostIf_DeviceInfoRdk_xBT::notifyAddDelEvent(numOfDevices, (char *)X_BT_CONNECTED_DEV_OBJ);
-                break;
-            default:
-                RDK_LOG(RDK_LOG_WARN, LOG_TR69HOSTIF,"[%s:%d] Invalid BTRMGR_Event (%d) received.\n",	__FUNCTION__, __LINE__, eventId);
-                break;
-            }
-        }
-    }
-
-    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
-}
-#endif
 /** @} */
 /** @} */
