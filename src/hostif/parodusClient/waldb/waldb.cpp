@@ -127,7 +127,7 @@ int getNumberofInstances(const char* paramName)
             // Get the number of instances using getValues
             int ret = 0;
             int retCount = 0;
-            const char *getParamList[]={numberOfEntitiesParam};
+            const char *getParamList[]= {numberOfEntitiesParam};
             ParamVal ***parametervalArr = (ParamVal ***) malloc(sizeof(ParamVal **) );
             getValues(getParamList, 1, NULL, parametervalArr, &retCount, (WAL_STATUS *)&ret);
             if(parametervalArr[0][0] && parametervalArr[0][0]->value)
@@ -424,14 +424,17 @@ static TiXmlNode* getList(TiXmlNode *pParent,char *paramName,char* currentParam,
             {
                 if(*paramCount <= MAX_NUM_PARAMETERS)
                 {
-                    ptrParamList[*paramCount] = (char *) malloc(MAX_PARAMETER_LENGTH * sizeof(char));
-                    pParamDataTypeList[*paramCount] = (char *) malloc(MAX_DATATYPE_LENGTH * sizeof(char));
                     if(strlen(currentParam) > 0)
                     {
-                        snprintf(ptrParamList[*paramCount],MAX_PARAMETER_LENGTH,"%s%s",currentParam,pChild->ToElement()->FirstAttribute()->Value());
-                        strncpy(pParamDataTypeList[*paramCount],pChild->FirstChild()->FirstChild()->Value(),MAX_DATATYPE_LENGTH-1);
+                        if(pChild->ToElement()->Attribute("getIdx") && strtol(pChild->ToElement()->Attribute("getIdx"),NULL,10) >= 1)
+                        {
+                            ptrParamList[*paramCount] = (char *) malloc(MAX_PARAMETER_LENGTH * sizeof(char));
+                            pParamDataTypeList[*paramCount] = (char *) malloc(MAX_DATATYPE_LENGTH * sizeof(char));
+                            snprintf(ptrParamList[*paramCount],MAX_PARAMETER_LENGTH,"%s%s",currentParam,pChild->ToElement()->FirstAttribute()->Value());
+                            strncpy(pParamDataTypeList[*paramCount],pChild->FirstChild()->FirstChild()->Value(),MAX_DATATYPE_LENGTH-1);
+                            (*paramCount)++;
+                        }
                     }
-                    (*paramCount)++;
                 }
             }
             // Go to next object
