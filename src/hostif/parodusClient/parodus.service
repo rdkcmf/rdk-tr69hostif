@@ -20,6 +20,7 @@
 Description=Webpa parodus Daemon
 
 [Service]
+SyslogIdentifier="parodus"
 ExecStartPre=/bin/sh -c 'source /lib/rdk/startParodus.sh'
 ExecStart=/bin/sh -c `$PARODUS_CMD`
 ExecStop=/bin/kill -15 $MAINPID

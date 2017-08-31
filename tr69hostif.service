@@ -23,6 +23,7 @@ Requires=tr69bus.service
 
 [Service]
 Type=notify
+SyslogIdentifier="tr69hostif"
 EnvironmentFile=/etc/device.properties
 ExecStartPre=/bin/sh -c 'if [ "$BUILD_TYPE" != "prod" ];then /lib/rdk/opt-override.sh; fi'
 ExecStart=/usr/bin/tr69hostif -c /etc/mgrlist.conf -p 10999 -d $DEBUGINIFILE -w $WEBPANOTIFYINCFG 
