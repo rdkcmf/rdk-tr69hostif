@@ -1,6 +1,14 @@
 #!/bin/sh
 
-WEBPA_CFG_FILE="/etc/webpa_cfg.json"
+. /etc/device.properties
+WEBPA_CFG_OVERIDE_FILE="/opt/webpa_cfg.json"
+
+if [ -f "$WEBPA_CFG_OVERIDE_FILE" ] && [ "$BUILD_TYPE" != "prod" ]; then
+    WEBPA_CFG_FILE=$WEBPA_CFG_OVERIDE_FILE
+else
+    WEBPA_CFG_FILE="/etc/webpa_cfg.json"
+fi
+
 MAX_PARODUS_WAIT_TIME=120
 
 get_webpa_string_parameter()
