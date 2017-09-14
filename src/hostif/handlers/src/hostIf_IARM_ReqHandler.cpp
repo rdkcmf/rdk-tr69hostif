@@ -36,7 +36,7 @@
 #include "libIBus.h"
 #include "libIARM.h"
 #include "sysMgr.h"
-#ifdef USE_MoCA_PROFILE
+#ifdef MEDIA_CLIENT
 #include "integrationSettings.h"
 #endif
 #ifdef USE_XRDK_BT_PROFILE
@@ -166,7 +166,7 @@ static bool TR69_HostIf_Mgr_Get_RegisterCall()
     /* Notification RPC:*/
     IARM_Bus_RegisterEvent(IARM_BUS_TR69HOSTIFMGR_EVENT_MAX);
 
-#ifdef USE_MoCA_PROFILE
+#ifdef MEDIA_CLIENT
     /* Register Event Handler for IARM_TR69_CLIENT for ACS Connection status */
     IARM_Bus_RegisterEventHandler(IARM_TR69_CLIENT, IARM_BUS_TR69Agent_ACS_CONN_EVENT, _hostIf_EventHandler);
 #endif
@@ -392,7 +392,7 @@ static void _hostIf_EventHandler(const char *owner, IARM_EventId_t eventId, void
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     if (0 == strcmp(owner, IARM_TR69_CLIENT))
     {
-#ifdef USE_MoCA_PROFILE
+#ifdef MEDIA_CLIENT
         IARM_Bus_TR69Agent_EventData_t *tr69AgentData = (IARM_Bus_TR69Agent_EventData_t *)data;
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] EventId: %d value : %d \n", __FILE__, __FUNCTION__, (IARM_Bus_tr69Agent_EventId_t)eventId, tr69AgentData->value);
 
