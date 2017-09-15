@@ -966,6 +966,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_FirstUseDate(HOSTIF_MsgData_t * stM
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret = OK;
+#if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     memset(&param, 0, sizeof(param));
     IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
@@ -1018,7 +1019,17 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgDat
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
         ret = NOK;
     }
-
+#else //if defined (USE_DEV_PROPERTIES_CONF)
+    memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
+    string stb_mac = getStbMacIf_fr_devProperties();
+    if(!stb_mac.empty())
+      strcpy(stMsgData->paramValue, stb_mac.c_str());
+    else 
+      stMsgData->faultCode = fcInvalidParameterValue;
+    stMsgData->paramLen = stb_mac.length();
+    stMsgData->paramtype = hostIf_StringType;
+    ret = OK;
+#endif
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
     return ret;
 }
@@ -1040,9 +1051,14 @@ string hostIf_DeviceInfo::getEstbIp()
         /*check for ipv6 file*/
         bool ipv6Enabled = (!access (ipv6_fileName, F_OK))?true:false;
         bool isWifiEnabled = (!access (Wifi_Enable_file, F_OK))?true:false;
-
+        const char* ip_if = NULL;
+#ifdef MEDIA_CLIENT
         /* Get configured moca interface */
-        char *ethIf = getenvOrDefault ("MOCA_INTERFACE", "");
+        ip_if = "MOCA_INTERFACE";
+#else
+        ip_if = "ESTB_INTERFACE";
+#endif
+        char *ethIf = getenvOrDefault (ip_if, "");
         RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s():%d] ipv6Enabled : %d; isWifiEnabled : %d ethIf : %s\n",
                 __FUNCTION__, __LINE__, ipv6Enabled, isWifiEnabled, ethIf);
 
@@ -2598,6 +2614,44 @@ size_t hostIf_DeviceInfo::findIgnoreCase (std::string haystack, std::string need
     std::transform (needle.begin(), needle.end(), needle.begin(), ::tolower); // convert needle to lower case
     return haystack.find (needle, pos); // find and return the location of the needle hidden in the haystack
 }
+
+string hostIf_DeviceInfo::getStbMacIf_fr_devProperties()
+{
+    string stb_mac;
+    try {
+        char mac_buf[20] = {0};
+
+        struct ifreq ifr;
+
+        /* Get configured Estb Mac interface */
+        char *stbMacIf = getenvOrDefault ("ESTB_INTERFACE", "");
+
+        int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
+        if(fd) {
+            strncpy(ifr.ifr_name, stbMacIf,IFNAMSIZ-1);
+            if (0 == ioctl(fd, SIOCGIFHWADDR, &ifr)) {
+                unsigned char *mac = NULL;
+                mac = (unsigned char *) ifr.ifr_hwaddr.sa_data;
+                if(mac) {
+                    sprintf (mac_buf, "%.2X:%.2X:%.2X:%.2X:%.2X:%.2X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+                    stb_mac = mac_buf;
+                    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] STB MAC : \'%s\'..\n", __FUNCTION__, __LINE__, mac_buf );
+                }
+                else {
+                    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed to get ifr_hwaddr.sa_data\'%s\'..\n", __FUNCTION__, __LINE__, strerror (errno) );
+                }
+            }
+            else {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed in ioctl() with  \'%s\'..\n", __FUNCTION__, __LINE__, strerror (errno) );
+            }
+            close (fd);
+        }
+    } catch (const std::exception &e) {
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s()]Exception caught %s\n", __FUNCTION__, e.what());
+    }
+    return stb_mac;
+}
+
 
 /* End of doxygen group */
 /**
