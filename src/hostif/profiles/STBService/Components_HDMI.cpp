@@ -56,7 +56,8 @@ static EnumStringMapper dsVideoPixelResolutionMapper[] =
     { dsVIDEO_PIXELRES_720x480, "720x480"},
     { dsVIDEO_PIXELRES_720x576, "720x576"},
     { dsVIDEO_PIXELRES_1280x720, "1280x720"},
-    { dsVIDEO_PIXELRES_1920x1080, "1920x1080"}
+    { dsVIDEO_PIXELRES_1920x1080, "1920x1080"},
+    { dsVIDEO_PIXELRES_3840x2160, "3840x2160"}
 };
 
 static EnumStringMapper dsVideoFrameRateMapper[] =

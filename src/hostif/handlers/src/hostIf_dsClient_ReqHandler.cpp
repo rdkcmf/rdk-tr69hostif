@@ -37,6 +37,7 @@
 #include "Components_XrdkSDCard.h"
 #endif
 
+#include "Capabilities.h"
 #include "Components_AudioOutput.h"
 #include "Components_SPDIF.h"
 #include "Components_HDMI.h"
@@ -51,7 +52,7 @@
 #ifdef USE_XRDK_RF4CE_PROFILE
 #include "Components_XrdkRf4ce.h"
 #endif
-
+#define CAPABILTIES_OBJ "Device.Services.STBService.1.Capabilities."
 
 DSClientReqHandler* DSClientReqHandler::pInstance = NULL;
 
@@ -209,7 +210,23 @@ int DSClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-    if(strcasecmp(stMsgData->paramName,
+    if(strncasecmp(stMsgData->paramName,
+                  CAPABILTIES_OBJ, strlen(CAPABILTIES_OBJ)) == 0)
+    {
+        hostIf_STBServiceCapabilities *pIface = hostIf_STBServiceCapabilities::getInstance();
+        if(!pIface)
+        {
+            hostIf_STBServiceHDMI::releaseLock();
+            stMsgData->faultCode = fcInternalError;
+            return NOK;
+        }
+		ret = pIface->handleGetMsg(stMsgData);
+        if(OK == ret)
+        {
+            stMsgData->faultCode = fcNoFault;
+        }
+    }
+    else if(strcasecmp(stMsgData->paramName,
                   "Device.Services.STBService.1.Components.VideoDecoderNumberOfEntries") == 0)
     {
         put_int(stMsgData->paramValue,1);

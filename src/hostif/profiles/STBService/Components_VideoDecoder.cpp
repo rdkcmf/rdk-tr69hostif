@@ -39,6 +39,8 @@
 #define STATUS_STRING "Status"
 #define CONTENT_AR_STRING "ContentAspectRatio"
 #define COMCAST_STANDBY_STRING "X_COMCAST-COM_Standby"
+#define HEVC_STRING "X_RDKCENTRAL-COM_MPEGHPart2"
+#define HEVC_PROFILE_PATH ".Capabilities.VideoDecoder.X_RDKCENTRAL-COM_MPEGHPart2.ProfileLevel.1"
 #define NAME_STRING "Name"
 
 #define ENABLE_STRING "Enable"
@@ -205,6 +207,13 @@ int hostIf_STBServiceVideoDecoder::handleGetMsg(const char *paramName, HOSTIF_Ms
     else if(strcasecmp(paramName, CONTENT_AR_STRING) == 0)
     {
         ret = getContentAspectRatio(stMsgData);
+    }
+    else if(strcasecmp(paramName, HEVC_STRING) == 0)
+    {
+        strncpy(stMsgData->paramValue, HEVC_PROFILE_PATH, strlen(HEVC_PROFILE_PATH)+1);
+        stMsgData->paramtype = hostIf_StringType;
+        stMsgData->paramLen = strlen(stMsgData->paramValue);
+        ret = OK;
     }
     return ret;
 }

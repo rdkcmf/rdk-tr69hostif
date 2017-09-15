@@ -39,7 +39,8 @@ libstbservice_la_SOURCES =	Components_AudioOutput.cpp \
 				Components_HDMI.cpp \
 				Components_DisplayDevice.cpp \
 				Components_VideoOutput.cpp \
-				Components_VideoDecoder.cpp 
+				Components_VideoDecoder.cpp \
+				Capabilities.cpp
 if WITH_XRDK_SDCARD_PROFILE
 libstbservice_la_SOURCES += Components_XrdkSDCard.cpp
 endif
