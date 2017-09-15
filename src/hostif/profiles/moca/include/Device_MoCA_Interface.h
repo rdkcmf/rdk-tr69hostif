@@ -294,10 +294,10 @@ class hostIf_MoCAInterface {
     bool bCallX_RDKCENTRAL_COM_MeshTableNumberOfEntries;
 
     int set_Device_MoCA_Interface_Fields(EMoCAInterfaceMembers interfaceMem,HOSTIF_MsgData_t *stMsgData);
-
+    static  GHashTable  *m_notifyHash;
     hostIf_MoCAInterface(int dev_id);
 
-    ~hostIf_MoCAInterface() {};
+    ~hostIf_MoCAInterface() ;
 
 
 public:
@@ -314,7 +314,7 @@ public:
 
     static void releaseLock();
 
-
+    static GHashTable* getNotifyHash();
     /** @defgroup TR_069_DEVICE_MOCA_API TR-069 Device.Moca object API.
      *  @ingroup TR_069_API
      *
