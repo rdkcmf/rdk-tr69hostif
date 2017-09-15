@@ -2,6 +2,7 @@
 
 . /etc/device.properties
 WEBPA_CFG_OVERIDE_FILE="/opt/webpa_cfg.json"
+SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
 
 if [ -f "$WEBPA_CFG_OVERIDE_FILE" ] && [ "$BUILD_TYPE" != "prod" ]; then
     WEBPA_CFG_FILE=$WEBPA_CFG_OVERIDE_FILE
@@ -48,7 +49,7 @@ parodus_start_up()
     HwMac=`get_hardware_mac`
 
      echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-inteface-used=$NwInterface webpa-url=$ServerIP" 
-     /bin/systemctl set-environment PARODUS_CMD="parodus --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-inteface-used=$NwInterface --webpa-url=$ServerIP --partner-id=comcast --webpa-backoff-max=9"
+     /bin/systemctl set-environment PARODUS_CMD="parodus --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-inteface-used=$NwInterface --webpa-url=$ServerIP --partner-id=comcast --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE"
      echo "Parodus command set.." 
 }
 
