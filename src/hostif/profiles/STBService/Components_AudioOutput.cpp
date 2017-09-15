@@ -684,7 +684,7 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioStereoMode(HOSTIF_Msg
         int stereoMode = 0;
 
         stereoMode =  aPort.getStereoMode().getId();
-
+       
         switch(stereoMode)
         {
         case dsAUDIO_STEREO_UNKNOWN:
@@ -698,6 +698,9 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioStereoMode(HOSTIF_Msg
             break;
         case dsAUDIO_STEREO_SURROUND:
             strncpy(stMsgData->paramValue, "Surround", PARAM_LEN);
+            break;
+        case dsAUDIO_STEREO_PASSTHRU:
+            strncpy(stMsgData->paramValue, "Expertmode", PARAM_LEN);
             break;
         default:
             return NOK;
