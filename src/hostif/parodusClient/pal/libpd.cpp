@@ -126,7 +126,7 @@ static void parodus_receive_wait()
             //getCurrentTime(startPtr);
             processRequest((char*)wrp_msg->u.req.payload, wrp_msg->u.req.transaction_uuid, ((char **)(&(res_wrp_msg->u.req.payload))));
 
-            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response payload is %s\n",(char *)(res_wrp_msg->u.req.payload));
+            RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response payload is %s\n",(char *)(res_wrp_msg->u.req.payload));
             if(res_wrp_msg->u.req.payload !=NULL)
             {
                 res_wrp_msg->u.req.payload_size = strlen((const char *)res_wrp_msg->u.req.payload);
