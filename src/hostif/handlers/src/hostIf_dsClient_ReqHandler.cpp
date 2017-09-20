@@ -234,6 +234,13 @@ int DSClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         ret = OK;
     }
     else if(strcasecmp(stMsgData->paramName,
+                  "Device.Services.STBServiceNumberOfEntries") == 0)
+    {
+        put_int(stMsgData->paramValue,1);
+        stMsgData->paramtype = hostIf_UnsignedIntType;
+        ret = OK;
+    }
+    else if(strcasecmp(stMsgData->paramName,
                        "Device.Services.STBService.1.Components.AudioOutputNumberOfEntries") == 0)
     {
 		ret = hostIf_STBServiceAudioInterface::getNumberOfInstances(stMsgData);
