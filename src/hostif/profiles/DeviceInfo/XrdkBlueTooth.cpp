@@ -432,14 +432,14 @@ int hostIf_DeviceInfoRdk_xBT::isEnabled(HOSTIF_MsgData_t *stMsgData)
     try {
         /* BLUETOOTH_DISABLED, BLUETOOTH_ENABLED, BLUETOOTH_INPUT_ENABLED */
         unsigned char power_status = 0;
-        if (BTRMGR_RESULT_SUCCESS != BTRMGR_GetAdapterPowerStatus (0, &power_status)) {
-            strncpy(stMsgData->paramValue, "BLUETOOTH_DISABLED", TR69HOSTIFMGR_MAX_PARAM_LEN);
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed in get BTRMGR_GetAdapterPowerStatus, so BLUETOOTH_DISABLED. \n", __FUNCTION__, __LINE__);
-        }
-        else {
+        if(BTRMGR_RESULT_SUCCESS == BTRMGR_GetAdapterPowerStatus (0, &power_status) && 0 != power_status) {
             strncpy(stMsgData->paramValue, "BLUETOOTH_ENABLED", TR69HOSTIFMGR_MAX_PARAM_LEN);
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s]xBlueTooth: Successfully get BTRMGR_GetAdapterPowerStatus (%u), so BLUETOOTH_ENABLED. \n",
                     __FUNCTION__, power_status);
+        }
+        else {
+            strncpy(stMsgData->paramValue, "BLUETOOTH_DISABLED", TR69HOSTIFMGR_MAX_PARAM_LEN);
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed in get BTRMGR_GetAdapterPowerStatus, so BLUETOOTH_DISABLED. \n", __FUNCTION__, __LINE__);
         }
     } catch (const std::exception& e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exception : %s\r\n",__FUNCTION__, __LINE__, e.what());
