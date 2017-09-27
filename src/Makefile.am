@@ -163,6 +163,6 @@ AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/parodusClient/pal
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/parodusClient/waldb
 AM_CXXFLAGS += $(PARODUS_ENABLE_FLAG)
 tr69hostif_LDADD += $(top_builddir)/src/hostif/parodusClient/waldb/libwaldb.la
-tr69hostif_LDADD += $(top_builddir)/src/hostif/parodusClient/pal/libpal.la
+tr69hostif_LDADD += $(top_builddir)/src/hostif/parodusClient/pal/libparodusclient.la
 
 endif
