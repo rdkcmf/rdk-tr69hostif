@@ -468,10 +468,10 @@ int hostIf_DeviceInfoRdk_xBT::isDiscoveryEnabled(HOSTIF_MsgData_t *stMsgData)
     bool isDisEnable = false;
 
     try {
-        unsigned char power_status = 0;
-        isDisEnable = (BTRMGR_RESULT_SUCCESS == BTRMGR_IsAdapterDiscoverable(0, &power_status))? true:false;
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: isDiscoveryEnabled \'%d\' with  %s power_status as \'%u\'\r\n",
-                __FUNCTION__, isDisEnable, power_status);
+        unsigned char isDiscoverable = 0;
+        isDisEnable = (BTRMGR_RESULT_SUCCESS == BTRMGR_IsAdapterDiscoverable(0, &isDiscoverable) && isDiscoverable == 1)? true:false;
+        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: isDiscoveryEnabled : %d \n",
+                __FUNCTION__, isDisEnable);
     } catch (const std::exception& e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exception : %s\r\n",__FUNCTION__, __LINE__, e.what());
         return NOK;
