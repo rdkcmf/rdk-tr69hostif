@@ -31,7 +31,6 @@ extern "C"
 #define WEBPA_DEVICE_REBOOT_PARAM          "Device.X_CISCO_COM_DeviceControl.RebootDevice"
 #define WEBPA_DEVICE_REBOOT_VALUE          "Device"
 #define WEBPA_NOTIFICATION_SOURCE		   "Unknown"
-#define WEBPA_NOTIFICATION_SOURCE		   "Destination"
 /*----------------------------------------------------------------------------*/
 /*                               Data Structures                              */
 /*----------------------------------------------------------------------------*/
@@ -191,15 +190,10 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
     res_struct *resObj = NULL;
     char *payload = NULL;
     WDMP_STATUS ret = WDMP_FAILURE, setRet = WDMP_FAILURE;
-    int paramCount = 0, i = 0, wildcardParamCount = 0,nonWildcardParamCount = 0, retCount=0, index = 0, error = 0;
+    int paramCount = 0, i = 0, retCount=0, index = 0, error = 0;
     const char *getParamList[MAX_PARAMETERNAME_LEN];
-    const char *wildcardGetParamList[MAX_PARAMETERNAME_LEN];
     WDMP_STATUS setCidStatus = WDMP_SUCCESS, setCmcStatus = WDMP_SUCCESS;
-    const char *wildcardList[1];
     char *param = NULL;
-    char *dbCID = NULL;
-    char *dbCMC = NULL;
-    char newCMC[32]= {'\0'};
 
     RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"************** processRequest *****************\n");
 
@@ -223,7 +217,7 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
             RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Request:> ParamCount = %zu\n",reqObj->u.getReq->paramCnt);
             resObj->paramCnt = reqObj->u.getReq->paramCnt;
             RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> paramCnt = %zu\n", resObj->paramCnt);
-            resObj->retStatus = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS)*resObj->paramCnt);
+            resObj->retStatus = (WDMP_STATUS *) calloc(resObj->paramCnt, sizeof(WDMP_STATUS));
             resObj->timeSpan = NULL;
             paramCount = (int)reqObj->u.getReq->paramCnt;
 
@@ -237,65 +231,38 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
                     error = 1;
                     break;
                 }
-
-                if(param[(strlen(param)-1)] == '.')
-                {
-                    wildcardGetParamList[wildcardParamCount] = param;
-                    wildcardParamCount++;
-                }
                 else
                 {
-                    getParamList[nonWildcardParamCount] = param;
-                    nonWildcardParamCount++;
+                    getParamList[i] = strdup(param); // Freed from wdmp_free_res_struct()
                 }
             }
 
-            if(error != 1)
+            if(error != 1 && paramCount > 0)
             {
                 resObj->u.getRes = (get_res_t *) malloc(sizeof(get_res_t));
                 memset(resObj->u.getRes, 0, sizeof(get_res_t));
 
+                // Allocate Memory based on input param count
                 resObj->u.getRes->paramCnt = reqObj->u.getReq->paramCnt;
-                resObj->u.getRes->paramNames = (char **) malloc(sizeof(char *) * resObj->u.getRes->paramCnt);
-                resObj->u.getRes->retParamCnt = (size_t *) malloc(sizeof(size_t)*paramCount);
-
+                resObj->u.getRes->paramNames = (char **) malloc(sizeof(char *) * paramCount);
+                resObj->u.getRes->retParamCnt = (size_t *) calloc(paramCount, sizeof(size_t));
                 resObj->u.getRes->params = (param_t **) malloc(sizeof(param_t*)*paramCount);
-                memset(resObj->u.getRes->params, 0, sizeof(param_t*)*paramCount);
-                if(nonWildcardParamCount > 0)
-                {
-                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Calling Get Values \n ");
-                    getValues(getParamList, nonWildcardParamCount, resObj->timeSpan, (ParamVal ***)&resObj->u.getRes->params, &retCount, (WAL_STATUS *)&ret);
-                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Non-Wildcard retCount : %d ret : %d\n",retCount, ret);
-                    for(i = 0; i < nonWildcardParamCount; i++)
-                    {
-                        resObj->u.getRes->paramNames[i] = const_cast<char *>(getParamList[i]);
-                        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> paramNames[%d] = %s\n",i,resObj->u.getRes->paramNames[i]);
-                        resObj->u.getRes->retParamCnt[i] = 1;
-                        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> retParamCnt[%d] = %zu\n",i,resObj->u.getRes->retParamCnt[i]);
-                        resObj->retStatus[i] = ret;
-                        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",i,resObj->retStatus[i]);
-                    }
-                }
 
-                if(wildcardParamCount > 0)
+                // Memset to 0
+                memset(resObj->u.getRes->params, 0, sizeof(param_t*)*paramCount);
+                memset(resObj->u.getRes->paramNames, 0, sizeof(char *) * paramCount);
+                memset(resObj->u.getRes->params, 0, sizeof(param_t*)*paramCount);
+                RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Calling Get Values \n ");
+                getValues(getParamList, paramCount,&resObj->u.getRes->params,&resObj->u.getRes->retParamCnt ,&resObj->retStatus);
+
+                for(i = 0; i < paramCount; i++)
                 {
-                    index = index+nonWildcardParamCount;
-                    for(i = 0; i < wildcardParamCount; i++)
-                    {
-                        wildcardList[0] = wildcardGetParamList[i];
-                        resObj->u.getRes->paramNames[index] = const_cast<char *> (wildcardGetParamList[i]);
-                        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> paramNames[%d] = %s\n",index,resObj->u.getRes->paramNames[index]);
-                        getValues(wildcardList, 1,resObj->timeSpan, (ParamVal ***)&resObj->u.getRes->params, &retCount, (WAL_STATUS *)&ret);
-                        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Wildcard retCount : %d ret: %d\n",retCount, ret);
-                        resObj->u.getRes->retParamCnt[index] = retCount;
-                        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> retParamCnt[%d] = %zu\n",index,resObj->u.getRes->retParamCnt[index]);
-                        resObj->retStatus[index] = ret;
-                        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",index,resObj->retStatus[index]);
-                        index++;
-                    }
+                    resObj->u.getRes->paramNames[i] = const_cast<char *>(getParamList[i]);
+                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> paramNames[%d] = %s\n",i,resObj->u.getRes->paramNames[i]);
+                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> retParamCnt[%d] = %zu\n",i,resObj->u.getRes->retParamCnt[i]);
+                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",i,resObj->retStatus[i]);
                 }
             }
-
         }
         break;
 
@@ -442,10 +409,10 @@ void notificationCallBack()
             NotifyData *notifyMsg = (NotifyData*) g_async_queue_timeout_pop (notificationQueue,1000);
             if(NULL != notifyMsg)
             {
-	        notifySource = getNotifySource();
-		notifyDest = getNotifyDestination(notifyDest);
-		RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Calling Process request \n");
-		notifyPayload = processNotification(notifyMsg,notifyPayload);
+                notifySource = getNotifySource();
+                notifyDest = getNotifyDestination(notifyDest);
+                RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Calling Process request \n");
+                notifyPayload = processNotification(notifyMsg,notifyPayload);
 
                 RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Notification Source = %s \n",notifySource);
                 RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Notification Dest = %s \n",notifyDest);
@@ -460,14 +427,14 @@ void notificationCallBack()
                 if(notifyPayload && notifySource && notifyDest)
                 {
                     sendNotification(notifyPayload,notifySource,notifyDest);
-		}
+                }
                 else
                 {
                     RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Error in generating notification payload\n");
                 }
 
                 // Lets free all allocated memory
-                //freeNotificationData(notifyMsg);
+                freeNotificationData(notifyMsg);
             }
             else
             {

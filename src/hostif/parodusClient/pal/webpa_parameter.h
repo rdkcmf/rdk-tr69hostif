@@ -39,8 +39,9 @@ extern "C"
  * for wildcards request where it represents the number of param/value pairs retrieved for the particular wildcard parameter.
  * @param[out] retStatus List of Return status.
  */
-void getValues(const char *paramName[], const unsigned int paramCount, money_trace_spans *timeSpan, ParamVal ***paramValArr, int *retValCount, WAL_STATUS *retStatus);
-
+//void getValues(const char *paramName[], const unsigned int paramCount, money_trace_spans *timeSpan, ParamVal ***paramValArr, int *retValCount, WAL_STATUS *retStatus);
+void getValues (const char *paramName[], const unsigned int paramCount, param_t ***paramValArr,
+                size_t **retValCount, WDMP_STATUS **retStatus);
 /**
  * @brief setValues interface sets the parameter value.
  *

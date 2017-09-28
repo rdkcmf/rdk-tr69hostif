@@ -66,8 +66,8 @@ void setNotifyConfigurationFile(const char* nofityConfigFile)
  */
 char* processNotification(NotifyData *notifyMsg, char* payload)
 {
-	RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Entering processNotification...-\n");
-	char* stringifiedNotifyPayload = NULL;
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Entering processNotification...-\n");
+    char* stringifiedNotifyPayload = NULL;
 
     if(notifyMsg)
     {
@@ -129,11 +129,11 @@ char* processNotification(NotifyData *notifyMsg, char* payload)
                         break;
                     }
                     }
-		    stringifiedNotifyPayload = cJSON_PrintUnformatted(notifyPayload);
+                    stringifiedNotifyPayload = cJSON_PrintUnformatted(notifyPayload);
                     payload = strdup(stringifiedNotifyPayload);
                     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Notification Processed , Payload = %s\n",payload);
-		    cJSON_Delete(notifyPayload);
-		}
+                    cJSON_Delete(notifyPayload);
+                }
                 else
                 {
                     RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"ParamNotify is NULL.. !!\n");
@@ -161,20 +161,24 @@ char* processNotification(NotifyData *notifyMsg, char* payload)
  */
 char * getNotifySource()
 {
-    int ret = 0;
-    int retCount = 0;
+    WDMP_STATUS* ret = 0;
+    size_t *retCount = 0;
 
     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Entering .... %s \n", __FUNCTION__);
 
     if(NULL == notificationSource)
     {
-        const char *getParamList[]= {DEVICE_ESTB_MAC_PARAM};
-        ParamVal ***parametervalArr = (ParamVal ***) malloc(sizeof(ParamVal **) );
-        getValues(getParamList, 1, NULL, parametervalArr, &retCount, (WAL_STATUS *)&ret);
+        char *getParamList[1];
+        getParamList[0]= (char*) calloc(1,MAX_PARAMETER_LENGTH);
+        strncpy(getParamList[0],DEVICE_ESTB_MAC_PARAM,MAX_PARAMETER_LENGTH);
+        param_t **parametervalArr = (param_t **) malloc(sizeof(param_t **));
+        ret = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS *)*1);
+        retCount = (size_t *) malloc(sizeof(size_t) * 1);
+        getValues(const_cast<const char**>(getParamList), 1, &parametervalArr, &retCount, &ret);
         notificationSource = (char*) malloc(WEBPA_NOTIFY_SRC_LEN);
-        if(notificationSource && parametervalArr[0][0] && parametervalArr[0][0]->value)
+        if( (NULL != parametervalArr) && NULL != (*parametervalArr)[0].value)
         {
-            strncpy(notificationSource, parametervalArr[0][0]->value,strlen(parametervalArr[0][0]->value));
+            strncpy(notificationSource, (*parametervalArr)[0].value,WEBPA_NOTIFY_SRC_LEN);
             RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s] Estb MAC :-  %s ", __FUNCTION__,notificationSource);
         }
         else
@@ -182,16 +186,17 @@ char * getNotifySource()
             RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"[%s] Unable to get Notification Source .!! \n", __FUNCTION__);
             strncpy(notificationSource, WEBPA_UNKNOWN_PARAM_VALUE,sizeof(WEBPA_UNKNOWN_PARAM_VALUE));
         }
-        if(parametervalArr[0] && parametervalArr[0][0])
+        // Lets free all allocated values
+        WAL_FREE(getParamList[0]);
+        WAL_FREE(ret);
+        WAL_FREE(retCount);
+
+        if(NULL != parametervalArr)
         {
-            WAL_FREE(parametervalArr[0][0]->name);
-            WAL_FREE(parametervalArr[0][0]->value);
+            WAL_FREE((*parametervalArr)[0].value)
+            WAL_FREE((*parametervalArr)[0].name);
+            WAL_FREE(parametervalArr);
         }
-        if(parametervalArr[0])
-        {
-            WAL_FREE(parametervalArr[0][0]);
-        }
-        WAL_FREE(parametervalArr[0]);
     }
     return notificationSource;
 }

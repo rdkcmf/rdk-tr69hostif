@@ -19,8 +19,8 @@
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
 /*----------------------------------------------------------------------------*/
-static WAL_STATUS GetParamInfo (const char *pParameterName, ParamVal **parametervalPtrPtr, int *paramCountPtr);
-static WAL_STATUS get_ParamValues_tr69hostIf(HOSTIF_MsgData_t *ptrParam);
+static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***parametervalPtrPtr, int *paramCountPtr,int paramIndex);
+static WDMP_STATUS get_ParamValues_tr69hostIf(HOSTIF_MsgData_t *ptrParam);
 int isWildCardParam(const char *paramName);
 static void converttohostIfType(char *ParamDataType,HostIf_ParamType_t* pParamType);
 static void converttoWalType(HostIf_ParamType_t paramType,WAL_DATA_TYPE* pwalType);
@@ -47,25 +47,19 @@ static WAL_STATUS convertFaultCodeToWalStatus(faultCode_t faultCode);
  * for wildcards request where it represents the number of param/value pairs retrieved for the particular wildcard parameter.
  * @param[out] retStatus List of Return status.
  */
-void getValues (const char *paramName[], const unsigned int paramCount, money_trace_spans *timeSpan, ParamVal ***paramValArr,
-                int *retValCount, WAL_STATUS *retStatus)
+void getValues (const char *paramName[], const unsigned int paramCount, param_t ***paramValArr,size_t **retValCount, WDMP_STATUS **retStatus)
 {
     // Generic code mallocs paramValArr to hold paramCount items but only paramValArr[0] is ever accessed.
-    RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Inside GetValues \n ");
     // Generic code uses "paramValArr[0][cnt2]" (iterating over the 2nd dimension instead of the 1st). This means
     // paramValArr[0] (which is of type "ParamVal**") is expected to point to an array of "ParamVal*" objects
-    paramValArr[0] = (ParamVal**)calloc (paramCount, sizeof(ParamVal*));
-
     int cnt = 0;
     int numParams = 0;
     for (cnt = 0; cnt < paramCount; cnt++)
     {
-        // Because GetParamInfo is responsible for producing results (including wildcard explansion) for only 1 input
-        // parameter, the address of the correct "ParamVal*" object from the above allocated array has to be given to
-        // GetParamInfo for initialization. So GetParamInfo has to take a "ParamVal**" as input.
-        retStatus[cnt] =  GetParamInfo (paramName[cnt], &paramValArr[0][cnt], &numParams);
-        retValCount[cnt] = numParams;
-        RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Parameter Name: %s return: %d\n", paramName[cnt], retStatus[cnt]);
+        // GetParamInfo is responsible for generating the output response including wild card. Allocate the memory for
+        (*retStatus)[cnt] =  GetParamInfo (paramName[cnt], paramValArr, &numParams,cnt);
+        (*retValCount)[cnt] = numParams;
+        RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Parameter Name: %s return: %d\n", paramName[cnt], (*retStatus)[cnt]);
     }
 }
 /**
@@ -88,139 +82,129 @@ void setValues(const ParamVal paramVal[], const unsigned int paramCount, const W
 /*                             Internal functions                             */
 /*----------------------------------------------------------------------------*/
 
-static WAL_STATUS GetParamInfo (const char *pParameterName, ParamVal **parametervalPtrPtr, int *paramCountPtr)
+static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***parametervalPtrPtr, int *paramCountPtr,int index)
 {
-    //Check if pParameterName is in the tree and convert to a list if a wildcard/branch
-    int i = 0;
-    WAL_STATUS ret = WAL_SUCCESS;
+
     int dataBaseHandle = 0;
     DB_STATUS dbRet = DB_FAILURE;
     HOSTIF_MsgData_t Param = { 0 };
-    memset(&Param, '\0', sizeof(HOSTIF_MsgData_t));
-    RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Inside GetParamInfo()\n" );
+    WDMP_STATUS ret = WDMP_FAILURE;
 
+    // Memset to 0
+    memset(&Param, '\0', sizeof(HOSTIF_MsgData_t));
+
+    // Get DB handle
     dataBaseHandle = getDBHandle();
     if (dataBaseHandle)
     {
-        ParamVal* parametervalPtr = NULL;
-        if (isWildCardParam(pParameterName))
+        if (isWildCardParam(pParameterName)) // It is a wildcard Param
         {
             /* Translate wildcard to list of parameters */
             char **getParamList = (char**) calloc (MAX_NUM_PARAMETERS, sizeof(char*));
-            char **ParamDataTypeList = (char**) calloc (MAX_NUM_PARAMETERS, sizeof(char*));
-            if (getParamList == NULL || ParamDataTypeList == NULL)
+            if (NULL == getParamList)
             {
                 RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
-                ret = WAL_FAILURE;
-                goto exit0;
+                return WDMP_FAILURE;
             }
-
+            char **ParamDataTypeList = (char**) calloc (MAX_NUM_PARAMETERS, sizeof(char*));
+            if(NULL == ParamDataTypeList)
+            {
+                RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
+                free(getParamList);
+                return WDMP_FAILURE;
+            }
             *paramCountPtr = 0;
+            int wc_cnt = 0;
+            WDMP_STATUS getRet = WDMP_FAILURE;
+
             dbRet = getParameterList ((void *) dataBaseHandle,const_cast<char*> (pParameterName), getParamList, ParamDataTypeList, paramCountPtr);
-            // allocate parametervalPtr as an array of ParamVal elements (wildcard case)
-            parametervalPtr = (ParamVal*) calloc (*paramCountPtr, sizeof(ParamVal));
-            if (parametervalPtr == NULL)
+            if(*paramCountPtr != 0 && dbRet == DB_SUCCESS)
             {
-                RDK_LOG (RDK_LOG_INFO, LOG_PARODUS_IF, "Error allocating memory\n");
-                ret = WAL_FAILURE;
-                goto exit0;
-            }
-            for (i = 0; i < *paramCountPtr; i++)
-            {
-                strncpy (Param.paramName, getParamList[i], MAX_PARAM_LENGTH - 1);
-                Param.paramName[MAX_PARAM_LENGTH - 1] = '\0';
-
-                // Convert ParamDataType to hostIf datatype
-                converttohostIfType (ParamDataTypeList[i], &(Param.paramtype));
-                Param.instanceNum = 0;
-
-                // Convert Param.paramtype to ParamVal.type
-                converttoWalType (Param.paramtype, &(parametervalPtr[i].type));
-                get_ParamValues_tr69hostIf (&Param);
-
-                parametervalPtr[i].name = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
-                parametervalPtr[i].value = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
-                if (parametervalPtr[i].name == NULL || parametervalPtr[i].value == NULL)
+                (*parametervalPtrPtr)[index] = (param_t *) calloc(sizeof(param_t),*paramCountPtr);
+                for(wc_cnt = 0; wc_cnt < *paramCountPtr; wc_cnt++)
                 {
-                    RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
-                    ret = WAL_FAILURE;
-                    goto exit0;
-                }
+                    strncpy (Param.paramName, getParamList[wc_cnt], MAX_PARAM_LENGTH - 1);
+                    Param.paramName[MAX_PARAM_LENGTH - 1] = '\0';
 
-                strncat(parametervalPtr[i].name, Param.paramName, MAX_PARAM_LENGTH - 1);
-                switch (Param.paramtype)
-                {
-                case hostIf_IntegerType:
-                case hostIf_BooleanType:
-                    snprintf (parametervalPtr[i].value, MAX_PARAM_LENGTH, "%d", *((int *) Param.paramValue));
-                    break;
-                case hostIf_UnsignedIntType:
-                    snprintf (parametervalPtr[i].value, MAX_PARAM_LENGTH, "%u", *((unsigned int *) Param.paramValue));
-                    break;
-                case hostIf_UnsignedLongType:
-                    snprintf (parametervalPtr[i].value, MAX_PARAM_LENGTH, "%u", *((unsigned long *) Param.paramValue));
-                    break;
-                case hostIf_StringType:
-                    strncat (parametervalPtr[i].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
-                    break;
-                default: // handle as string
-                    strncat (parametervalPtr[i].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
-                    break;
-                }
+                    // Convert ParamDataType to hostIf datatype
+                    converttohostIfType (ParamDataTypeList[wc_cnt], &(Param.paramtype));
+                    Param.instanceNum = 0;
 
-                free (getParamList[i]);
-                free (ParamDataTypeList[i]);
-                memset(&Param, '\0', sizeof(HOSTIF_MsgData_t));
-            }
-exit0:
-            // For success case generic layer would free up parametervalPtr after consuming data
-            if (ret != WAL_SUCCESS && parametervalPtr != NULL)
-            {
-                int j;
-                for (j = 0; j < i; j++)
-                {
-                    if (parametervalPtr[j].name != NULL)
+                    // Initialize Name and Value to NULL
+                    (*parametervalPtrPtr)[index][wc_cnt].name = NULL;
+                    (*parametervalPtrPtr)[index][wc_cnt].value = NULL;
+
+                    // Convert Param.paramtype to ParamVal.type
+                    converttoWalType (Param.paramtype, (WAL_DATA_TYPE *) &(*parametervalPtrPtr)[index][wc_cnt].type);
+                    getRet = get_ParamValues_tr69hostIf (&Param);
+
+                    (*parametervalPtrPtr)[index][wc_cnt].name = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
+                    (*parametervalPtrPtr)[index][wc_cnt].value = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
+                    if ((*parametervalPtrPtr)[index][wc_cnt].name == NULL || (*parametervalPtrPtr)[index][wc_cnt].value == NULL)
                     {
-                        free (parametervalPtr[j].name);
-                        parametervalPtr[j].name = NULL;
+                        RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
+                        ret = WDMP_FAILURE;
+                        break;
                     }
-                    if (parametervalPtr[j].value != NULL)
+                    // Copy Param Name
+                    strncat((*parametervalPtrPtr)[index][wc_cnt].name, Param.paramName, MAX_PARAM_LENGTH - 1);
+
+                    // Copy param value
+                    switch (Param.paramtype)
                     {
-                        free (parametervalPtr[j].value);
-                        parametervalPtr[j].value = NULL;
+                    case hostIf_IntegerType:
+                    case hostIf_BooleanType:
+                        snprintf ((*parametervalPtrPtr)[index][wc_cnt].value, MAX_PARAM_LENGTH, "%d", *((int *) Param.paramValue));
+                        break;
+                    case hostIf_UnsignedIntType:
+                        snprintf ((*parametervalPtrPtr)[index][wc_cnt].value, MAX_PARAM_LENGTH, "%u", *((unsigned int *) Param.paramValue));
+                        break;
+                    case hostIf_UnsignedLongType:
+                        snprintf ((*parametervalPtrPtr)[index][wc_cnt].value, MAX_PARAM_LENGTH, "%u", *((unsigned long *) Param.paramValue));
+                        break;
+                    case hostIf_StringType:
+                        strncat ((*parametervalPtrPtr)[index][wc_cnt].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
+                        break;
+                    default: // handle as string
+                        strncat ((*parametervalPtrPtr)[index][wc_cnt].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
+                        break;
                     }
-                }
-                free (parametervalPtr);
-                parametervalPtr = NULL;
+                    memset(&Param, '\0', sizeof(HOSTIF_MsgData_t));
+                } // End of Wild card for loop
+                // Lets Free GetParameter List
+                free(getParamList);
+                free(ParamDataTypeList);
+                ret = WDMP_SUCCESS;
             }
-            if (getParamList != NULL)
-                free (getParamList);
-            if (ParamDataTypeList != NULL)
-                free (ParamDataTypeList);
+            else
+            {
+                free(getParamList);
+                free(ParamDataTypeList);
+                RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, " Wild card Param list is empty\n");
+                ret = WDMP_FAILURE;
+            }
         }
-        else /* No wildcard, check whether given parameter is valid */
+        else // Not a wildcard Parameter Lets fill it
         {
             RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Get Request for a Non-WildCard Parameter \n");
+            *paramCountPtr = 1;
             char *dataType = (char*) calloc (MAX_DATATYPE_LENGTH, sizeof(char));
-            if (dataType == NULL)
-            {
-                RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
-                ret = WAL_FAILURE;
-                goto exit1;
-            }
-            // allocate parametervalPtr as a single ParamVal element (the usual case)
-            parametervalPtr = (ParamVal*) calloc (1, sizeof(ParamVal));
-            if (parametervalPtr == NULL)
-            {
-                RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
-                ret = WAL_FAILURE;
-                goto exit1;
-            }
 
-            if (isParameterValid ((void *) dataBaseHandle,const_cast<char*> (pParameterName), dataType))
+            // allocate parametervalPtr as a single param_t and initialize varribales
+            (*parametervalPtrPtr)[index] = (param_t*) calloc (1, sizeof(param_t));
+            (*parametervalPtrPtr)[index][0].name = NULL;
+            (*parametervalPtrPtr)[index][0].value = NULL;
+            (*parametervalPtrPtr)[index][0].type = WDMP_STRING;
+
+            if (NULL == dataType || NULL == (*parametervalPtrPtr)[index])
             {
+                RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
+                ret = WDMP_FAILURE;
+            }
+            else if (isParameterValid ((void *) dataBaseHandle,const_cast<char*> (pParameterName), dataType))
+            {
+
                 RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Valid Parameter..! \n ");
-                *paramCountPtr = 1;
                 strncpy (Param.paramName, pParameterName, MAX_PARAM_LENGTH - 1);
                 Param.paramName[MAX_PARAM_LENGTH - 1] = '\0';
 
@@ -229,79 +213,57 @@ exit0:
 
                 // Convert Param.paramtype to ParamVal.type
                 RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo Param.paramtype is %d\n", Param.paramtype);
-                converttoWalType (Param.paramtype, &(parametervalPtr->type));
-                RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo parametervalPtr->type is %d\n",parametervalPtr->type);
+                converttoWalType (Param.paramtype, (WAL_DATA_TYPE *) &(*parametervalPtrPtr)[index][0].type);
+                RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo parametervalPtr->type is %d\n",((*parametervalPtrPtr)[index][0].type));
                 RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo\n");
                 ret = get_ParamValues_tr69hostIf (&Param);
-                if (ret == WAL_SUCCESS)
+                if (ret == WDMP_SUCCESS)
                 {
-                    parametervalPtr->name = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
-                    parametervalPtr->value = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
-                    if (parametervalPtr->name == NULL || parametervalPtr->value == NULL)
+                    (*parametervalPtrPtr)[index][0].name = (char*) calloc (strlen(pParameterName)+1, sizeof(char));
+                    (*parametervalPtrPtr)[index][0].value = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
+                    if (NULL == (*parametervalPtrPtr)[index][0].name || NULL == (*parametervalPtrPtr)[index][0].value)
                     {
                         RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
-                        ret = WAL_FAILURE;
-                        goto exit1;
+                        ret = WDMP_FAILURE;
                     }
-
-                    strncat (parametervalPtr->name, Param.paramName, MAX_PARAM_LENGTH - 1);
-
-                    switch (Param.paramtype)
-                    {
-                    case hostIf_IntegerType:
-                    case hostIf_BooleanType:
-                        snprintf (parametervalPtr->value, MAX_PARAM_LENGTH, "%d", *((int *) Param.paramValue));
-                        break;
-                    case hostIf_UnsignedIntType:
-                        snprintf (parametervalPtr->value, MAX_PARAM_LENGTH, "%u", *((unsigned int *) Param.paramValue));
-                        break;
-                    case hostIf_UnsignedLongType:
-                        snprintf (parametervalPtr->value, MAX_PARAM_LENGTH, "%u", *((unsigned long *) Param.paramValue));
-                        break;
-                    case hostIf_StringType:
-                        strncat (parametervalPtr->value, Param.paramValue, MAX_PARAM_LENGTH - 1);
-                        break;
-                    default: // handle as string
-                        strncat (parametervalPtr->value, Param.paramValue, MAX_PARAM_LENGTH - 1);
-                        break;
+                    else {
+                        strncpy((*parametervalPtrPtr)[index][0].name, Param.paramName, strlen(pParameterName)+1);
+                        switch (Param.paramtype)
+                        {
+                        case hostIf_IntegerType:
+                        case hostIf_BooleanType:
+                            snprintf ((*parametervalPtrPtr)[index][0].value, MAX_PARAM_LENGTH, "%d", *((int *) Param.paramValue));
+                            break;
+                        case hostIf_UnsignedIntType:
+                            snprintf ((*parametervalPtrPtr)[index][0].value, MAX_PARAM_LENGTH, "%u", *((unsigned int *) Param.paramValue));
+                            break;
+                        case hostIf_UnsignedLongType:
+                            snprintf ((*parametervalPtrPtr)[index][0].value, MAX_PARAM_LENGTH, "%u", *((unsigned long *) Param.paramValue));
+                            break;
+                        case hostIf_StringType:
+                            strncat ((*parametervalPtrPtr)[index][0].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
+                            break;
+                        default: // handle as string
+                            strncat ((*parametervalPtrPtr)[index][0].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
+                            break;
+                        }
+                        RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo value is %s\n", (*parametervalPtrPtr)[index][0].value);
+                        ret = WDMP_SUCCESS;
                     }
-                    RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo value is %s\n", parametervalPtr->value);
                 }
                 else
                 {
-                    RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "get_ParamValues_tr69hostIf failed:ret is %d\n", ret);
-                    ret = WAL_FAILURE;
+                    RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Failed get_ParamValues_tr69hostIf() Param Name :-  %s \n",pParameterName);
+                    ret = WDMP_FAILURE;
                 }
             }
             else
             {
-                RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, " Invalid Parameter name %s\n", pParameterName);
-                ret = WAL_ERR_INVALID_PARAMETER_NAME;
+                RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Invalid Parameter Name  :-  %s \n",pParameterName);
+                ret = WDMP_ERR_INVALID_PARAMETER_NAME;
             }
-exit1:
-            // For success case generic layer would free up parametervalPtr after consuming data
-            if (ret != WAL_SUCCESS && parametervalPtr != NULL)
-            {
-                if (parametervalPtr->name != NULL)
-                {
-                    free (parametervalPtr->name);
-                    parametervalPtr->name = NULL;
-                }
-                if (parametervalPtr->value != NULL)
-                {
-                    free (parametervalPtr->value);
-                    parametervalPtr->value = NULL;
-                }
-                free (parametervalPtr);
-                parametervalPtr = NULL;
-            }
-            if (dataType != NULL)
-            {
-                free (dataType);
-                dataType = NULL;
-            }
+            free(dataType);
         }
-        *parametervalPtrPtr = parametervalPtr;
     }
     else
     {
@@ -394,7 +356,7 @@ static WAL_STATUS SetParamInfo(ParamVal paramVal)
 /**
  * generic Api for get HostIf parameters
  **/
-static WAL_STATUS get_ParamValues_tr69hostIf(HOSTIF_MsgData_t *ptrParam)
+static WDMP_STATUS get_ParamValues_tr69hostIf(HOSTIF_MsgData_t *ptrParam)
 {
     int status = -1;
     ptrParam->reqType = HOSTIF_GET;
@@ -402,13 +364,13 @@ static WAL_STATUS get_ParamValues_tr69hostIf(HOSTIF_MsgData_t *ptrParam)
 
     if(status != 0) {
         RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"[%s:%s:%d] Error in Get Message Handler Status : %d\n", __FILE__, __FUNCTION__, __LINE__, status);
-        return WAL_ERR_INVALID_PARAM;
+        return WDMP_FAILURE;
     }
     else
     {
         RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s:%s:%d] The value for param: %s is %s paramLen : %d\n", __FILE__, __FUNCTION__, __LINE__, ptrParam->paramName,ptrParam->paramValue, ptrParam->paramLen);
     }
-    return WAL_SUCCESS;
+    return WDMP_SUCCESS;
 }
 
 /**

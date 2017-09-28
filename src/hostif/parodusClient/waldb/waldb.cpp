@@ -125,14 +125,33 @@ int getNumberofInstances(const char* paramName)
                 strcpy(position-1,"NumberOfEntries");
             }
             // Get the number of instances using getValues
-            int ret = 0;
-            int retCount = 0;
-            const char *getParamList[]= {numberOfEntitiesParam};
-            ParamVal ***parametervalArr = (ParamVal ***) malloc(sizeof(ParamVal **) );
-            getValues(getParamList, 1, NULL, parametervalArr, &retCount, (WAL_STATUS *)&ret);
-            if(parametervalArr[0][0] && parametervalArr[0][0]->value)
+            WDMP_STATUS *ret ;
+            size_t *retCount = 0;
+            char *getParamList[1];
+            getParamList[0] = (char*) calloc(1,MAX_PARAMETER_LENGTH);
+            strncpy(getParamList[0],numberOfEntitiesParam,MAX_PARAMETER_LENGTH);
+            param_t **parametervalArr = (param_t **) malloc(sizeof(param_t**));
+            ret = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS *)*1);
+            retCount = (size_t *) malloc(sizeof(size_t) * 1);
+            getValues(const_cast<const char**>(getParamList), 1, &parametervalArr, &retCount,&ret);
+            if( (NULL != parametervalArr) && NULL != (*parametervalArr)[0].value)
             {
-                instanceCount = strtol(parametervalArr[0][0]->value,NULL,10);
+                instanceCount = strtol(const_cast<const char*>((*parametervalArr)[0].value),NULL,10);
+            }
+            // Lets free all allocated values
+            if(getParamList[0])
+                free(getParamList[0]);
+            if(ret)
+                free(ret);
+            if(retCount)
+                free(retCount);
+            if(NULL != parametervalArr)
+            {
+                if((*parametervalArr)[0].value)
+                    free((*parametervalArr)[0].value);
+                if((*parametervalArr)[0].name)
+                    free((*parametervalArr)[0].name);
+                free(parametervalArr);
             }
         }
     }
