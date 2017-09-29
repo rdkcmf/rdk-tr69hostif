@@ -157,7 +157,7 @@ int hostIf_STBServiceCapabilities::getVideoStandards(HOSTIF_MsgData_t *stMsgData
         stMsgData->paramLen = strlen(stMsgData->paramValue);
     }
     catch (const std::exception e) {
-        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\n",__FUNCTION__);
         stMsgData->faultCode = fcInternalError;
         return NOK;
     }
@@ -173,7 +173,7 @@ int hostIf_STBServiceCapabilities::getNumHEVCProfileEntries(HOSTIF_MsgData_t *st
 
         if(0 == info.num_entries)
         {
-            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Zero profile entries reported.\r\n",__FUNCTION__);
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Zero profile entries reported.\n",__FUNCTION__);
             stMsgData->faultCode = fcInternalError;
             return NOK;
         }
@@ -183,7 +183,7 @@ int hostIf_STBServiceCapabilities::getNumHEVCProfileEntries(HOSTIF_MsgData_t *st
         stMsgData->paramLen = sizeof(unsigned int); 
     }
     catch (const std::exception e) {
-        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\n",__FUNCTION__);
         stMsgData->faultCode = fcInternalError;
         return NOK;
     }
@@ -202,7 +202,7 @@ static const char * convertHEVCProfileNameToString(dsVideoCodecHevcProfiles_t pr
         case dsVIDEO_CODEC_HEVC_PROFILE_MAINSTILLPICTURE:
             return "MAIN STILL PICTURE";
         default:
-            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Unknown profile 0x%x!\r\n",__FUNCTION__, (unsigned int)profile);
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Unknown profile 0x%x!\n",__FUNCTION__, (unsigned int)profile);
             return "";
     }
 }
@@ -216,7 +216,7 @@ static unsigned int getMaxHEVCDecodeKBitRate(dsVideoCodecProfileSupport_t &entry
     }
     else
     {
-        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Unknown profile (0x%x) and level (%g) combination!\r\n",__FUNCTION__, entry.profile, entry.level);
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Unknown profile (0x%x) and level (%g) combination!\n",__FUNCTION__, entry.profile, entry.level);
     }
     return kbit_rate;
 }
@@ -250,7 +250,7 @@ int hostIf_STBServiceCapabilities::getHEVCProfileDetails(HOSTIF_MsgData_t * stMs
 
         if((0 == info.num_entries) || (index > info.num_entries))
         {
-            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Could not find profiles matching index %d.\r\n",__FUNCTION__, index);
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Could not find profiles matching index %d.\n",__FUNCTION__, index);
             stMsgData->faultCode = ((0 == info.num_entries) ? fcInternalError : fcInvalidParameterName );
             return NOK;
         }
@@ -284,7 +284,7 @@ int hostIf_STBServiceCapabilities::getHEVCProfileDetails(HOSTIF_MsgData_t * stMs
 
     }
     catch (...) {
-        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\n",__FUNCTION__);
         stMsgData->faultCode = fcInternalError;
         return NOK;
     }
@@ -323,7 +323,7 @@ int hostIf_STBServiceCapabilities::getSupportedResolutions(HOSTIF_MsgData_t *stM
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s]  : Value: %s \n",__FUNCTION__, stMsgData->paramValue);
     }
     catch (...) {
-        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\n",__FUNCTION__);
         stMsgData->faultCode = fcInternalError;
         return NOK;
     }
