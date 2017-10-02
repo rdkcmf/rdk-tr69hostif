@@ -264,7 +264,10 @@ GHashTable*  hostIf_DeviceInfo::getNotifyHash()
  */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
-    int ret;
+    int ret=NOT_HANDLED;
+    stMsgData->paramtype = hostIf_StringType;
+
+#if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     memset(&param, 0, sizeof(param));
     IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
@@ -287,7 +290,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t * stM
                 }
                 bCalledSerialNumber = true;
                 strncpy(backupSerialNumber,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
-                stMsgData->paramtype = hostIf_StringType;
                 ret = OK;
             }
             else
@@ -303,6 +305,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t * stM
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
+#else
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s]This parameter \"%s\" is not handled. No data source available.\n",__FUNCTION__, stMsgData->paramName);
+#endif //!defined (USE_DEV_PROPERTIES_CONF)
     return ret;
 }
 
@@ -415,7 +420,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SoftwareVersion(HOSTIF_MsgData_t * 
  */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
-    int ret;
+    int ret = NOT_HANDLED;
+    stMsgData->paramtype = hostIf_StringType;
+#if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
     memset(&param, 0, sizeof(param));
@@ -437,7 +444,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t * stM
                 }
                 bCalledManufacturer = true;
                 strncpy(backupManufacturer,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
-                stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
             }
@@ -454,7 +460,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t * stM
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
-
+#else
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s]This parameter \"%s\" is not handled. No data source available.\n",__FUNCTION__, stMsgData->paramName);
+#endif //  #if !defined (USE_DEV_PROPERTIES_CONF)
     return ret;
 }
 
@@ -477,7 +485,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t * stM
  */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
-    int ret;
+    int ret=NOT_HANDLED;
+    stMsgData->paramtype = hostIf_StringType;
+#if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
     memset(&param, 0, sizeof(param));
@@ -500,7 +510,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t * 
                 }
                 bCalledManufacturerOUI = true;
                 strncpy(backupManufacturerOUI,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
-                stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
             }
@@ -517,7 +526,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t * 
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
+#else
 
+#endif //#if !defined (USE_DEV_PROPERTIES_CONF)
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
     return ret;
 }
@@ -537,7 +548,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t * 
  */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
-    int ret;
+    int ret=NOT_HANDLED;
+    stMsgData->paramtype = hostIf_StringType;
+#if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
     memset(&param, 0, sizeof(param));
@@ -560,7 +573,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgD
                 }
                 bCalledModelName = true;
                 strncpy(backupModelName,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
-                stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
             }
@@ -577,7 +589,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgD
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
-
+#endif //#if !defined (USE_DEV_PROPERTIES_CONF)
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
     return ret;
 
@@ -635,7 +647,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProductClass(HOSTIF_MsgData_t * stM
  */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
-    int ret;
+    int ret=NOT_HANDLED;
+    stMsgData->paramtype = hostIf_StringType;
+#if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
     memset(&param, 0, sizeof(param));
@@ -657,7 +671,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t * 
                 }
                 bCalledHardwareVersion = true;
                 strncpy(backupHardwareVersion,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
-                stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
             }
@@ -676,6 +689,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t * 
         ret = NOK;
     }
 
+#else  //#if !defined (USE_DEV_PROPERTIES_CONF)
+
+#endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
     return ret;
 }
@@ -716,6 +732,8 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalHardwareVersion(HOSTIF_Ms
 int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     int ret = NOT_HANDLED;
+    stMsgData->paramtype = hostIf_StringType;
+#if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
     memset(&param, 0, sizeof(param));
@@ -742,7 +760,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_Ms
                 strncpy(backupAdditionalSoftwareVersion,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
 
                 stMsgData->paramLen = param.bufLen;
-                stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
             }
@@ -759,6 +776,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_Ms
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
+#endif
     return ret;
 }
 
@@ -780,7 +798,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_Ms
  */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
-    int ret;
+    int ret=NOT_HANDLED;
+    stMsgData->paramtype = hostIf_StringType;
+#if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
     memset(&param, 0, sizeof(param));
@@ -797,7 +817,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t *
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
-                stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
             }
@@ -817,78 +836,11 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t *
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
-
+#endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
     return ret;
 }
 
-#if 0
-//#else
-
-int hostIf_DeviceInfo::get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
-{
-    string line;
-    ifstream socProvfile (SOC_ID_FILE);
-    char socId[24] = {'\0'};
-
-    try {
-        if (socProvfile.is_open())
-        {
-            while ( getline (socProvfile,line) )
-            {
-                if (line.find("SOC Device ID") !=string::npos)
-                {
-                    char *tmp = strstr((char *)line.c_str(), "SOC Device ID");
-                    tmp = strstr((char *)tmp, ":");
-                    tmp++;
-                    while(isspace(*tmp)) {
-                        tmp++;
-                    }
-                    strcpy(socId, tmp);
-                    break;
-                }
-            }
-            socProvfile.close();
-        }
-        else
-        {
-            g_printf ("[%s()] Failed to open file\n", __FUNCTION__);
-            g_printf ("[%s()] Trying to get from mfr library\n", __FUNCTION__);
-
-            IARM_Bus_MFRLib_GetSerializedData_Param_t param;
-            IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
-            param.type = mfrSERIALIZED_TYPE_PROVISIONINGCODE;
-            iarm_ret = IARM_Bus_Call(IARM_BUS_MFRLIB_NAME, IARM_BUS_MFRLIB_API_GetSerializedData, &param, sizeof(param));
-
-            if(iarm_ret == IARM_RESULT_SUCCESS)
-            {
-                try
-                {
-                    strncpy((char *)socId, param.buffer, param.bufLen);
-                } catch (const std::exception e)
-                {
-                    g_printf("[%s] Exception caught\r\n",__FUNCTION__);
-                    return NOK;
-                }
-            }
-            else
-            {
-                g_printf ( "Failed in IARM_Bus_Call() for parameter : %s [param.type:%s with error code:%d]\n",stMsgData->paramName,param.type, iarm_ret);
-                return NOK;
-            }
-        }
-
-        stMsgData->paramLen = strlen(socId);
-        strncpy(stMsgData->paramValue,socId, stMsgData->paramLen);
-        stMsgData->paramtype = hostIf_StringType;
-    }
-    catch (const std::exception e) {
-        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s()]Exception caught.\n", __FUNCTION__);
-        return NOK;
-    }
-    return OK;
-}
-#endif
 
 /**
  * @brief This is an identifier of time in seconds since the CPE was last restarted.
@@ -965,7 +917,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_FirstUseDate(HOSTIF_MsgData_t * stM
  */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
-    int ret = OK;
+    int ret = NOT_HANDLED;
 #if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     memset(&param, 0, sizeof(param));
@@ -1023,9 +975,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgDat
     memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
     string stb_mac = getStbMacIf_fr_devProperties();
     if(!stb_mac.empty())
-      strcpy(stMsgData->paramValue, stb_mac.c_str());
-    else 
-      stMsgData->faultCode = fcInvalidParameterValue;
+        strcpy(stMsgData->paramValue, stb_mac.c_str());
+    else
+        stMsgData->faultCode = fcInvalidParameterValue;
     stMsgData->paramLen = stb_mac.length();
     stMsgData->paramtype = hostIf_StringType;
     ret = OK;
@@ -1056,7 +1008,7 @@ string hostIf_DeviceInfo::getEstbIp()
         /* Get configured moca interface */
         ip_if = "MOCA_INTERFACE";
 #else
-        ip_if = "ESTB_INTERFACE";
+        ip_if = "DEFAULT_ESTB_INTERFACE";
 #endif
         char *ethIf = getenvOrDefault (ip_if, "");
         RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s():%d] ipv6Enabled : %d; isWifiEnabled : %d ethIf : %s\n",
@@ -2624,7 +2576,7 @@ string hostIf_DeviceInfo::getStbMacIf_fr_devProperties()
         struct ifreq ifr;
 
         /* Get configured Estb Mac interface */
-        char *stbMacIf = getenvOrDefault ("ESTB_INTERFACE", "");
+        char *stbMacIf = getenvOrDefault ("DEFAULT_ESTB_INTERFACE", "");
 
         int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
         if(fd) {
