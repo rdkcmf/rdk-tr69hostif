@@ -116,6 +116,7 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
             *paramCountPtr = 0;
             int wc_cnt = 0;
             WDMP_STATUS getRet = WDMP_FAILURE;
+            int successWcCnt = 0;
 
             dbRet = getParameterList ((void *) dataBaseHandle,const_cast<char*> (pParameterName), getParamList, ParamDataTypeList, paramCountPtr);
             if(*paramCountPtr != 0 && dbRet == DB_SUCCESS)
@@ -124,11 +125,13 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                 for(wc_cnt = 0; wc_cnt < *paramCountPtr; wc_cnt++)
                 {
                     strncpy (Param.paramName, getParamList[wc_cnt], MAX_PARAM_LENGTH - 1);
+                    free(getParamList[wc_cnt]);
                     Param.paramName[MAX_PARAM_LENGTH - 1] = '\0';
 
                     // Convert ParamDataType to hostIf datatype
                     converttohostIfType (ParamDataTypeList[wc_cnt], &(Param.paramtype));
                     Param.instanceNum = 0;
+                    free(ParamDataTypeList[wc_cnt]);
 
                     // Initialize Name and Value to NULL
                     (*parametervalPtrPtr)[index][wc_cnt].name = NULL;
@@ -138,42 +141,48 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                     converttoWalType (Param.paramtype, (WAL_DATA_TYPE *) &(*parametervalPtrPtr)[index][wc_cnt].type);
                     getRet = get_ParamValues_tr69hostIf (&Param);
 
-                    (*parametervalPtrPtr)[index][wc_cnt].name = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
-                    (*parametervalPtrPtr)[index][wc_cnt].value = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
-                    if ((*parametervalPtrPtr)[index][wc_cnt].name == NULL || (*parametervalPtrPtr)[index][wc_cnt].value == NULL)
+                    // Fill Only if we can able to get Proper value
+                    if(WDMP_SUCCESS == getRet)
                     {
-                        RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
-                        ret = WDMP_FAILURE;
-                        break;
-                    }
-                    // Copy Param Name
-                    strncat((*parametervalPtrPtr)[index][wc_cnt].name, Param.paramName, MAX_PARAM_LENGTH - 1);
+                        (*parametervalPtrPtr)[index][successWcCnt].name = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
+                        (*parametervalPtrPtr)[index][successWcCnt].value = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
+                        if ((*parametervalPtrPtr)[index][successWcCnt].name == NULL || (*parametervalPtrPtr)[index][successWcCnt].value == NULL)
+                        {
+                            RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
+                            ret = WDMP_FAILURE;
+                            break;
+                        }
+                        // Copy Param Name
+                        strncat((*parametervalPtrPtr)[index][successWcCnt].name, Param.paramName, MAX_PARAM_LENGTH - 1);
 
-                    // Copy param value
-                    switch (Param.paramtype)
-                    {
-                    case hostIf_IntegerType:
-                    case hostIf_BooleanType:
-                        snprintf ((*parametervalPtrPtr)[index][wc_cnt].value, MAX_PARAM_LENGTH, "%d", *((int *) Param.paramValue));
-                        break;
-                    case hostIf_UnsignedIntType:
-                        snprintf ((*parametervalPtrPtr)[index][wc_cnt].value, MAX_PARAM_LENGTH, "%u", *((unsigned int *) Param.paramValue));
-                        break;
-                    case hostIf_UnsignedLongType:
-                        snprintf ((*parametervalPtrPtr)[index][wc_cnt].value, MAX_PARAM_LENGTH, "%u", *((unsigned long *) Param.paramValue));
-                        break;
-                    case hostIf_StringType:
-                        strncat ((*parametervalPtrPtr)[index][wc_cnt].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
-                        break;
-                    default: // handle as string
-                        strncat ((*parametervalPtrPtr)[index][wc_cnt].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
-                        break;
+                        // Copy param value
+                        switch (Param.paramtype)
+                        {
+                        case hostIf_IntegerType:
+                        case hostIf_BooleanType:
+                            snprintf ((*parametervalPtrPtr)[index][successWcCnt].value, MAX_PARAM_LENGTH, "%d", *((int *) Param.paramValue));
+                            break;
+                        case hostIf_UnsignedIntType:
+                            snprintf ((*parametervalPtrPtr)[index][successWcCnt].value, MAX_PARAM_LENGTH, "%u", *((unsigned int *) Param.paramValue));
+                            break;
+                        case hostIf_UnsignedLongType:
+                            snprintf ((*parametervalPtrPtr)[index][successWcCnt].value, MAX_PARAM_LENGTH, "%u", *((unsigned long *) Param.paramValue));
+                            break;
+                        case hostIf_StringType:
+                            strncat ((*parametervalPtrPtr)[index][successWcCnt].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
+                            break;
+                        default: // handle as string
+                            strncat ((*parametervalPtrPtr)[index][successWcCnt].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
+                            break;
+                        }
+                        memset(&Param, '\0', sizeof(HOSTIF_MsgData_t));
+                        successWcCnt++;
                     }
-                    memset(&Param, '\0', sizeof(HOSTIF_MsgData_t));
                 } // End of Wild card for loop
                 // Lets Free GetParameter List
                 free(getParamList);
                 free(ParamDataTypeList);
+                *paramCountPtr = successWcCnt;
                 ret = WDMP_SUCCESS;
             }
             else
