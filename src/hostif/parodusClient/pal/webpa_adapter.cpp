@@ -434,6 +434,8 @@ void notificationCallBack()
                 }
 
                 // Lets free all allocated memory
+                if(notifyDest)
+                    free(notifyDest);
                 freeNotificationData(notifyMsg);
             }
             else

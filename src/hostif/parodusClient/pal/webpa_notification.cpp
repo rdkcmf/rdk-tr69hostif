@@ -38,7 +38,7 @@ unsigned int g_notifyListSize = 0;
 const char* webpaNotifyConfigFile = NULL;
 char* notificationSource = NULL;
 
-void macToLower(char macValue[],char macConverted[]);
+static void macToLower(char macValue[],char macConverted[]);
 
 
 /**
@@ -74,6 +74,7 @@ char* processNotification(NotifyData *notifyMsg, char* payload)
 
         cJSON * notifyPayload = NULL;
         ParamNotify *param = NULL;
+        char *device_id = NULL;
 
         switch (notifyMsg->type)
         {
@@ -89,6 +90,8 @@ char* processNotification(NotifyData *notifyMsg, char* payload)
                 if(param)
                 {
                     notifyPayload = cJSON_CreateObject();
+                    device_id = getNotifySource(); // Device ID and Notification source are same
+                    cJSON_AddStringToObject(notifyPayload, "device_id",device_id);
                     cJSON_AddNumberToObject(notifyPayload, "datatype",param->type);
                     cJSON_AddStringToObject(notifyPayload, "paramName",param->paramName);
                     cJSON_AddStringToObject(notifyPayload, "notificationType",WEBPA_NOTIFY_TYPE);
@@ -163,6 +166,8 @@ char * getNotifySource()
 {
     WDMP_STATUS* ret = 0;
     size_t *retCount = 0;
+    char convertedMac[32]= {'\0'};
+    char deviceMac[32] = {'\0'};
 
     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Entering .... %s \n", __FUNCTION__);
 
@@ -178,8 +183,12 @@ char * getNotifySource()
         notificationSource = (char*) malloc(WEBPA_NOTIFY_SRC_LEN);
         if( (NULL != parametervalArr) && NULL != (*parametervalArr)[0].value)
         {
-            strncpy(notificationSource, (*parametervalArr)[0].value,WEBPA_NOTIFY_SRC_LEN);
-            RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s] Estb MAC :-  %s ", __FUNCTION__,notificationSource);
+            strncpy(deviceMac,const_cast<const char*>((*parametervalArr)[0].value),WEBPA_NOTIFY_SRC_LEN);
+            RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s] Calling MacToLower for MAC:  %s ", __FUNCTION__,deviceMac);
+            macToLower(deviceMac,convertedMac);
+            RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s] Converted MAC:  %s ", __FUNCTION__,convertedMac);
+            snprintf(notificationSource, WEBPA_NOTIFY_SRC_LEN, "mac:%s", convertedMac);
+            RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s] Notify Source :-  %s ", __FUNCTION__,notificationSource);
         }
         else
         {
@@ -201,6 +210,37 @@ char * getNotifySource()
     return notificationSource;
 }
 
+
+/*
+ * @brief To convert MAC to lower case without colon
+ * assuming max MAC size as 32
+ */
+static void macToLower(char macValue[],char macConverted[])
+{
+    int i = 0;
+    int j;
+    char *token[32];
+    char tmp[32];
+    strncpy(tmp, macValue,sizeof(tmp));
+    token[i] = strtok(tmp, ":");
+    if(token[i]!=NULL)
+    {
+        strncat(macConverted, token[i],31);
+        macConverted[31]='\0';
+        i++;
+    }
+    while ((token[i] = strtok(NULL, ":")) != NULL)
+    {
+        strncat(macConverted, token[i],31);
+        macConverted[31]='\0';
+        i++;
+    }
+    macConverted[31]='\0';
+    for(j = 0; macConverted[j]; j++)
+    {
+        macConverted[j] = tolower(macConverted[j]);
+    }
+}
 /**
  * @brief Get the Notification Destination
  *
