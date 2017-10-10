@@ -374,7 +374,7 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
 
     *resPayload = payload;
 
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> Payload = %s\n", *resPayload);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> Payload = %s\n", *resPayload);
 
     if(NULL != reqObj)
     {
