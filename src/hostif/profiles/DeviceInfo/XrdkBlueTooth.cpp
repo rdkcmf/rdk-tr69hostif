@@ -178,18 +178,21 @@ int hostIf_DeviceInfoRdk_xBT::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 
         if(NULL == path) {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed : Parameter is NULL, %s  \n",  __FUNCTION__, __LINE__, path);
+            stMsgData->faultCode = fcInvalidParameterName;
             releaseLock();
             return ret;
         }
 
         if((strncasecmp(path, X_BT_ROOT_OBJ, str_len) != 0)) {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed due to Mismatch parameter path : %s  \n", __FUNCTION__, __LINE__, path);
+            stMsgData->faultCode = fcInvalidParameterName;
             releaseLock();
             return ret;
         }
         const char *tmp_ptr = strchr(path+str_len-1,'.');
         if(tmp_ptr == NULL)  {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Parameter is NULL  \n", __FUNCTION__, __LINE__);
+            stMsgData->faultCode = fcInvalidParameterName;
             releaseLock();
             return ret;
         }
@@ -202,6 +205,7 @@ int hostIf_DeviceInfoRdk_xBT::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         }
         else
         {
+            stMsgData->faultCode = fcInvalidParameterName;
             ret = NOT_HANDLED;
         }
 
@@ -209,6 +213,7 @@ int hostIf_DeviceInfoRdk_xBT::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     catch (const std::exception& e )
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exception caught %s   \n", __FUNCTION__, __LINE__, e.what());
+        stMsgData->faultCode = fcInternalError;
         releaseLock();
         return NOK;
     }
@@ -339,6 +344,7 @@ int hostIf_DeviceInfoRdk_xBT::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             else
             {
                 RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Parameter \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+                stMsgData->faultCode = fcInvalidParameterName;
                 ret = NOK;
             }
         }
@@ -365,6 +371,7 @@ int hostIf_DeviceInfoRdk_xBT::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             else
             {
                 RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Parameter \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+                stMsgData->faultCode = fcInvalidParameterName;
                 ret = NOK;
             }
         }
@@ -392,18 +399,21 @@ int hostIf_DeviceInfoRdk_xBT::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             else
             {
                 RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Parameter \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+                stMsgData->faultCode = fcInvalidParameterName;
                 ret = NOK;
             }
         }
         else
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Parameter \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, paramName);
+            stMsgData->faultCode = fcInvalidParameterName;
             ret = NOK;
         }
     }
     catch (const std::exception& e )
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exception caught %s   \n", __FUNCTION__, __LINE__, e.what());
+        stMsgData->faultCode = fcInternalError;
         releaseLock();
         return NOK;
     }
