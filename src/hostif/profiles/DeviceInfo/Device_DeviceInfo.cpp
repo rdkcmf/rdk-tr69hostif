@@ -2216,7 +2216,16 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
             reverseSSHArgs += getEstbIp();
         }
 
-        reverseSSHArgs +=  ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
+        if (parsedMap.find("localsshport") != parsedMap.end())
+        {
+           reverseSSHArgs +=  ":" + parsedMap["localsshport"];
+           reverseSSHArgs +=  " ";
+        }
+        else
+        {
+           reverseSSHArgs +=  ":22 ";
+        }
+        reverseSSHArgs +=  parsedMap["user"] + "@" + parsedMap["host"];
         if (parsedMap.find("sshport") != parsedMap.end())
         {
             reverseSSHArgs += " -p " + parsedMap["sshport"];
