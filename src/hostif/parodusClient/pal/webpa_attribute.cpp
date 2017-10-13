@@ -58,13 +58,13 @@ void getAttributes(const char *paramName[], const unsigned int paramCount, money
  * @param[in] attr List of attribute name/value pairs.
  * @param[out] retStatus List of Return status.
  */
-void setAttributes(ParamVal params[], const unsigned int paramCount, money_trace_spans *timeSpan, const AttrVal *attr[], WAL_STATUS *retStatus)
+void setAttributes(ParamVal params[], const unsigned int paramCount, money_trace_spans *timeSpan, const AttrVal *attr[], WDMP_STATUS **retStatus)
 {
     RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"[%s:%s:%d] Inside setAttributes, Param Count = %d\n", __FILE__, __FUNCTION__, __LINE__,paramCount);
     int cnt=0;
     for(cnt=0; cnt<paramCount; cnt++)
     {
-        retStatus[cnt] = setParamAttributes(const_cast<const char*>(params[cnt].name),attr[cnt]);
+        (*retStatus)[cnt] = (WDMP_STATUS) setParamAttributes(const_cast<const char*>(params[cnt].name),attr[cnt]);
     }
 }
 

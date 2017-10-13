@@ -30,7 +30,7 @@ extern "C"
 
 #define WEBPA_DEVICE_REBOOT_PARAM          "Device.X_CISCO_COM_DeviceControl.RebootDevice"
 #define WEBPA_DEVICE_REBOOT_VALUE          "Device"
-#define WEBPA_NOTIFICATION_SOURCE		   "Unknown"
+#define WEBPA_NOTIFICATION_SOURCE          "Unknown"
 /*----------------------------------------------------------------------------*/
 /*                               Data Structures                              */
 /*----------------------------------------------------------------------------*/
@@ -129,12 +129,12 @@ void setInitialNotify()
     int status = getnotifyparamList(&notifyparameters, &notifyListSize);
     if(notifyparameters != NULL)
     {
-        WAL_STATUS *ret = NULL;
+        WDMP_STATUS *ret = NULL;
         AttrVal **attArr = NULL;
         char ** tempArr = NULL;
 
         RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"notify List Size: %d\n",notifyListSize);
-        ret = (WAL_STATUS *) malloc(sizeof(WAL_STATUS) * 1);
+        ret = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS) * 1);
         attArr = (AttrVal **) malloc(sizeof(AttrVal *) * 1);
         for(i=0; i < notifyListSize; i++)
         {
@@ -145,7 +145,7 @@ void setInitialNotify()
             attArr[0]->name= (char *) notifyparameters[i];
             attArr[0]->type = WAL_INT;
             RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"notifyparameters[%d]: %s\n", i, notifyparameters[i]);
-            setAttributes(attArr[0], 1, NULL, (const AttrVal **) attArr, ret);
+            setAttributes(attArr[0], 1, NULL, (const AttrVal **) attArr, &ret);
             if(ret[0] != WAL_SUCCESS)
             {
                 RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failed to turn notification ON for parameter : %s ret: %d ",notifyparameters[i],ret[0]);
@@ -311,13 +311,14 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
         break;
         case SET:
         case SET_ATTRIBUTES:
-        {
-            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Request:> ParamCount = %zu\n",reqObj->u.setReq->paramCnt);
+        {    
+            WDMP_STATUS *retList = (WDMP_STATUS *) calloc(resObj->paramCnt, sizeof(WDMP_STATUS));
+            RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Request:> ParamCount = %zu\n",reqObj->u.setReq->paramCnt);
             resObj->paramCnt = reqObj->u.setReq->paramCnt;
-            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> paramCnt = %zu\n", resObj->paramCnt);
-            resObj->retStatus = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS)*resObj->paramCnt);
+            RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> paramCnt = %zu\n", resObj->paramCnt);
             resObj->timeSpan = NULL;
             paramCount = (int)reqObj->u.setReq->paramCnt;
+            resObj->retStatus = (WDMP_STATUS *) calloc(resObj->paramCnt, sizeof(WDMP_STATUS));
             resObj->u.paramRes = (param_res_t *) malloc(sizeof(param_res_t));
             memset(resObj->u.paramRes, 0, sizeof(param_res_t));
 
@@ -330,18 +331,16 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
             }
 
             ret = validate_parameter(reqObj->u.setReq->param, paramCount);
-            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"ret : %d\n",ret);
             if(ret == WDMP_SUCCESS)
             {
                 if(reqObj->reqType == SET)
                 {
-                    setValues((ParamVal*)reqObj->u.setReq->param, paramCount, WEBPA_SET, resObj->timeSpan, (WAL_STATUS *)&ret, transactionId);
+                    setValues((ParamVal*)reqObj->u.setReq->param, paramCount, WEBPA_SET, resObj->timeSpan, &resObj->retStatus, transactionId);
                 }
                 else
                 {
-                    setAttributes((ParamVal*)reqObj->u.setReq->param, paramCount, resObj->timeSpan, (const AttrVal **) reqObj->u.setReq->param, (WAL_STATUS*)&ret);
+                    setAttributes((ParamVal*)reqObj->u.setReq->param, paramCount, resObj->timeSpan, (const AttrVal **) reqObj->u.setReq->param, &resObj->retStatus);
                 }
-
                 resObj->u.paramRes->params = (param_t *) malloc(sizeof(param_t)*paramCount);
                 memset(resObj->u.paramRes->params, 0, sizeof(param_t)*paramCount);
 
@@ -352,12 +351,6 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
                     RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> params[%d].name = %s\n",i,resObj->u.paramRes->params[i].name);
                     resObj->u.paramRes->params[i].value = NULL;
                     resObj->u.paramRes->params[i].type = WDMP_STRING;
-
-                }
-                RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"ret : %d\n",ret);
-                for (i = 0; i < paramCount; i++)
-                {
-                    resObj->retStatus[i] = ret;
                     RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",i,resObj->retStatus[i]);
                 }
             }
@@ -373,9 +366,10 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
     wdmp_form_response(resObj,&payload);
 
     *resPayload = payload;
-
-    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> Payload = %s\n", *resPayload);
-
+    if(resPayload) 
+    {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> Payload = %s\n", *resPayload);
+    }
     if(NULL != reqObj)
     {
         wdmp_free_req_struct(reqObj);
@@ -494,28 +488,29 @@ static WDMP_STATUS validate_parameter(param_t *param, int paramCount)
  */
 static void setRebootReason(param_t param, WEBPA_SET_TYPE setType)
 {
-    WDMP_STATUS retReason = WDMP_FAILURE;
+    WDMP_STATUS *retReason = NULL;
     param_t *rebootParam = NULL;
     // Detect device reboot through WEBPA and log message for device reboot through webpa
     if(strcmp(param.name, WEBPA_DEVICE_REBOOT_PARAM) == 0 && strcmp(param.value, WEBPA_DEVICE_REBOOT_VALUE) == 0)
     {
         rebootParam = (param_t *) malloc(sizeof(param_t));
+        retReason = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS *)*1);
 
         RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"RDKB_REBOOT : Reboot triggered through WEBPA\n");
         rebootParam[0].name = "Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason";
         rebootParam[0].value = "webpa-reboot";
         rebootParam[0].type = WDMP_STRING;
 
-        setValues((ParamVal*)rebootParam, 1, setType, NULL, (WAL_STATUS *)&retReason,NULL);
-        if(retReason != WDMP_SUCCESS)
+        setValues((ParamVal*)rebootParam, 1, setType, NULL, &retReason,NULL);
+        if(retReason[0] != WDMP_SUCCESS)
         {
-            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Failed to set Reason with status %d\n",retReason);
+            RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failed to set Reason with status %d\n",retReason[0]);
         }
         else
         {
-            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Successfully set Reason with status %d\n",retReason);
+            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Successfully set Reason with status %d\n",retReason[0]);
         }
-
+        WAL_FREE(retReason);
         WAL_FREE(rebootParam);
     }
 
@@ -531,7 +526,7 @@ void getCurrentTime(struct timespec *timer)
 }
 
 /**
- * @brief Get Current time
+ * @brief Frees the Notification data
  *
  * @param[in] Notification Data pointer
  */
@@ -546,3 +541,4 @@ static void freeNotificationData(NotifyData *notifyMsg)
     }
     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Exiting... %s \n",__FUNCTION__);
 }
+

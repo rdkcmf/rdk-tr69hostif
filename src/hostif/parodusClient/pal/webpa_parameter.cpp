@@ -69,12 +69,12 @@ void getValues (const char *paramName[], const unsigned int paramCount, param_t 
  * @param[in] paramCount Number of parameters.
  * @param[out] retStatus List of Return status.
  */
-void setValues(const ParamVal paramVal[], const unsigned int paramCount, const WEBPA_SET_TYPE setType, money_trace_spans *timeSpan, WAL_STATUS *retStatus,char * transaction_id)
+void setValues(const ParamVal paramVal[], const unsigned int paramCount, const WEBPA_SET_TYPE setType, money_trace_spans *timeSpan, WDMP_STATUS **retStatus,char * transaction_id)
 {
     int cnt=0;
     for(cnt = 0; cnt < paramCount; cnt++)
     {
-        retStatus[cnt] = SetParamInfo(paramVal[cnt]);
+        (*retStatus)[cnt] = (WDMP_STATUS) SetParamInfo(paramVal[cnt]);
     }
 }
 

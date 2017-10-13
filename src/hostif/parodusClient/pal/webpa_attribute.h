@@ -35,4 +35,4 @@ void getAttributes(const char *paramName[], const unsigned int paramCount, money
  * @param[in] attr List of attribute name/value pairs.
  * @param[out] retStatus List of Return status.
  */
-void setAttributes(ParamVal params[], const unsigned int paramCount, money_trace_spans *timeSpan, const AttrVal *attr[], WAL_STATUS *retStatus);
+void setAttributes(ParamVal params[], const unsigned int paramCount, money_trace_spans *timeSpan, const AttrVal *attr[], WDMP_STATUS **retStatus);

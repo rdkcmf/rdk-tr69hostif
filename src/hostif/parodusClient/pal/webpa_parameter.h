@@ -51,4 +51,4 @@ void getValues (const char *paramName[], const unsigned int paramCount, param_t 
  * @param[out] timeSpan timing_values for each component.
  * @param[out] retStatus List of Return status.
  */
-void setValues(const ParamVal paramVal[], const unsigned int paramCount, const WEBPA_SET_TYPE setType, money_trace_spans *timeSpan, WAL_STATUS *retStatus,char * transaction_id);
+void setValues(const ParamVal paramVal[], const unsigned int paramCount, const WEBPA_SET_TYPE setType, money_trace_spans *timeSpan, WDMP_STATUS **retStatus,char * transaction_id);
