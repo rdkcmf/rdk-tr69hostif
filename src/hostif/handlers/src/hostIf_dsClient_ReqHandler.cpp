@@ -366,6 +366,7 @@ int DSClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     else
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s%s] Failed to match STBSevice Object. Not supported \'%s\' object. \n", __FILE__, __FUNCTION__, stMsgData->paramName);
+        stMsgData->faultCode = fcInvalidParameterName;
         ret = NOK;
     }
 

@@ -289,6 +289,12 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIfaceProcess->get_Device_DeviceInfo_ProcessStatus_Process_State(stMsgData);
         }
+        else
+        {
+             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+             stMsgData->faultCode = fcInvalidParameterName;
+             ret = NOK;   
+        }
     }
     else if(matchComponent(stMsgData->paramName,"Device.DeviceInfo.Processor",&pSetting,instanceNumber))
     {
@@ -302,6 +308,12 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         if(strcasecmp(pSetting,"Architecture")==0)
         {
             ret = pIfaceProcessor->get_Device_DeviceInfo_Processor_Architecture(stMsgData);
+        }
+        else
+        {
+             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+             stMsgData->faultCode = fcInvalidParameterName;
+             ret = NOK;   
         }
     }
     else if(strncasecmp(stMsgData->paramName,"Device.DeviceInfo.ProcessStatus",strlen("Device.DeviceInfo.ProcessStatus"))==0)
@@ -317,9 +329,15 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = hostIf_DeviceProcess::getNumOfProcessEntries(stMsgData);
         }
-        if(strcasecmp(stMsgData->paramName,"Device.DeviceInfo.ProcessStatus.CPUUsage")==0)
+        else if(strcasecmp(stMsgData->paramName,"Device.DeviceInfo.ProcessStatus.CPUUsage")==0)
         {
             ret = pIfaceStatus->get_Device_DeviceInfo_ProcessStatus_CPUUsage(stMsgData);
+        }
+        else
+        {
+             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+             stMsgData->faultCode = fcInvalidParameterName;
+             ret = NOK;   
         }
     }
     else if(strncasecmp(stMsgData->paramName,xOpsReverseSshStatus_STR,strlen(xOpsReverseSshStatus_STR)) == 0)
@@ -514,6 +532,12 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             ret = pIface->get_xOpsDeviceMgmt_hwHealthTest_Results(stMsgData);
         }
 #endif /* USE_HWSELFTEST_PROFILE */
+        else
+        {
+             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+             stMsgData->faultCode = fcInvalidParameterName;
+             ret = NOK;   
+        }
     }
     hostIf_DeviceInfo::releaseLock();
     return ret;

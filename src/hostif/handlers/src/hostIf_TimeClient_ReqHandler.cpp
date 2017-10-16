@@ -112,6 +112,12 @@ int TimeClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_Device_Time_Enable(stMsgData);
         }
+        else
+        {
+           RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] parameter : \'%s\' Not handled \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+           stMsgData->faultCode = fcInvalidParameterName;
+           ret = NOK;
+        }
     }
     hostIf_Time::releaseLock();
     return ret;
@@ -152,10 +158,22 @@ int TimeClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->get_Device_Time_LocalTimeZone(stMsgData);
         }
-        if (strcasecmp(stMsgData->paramName,"Device.Time.CurrentLocalTime") == 0)
+        else if (strcasecmp(stMsgData->paramName,"Device.Time.CurrentLocalTime") == 0)
         {
             ret = pIface->get_Device_Time_CurrentLocalTime(stMsgData);
         }
+        else
+        {
+           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] parameter : \'%s\' Not handled \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+           stMsgData->faultCode = fcInvalidParameterName;
+           ret = NOK;
+        }
+    }
+    else
+    {
+       RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] parameter : \'%s\' Not handled \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+       stMsgData->faultCode = fcInvalidParameterName;
+       ret = NOK;
     }
     hostIf_Time::releaseLock();
     return ret;

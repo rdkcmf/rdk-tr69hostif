@@ -381,6 +381,12 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pWifiRadioStats->get_Device_WiFi_Radio_Stats_NoiseFloor(stMsgData,radioIndex);
         }
+        else
+        {
+           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]  Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+           stMsgData->faultCode = fcInvalidParameterName;
+           ret = NOK; 
+        }
     }
     else if (matchComponent(stMsgData->paramName, "Device.WiFi.Endpoint", &pSetting, instanceNum))
     {
@@ -433,6 +439,13 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pWifiEndPoint->get_Device_WiFi_EndPoint_Stats_Retransmissions(stMsgData);
         }
+        else
+        {
+           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]  Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+           stMsgData->faultCode = fcInvalidParameterName;
+           ret = NOK;
+        }
+
     }
     else if (matchComponent(stMsgData->paramName, "Device.WiFi.AccessPoint", &pSetting, instanceNum))
     {
@@ -487,6 +500,19 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIfaceSsid->get_Device_WiFi_SSID_Name(stMsgData);
         }
+        else
+        {
+           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]  Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+           stMsgData->faultCode = fcInvalidParameterName;
+           ret = NOK;
+        }
+
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]  Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret = NOK;
     }
 
     return ret;

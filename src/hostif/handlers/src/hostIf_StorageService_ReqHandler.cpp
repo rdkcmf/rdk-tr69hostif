@@ -95,7 +95,7 @@ int StorageSrvcReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] Found string as %s. Set command not supported.\n",
              __FUNCTION__, __FILE__, stMsgData->paramName);
-
+    stMsgData->faultCode = fcInvalidParameterName;
     return ret;
 }
 
@@ -140,7 +140,11 @@ int StorageSrvcReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
                     __FUNCTION__, __FILE__, __LINE__, instanceNumber);
         }
     }
-
+    else
+    {
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret = NOK;
+    }
     hostIf_StorageSrvc::releaseLock();
     return ret;
 }

@@ -255,7 +255,12 @@ int hostIf_IPv4Address::handleGetMsg (const char* pSubSetting, int subInstanceNu
     {
         ret = get_IPv4Address_IPAddress (stMsgData, subInstanceNumber);
     }
-
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Device.IPv4: Parameter \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret = NOK;
+    }
     return ret;
 }
 
@@ -276,6 +281,11 @@ int hostIf_IPv4Address::handleSetMsg (const char* pSubSetting, int subInstanceNu
     else if (!strcasecmp (pSubSetting, "IPAddress"))
     {
         ret = set_IPv4Address_IPAddress (stMsgData, subInstanceNumber);
+    }
+    else
+    {
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret = NOT_HANDLED;
     }
 
     return ret;

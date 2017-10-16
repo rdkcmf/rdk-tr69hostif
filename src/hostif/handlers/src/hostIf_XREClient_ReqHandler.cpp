@@ -171,7 +171,11 @@ int XREClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     {
         ret = setXreReceiverRestart(stMsgData);
     }
-
+    else
+    {
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret = NOT_HANDLED;
+    }
     releaseLock();
 
     return ret;
@@ -392,6 +396,12 @@ int XREClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             {
                 ret = get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_ConnectionTable_xreConnRetryAttempts(stMsgData, instanceNumber);
             }
+            else
+            {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+                stMsgData->faultCode = fcInvalidParameterName;
+                ret = NOK;
+            }
         }
     }
 #endif
@@ -435,6 +445,12 @@ int XREClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     else if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.TRM.trmGatewayDeviceFriendlyName") == 0)
     {
         ret = get_Device_X_COMCAST_COM_Xcalibur_TRM_trmGatewayDeviceFriendlyName(stMsgData);
+    }
+    else 
+    {
+       RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+       stMsgData->faultCode = fcInvalidParameterName;
+       ret = NOK;
     }
 
     releaseLock();

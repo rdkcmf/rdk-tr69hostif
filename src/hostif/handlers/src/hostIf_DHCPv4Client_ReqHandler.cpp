@@ -150,6 +150,12 @@ int DHCPv4ClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             {
                 ret = pDHCPv4Client->get_Device_DHCPv4_Client_DnsServer(stMsgData);
             }
+            else
+            {
+               RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);               
+               stMsgData->faultCode = fcInvalidParameterName;
+               ret=NOK;
+            }
         }
         else
         {
@@ -157,6 +163,12 @@ int DHCPv4ClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s:%d] hostIf_DHCPv4Client::getInstance returned NULL for instance %d,\n",
                     __FUNCTION__, __FILE__, __LINE__, instanceNumber);
         }
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);          
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret=NOK;
     }
 
     hostIf_DHCPv4Client::releaseLock();

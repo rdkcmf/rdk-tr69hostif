@@ -85,6 +85,7 @@ hostIf_STBServiceDisplayDevice::hostIf_STBServiceDisplayDevice(int devId, device
  */
 int hostIf_STBServiceDisplayDevice::handleSetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData)
 {
+    stMsgData->faultCode = fcInvalidParameterName;
     int ret = NOT_HANDLED;
     return ret;
 }
@@ -129,18 +130,32 @@ int hostIf_STBServiceDisplayDevice::handleGetMsg(const char *paramName, HOSTIF_M
     else if (strcasecmp(paramName, VIDEO_LATENCY_STRING) == 0)
     {
         //TODO
+        //Adding fault code to handle errors, Remove the fault code when implemented
+        stMsgData->faultCode = fcInvalidParameterName;
     }
     else if (strcasecmp(paramName, CECSUPPORT_STRING) == 0)
     {
         //TODO
+        //Adding fault code to handle errors, Remove the fault code when implemented
+        stMsgData->faultCode = fcInvalidParameterName;
     }
     else if (strcasecmp(paramName, AUTO_LIP_SYNC_STRING) == 0)
     {
-        //TODO
+        //TODO       
+        //Adding fault code to handle errors, Remove the fault code when implemented
+        stMsgData->faultCode = fcInvalidParameterName;
     }
     else if (strcasecmp(paramName, HDMI3D_STRING) == 0)
     {
         //TODO
+        //Adding fault code to handle errors, Remove the fault code when implemented
+        stMsgData->faultCode = fcInvalidParameterName;
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret = NOK;
     }
     return ret;
 }

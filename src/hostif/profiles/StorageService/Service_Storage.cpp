@@ -194,13 +194,19 @@ int hostIf_StorageSrvc :: handleGetMsg(HOSTIF_MsgData_t *stMsgData)
                     {
                         retVal = pPhyMed->get_Device_Service_StorageMedium_Name(stMsgData);
                     }
-                    if(0 == strcasecmp(pSubSettings, "SmartCapable"))
+                    else if(0 == strcasecmp(pSubSettings, "SmartCapable"))
                     {
                         retVal = pPhyMed->get_Device_Service_StorageMedium_SMARTCapable(stMsgData);
                     }
-                    if(0 == strcasecmp(pSubSettings, "Health"))
+                    else if(0 == strcasecmp(pSubSettings, "Health"))
                     {
                         retVal = pPhyMed->get_Device_Service_StorageMedium_Health(stMsgData);
+                    }
+                    else
+                    {
+                        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+                        stMsgData->faultCode = fcInvalidParameterName;
+                        ret = NOK;
                     }
                 }
                 
@@ -208,16 +214,24 @@ int hostIf_StorageSrvc :: handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             else
             {
                 RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed to match component\n");
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+                stMsgData->faultCode = fcInvalidParameterName;
+                ret = NOK;
             }
         }
         else
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s not implemented\n",stMsgData->paramName);
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+            stMsgData->faultCode = fcInvalidParameterName;
+            ret = NOK;
         }
     }
     else
     {
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Not able to get component:%s %s %d",stMsgData->paramName, __FUNCTION__, __LINE__);
-    }
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret = NOK;
+   }
     return retVal;
 }

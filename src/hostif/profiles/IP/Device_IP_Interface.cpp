@@ -317,6 +317,12 @@ int hostIf_IPInterface::handleGetMsg (const char* pSetting, HOSTIF_MsgData_t* st
     {
         ret = get_Interface_AutoIPEnable (stMsgData);
     }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] IP : Parameter \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret = NOK;
+     }
 
     return ret;
 }
@@ -342,6 +348,11 @@ int hostIf_IPInterface::handleSetMsg (const char* pSetting, HOSTIF_MsgData_t* st
     else if (!strcasecmp (pSetting, "MaxMTUSize"))
     {
         ret = set_Interface_MaxMTUSize (stMsgData);
+    }
+    else
+    {
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret = NOT_HANDLED;
     }
 
     return ret;

@@ -145,6 +145,10 @@ int SNMPClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] hostIf_snmpAdapter::getInstance is NULL for %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
         }
     }
+    else
+    {
+        stMsgData->faultCode = fcInvalidParameterName;
+    }
     hostIf_snmpAdapter::releaseLock();
     return ret;
 }

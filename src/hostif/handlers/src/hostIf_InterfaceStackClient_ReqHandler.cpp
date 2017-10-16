@@ -146,6 +146,12 @@ int InterfaceStackClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             {
                 ret = pInterfaceStack->get_Device_InterfaceStack_LowerLayer(stMsgData);
             }
+            else
+            {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]  Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+                stMsgData->faultCode = fcInvalidParameterName;
+                ret = NOK;
+            }
         }
         else
         {

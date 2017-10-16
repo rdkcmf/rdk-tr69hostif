@@ -494,6 +494,12 @@ int hostIf_IP::handleGetMsg (HOSTIF_MsgData_t* stMsgData)
     {
         ret = hostIf_IP::get_Device_IP_ActivePortNumberOfEntries (stMsgData);
     }
+    else
+    {
+         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]Device.IP: Parameter \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+         stMsgData->faultCode = fcInvalidParameterName;
+         ret = NOK;
+    }
 
     return ret;
 }
@@ -505,6 +511,11 @@ int hostIf_IP::handleSetMsg (HOSTIF_MsgData_t* stMsgData)
     if (!strcasecmp (stMsgData->paramName, "Device.IP.IPv4Enable"))
     {
         ret = set_Device_IP_IPv4Enable (stMsgData);
+    }
+    else
+    {
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret = NOT_HANDLED;
     }
     return ret;
 }

@@ -496,6 +496,11 @@ int MoCAClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             {
                 ret = pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_FlowPackets(stMsgData,subInstanceNumber);
             }
+            else
+            {
+               stMsgData->faultCode = fcInvalidParameterName;
+               ret =  NOK;
+            }
 
         }
         else if(matchComponent(pSetting,"AssociatedDevice",
@@ -569,6 +574,11 @@ int MoCAClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             {
                 ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_Active(stMsgData,subInstanceNumber);
             }
+            else
+            {
+               stMsgData->faultCode = fcInvalidParameterName;
+               ret =  NOK;
+            }
         }
         else if(matchComponent(pSetting,"X_RDKCENTRAL-COM_MeshTable", &pSubSetting, subInstanceNumber))
         {
@@ -584,8 +594,22 @@ int MoCAClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             {
                 ret = pIfaceMeshTableDev->get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTable_MeshPHYTxRate(stMsgData,subInstanceNumber);
             }
+            else
+            {
+               stMsgData->faultCode = fcInvalidParameterName;
+               ret =  NOK;
+            }
         }
-
+        else 
+        {
+            stMsgData->faultCode = fcInvalidParameterName;
+            ret =  NOK;
+        }
+    }
+    else
+    {
+        stMsgData->faultCode = fcInvalidParameterName;
+        ret =  NOK;
     }
     hostIf_MoCAInterface::releaseLock();
     return ret;

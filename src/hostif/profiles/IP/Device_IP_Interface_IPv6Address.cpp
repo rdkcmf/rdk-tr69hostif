@@ -224,6 +224,12 @@ int hostIf_IPv6Address::handleGetMsg (const char* pSubSetting, int subInstanceNu
         {
             ret = get_IPv6Address_Anycast (stMsgData, subInstanceNumber);
         }
+        else
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]Device.IPv6: Parameter \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+            stMsgData->faultCode = fcInvalidParameterName;
+            ret = NOK;
+        }
     }
     else
     {
@@ -279,7 +285,12 @@ int hostIf_IPv6Address::handleGetMsg (const char* pSubSetting, int subInstanceNu
         {
             ret = get_IPv6Prefix_ValidLifetime (stMsgData, subInstanceNumber);
         }
-
+        else
+        {
+           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Parameter \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+           stMsgData->faultCode = fcInvalidParameterName;
+           ret = NOK;
+        }
     }
 
     return ret;
@@ -320,6 +331,11 @@ int hostIf_IPv6Address::handleSetMsg (const char* pSubSetting, int subInstanceNu
         else if (!strcasecmp (pSubSetting, "Anycast"))
         {
             ret = set_IPv6Address_Anycast (stMsgData, subInstanceNumber);
+        }
+        else
+        {
+            stMsgData->faultCode = fcInvalidParameterName;
+            ret = NOT_HANDLED;
         }
     }
     else
@@ -364,6 +380,12 @@ int hostIf_IPv6Address::handleSetMsg (const char* pSubSetting, int subInstanceNu
         {
             ret = set_IPv6Prefix_ValidLifetime (stMsgData, subInstanceNumber);
         }
+        else
+        {
+            stMsgData->faultCode = fcInvalidParameterName;
+            ret = NOT_HANDLED;
+        }
+
     }
 
     return ret;
