@@ -233,6 +233,10 @@ static const char* getTR181ResolutionString(std::string &resolution)
         return "3840x2160p/30Hz";
     else if("2160p60" == resolution)
         return "3840x2160p/59.94Hz";
+    else if("480i" == resolution)
+        return "720x480i/59.94Hz";
+    else if("480p" == resolution)
+        return "720x480p/59.94Hz";
     else
     {
         RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Unhandled resolution: %s. Cannot translate!\n", __FUNCTION__, resolution.c_str());
