@@ -558,6 +558,7 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
 #ifdef USE_RDK_STORAGE_MANAGER_V2
     bool rc = true;
     static char sdCardDeviceID[RDK_STMGR_MAX_STRING_LENGTH] = "";
+    static char sdCardPartitionID[RDK_STMGR_MAX_STRING_LENGTH] = "";
 
     eSTMGRReturns stRet;
     if ('\0' == sdCardDeviceID[0])
@@ -570,6 +571,7 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
             if (RDK_STMGR_DEVICE_TYPE_SDCARD == deviceInfoList.m_devices[i].m_type)
             {
                 memcpy (&sdCardDeviceID, &deviceInfoList.m_devices[i].m_deviceID, RDK_STMGR_MAX_STRING_LENGTH);
+                memcpy (&sdCardPartitionID, &deviceInfoList.m_devices[i].m_partitions, RDK_STMGR_MAX_STRING_LENGTH);
                 break;
             }
         }
@@ -601,8 +603,17 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
         }
         else if (sdCardParam->eSDPropType == SD_TSBQualified)
         {
-            /* Note: rdkStorage_isTSBEnabled() is good now.. as this will is there any memory found that supports TSB. May be we can enhance it by querying SD partitions */
-            sdCardParam->sdCardProp.bVal = rdkStorage_isTSBEnabled();
+            if ('\0' == sdCardPartitionID[0]) {
+                eSTMGRPartitionInfo partitionInfo;
+                if (RDK_STMGR_RETURN_SUCCESS != rdkStorage_getPartitionInfo (sdCardDeviceID, sdCardPartitionID, &partitionInfo)) {
+                    sdCardParam->sdCardProp.bVal = false;
+                }
+                else {
+                    sdCardParam->sdCardProp.bVal = partitionInfo.m_isTSBSupported;
+                }
+            }
+            else
+                sdCardParam->sdCardProp.bVal = false;
         }
         else
         {
@@ -643,7 +654,6 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
                         sdCardParam->sdCardProp.bVal = (deviceInfo.m_status == RDK_STMGR_DEVICE_STATUS_READ_ONLY) ? true : false;
                         break;
                     case SD_SerialNumber:
-                        //sdCardParam->sdCardProp.ui32Val = (unsigned int) deviceInfo.m_serialNumber;
                         strcpy(sdCardParam->sdCardProp.uchVal, deviceInfo.m_serialNumber);
                         break;
                     case SD_Status:
