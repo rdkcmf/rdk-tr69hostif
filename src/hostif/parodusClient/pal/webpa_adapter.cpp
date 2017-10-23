@@ -111,7 +111,7 @@ void setInitialNotifyConfigFile(const char* nofityConfigFile)
  */
 void registerNotifyCallback()
 {
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"***************Inside registerNotifyCallback*****************\n");
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"***************Inside registerNotifyCallback*****************\n");
 
     // Get Notification handler instance
     NotificationHandler* pIface = NULL;
@@ -136,7 +136,7 @@ void registerNotifyCallback()
  */
 void setInitialNotify()
 {
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"***************Inside setInitialNotify*****************\n");
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"***************Inside setInitialNotify*****************\n");
     int i=0;
     char notif[20] = "";
     char **notifyparameters=NULL;
@@ -212,28 +212,26 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
     WDMP_STATUS setCidStatus = WDMP_SUCCESS, setCmcStatus = WDMP_SUCCESS;
     char *param = NULL;
 
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"************** processRequest *****************\n");
+   RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"************** processRequest *****************\n");
 
     wdmp_parse_request(reqPayload,&reqObj);
 
     if(reqObj != NULL)
     {
-        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Request:> Type : %d\n",reqObj->reqType);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Request:> Type : %d\n",reqObj->reqType);
 
         resObj = (res_struct *) malloc(sizeof(res_struct));
         memset(resObj, 0, sizeof(res_struct));
 
         resObj->reqType = reqObj->reqType;
-        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> type = %d\n", resObj->reqType);
 
         switch( reqObj->reqType )
         {
 
         case GET:
         {
-            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Request:> ParamCount = %zu\n",reqObj->u.getReq->paramCnt);
+            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Processing GET request \n");
             resObj->paramCnt = reqObj->u.getReq->paramCnt;
-            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> paramCnt = %zu\n", resObj->paramCnt);
             resObj->retStatus = (WDMP_STATUS *) calloc(resObj->paramCnt, sizeof(WDMP_STATUS));
             resObj->timeSpan = NULL;
             paramCount = (int)reqObj->u.getReq->paramCnt;
@@ -269,15 +267,14 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
                 memset(resObj->u.getRes->params, 0, sizeof(param_t*)*paramCount);
                 memset(resObj->u.getRes->paramNames, 0, sizeof(char *) * paramCount);
                 memset(resObj->u.getRes->params, 0, sizeof(param_t*)*paramCount);
-                RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Calling Get Values \n ");
                 getValues(getParamList, paramCount,&resObj->u.getRes->params,&resObj->u.getRes->retParamCnt ,&resObj->retStatus);
 
                 for(i = 0; i < paramCount; i++)
                 {
                     resObj->u.getRes->paramNames[i] = const_cast<char *>(getParamList[i]);
-                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> paramNames[%d] = %s\n",i,resObj->u.getRes->paramNames[i]);
-                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> retParamCnt[%d] = %zu\n",i,resObj->u.getRes->retParamCnt[i]);
-                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",i,resObj->retStatus[i]);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> paramNames[%d] = %s\n",i,resObj->u.getRes->paramNames[i]);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> retParamCnt[%d] = %zu\n",i,resObj->u.getRes->retParamCnt[i]);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",i,resObj->retStatus[i]);
                 }
             }
         }
@@ -285,9 +282,10 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
 
         case GET_ATTRIBUTES:
         {
-            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Request:> ParamCount = %zu\n",reqObj->u.getReq->paramCnt);
+            
+            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Processing GETATTR request \n");
+            RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Request:> ParamCount = %zu\n",reqObj->u.getReq->paramCnt);
             resObj->paramCnt = reqObj->u.getReq->paramCnt;
-            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> paramCnt = %zu\n", resObj->paramCnt);
             resObj->retStatus = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS)*resObj->paramCnt);
             resObj->timeSpan = NULL;
             paramCount = (int)reqObj->u.getReq->paramCnt;
@@ -312,16 +310,16 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
                 memset(resObj->u.paramRes->params, 0, sizeof(param_t)*paramCount);
 
                 getAttributes(const_cast<const char**>(reqObj->u.getReq->paramNames), paramCount, resObj->timeSpan, (ParamVal ***)&resObj->u.paramRes->params, &retCount, (WAL_STATUS *)&ret);
-                RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"retCount : %d ret : %d\n",retCount, ret);
+                RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"retCount : %d ret : %d\n",retCount, ret);
 
                 for (i = 0; i < paramCount; i++)
                 {
-                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> params[%d].name = %s\n",i,resObj->u.paramRes->params[i].name);
-                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> params[%d].value = %s\n",i,resObj->u.paramRes->params[i].value);
-                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> params[%d].type = %d\n",i,resObj->u.paramRes->params[i].type);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> params[%d].name = %s\n",i,resObj->u.paramRes->params[i].name);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> params[%d].value = %s\n",i,resObj->u.paramRes->params[i].value);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> params[%d].type = %d\n",i,resObj->u.paramRes->params[i].type);
 
                     resObj->retStatus[i] = ret;
-                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",i,resObj->retStatus[i]);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",i,resObj->retStatus[i]);
                 }
             }
         }
@@ -329,10 +327,10 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
         case SET:
         case SET_ATTRIBUTES:
         {    
+            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Processing SET/SETATTR request \n");
             WDMP_STATUS *retList = (WDMP_STATUS *) calloc(resObj->paramCnt, sizeof(WDMP_STATUS));
             RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Request:> ParamCount = %zu\n",reqObj->u.setReq->paramCnt);
             resObj->paramCnt = reqObj->u.setReq->paramCnt;
-            RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> paramCnt = %zu\n", resObj->paramCnt);
             resObj->timeSpan = NULL;
             paramCount = (int)reqObj->u.setReq->paramCnt;
             resObj->retStatus = (WDMP_STATUS *) calloc(resObj->paramCnt, sizeof(WDMP_STATUS));
@@ -341,9 +339,8 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
 
             for (i = 0; i < paramCount; i++)
             {
-                RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Request:> param[%d].name = %s\n",i,reqObj->u.setReq->param[i].name);
-                RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Request:> param[%d].value = %s\n",i,reqObj->u.setReq->param[i].value);
-                RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Request:> param[%d].type = %d\n",i,reqObj->u.setReq->param[i].type);
+                RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Request:> param[%d].name = %s\n",i,reqObj->u.setReq->param[i].name);
+                RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Request:> param[%d].value = %s\n",i,reqObj->u.setReq->param[i].value);
                 setRebootReason(reqObj->u.setReq->param[i], WEBPA_SET);
             }
 
@@ -365,16 +362,16 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
                 {
                     resObj->u.paramRes->params[i].name = (char *) malloc(sizeof(char) * MAX_PARAMETERNAME_LEN);
                     strcpy(resObj->u.paramRes->params[i].name, reqObj->u.setReq->param[i].name);
-                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> params[%d].name = %s\n",i,resObj->u.paramRes->params[i].name);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> params[%d].name = %s\n",i,resObj->u.paramRes->params[i].name);
                     resObj->u.paramRes->params[i].value = NULL;
                     resObj->u.paramRes->params[i].type = WDMP_STRING;
-                    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",i,resObj->retStatus[i]);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",i,resObj->retStatus[i]);
                 }
             }
             else
             {
                 resObj->retStatus[0] = ret;
-                RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Response:> resObj->retStatus[0] = %d\n",resObj->retStatus[0]);
+                RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Response:> resObj->retStatus[0] = %d\n",resObj->retStatus[0]);
             }
         }
         break;
@@ -395,12 +392,12 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
     {
         wdmp_free_res_struct(resObj);
     }
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"************** processRequest *****************\n");
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"************** processRequest *****************\n");
 }
 
 void notificationCallBack()
 {
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"************** notificationCallBack *****************\n");
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"************** notificationCallBack *****************\n");
     char *notifyPayload = NULL;
     char *notifySource = NULL;
     char *notifyDest = NULL;
@@ -473,7 +470,7 @@ void notificationCallBack()
 static WDMP_STATUS validate_parameter(param_t *param, int paramCount)
 {
     int i = 0;
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"------------ validate_parameter ----------\n");
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"------------ validate_parameter ----------\n");
     for (i = 0; i < paramCount; i++)
     {
         // If input parameter is wildcard ending with "." then send error as wildcard is not supported for TEST_AND_SET

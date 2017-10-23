@@ -53,6 +53,7 @@ const char *rdk_logger_module_fetch(void);
 static void connect_parodus();
 static void get_parodus_url(char *parodus_url, char *client_url);
 static void parodus_receive_wait();
+static long timeValDiff(struct timespec *starttime, struct timespec *finishtime);
 
 /*----------------------------------------------------------------------------*/
 /*                             Global Variables                             */
@@ -130,7 +131,6 @@ static void parodus_receive_wait()
 
         if (rtn != 0)
         {
-            //RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Libparodus failed to recieve message: '%s'\n",libparodus_strerror(rtn));
             sleep(5);
             continue;
         }
@@ -140,7 +140,7 @@ static void parodus_receive_wait()
             res_wrp_msg = (wrp_msg_t *)malloc(sizeof(wrp_msg_t));
             memset(res_wrp_msg, 0, sizeof(wrp_msg_t));
 
-            //getCurrentTime(startPtr);
+            getCurrentTime(startPtr);
             processRequest((char*)wrp_msg->u.req.payload, wrp_msg->u.req.transaction_uuid, ((char **)(&(res_wrp_msg->u.req.payload))));
 
             RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response payload is %s\n",(char *)(res_wrp_msg->u.req.payload));
@@ -156,17 +156,17 @@ static void parodus_receive_wait()
             strncpy(contentType,CONTENT_TYPE_JSON,strlen(CONTENT_TYPE_JSON)+1);
             res_wrp_msg->u.req.content_type = contentType;
             int sendStatus = libparodus_send(libparodus_instance, res_wrp_msg);
-            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"sendStatus is %d\n",sendStatus);
+            
             if(sendStatus == 0)
             {
                 RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Sent message successfully to parodus\n");
             }
             else
             {
-                //RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Failed to send message: '%s'\n",libparodus_strerror(sendStatus));
+                RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failed to send message: '%s'\n",libparodus_strerror((libpd_error_t )sendStatus));
             }
-            //getCurrentTime(endPtr);
-            //RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Elapsed time : %ld ms\n", timeValDiff(startPtr, endPtr));
+            getCurrentTime(endPtr);
+            RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Elapsed time : %ld ms\n", timeValDiff(startPtr, endPtr));
             wrp_free_struct (res_wrp_msg);
         }
         free(wrp_msg);
@@ -174,8 +174,7 @@ static void parodus_receive_wait()
 
     libparodus_shutdown(&libparodus_instance);
 
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"End of parodus_upstream\n");
-    //return 0;
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"End of parodus_upstream\n");
 }
 
 /**
@@ -198,16 +197,16 @@ void sendNotification(char *payload, char *source, char *destination)
     memset(notif_wrp_msg, 0, sizeof(wrp_msg_t));
 
     notif_wrp_msg ->msg_type = WRP_MSG_TYPE__EVENT;
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"source: %s\n",source);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"source: %s\n",source);
     notif_wrp_msg ->u.event.source = strdup(source);
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"destination: %s\n", destination);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"destination: %s\n", destination);
     notif_wrp_msg ->u.event.dest = strdup(destination);
     contentType = (char *)malloc(sizeof(char)*(strlen(CONTENT_TYPE_JSON)+1));
     strncpy(contentType,CONTENT_TYPE_JSON,strlen(CONTENT_TYPE_JSON)+1);
     notif_wrp_msg->u.event.content_type = contentType;
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"content_type is %s\n",notif_wrp_msg->u.event.content_type);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"content_type is %s\n",notif_wrp_msg->u.event.content_type);
 
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Notification payload: %s\n",payload);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Notification payload: %s\n",payload);
     notif_wrp_msg ->u.event.payload = (void *)payload;
     notif_wrp_msg ->u.event.payload_size = strlen((const char*)notif_wrp_msg ->u.event.payload);
 
@@ -224,7 +223,6 @@ void sendNotification(char *payload, char *source, char *destination)
         }
         else
         {
-            //RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failed to send Notification: '%s', retrying ....\n",libparodus_strerror(sendStatus));
             RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"sendNotification backoffRetryTime %d seconds\n", backoffRetryTime);
             sleep(backoffRetryTime);
             c++;
@@ -232,9 +230,9 @@ void sendNotification(char *payload, char *source, char *destination)
         }
     }
 
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"sendStatus is %d\n",sendStatus);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"sendStatus is %d\n",sendStatus);
     wrp_free_struct (notif_wrp_msg );
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Freed notif_wrp_msg struct.\n");
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Freed notif_wrp_msg struct.\n");
 }
 
 
@@ -264,7 +262,7 @@ static void get_parodus_url(char *parodus_url, char *client_url)
     char *webpaCfgFile = NULL;
     int ch_count = 0;
 
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Reading Parodus URL...\n");
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Reading Parodus URL...\n");
     fp = fopen(WEBPA_CONFIG_FILE, "r");
     if (fp == NULL)
     {
@@ -308,8 +306,8 @@ static void get_parodus_url(char *parodus_url, char *client_url)
         strncpy(parodus_url,PARODUS_URL,strlen(PARODUS_URL));
         strncpy(client_url,PAROUDUS_CLIENT_URL,strlen(PAROUDUS_CLIENT_URL));
     }
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Parodus URL formed = %s \n",parodus_url);
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Client URL formed = %s \n",client_url);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Parodus URL formed = %s \n",parodus_url);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Client URL formed = %s \n",client_url);
 }
 
 /**
@@ -327,7 +325,7 @@ static void connect_parodus()
     pthread_detach(pthread_self());
 
     max_retry_sleep = (int) pow(2, backoff_max_time) -1;
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"max_retry_sleep is %d\n", max_retry_sleep );
+    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"max_retry_sleep is %d\n", max_retry_sleep );
 
     get_parodus_url(parodus_url, client_url);
 
@@ -346,18 +344,16 @@ static void connect_parodus()
             backoffRetryTime = (int) pow(2, c) -1;
         }
 
-        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"New backoffRetryTime value calculated as %d seconds\n", backoffRetryTime);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"New backoffRetryTime value calculated as %d seconds\n", backoffRetryTime);
         int ret =libparodus_init (&libparodus_instance, &cfg1);
         if(ret ==0)
         {
             RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Init for parodus Success..!!\n");
             RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"WebPA is now ready to process requests\n");
-            system("print_uptime \"boot_to_WEBPA_READY_uptime\" \"/rdklogs/logs/WEBPAlog.txt.0\"");
             break;
         }
         else
         {
-            //RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Init for parodus failed: '%s'\n",libparodus_strerror(ret));
             sleep(backoffRetryTime);
             c++;
 
@@ -369,6 +365,15 @@ static void connect_parodus()
             }
         }
         retval = libparodus_shutdown(&libparodus_instance);
-        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"libparodus_shutdown retval %d\n", retval);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"libparodus_shutdown retval %d\n", retval);
     }
+}
+
+
+static long timeValDiff(struct timespec *starttime, struct timespec *finishtime)
+{
+    long msec;
+    msec=(finishtime->tv_sec-starttime->tv_sec)*1000;
+    msec+=(finishtime->tv_nsec-starttime->tv_nsec)/1000000;
+    return msec;
 }
