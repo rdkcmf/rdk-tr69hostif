@@ -119,8 +119,8 @@ void NotificationHandler::addNotificationToQueue(const char *owner, IARM_Bus_tr6
                 {
                     notify_data->notify = paramNotify;
                     notifyDataPtr->data = notify_data;
-                    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Notification forwarded for Parameter Name (%s) with Value (%s) and Data type (%d).\n",
-                            paramNotify->paramName,  paramNotify->newValue, paramNotify->type);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Notification forwarded for Parameter Name (%s) with Data type (%d).\n",
+                            paramNotify->paramName, paramNotify->type); // Not printing value due to security reasons
 
                     // Add the notification to queue and call Webpa Callback
                     if(NULL != notificationQueue)
