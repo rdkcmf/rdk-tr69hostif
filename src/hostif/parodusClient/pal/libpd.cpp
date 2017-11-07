@@ -131,6 +131,7 @@ static void parodus_receive_wait()
 
         if (rtn != 0)
         {
+	    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Libparodus failed to recieve message: '%s'\n",libparodus_strerror((libpd_error_t)rtn));
             sleep(5);
             continue;
         }
@@ -354,6 +355,7 @@ static void connect_parodus()
         }
         else
         {
+	    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Init for parodus failed: '%s'\n",libparodus_strerror((libpd_error_t)ret));
             sleep(backoffRetryTime);
             c++;
 
