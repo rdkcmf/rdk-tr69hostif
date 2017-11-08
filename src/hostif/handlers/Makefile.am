@@ -83,7 +83,7 @@ if WITH_SNMP_ADAPTER
 AM_CXXFLAGS += -DSNMP_ADAPTER_ENABLED -I$(top_srcdir)/src/hostif/snmpAdapter
 endif
 
-AM_LDFLAGS = $(GLIB_LIBS) $(G_THREAD_LIBS) $(SOUP_LIBS) $(PROCPS_LIBS) -lIARMBus -lyajl -ldirect -lfusion -lds -ldshalcli -ldbus-1
+AM_LDFLAGS = $(GLIB_LIBS) $(G_THREAD_LIBS) $(SOUP_LIBS) $(PROCPS_LIBS) -lIARMBus -lyajl -ldirect -lfusion -lds -ldshalcli -ldbus-1 -lestoria
 
 noinst_LTLIBRARIES = libMsgHandlers.la
 libMsgHandlers_la_SOURCES =	src/hostIf_IARM_ReqHandler.cpp \
@@ -95,6 +95,7 @@ libMsgHandlers_la_SOURCES =	src/hostIf_IARM_ReqHandler.cpp \
 				src/hostIf_updateHandler.cpp \
 				src/hostIf_MoCAClient_ReqHandler.cpp \
 				src/hostIf_TimeClient_ReqHandler.cpp \
+				src/hostIf_EstoriaClient_ReqHandler.cpp \
 				src/hostIf_IPClient_ReqHandler.cpp \
 				src/hostIf_EthernetClient_ReqHandler.cpp \
 				src/hostIf_WiFi_ReqHandler.cpp 

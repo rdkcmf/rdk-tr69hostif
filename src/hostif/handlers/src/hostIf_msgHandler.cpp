@@ -44,6 +44,7 @@
 #include "hostIf_EthernetClient_ReqHandler.h"
 #include "hostIf_IPClient_ReqHandler.h"
 #include "hostIf_TimeClient_ReqHandler.h"
+#include "hostIf_EstoriaClient_ReqHandler.h"
 #ifdef USE_WIFI_PROFILE
 #include "hostIf_WiFi_ReqHandler.h"
 #endif /* USE_WIFI_PROFILE */
@@ -270,6 +271,10 @@ bool hostIf_initalize_ConfigManger()
                 mgrName = HOSTIF_InterfaceStack;
             }
 #endif /* USE_INTFSTACK_PROFILE */
+            else if(strcasecmp(mgr, "estoriaMgr") == 0)
+            {
+                mgrName = HOSTIF_Estoria;
+            }
 #ifdef USE_STORAGESERVICE_PROFILE
             else if(strcasecmp(mgr, "storageSrvcMgr") == 0)
             {
@@ -362,6 +367,9 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
                 pRet = InterfaceStackClientReqHandler::getInstance();
                 break;
 #endif /* USE_INTFSTACK_PROFILE */
+            case HOSTIF_Estoria:
+                pRet = EstoriaReqHandler::getInstance();
+                break;
 #ifdef USE_STORAGESERVICE_PROFILE
             case HOSTIF_StorageSrvcMgr:
                 pRet = StorageSrvcReqHandler::getInstance();
