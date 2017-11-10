@@ -102,7 +102,6 @@
 GHashTable* hostIf_DeviceInfo::ifHash = NULL;
 GHashTable* hostIf_DeviceInfo::m_notifyHash = NULL;
 GMutex* hostIf_DeviceInfo::m_mutex = NULL;
-bool hostIf_DeviceInfo::m_telemetryRFCEnable=false;
 void *ResetFunc(void *);
 
 
@@ -115,7 +114,7 @@ string hostIf_DeviceInfo::m_xFirmwareDownloadProtocol;
 string hostIf_DeviceInfo::m_xFirmwareDownloadURL;
 string hostIf_DeviceInfo::m_xFirmwareToDownload;
 bool hostIf_DeviceInfo::m_xFirmwareDownloadNow;
-
+XRFCStorage hostIf_DeviceInfo::m_rfcStorage;
 
 #if defined(ENABLE_TELEMETRY_LOGGER)
 extern pthread_cond_t cond_telemetry;
@@ -2318,14 +2317,45 @@ int hostIf_DeviceInfo::get_xOpsDeviceMgmt_hwHealthTest_Results(HOSTIF_MsgData_t 
 }
 #endif /* USE_HWSELFTEST_PROFILE */
 
+int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
+{
+    int ret = NOK;
+
+    // set value
+    ret = m_rfcStorage.setValue(stMsgData);
+
+
+    // any additional immediate handling
+    if (strcasecmp(stMsgData->paramName,TELEMETRY_RFC_ENABLE) == 0)
+    {
+        ret = set_xRDKCentralComTelemetryRFCEnable(stMsgData);
+    }
+
+    return ret;
+}
+
+int hostIf_DeviceInfo::get_xRDKCentralComRFC(HOSTIF_MsgData_t *stMsgData)
+{
+    return m_rfcStorage.getValue(stMsgData);
+}
+
+bool hostIf_DeviceInfo::isTelemetryRFCEnabled()
+{
+    bool ret = false;
+    const std::string &teleEnabled = m_rfcStorage.getRawValue(TELEMETRY_RFC_ENABLE);
+    if( teleEnabled == "true" ) {
+        ret = true;
+    }
+    return ret;
+}
+
 int hostIf_DeviceInfo::set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOK;
     LOG_ENTRY_EXIT;
     if(stMsgData->paramtype == hostIf_BooleanType)
     {
-        m_telemetryRFCEnable = get_boolean(stMsgData->paramValue);
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully set \"%s\" to \"%d\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, m_telemetryRFCEnable);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully set \"%s\" to \"%d\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, isTelemetryRFCEnabled());
 #if defined(ENABLE_TELEMETRY_LOGGER)
         pthread_mutex_lock(&mutex_telemetry);
         pthread_cond_signal(&cond_telemetry);
@@ -2341,7 +2371,6 @@ int hostIf_DeviceInfo::set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *st
 
     return ret;
 }
-
 
 int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
 {

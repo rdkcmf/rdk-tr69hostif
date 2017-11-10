@@ -190,9 +190,10 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_xOpsDeviceMgmtRPCRebootNow (stMsgData);
         }
-        else if (strcasecmp(stMsgData->paramName,TELEMETRY_RFC_ENABLE) == 0)
+        else if (strstr(stMsgData->paramName,TR181_RFC_PREFIX) != NULL)
         {
-	    ret = pIface->set_xRDKCentralComTelemetryRFCEnable(stMsgData);
+            RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] parameter %s is being set with value %s \n", __FUNCTION__, stMsgData->paramName, stMsgData->paramValue);
+            ret = pIface->set_xRDKCentralComRFC(stMsgData);
         }
 #ifdef USE_XRDK_BT_PROFILE
         else if(strncasecmp(stMsgData->paramName,X_BT_ROOT_OBJ,strlen(X_BT_ROOT_OBJ))==0)
@@ -525,6 +526,11 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         else if (strcasecmp(stMsgData->paramName,XRDK_BOOT_TIME) == 0)
         {
             ret = pIface->get_X_RDKCENTRAL_COM_BootTime(stMsgData);
+        } else if (strstr(stMsgData->paramName,TR181_RFC_PREFIX) != NULL)
+        {
+            // RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] requst for parameter: %s of type: %d \n", __FUNCTION__, stMsgData->paramName, stMsgData->paramtype);
+            ret = pIface->get_xRDKCentralComRFC(stMsgData);
+            // RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] return for parameter: %s , is: %s \n", __FUNCTION__, stMsgData->paramName, stMsgData->paramValue);
         }
 #ifdef USE_HWSELFTEST_PROFILE
         else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.Results"))

@@ -31,6 +31,7 @@
 #include "stdio.h"
 #include <stddef.h>
 #include <stdlib.h>
+#include <sstream>
 #include "hostIf_utils.h"
 
 #if defined (RDK_DEVICE_CISCO_XI4) || defined (RDK_DEVICE_EMU)
@@ -121,6 +122,20 @@ std::string int_to_string(int d)
     return std::string(tmp_buff);
 }
 
+std::string uint_to_string(uint d)
+{
+    std::stringstream ss;
+    ss << d;
+    return ss.str();
+}
+
+std::string ulong_to_string(unsigned long d)
+{
+    std::stringstream ss;
+    ss << d;
+    return ss.str();
+}
+
 int get_int(const char* ptr)
 {
     int *ret = (int *)ptr;
@@ -132,6 +147,20 @@ void put_int(char *ptr, int val)
     int *tmp = (int *)ptr;
     *tmp = val;
 }
+
+uint get_uint(char *ptr)
+{
+    uint *ret = (uint *)ptr;
+    return *ret;
+}
+
+void put_uint(char *ptr, uint val)
+{
+    uint *tmp = (uint *)ptr;
+    *tmp = val;
+}
+
+
 
 int get_ulong(const char* ptr)
 {
@@ -156,6 +185,92 @@ void put_boolean(char *ptr, bool val)
 {
     bool *tmp = (bool *)ptr;
     *tmp = val;
+}
+
+std::string bool_to_string(bool value)
+{
+    if (value == true) {
+        return "true";
+    } else if (value == false) {
+        return "false";
+    }
+    return "";
+}
+
+int string_to_int(const char *value)
+{
+    char *end;
+    long ret = strtol(value, &end, 10);
+    return (int)ret;
+}
+
+uint string_to_uint(const char *value)
+{
+    char *end;
+    unsigned long ret = strtoul(value, &end, 10);
+    return (uint)ret;
+}
+
+unsigned long string_to_ulong(const char *value)
+{
+    char *end;
+    unsigned long ret = strtoul(value, &end, 10);
+    return ret;
+}
+
+bool string_to_bool(const char *value)
+{
+    bool ret = (strcmp(value, "true") == 0) ? true : false;
+    return ret;
+}
+
+std::string getStringValue(HOSTIF_MsgData_t *stMsgData)
+{
+    switch (stMsgData->paramtype) {
+    case hostIf_StringType:
+        return string(stMsgData->paramValue);
+    case hostIf_IntegerType:
+        return int_to_string(get_int(stMsgData->paramValue));
+    case hostIf_UnsignedIntType:
+        return uint_to_string(get_uint(stMsgData->paramValue));
+    case hostIf_BooleanType:
+        return bool_to_string(get_boolean(stMsgData->paramValue));
+    case hostIf_UnsignedLongType:
+        return ulong_to_string(get_ulong(stMsgData->paramValue));
+    case hostIf_DateTimeType:
+        // we don't handle this one yet
+    default:
+        return "";
+    }
+}
+
+void putValue(HOSTIF_MsgData_t *stMsgData, const string &value)
+{
+    // std::cout << "value ot be inserted is : " << value << std::endl;
+    memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+
+    switch (stMsgData->paramtype) {
+    case hostIf_StringType:
+        strcpy(stMsgData->paramValue, value.c_str());
+        stMsgData->paramLen = strlen(value.c_str());
+        break;
+    case hostIf_IntegerType:
+        put_int(stMsgData->paramValue, string_to_int(value.c_str()));
+        break;
+    case hostIf_UnsignedIntType:
+        put_uint(stMsgData->paramValue, string_to_uint(value.c_str()));
+        break;
+    case hostIf_BooleanType:
+        put_boolean(stMsgData->paramValue, string_to_bool(value.c_str()));
+        break;
+    case hostIf_UnsignedLongType:
+        put_ulong(stMsgData->paramValue, string_to_ulong(value.c_str()));
+        break;
+    case hostIf_DateTimeType:
+        // we don't handle this one yet
+    default:
+        break;
+    }
 }
 
 void setResetState( eSTBResetState rebootFlag)

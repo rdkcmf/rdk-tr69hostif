@@ -155,6 +155,7 @@
 #include "hostIf_main.h"
 #include "hostIf_tr69ReqHandler.h"
 #include "hostIf_utils.h"
+#include "XrdkCentralComRFC.h"
 #include "hostIf_updateHandler.h"
 
 #define CDL_FLASH_FILE "/opt/cdl_flashed_file_name"
@@ -176,6 +177,8 @@
 #define XRDK_BOOT_TIME "Device.DeviceInfo.X_RDKCENTRAL-COM_BootTime"
 
 #define xOpsRPCRebootNow "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.RebootNow"
+
+#define TR181_RFC_PREFIX	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC"
 
 #define TELEMETRY_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RF_Telemetry.Enable"
 
@@ -226,10 +229,14 @@ class hostIf_DeviceInfo {
     static string m_xFirmwareToDownload;
     static bool m_xFirmwareDownloadNow;
 
+    static XRFCStorage m_rfcStorage;
+
     string getEstbIp();
     bool isRsshactive();
     size_t findIgnoreCase (std::string haystack, std::string needle, size_t pos = 0);
     string getStbMacIf_fr_devProperties();
+
+    int set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *);
 
 public:
 
@@ -247,7 +254,8 @@ public:
 
     GHashTable* getNotifyHash();
 
-    static bool m_telemetryRFCEnable;
+    static bool isTelemetryRFCEnabled();
+
     /**
     * Description. This is the getter api for DeviceInfo for
     *  Device.DeviceInfo Profile.
@@ -722,7 +730,8 @@ public:
     int get_xOpsDeviceMgmt_hwHealthTest_Results(HOSTIF_MsgData_t *);
 #endif /* USE_HWSELFTEST_PROFILE */
 
-    int set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *);
+    int set_xRDKCentralComRFC(HOSTIF_MsgData_t *);
+    int get_xRDKCentralComRFC(HOSTIF_MsgData_t *);
 
     int readFirmwareInfo(char *, HOSTIF_MsgData_t *);
     int writeFirmwareInfo(char *, HOSTIF_MsgData_t *);

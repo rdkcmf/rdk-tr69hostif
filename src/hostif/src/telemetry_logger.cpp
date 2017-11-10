@@ -262,12 +262,12 @@ void *telemetryLogger_thFunc(void *arg)
         pthread_cond_wait(&cond_telemetry, &mutex_telemetry);
         pthread_mutex_unlock(&mutex_telemetry);
 
-        if(!hostIf_DeviceInfo::m_telemetryRFCEnable)
+        if(!hostIf_DeviceInfo::isTelemetryRFCEnabled())
         {
             RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s()] \"%s\" is %d, so disabled telemetry logging. \n",
-                    __FUNCTION__,TELEMETRY_RFC_ENABLE, hostIf_DeviceInfo::m_telemetryRFCEnable);
+                    __FUNCTION__,TELEMETRY_RFC_ENABLE, hostIf_DeviceInfo::isTelemetryRFCEnabled());
         }
-        while(hostIf_DeviceInfo::m_telemetryRFCEnable) {
+        while(hostIf_DeviceInfo::isTelemetryRFCEnabled()) {
             tele_logger->startLogging();
             RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s()] Sleep for log Interval %d\n",__FUNCTION__, tele_logger->getLogInterval());
             sleep(tele_logger->getLogInterval());

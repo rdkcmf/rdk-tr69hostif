@@ -49,7 +49,8 @@ noinst_LTLIBRARIES = libdeviceinfo.la
 libdeviceinfo_la_SOURCES = 	Device_DeviceInfo.cpp\
 				Device_DeviceInfo_Processor.cpp\
 				Device_DeviceInfo_ProcessStatus_Process.cpp \
-				Device_DeviceInfo_ProcessStatus.cpp
+				Device_DeviceInfo_ProcessStatus.cpp \
+				XrdkCentralComRFC.cpp
 if WITH_XRDK_BT_PROFILE
 libdeviceinfo_la_SOURCES +=	XrdkBlueTooth.cpp
 endif

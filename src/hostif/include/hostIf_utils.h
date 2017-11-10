@@ -33,6 +33,7 @@
 
 #include <string>
 #include "hostIf_main.h"
+#include "hostIf_tr69ReqHandler.h"
 
 #define REBOOT_SCR "sh /rebootNow.sh -s hostIf_utils"
 #define SCR_PATH "/lib/rdk"
@@ -112,6 +113,22 @@ void put_ulong(char *ptr, unsigned long val);
 
 std::string int_to_string(int d);
 
+std::string uint_to_string(uint d);
+
+std::string ulong_to_string(unsigned long d);
+
+int string_to_int(const char *value);
+
+uint string_to_uint(const char *value);
+
+unsigned long string_to_ulong(const char *value);
+
+bool string_to_bool(const char *value);
+
+std::string getStringValue(HOSTIF_MsgData_t *stMsgData);
+
+void putValue(HOSTIF_MsgData_t *stMsgData, const std::string &value);
+
 /*
  *  Set the flag for ACS connection status
  */
@@ -134,6 +151,9 @@ char* getenvOrDefault (const char* name, char* defaultValue);
 
 int read_command_output (char* cmd, char* resultBuff, int length);
 int GetStdoutFromCommand(char *cmd, string &consoleString);
+
+//bool write_config_file(const std::string &filename, const std::string &key, const std::string &value);
+//std::string read_config_file(const std::string &filename, const std::string &key, const std::string &defaultValue);
 
 #endif /* HOSTIF_UTILS_H_*/
 
