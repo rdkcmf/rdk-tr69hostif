@@ -18,6 +18,8 @@
 # limitations under the License.
 
 . /etc/device.properties
+. /etc/include.properties
+. $RDK_PATH/utils.sh
 WEBPA_CFG_OVERIDE_FILE="/opt/webpa_cfg.json"
 SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
 
@@ -52,8 +54,29 @@ get_webpa_max_waiting_time()
 
 get_hardware_mac()
 {
-    hw_mac=`cat /tmp/.macAddress | sed 's/://g'`;
-    echo "$hw_mac"
+    hw_mac=`getEstbMacAddressWithoutColon`
+    if [ -z $hw_mac ]; then
+       timer=0
+       while :
+           do
+           if [ -e "/tmp/.macAddress" ]; then
+              hw_mac=`cat /tmp/.macAddress | sed 's/://g'`;
+              echo "$hw_mac"
+              break
+           else
+              #echo "Device details file not exists waiting for 2 min."
+              sleep 2
+              timer=`expr $timer + 2`
+              if [ $timer -eq $MAX_PARODUS_WAIT_TIME ]; then
+                 #echo "Waited for 2 min. /tmp/.macAddress does not exists, unable to start parodus"
+                 break
+              fi
+           fi
+       done
+    else  
+       echo "$hw_mac"
+    fi
+
 }
 
 parodus_start_up()
@@ -64,27 +87,13 @@ parodus_start_up()
     ServerPort=`get_webpa_number_parameter "ServerPort"`
     PingWaitTime=`get_webpa_max_waiting_time "MaxPingWaitTimeInSec"`
     HwMac=`get_hardware_mac`
-
-     echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-inteface-used=$NwInterface webpa-url=$ServerIP" 
-     /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-inteface-used=$NwInterface --webpa-url=$ServerIP --partner-id=comcast --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE"
-     echo "Parodus command set.." 
+    if [ -z $HwMac ]; then
+       echo "Failed to start Parodus, Can't fetch macAddress "
+    else
+       echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-interface-used=$NwInterface webpa-url=$ServerIP" 
+       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-inteface-used=$NwInterface --webpa-url=$ServerIP --partner-id=comcast --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE"
+       echo "Parodus command set.." 
+    fi
 }
 
-timer=0
-while :
-    do
-    if [ -e "/tmp/.macAddress" ]; then
-	parodus_start_up
-	echo "parodus process is started"
-	break
-    else
-	echo "Device details file not exists waiting for 2 min."
-	sleep 5
-	timer=`expr $timer + 5`
-	if [ $timer -eq $MAX_PARODUS_WAIT_TIME ]; then
-	    echo "Waited for 2 min. /tmp/.macAddress does not exists, unable to start parodus"
-	    break
-        fi
-    fi
-done
-
+parodus_start_up
