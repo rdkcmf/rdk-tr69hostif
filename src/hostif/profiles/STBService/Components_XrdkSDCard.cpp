@@ -242,7 +242,12 @@ int hostIf_STBServiceXSDCard::getCapacity(HOSTIF_MsgData_t *stMsgData)
         memset(&param, '\0', sizeof(param));
         param.eSDPropType = SD_Capacity;
         if(getSDCardProperties(&param) ) {
-            put_int(stMsgData->paramValue, param.sdCardProp.ui32Val);
+            // Capacity from getSDCardProperties is in bytes, Need to convert it to MB.
+            unsigned long long capacityBytes = 0;
+            int capacityMegaBytes = 0;
+            capacityBytes = (unsigned long long) param.sdCardProp.ui32Val;
+            capacityMegaBytes = (capacityBytes /1024/1024) ;
+            put_int(stMsgData->paramValue, capacityMegaBytes);
         }
         stMsgData->paramtype=hostIf_UnsignedIntType;
     }
