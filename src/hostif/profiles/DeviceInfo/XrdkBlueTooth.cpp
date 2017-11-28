@@ -542,7 +542,7 @@ int hostIf_DeviceInfoRdk_xBT::getPairedDeviceCnt(HOSTIF_MsgData_t *stMsgData)
 
     try {
         fetch_Bluetooth_PairedDevicesList();
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"Successful, Total Paired Devices are (%d).\n", __FUNCTION__, pairedDevList.m_numOfDevices);
+        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]Successful, Total Paired Devices are (%d).\n", __FUNCTION__, pairedDevList.m_numOfDevices);
     } catch (const std::exception& e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s]xBlueTooth: Exception : %s\r\n",__FUNCTION__, e.what());
         return NOK;
@@ -572,7 +572,7 @@ int hostIf_DeviceInfoRdk_xBT::getConnectedDeviceCnt(HOSTIF_MsgData_t *stMsgData)
 
     try {
         fetch_Bluetooth_ConnectedDevicesList();
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"Successful, Total Connected Devices are (%d).\n", __FUNCTION__, connectedDevList.m_numOfDevices);
+        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s] Successful, Total Connected Devices are (%d).\n", __FUNCTION__, connectedDevList.m_numOfDevices);
     } catch (const std::exception& e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s]xBlueTooth: Exception : %s\r\n",__FUNCTION__, e.what());
         return NOK;
