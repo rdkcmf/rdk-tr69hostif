@@ -694,10 +694,10 @@ public:
     /**
     * @brief set_xOpsDeviceMgmt_hwHealthTest_Enable
     *
-    * This method is used to enable/disable the harware health test functionality.
+    * This method is used to enable/disable the hardware health test functionality.
     * with following TR-069 definition:
     *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.Enable
-    *   Data type: boolean - Setting this will enable/disable health test functionality.
+    *   Data type: boolean - Enable (True)/disable (False) health test functionality.
     *
     * @retval OK if it is successful.
     * @retval NOK if operation fails.
@@ -710,7 +710,7 @@ public:
     * This method is used to trigger hardware health test on the STB.
     * with following TR-069 definition:
     *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.ExecuteTest
-    *   Data type: integer - Setting this parameter will schedule a new test run
+    *   Data type: integer - Unused.
     *
     * @retval OK if it is successful.
     * @retval NOK if operation fails.
@@ -720,7 +720,7 @@ public:
     /**
     * @brief set_xOpsDeviceMgmt_hwHealthTest_Results
     *
-    * This method is used to retrieve the most recent harware health test results.
+    * This method is used to retrieve the most recent hardware health test results.
     * with following TR-069 definition:
     *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.Results
     *
@@ -728,6 +728,60 @@ public:
     * @retval NOK if operation fails.
     */
     int get_xOpsDeviceMgmt_hwHealthTest_Results(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xOpsDeviceMgmt_hwHealthTest_EnablePeriodicRun
+    *
+    * This method is used to enable/disable the hardware health test periodic run functionality.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.EnablePeriodicRun
+    *   Data type: boolean - Enable (True)/disable (False) health test periodic run functionality.
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xOpsDeviceMgmt_hwHealthTest_EnablePeriodicRun(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xOpsDeviceMgmt_hwHealthTest_PeriodicRunFrequency
+    *
+    * This method is used to set the hardware health test periodic run frequency.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.PeriodicRunFrequency
+    *   Data type: unsigned int - Periodic run frequency to set (in minutes), 0 = default frequency.
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xOpsDeviceMgmt_hwHealthTest_PeriodicRunFrequency(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xOpsDeviceMgmt_hwHealthTest_cpuThreshold
+    *
+    * This method is used to set the hardware health test periodic run CPU usage threshold.
+    * If CPU usage is higher than the threshold set, periodic health test will not execute.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.cpuThreshold
+    *   Data type: unsigned int - CPU threshold to set (in percent).
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xOpsDeviceMgmt_hwHealthTest_CpuThreshold(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xOpsDeviceMgmt_hwHealthTest_dramThreshold
+    *
+    * This method is used to set the hardware health test periodic run DRAM usage threshold.
+    * If free DRAM memory is less than the threshold set, periodic health test will not execute.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.dramThreshold
+    *   Data type: unsigned int - DRAM threshold to set (in MB).
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xOpsDeviceMgmt_hwHealthTest_DramThreshold(HOSTIF_MsgData_t *);
 #endif /* USE_HWSELFTEST_PROFILE */
 
     int set_xRDKCentralComRFC(HOSTIF_MsgData_t *);

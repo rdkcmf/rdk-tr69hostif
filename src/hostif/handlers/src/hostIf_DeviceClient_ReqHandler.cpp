@@ -216,6 +216,22 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_xOpsDeviceMgmt_hwHealthTest_Enable(stMsgData);
         }
+        else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.EnablePeriodicRun"))
+        {
+            ret = pIface->set_xOpsDeviceMgmt_hwHealthTest_EnablePeriodicRun(stMsgData);
+        }
+        else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.PeriodicRunFrequency"))
+        {
+            ret = pIface->set_xOpsDeviceMgmt_hwHealthTest_PeriodicRunFrequency(stMsgData);
+        }
+        else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.cpuThreshold"))
+        {
+            ret = pIface->set_xOpsDeviceMgmt_hwHealthTest_CpuThreshold(stMsgData);
+        }
+        else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.dramThreshold"))
+        {
+            ret = pIface->set_xOpsDeviceMgmt_hwHealthTest_DramThreshold(stMsgData);
+        }
 #endif /* USE_HWSELFTEST_PROFILE */
         else if (!strcasecmp(stMsgData->paramName, xFirmwareDownloadNow_STR))
         {
