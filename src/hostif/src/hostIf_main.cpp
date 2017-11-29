@@ -63,7 +63,7 @@ gchar *date_str = NULL;
 const gchar* logfilename = NULL;
 FILE *logfile = NULL;
 int rdk_logger_enabled = 0;
-GHashTable* paramMgrhash;
+GHashTable* paramMgrhash = NULL;
 static void usage();
 T_ARGLIST argList = {{'\0'}, 0};
 
@@ -86,7 +86,7 @@ static  pthread_t   shutdown_thread = 0;                /* The thread ID */
 static  void        *shutdown_thread_entry(void *arg);  /* Thread entry function */
 static  sem_t       shutdown_thread_sem;                /* Semaphore used to signal shutdown */
 static  int         shutdown_sig_received = 0;          /* The signal that triggered the shutdown */
-
+pthread_mutex_t     graceful_exit_mutex;
 #define UNUSED(x)   ((void)(x))
 
 #if defined(ENABLE_TELEMETRY_LOGGER)
@@ -450,36 +450,41 @@ void quit_handler (int sig_received)
 
 void exit_gracefully (int sig_received)
 {
-    RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+
+    if(pthread_mutex_trylock(&graceful_exit_mutex) == 0) {
+        RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
 
 #if defined(USE_WIFI_PROFILE)
-    /* Perform the necessary operations to shut down the WiFi device */
-    WiFiDevice::shutdown();
+        /* Perform the necessary operations to shut down the WiFi device */
+        WiFiDevice::shutdown();
 #endif
 
 #if defined(ENABLE_TELEMETRY_LOGGER)
-    pthread_kill(telemetery_tid, sig_received);
+        pthread_kill(telemetery_tid, sig_received);
 #endif
 
 #if defined(PARODUS_ENABLE)
-    // Kill Parodus Thread
-    pthread_kill(parodus_init_tid, sig_received);
+        // Kill Parodus Thread
+        pthread_kill(parodus_init_tid, sig_received);
 #endif
-    /*Stop libSoup server and exit Json Thread */
-    hostIf_HttpServerStop();
+       /*Stop libSoup server and exit Json Thread */
+       hostIf_HttpServerStop();
 
 
-    updateHandler::stop();
+       updateHandler::stop();
 
-    if(logfile) fclose (logfile);
+       if(logfile) fclose (logfile);
 
-    if(paramMgrhash) {
-        g_hash_table_destroy(paramMgrhash);
+       if(paramMgrhash) {
+            g_hash_table_destroy(paramMgrhash);
+            paramMgrhash = NULL;
+       }
+       hostIf_IARM_IF_Stop();
+
+       RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"[%s:%s] Exiting program gracefully..\n", __FUNCTION__, __FILE__);
+       pthread_mutex_unlock(&graceful_exit_mutex);
+       exit (0);
     }
-    hostIf_IARM_IF_Stop();
-
-    RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"[%s:%s] Exiting program gracefully..\n", __FUNCTION__, __FILE__);
-    exit (0);
 }
 
 //------------------------------------------------------------------------------
