@@ -190,6 +190,8 @@
 #define RFC_WL_ROAM_TRIGGER_RF	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RoamTrigger"
 
 #define RFC_CTL_RETRIEVE_NOW	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.RetrieveNow"
+#define MS12_DAPV2_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MS12.DAPv2_Enable"
+#define MS12_DE_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MS12.DE_Enable"
 
 #define xFirmwareDownloadNow_STR	"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadNow" /* boolean [w] Trigger download on set true. */
 
@@ -819,4 +821,3 @@ public:
 
 /** @} */
 /** @} */
-

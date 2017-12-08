@@ -73,6 +73,7 @@
 #include "host.hpp"
 #include "manager.hpp"
 #include "dsError.h"
+#include "audioOutputPort.hpp"
 #include "sysMgr.h"
 #ifdef USE_MoCA_PROFILE
 #include "netsrvmgrIarm.h"
@@ -2382,6 +2383,30 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     {
         ret = set_xRDKCentralComRFCRetrieveNow(stMsgData);
     }
+    else if (strcasecmp(stMsgData->paramName,MS12_DAPV2_RFC_ENABLE) == 0)
+    {
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MS12->DAPV2 RFC status:%s\n",__FUNCTION__,stMsgData->paramValue);
+        if(strcasecmp(stMsgData->paramValue,"true") == 0)
+        {
+            device::Host::getInstance().getAudioOutputPort("HDMI0").enableMS12Config(dsMS12FEATURE_DAPV2,1);
+        }
+        else
+        {
+            device::Host::getInstance().getAudioOutputPort("HDMI0").enableMS12Config(dsMS12FEATURE_DAPV2,0);
+        }
+    }
+    else if (strcasecmp(stMsgData->paramName,MS12_DE_RFC_ENABLE) == 0)
+    {
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MS12->DE RFC status:%s\n",__FUNCTION__,stMsgData->paramValue);
+        if(strcasecmp(stMsgData->paramValue,"true") == 0)
+        {
+            device::Host::getInstance().getAudioOutputPort("HDMI0").enableMS12Config(dsMS12FEATURE_DE,1);
+        }
+        else
+        {
+            device::Host::getInstance().getAudioOutputPort("HDMI0").enableMS12Config(dsMS12FEATURE_DE,0);
+        }
+    }
 
     return ret;
 }
@@ -2795,4 +2820,3 @@ string hostIf_DeviceInfo::getStbMacIf_fr_devProperties()
 
 /** @} */
 /** @} */
-
