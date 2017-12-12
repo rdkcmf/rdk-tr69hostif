@@ -2350,6 +2350,14 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     {
         ret = set_xRDKCentralComTelemetryRFCEnable(stMsgData);
     }
+    else if (strcasecmp(stMsgData->paramName,HDR_RFC_ENABLE) == 0)
+    {
+        ret = set_xRDKCentralComHdrRFCEnable(stMsgData);
+    }
+    else if (strcasecmp(stMsgData->paramName,UHD_RFC_ENABLE) == 0)
+    {
+        ret = set_xRDKCentralComUhdRFCEnable(stMsgData);
+    }
 
     return ret;
 }
@@ -2387,11 +2395,54 @@ int hostIf_DeviceInfo::set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *st
     else
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong data type for %s, please use boolean(0/1) to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
+        stMsgData->faultCode = fcInvalidParameterType;
     }
 
     return ret;
 }
 
+int hostIf_DeviceInfo::set_xRDKCentralComHdrRFCEnable(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOK;
+    bool enable = false;
+    LOG_ENTRY_EXIT;
+    if(stMsgData->paramtype == hostIf_BooleanType)
+    {
+        enable = get_boolean(stMsgData->paramValue);
+        device::VideoDevice decoder = device::Host::getInstance().getVideoDevices().at(0);
+        decoder.forceDisableHDRSupport(!enable);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully set \"%s\" to \"%d\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, enable);
+        ret = OK;
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong data type for %s, please use boolean(0/1) to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
+        stMsgData->faultCode = fcInvalidParameterType;
+    }
+
+    return ret;
+}
+
+int hostIf_DeviceInfo::set_xRDKCentralComUhdRFCEnable(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOK;
+    bool enable = false;
+    LOG_ENTRY_EXIT;
+    if(stMsgData->paramtype == hostIf_BooleanType)
+    {
+        enable = get_boolean(stMsgData->paramValue);
+        device::Host::getInstance().getVideoOutputPort("HDMI0").forceDisable4KSupport(!enable);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully set \"%s\" to \"%d\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, enable);
+        ret = OK;
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong data type for %s, please use boolean(0/1) to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
+        stMsgData->faultCode = fcInvalidParameterType;
+    }
+
+    return ret;
+}
 int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
 {
     int ret = OK;

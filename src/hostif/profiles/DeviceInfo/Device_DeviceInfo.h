@@ -181,6 +181,8 @@
 #define TR181_RFC_PREFIX	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC"
 
 #define TELEMETRY_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RF_Telemetry.Enable"
+#define HDR_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HdrEnable.Enable"
+#define UHD_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.UhdEnable.Enable"
 
 #define xFirmwareDownloadNow_STR	"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadNow" /* boolean [w] Trigger download on set true. */
 
@@ -237,6 +239,8 @@ class hostIf_DeviceInfo {
     string getStbMacIf_fr_devProperties();
 
     int set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *);
+    int set_xRDKCentralComHdrRFCEnable(HOSTIF_MsgData_t *);
+    int set_xRDKCentralComUhdRFCEnable(HOSTIF_MsgData_t *);
 
 public:
 
