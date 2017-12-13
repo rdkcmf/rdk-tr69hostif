@@ -588,7 +588,7 @@ void WiFiReqHandler::checkForUpdates()
         int currentSSIDNumberOfEntries = get_int (stMsgData.paramValue);
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s] currentSSIDNumberOfEntries = %d, savedSSIDNumberOfEntries = %d\n",
                 __FILE__, __FUNCTION__, currentSSIDNumberOfEntries, savedSSIDNumberOfEntries);
-        sendAddRemoveEvents (mUpdateCallback, currentSSIDNumberOfEntries, savedSSIDNumberOfEntries, DEVICE_WIFI_SSID_PROFILE);
+        sendAddRemoveEvents (mUpdateCallback, currentSSIDNumberOfEntries, savedSSIDNumberOfEntries, (char *)DEVICE_WIFI_SSID_PROFILE);
     }
 
     if (!bfirstInstance && (OK == pIface->get_Device_WiFi_RadioNumberOfEntries (&stMsgData)))
@@ -597,7 +597,7 @@ void WiFiReqHandler::checkForUpdates()
         int currentRadioNumberOfEntries = get_int (stMsgData.paramValue);
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s] currentRadioNumberOfEntries = %d, savedRadioNumberOfEntries = %d\n",
                 __FILE__, __FUNCTION__, currentRadioNumberOfEntries, savedRadioNumberOfEntries);
-        sendAddRemoveEvents (mUpdateCallback, currentRadioNumberOfEntries, savedRadioNumberOfEntries, DEVICE_WIFI_RADIO_PROFILE);
+        sendAddRemoveEvents (mUpdateCallback, currentRadioNumberOfEntries, savedRadioNumberOfEntries, (char *)DEVICE_WIFI_RADIO_PROFILE);
     }
 
     if (OK == pIface->get_Device_WiFi_EndPointNumberOfEntries (&stMsgData))
@@ -605,7 +605,7 @@ void WiFiReqHandler::checkForUpdates()
         int currentEndPointNumberOfEntries = get_int (stMsgData.paramValue);
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s] currentEndPointNumberOfEntries = %d, savedEndPointNumberOfEntries = %d\n",
                 __FILE__, __FUNCTION__, currentEndPointNumberOfEntries, savedEndPointNumberOfEntries);
-        sendAddRemoveEvents (mUpdateCallback, currentEndPointNumberOfEntries, savedEndPointNumberOfEntries, DEVICE_WIFI_ENDPOINT_PROFILE);
+        sendAddRemoveEvents (mUpdateCallback, currentEndPointNumberOfEntries, savedEndPointNumberOfEntries, (char *)DEVICE_WIFI_ENDPOINT_PROFILE);
     }
 }
 

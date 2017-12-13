@@ -1375,7 +1375,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadPerce
 
     int firmwareDownloadPercent = -1;
     char output[8];
-    if (OK == read_command_output ("cat /opt/curl_progress | tr -s '\r' '\n' | tail -n 1 | sed 's/^ *//g' | tr -s ' ' | cut -d ' ' -f3", output, 8))
+    if (OK == read_command_output ((char *)"cat /opt/curl_progress | tr -s '\r' '\n' | tail -n 1 | sed 's/^ *//g' | tr -s ' ' | cut -d ' ' -f3", output, 8))
     {
         output[strcspn(output, "\n")] = 0;
         if (*output)
@@ -2283,7 +2283,7 @@ int hostIf_DeviceInfo::set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t * stMsgD
 
     if (get_boolean (stMsgData->paramValue))
     {
-        char* command = "(sleep 1; /lib/rdk/rebootNow.sh -s hostifDeviceInfo) &";
+        char* command = (char *)"(sleep 1; /lib/rdk/rebootNow.sh -s hostifDeviceInfo) &";
         RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Invoking 'system (\"%s\")'. %s = true\n", __FUNCTION__, command, stMsgData->paramName);
         int ret = system (command);
         if (ret != 0)
@@ -2634,7 +2634,7 @@ string hostIf_DeviceInfo::getStbMacIf_fr_devProperties()
         struct ifreq ifr;
 
         /* Get configured Estb Mac interface */
-        char *stbMacIf = getenvOrDefault ("DEFAULT_ESTB_INTERFACE", "");
+        char *stbMacIf = getenvOrDefault ((char *)"DEFAULT_ESTB_INTERFACE", "");
 
         int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
         if(fd) {

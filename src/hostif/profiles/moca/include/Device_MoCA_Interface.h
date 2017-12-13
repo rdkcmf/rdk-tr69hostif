@@ -361,7 +361,7 @@ public:
      *
      */
 
-    static int get_Device_MoCA_InterfaceNumberOfEntries(HOSTIF_MsgData_t *,bool *pChanged = false);
+    static int get_Device_MoCA_InterfaceNumberOfEntries(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @ingroup TR69_HOSTIF_MOCA_INTERFACE
@@ -386,7 +386,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_Enable(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_Enable(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the current operational state of the interface (see [Section 4.2.2/TR-181i2]). Enumeration of:
@@ -419,7 +419,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_Status(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_Status(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the Alias-based addressing used for MoCA interface.
@@ -439,7 +439,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_Alias(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_Alias(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the textual name of the interface as assigned by the CPE.
@@ -448,7 +448,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_Name(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_Name(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the accumulated time in seconds since the interface entered its current operational state.
@@ -457,7 +457,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_LastChange(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_LastChange(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the path name of the MoCA interface object.
@@ -471,7 +471,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_LowerLayers(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_LowerLayers(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Check whether the interface points towards the Internet (true) or towards End Devices (false).
@@ -488,7 +488,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_Upstream(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_Upstream(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the MAC Address of the interface.
@@ -500,7 +500,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_MACAddress(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_MACAddress(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the MoCA interface's firmware version.
@@ -511,7 +511,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_FirmwareVersion(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_FirmwareVersion(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the maximum MoCA PHY bit rate (expressed in Mbps).
@@ -520,7 +520,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_MaxBitRate(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_MaxBitRate(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the maximum bandwidth of this interface for flows onto the MoCA network in Mbps.
@@ -531,7 +531,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_MaxIngressBW(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_MaxIngressBW(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the maximum bandwidth of this interface for flows from the MoCA network in Mbps.
@@ -542,7 +542,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_MaxEgressBW(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_MaxEgressBW(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the identifies the highest MoCA version that this interface supports.
@@ -556,7 +556,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_HighestVersion(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_HighestVersion(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the MoCA version that the MoCA network is currently running.
@@ -572,7 +572,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_CurrentVersion(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_CurrentVersion(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the Node ID of the current Network Coordinator (NC) for the MoCA network.
@@ -583,7 +583,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_NetworkCoordinator(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_NetworkCoordinator(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the Node ID of the MoCA interface.
@@ -594,7 +594,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_NodeID(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_NodeID(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the maximum network node capability supported by the interface.
@@ -605,7 +605,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_MaxNodes(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_MaxNodes(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Check Whether this interface is a preferred Network Coordinator (NC).
@@ -616,7 +616,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_PreferredNC(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_PreferredNC(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the Node ID of the backup Network Coordinator node.
@@ -627,7 +627,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_BackupNC(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_BackupNC(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the configured privacy mode. This indicates whether link-layer security is enabled (true)
@@ -640,7 +640,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_PrivacyEnabledSetting(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_PrivacyEnabledSetting(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Check whether link-layer security is enabled or disabled.
@@ -651,7 +651,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_PrivacyEnabled(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_PrivacyEnabled(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the hexadecimal encoded 64-bit mask of supported frequencies.
@@ -667,7 +667,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_FreqCapabilityMask(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_FreqCapabilityMask(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the configured hexadecimal encoded 64-bit mask of enabled frequencies for network admission.
@@ -679,7 +679,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_FreqCurrentMaskSetting(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_FreqCurrentMaskSetting(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the hexadecimal encoded 64-bit mask of used frequencies.
@@ -693,7 +693,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_FreqCurrentMask(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_FreqCurrentMask(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the current Operational Frequency. The RF frequency in Hz to which the MoCA interface
@@ -705,7 +705,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_CurrentOperFreq(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_CurrentOperFreq(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the last Operational Frequency. The RF frequency in Hz to which the MoCA interface was
@@ -717,7 +717,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_LastOperFreq(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_LastOperFreq(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the MoCA Password. The value consists of numeric characters (0-9).
@@ -732,7 +732,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_KeyPassphrase(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_KeyPassphrase(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the transmit Power attenuation in dB relative to the maximum transmit power.
@@ -746,7 +746,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_TxPowerLimit(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_TxPowerLimit(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the target PHY rate in Mbps for the power control algorithm.
@@ -760,7 +760,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_PowerCntlPhyTarget(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_PowerCntlPhyTarget(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the Beacon Transmit Power attenuation in dB relative to the maximum transmit power.
@@ -774,7 +774,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_BeaconPowerLimit(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_BeaconPowerLimit(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the hexadecimal encoded 64-bit mask of MoCA taboo channels identified for the home network.
@@ -787,7 +787,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_NetworkTabooMask(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_NetworkTabooMask(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the hexadecimal encoded 64-bit mask of supported frequencies.
@@ -800,7 +800,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_NodeTabooMask(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_NodeTabooMask(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the broadcast PHY transmit rate in Mbps for this interface.
@@ -811,7 +811,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_TxBcastRate(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_TxBcastRate(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the transmit Power attenuation in dB relative to the maximum transmit power for broadcast transmissions.
@@ -822,7 +822,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_TxBcastPowerReduction(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_TxBcastPowerReduction(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Check whether this interface supports the 256 QAM feature.
@@ -833,7 +833,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_QAM256Capable(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_QAM256Capable(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief Get the packet aggregation capability supported by the interface.
@@ -846,7 +846,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_PacketAggregationCapability(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_PacketAggregationCapability(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
    /**
     * @brief The number of entries in the AssociatedDevice table.
@@ -856,7 +856,7 @@ public:
     *
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
-    int get_Device_MoCA_Interface_AssociatedDeviceNumberOfEntries(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_AssociatedDeviceNumberOfEntries(HOSTIF_MsgData_t *,bool *pChanged = NULL);
 
     /**
      * @brief    Get the number of entries in the X_RDKCENTRAL_COM_MeshTable table of a MoCA Interface.
@@ -866,7 +866,7 @@ public:
      * See @ref dev_moca_if_getter
      *
      */
-    int get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTableNumberOfEntries(HOSTIF_MsgData_t *,bool *pChanged = false);
+    int get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTableNumberOfEntries(HOSTIF_MsgData_t *,bool *pChanged = NULL);
     /* End of TR_069_DEVICE_MOCA_GETTER_API doxygen group */
     /**
      * @}
