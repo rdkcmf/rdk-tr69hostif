@@ -91,7 +91,7 @@ parodus_start_up()
        echo "Failed to start Parodus, Can't fetch macAddress "
     else
        echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-interface-used=$NwInterface webpa-url=$ServerIP" 
-       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-inteface-used=$NwInterface --webpa-url=$ServerIP --partner-id=comcast --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE"
+       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=comcast --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE"
        echo "Parodus command set.." 
     fi
 }
