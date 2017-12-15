@@ -184,6 +184,9 @@
 #define HDR_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HdrEnable.Enable"
 #define UHD_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.UhdEnable.Enable"
 
+
+#define RFC_WL_ROAM_TRIGGER_RF	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RoamTrigger"
+
 #define xFirmwareDownloadNow_STR	"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadNow" /* boolean [w] Trigger download on set true. */
 
 /**
@@ -242,6 +245,8 @@ class hostIf_DeviceInfo {
     int set_xRDKCentralComHdrRFCEnable(HOSTIF_MsgData_t *);
     int set_xRDKCentralComUhdRFCEnable(HOSTIF_MsgData_t *);
 
+    // This is to set wl roam_trigger
+    int set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *);
 public:
 
     static hostIf_DeviceInfo *getInstance(int dev_id);

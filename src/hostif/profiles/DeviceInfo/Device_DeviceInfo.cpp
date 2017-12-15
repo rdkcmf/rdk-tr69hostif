@@ -2358,6 +2358,10 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     {
         ret = set_xRDKCentralComUhdRFCEnable(stMsgData);
     }
+    else if (strcasecmp(stMsgData->paramName,RFC_WL_ROAM_TRIGGER_RF) == 0)
+    {
+        ret = set_xRDKCentralComRFCRoamTrigger(stMsgData);
+    }
 
     return ret;
 }
@@ -2443,6 +2447,24 @@ int hostIf_DeviceInfo::set_xRDKCentralComUhdRFCEnable(HOSTIF_MsgData_t *stMsgDat
 
     return ret;
 }
+
+int hostIf_DeviceInfo::set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOK;
+    LOG_ENTRY_EXIT;
+    //if(stMsgData->paramtype)
+    {
+ 	char execBuf[100] = {'\0'};
+	sprintf(execBuf, "wl roam_trigger %s &", stMsgData->paramValue);
+        system(execBuf);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully executed \"%s\" with \"%s\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, execBuf);
+        ret = OK;
+    }
+    system("wl roam_trigger &");
+    return ret;
+}
+
+
 int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
 {
     int ret = OK;
