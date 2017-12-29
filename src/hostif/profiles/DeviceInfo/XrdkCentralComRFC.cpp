@@ -44,6 +44,11 @@ bool IniFile::load(const string &filename)
     return true;
 }
 
+void IniFile::clear()
+{
+    m_dict.clear();
+}
+
 string IniFile::value(const string &key, const string &defaultValue) const
 {
     map<string,string>::const_iterator it = m_dict.find(key);
@@ -83,6 +88,11 @@ XRFCStorage::XRFCStorage()
     m_storageLoaded = false;
 }
 
+void XRFCStorage::clearAll()
+{
+    m_storage.clear();
+}
+
 int XRFCStorage::getValue(HOSTIF_MsgData_t *stMsgData)
 {
     if (!init()) {
@@ -118,8 +128,16 @@ int  XRFCStorage::setValue(HOSTIF_MsgData_t *stMsgData)
     if (!init()) {
         return NOK;
     }
+
     // FixMe:: validate
     const string &valueString = getStringValue(stMsgData);
+
+    const string &oldValue = m_storage.value(stMsgData->paramName);
+
+    // if nothing changed, don't do anything
+    if (oldValue == valueString) {
+        return OK;
+    }
 
     // store
     int ret = NOK;

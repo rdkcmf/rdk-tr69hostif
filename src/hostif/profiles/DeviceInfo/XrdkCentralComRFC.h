@@ -13,6 +13,7 @@ class IniFile
 public:
     IniFile();
     bool                load(const string &filename);
+    void                clear();
     string              value(const string &key, const string &defaultValue = "") const;
     bool                setValue(const string &key, const string &value);
 
@@ -25,6 +26,7 @@ class XRFCStorage
 {
 public:
     XRFCStorage();
+    void clearAll();
     int  getValue(HOSTIF_MsgData_t *stMsgData);
     int  setValue(HOSTIF_MsgData_t *stMsgData);
 

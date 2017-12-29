@@ -2346,7 +2346,11 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
 
 
     // any additional immediate handling
-    if (strcasecmp(stMsgData->paramName,TELEMETRY_RFC_ENABLE) == 0)
+    if (strcasecmp(stMsgData->paramName,TR181_RFC_RESET_DATA) == 0) // used to clear out all data from storage
+    {
+       m_rfcStorage.clearAll();
+    }
+    else if (strcasecmp(stMsgData->paramName,TELEMETRY_RFC_ENABLE) == 0)
     {
         ret = set_xRDKCentralComTelemetryRFCEnable(stMsgData);
     }
