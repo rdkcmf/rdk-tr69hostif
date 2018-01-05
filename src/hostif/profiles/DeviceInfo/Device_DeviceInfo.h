@@ -184,6 +184,7 @@
 #define TELEMETRY_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RF_Telemetry.Enable"
 #define HDR_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HdrEnable.Enable"
 #define UHD_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.UhdEnable.Enable"
+#define LE_RFC_ENABLE   "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LoudnessEquivalenceEnable"
 
 
 #define RFC_WL_ROAM_TRIGGER_RF	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RoamTrigger"
