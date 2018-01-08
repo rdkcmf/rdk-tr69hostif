@@ -179,7 +179,7 @@
 #define xOpsRPCRebootNow "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.RebootNow"
 
 #define TR181_RFC_PREFIX	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC"
-#define TR181_RFC_RESET_DATA     "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.RESET-DATA"
+#define TR181_RFC_RESET_DATA     "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.ClearDB"
 
 #define TELEMETRY_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RF_Telemetry.Enable"
 #define HDR_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HdrEnable.Enable"
