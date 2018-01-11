@@ -2378,6 +2378,10 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
             device::Host::getInstance().getAudioOutputPort("HDMI0").enableLEConfig(0);
         }
     }
+    else if (strcasecmp(stMsgData->paramName,RFC_CTL_RETRIEVE_NOW) == 0)
+    {
+        ret = set_xRDKCentralComRFCRetrieveNow(stMsgData);
+    }
 
     return ret;
 }
@@ -2480,6 +2484,35 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *stMsgD
     return ret;
 }
 
+// Handle RFC RetrieveNow
+int hostIf_DeviceInfo::set_xRDKCentralComRFCRetrieveNow(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOK;
+    struct timeval currTime;
+    char cmd[100] = {'\0'};
+
+    LOG_ENTRY_EXIT;
+
+    sprintf(cmd, "sh /lib/rdk/RFCscript.sh &");
+    system (cmd);
+    ret = OK;
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully executed \"%s\" with \"%s\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, cmd);
+    // log the last RFC request
+    if(gettimeofday(&currTime, NULL))
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in sysinfo due to \'%s\' (%d).  \n",  strerror(errno), errno);
+    }
+    else
+    {
+        put_ulong(stMsgData->paramValue, (unsigned int)currTime.tv_sec);
+        stMsgData->paramtype = hostIf_UnsignedIntType;
+        stMsgData->paramLen = sizeof(hostIf_UnsignedIntType);
+        // set the time in Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.RetrieveNow parameter
+        ret = m_rfcStorage.setValue(stMsgData);
+    }
+
+    return ret;
+}
 
 int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
 {
@@ -2762,3 +2795,4 @@ string hostIf_DeviceInfo::getStbMacIf_fr_devProperties()
 
 /** @} */
 /** @} */
+

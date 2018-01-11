@@ -189,6 +189,8 @@
 
 #define RFC_WL_ROAM_TRIGGER_RF	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RoamTrigger"
 
+#define RFC_CTL_RETRIEVE_NOW	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.RetrieveNow"
+
 #define xFirmwareDownloadNow_STR	"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadNow" /* boolean [w] Trigger download on set true. */
 
 /**
@@ -249,6 +251,9 @@ class hostIf_DeviceInfo {
 
     // This is to set wl roam_trigger
     int set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *);
+
+    int set_xRDKCentralComRFCRetrieveNow(HOSTIF_MsgData_t *);
+
 public:
 
     static hostIf_DeviceInfo *getInstance(int dev_id);
@@ -814,3 +819,4 @@ public:
 
 /** @} */
 /** @} */
+
