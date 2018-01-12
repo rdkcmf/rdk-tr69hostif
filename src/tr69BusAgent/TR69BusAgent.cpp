@@ -91,7 +91,7 @@ extern "C"
             return IARM_RESULT_IPCCORE_FAIL;
         }
 
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"%s: tr69AgentCallback returned success !!!\n", __FUNCTION__);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s: tr69AgentCallback returned success !!!\n", __FUNCTION__);
 //        RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Exit \n", __FILE__, __FUNCTION__, __LINE__);
         return IARM_RESULT_SUCCESS;
     }
