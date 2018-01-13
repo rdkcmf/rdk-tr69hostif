@@ -2,25 +2,10 @@
 #define XRDKCENTRALCOMRFC_H
 
 #include "hostIf_tr69ReqHandler.h"
-
+#include "IniFile.h"
 #include <string>
-#include <map>
 
 using namespace std;
-
-class IniFile
-{
-public:
-    IniFile();
-    bool                load(const string &filename);
-    void                clear();
-    string              value(const string &key, const string &defaultValue = "") const;
-    bool                setValue(const string &key, const string &value);
-
-private:
-    string m_filename;
-    map<string, string> m_dict;
-};
 
 class XRFCStorage
 {

@@ -30,8 +30,8 @@ libhostIfIP_la_SOURCES =  Device_IP_ActivePort.cpp \
 				Device_IP.cpp \
 				Device_IP_Interface.cpp \
 				Device_IP_Interface_IPv4Address.cpp \
-				Device_IP_Interface_Stats.cpp	
-
+				Device_IP_Interface_Stats.cpp \
+				Device_IP_Diagnostics_IPPing.cpp
 
 if WITH_IPV6_SUPPORT
 libhostIfIP_la_SOURCES += Device_IP_Interface_IPv6Address.cpp

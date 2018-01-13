@@ -40,6 +40,7 @@
 #endif // IPV6_SUPPORT
 #include "Device_IP_Interface_Stats.h"
 #include "Device_IP.h"
+#include "Device_IP_Diagnostics_IPPing.h"
 #include <mutex>
 
 std::mutex IPClientReqHandler::m_mutex;
@@ -193,6 +194,11 @@ int IPClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             ret = pIface->handleGetMsg (positionAfterInstanceNumber, stMsgData);
         }
     }
+    else if (strncasecmp (stMsgData->paramName, hostIf_IP_Diagnostics_IPPing::PROFILE_NAME, strlen (hostIf_IP_Diagnostics_IPPing::PROFILE_NAME)) == 0)
+    {
+        hostIf_IP_Diagnostics_IPPing& ipping = hostIf_IP_Diagnostics_IPPing::getInstance ();
+        ret = ipping.handleGetMsg (stMsgData);
+    }
     else if (matchComponent (stMsgData->paramName, "Device.IP.ActivePort", &positionAfterInstanceNumber, instanceNumber))
     {
         stMsgData->instanceNum = instanceNumber;
@@ -280,6 +286,11 @@ int IPClientReqHandler::handleSetMsg (HOSTIF_MsgData_t *stMsgData)
 
             ret = pIface->handleSetMsg (positionAfterInstanceNumber, stMsgData);
         }
+    }
+    else if (strncasecmp (stMsgData->paramName, hostIf_IP_Diagnostics_IPPing::PROFILE_NAME, strlen (hostIf_IP_Diagnostics_IPPing::PROFILE_NAME)) == 0)
+    {
+        hostIf_IP_Diagnostics_IPPing& ipping = hostIf_IP_Diagnostics_IPPing::getInstance ();
+        ret = ipping.handleSetMsg (stMsgData);
     }
     else if (strncasecmp (stMsgData->paramName, "Device.IP", strlen ("Device.IP")))
     {

@@ -114,6 +114,7 @@ AM_LDFLAGS += $(SYSTEMD_SDNOTIFY_LDFLAGS) -lcjson
 bin_PROGRAMS = tr69hostif
 tr69hostif_SOURCES = $(top_srcdir)/src/hostif/src/hostIf_main.cpp
 tr69hostif_SOURCES += $(top_srcdir)/src/hostif/src/hostIf_utils.cpp
+tr69hostif_SOURCES += $(top_srcdir)/src/hostif/src/IniFile.cpp
 
 if WITH_TELEMETRY_LOGGER
 tr69hostif_SOURCES += $(top_srcdir)/src/hostif/src/telemetry_logger.cpp

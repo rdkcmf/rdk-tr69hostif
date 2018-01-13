@@ -17,41 +17,24 @@
  * limitations under the License.
 */
 
-/**
-* @defgroup tr69hostif
-* @{
-* @defgroup hostif
-* @{
-**/
+#ifndef INIFILE_H_
+#define INIFILE_H_
 
-#ifndef DEVICE_IP_DIAGNOSTICS_IPPING_H_
-#define DEVICE_IP_DIAGNOSTICS_IPPING_H_
+#include <string>
+#include <map>
 
-#include "hostIf_tr69ReqHandler.h"
-#include "IniFile.h"
-
-class hostIf_IP_Diagnostics_IPPing
+class IniFile
 {
-
 public:
-
-    static const char* PROFILE_NAME;
-    static hostIf_IP_Diagnostics_IPPing& getInstance ();
-
-    hostIf_IP_Diagnostics_IPPing (hostIf_IP_Diagnostics_IPPing const&) = delete;
-    void operator= (hostIf_IP_Diagnostics_IPPing const&) = delete;
-
-    int handleGetMsg (HOSTIF_MsgData_t* stMsgData);
-    int handleSetMsg (HOSTIF_MsgData_t* stMsgData);
+    IniFile();
+    bool                load(const std::string &filename);
+    void                clear();
+    std::string         value(const std::string &key, const std::string &defaultValue = "") const;
+    bool                setValue(const std::string &key, const std::string &value);
 
 private:
-
-    IniFile store;
-    hostIf_IP_Diagnostics_IPPing ();
+    std::string m_filename;
+    std::map<std::string, std::string> m_dict;
 };
 
-#endif /* DEVICE_IP_DIAGNOSTICS_IPPING_H_ */
-
-
-/** @} */
-/** @} */
+#endif /* INIFILE_H_ */
