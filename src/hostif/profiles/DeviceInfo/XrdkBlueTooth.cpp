@@ -76,7 +76,9 @@ hostIf_DeviceInfoRdk_xBT* hostIf_DeviceInfoRdk_xBT::m_instance = NULL;
 short hostIf_DeviceInfoRdk_xBT::noOfDiscoveredDevice=0;
 short hostIf_DeviceInfoRdk_xBT::noOfPairedDevice=0;
 short hostIf_DeviceInfoRdk_xBT::noOfConnectedDevices=0;
-void BTRMgr_EventCallback(BTRMGR_EventMessage_t );
+#if 0
+BTRMGR_Result_t BTRMgr_EventCallback(BTRMGR_EventMessage_t );
+#endif
 
 hostIf_DeviceInfoRdk_xBT* hostIf_DeviceInfoRdk_xBT::getInstance()
 {
@@ -131,8 +133,8 @@ hostIf_DeviceInfoRdk_xBT::hostIf_DeviceInfoRdk_xBT()
 
 }
 
-/*
 
+#if 0
 void hostIf_DeviceInfoRdk_xBT::XrdkBlueTooth_init()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering...  \n", __FUNCTION__, __LINE__);
@@ -153,7 +155,7 @@ void hostIf_DeviceInfoRdk_xBT::XrdkBlueTooth_init()
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]Exiting...  \n", __FUNCTION__, __LINE__);
 }
-*/
+#endif
 
 /**
  * @brief This function set the bluetooth profile attributes
@@ -1781,7 +1783,7 @@ void fetch_Bluetooth_ConnectedDevicesList()
                   value -> Event data for bluetooth connected devices
 ************************************************************/
 #if 0
-void BTRMgr_EventCallback(BTRMGR_EventMessage_t eventData)
+BTRMGR_Result_t BTRMgr_EventCallback(BTRMGR_EventMessage_t eventData)
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering..\n", __FUNCTION__, __LINE__);
     BTRMGR_Events_t eventType = eventData.m_eventType;
@@ -1812,6 +1814,7 @@ void BTRMgr_EventCallback(BTRMGR_EventMessage_t eventData)
     }
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exiting..\n", __FUNCTION__, __LINE__);
+    return BTRMGR_RESULT_SUCCESS;
 }
 #endif
 

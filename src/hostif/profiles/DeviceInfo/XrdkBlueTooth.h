@@ -147,7 +147,9 @@ private:
 
 public:
 //    static updateCallback mUpdateCallback;
-//    static void XrdkBlueTooth_init();
+#if 0
+    static void XrdkBlueTooth_init();
+#endif
     static void getLock();
     static void releaseLock();
     static void reset();
