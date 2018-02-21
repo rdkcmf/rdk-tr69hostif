@@ -831,20 +831,22 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioEncoding(HOSTIF_MsgDa
 int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioFormat(HOSTIF_MsgData_t *stMsgData)
 {
     try {
-       
-        switch(aPort.getStereoMode().getId())
+        switch(aPort.getEncoding().getId())
         {
-            case dsAUDIO_STEREO_UNKNOWN:
-                strncpy(stMsgData->paramValue, "None", PARAM_LEN);
+            case dsAUDIO_ENC_NONE:
+                strncpy(stMsgData->paramValue, "Other", PARAM_LEN);
                 break;
         
-            case dsAUDIO_STEREO_STEREO:
-            case dsAUDIO_STEREO_MONO:
+            case dsAUDIO_ENC_PCM:
                 strncpy(stMsgData->paramValue, "PCM", PARAM_LEN);
                 break;
 
-            case dsAUDIO_STEREO_SURROUND:
+            case dsAUDIO_ENC_AC3:
                 strncpy(stMsgData->paramValue, "AC3", PARAM_LEN);
+                break;
+
+            case dsAUDIO_ENC_EAC3:
+                strncpy(stMsgData->paramValue, "EAC3", PARAM_LEN);
                 break;
 
             default:
