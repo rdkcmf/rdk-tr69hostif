@@ -82,7 +82,10 @@ get_hardware_mac()
 parodus_start_up()
 {
     # Getting Webpa Parameters
-    ServerIP=`get_webpa_string_parameter "ServerIP"`
+    #ServerIP=`get_webpa_string_parameter "ServerIP"`
+    # Hardcoded URL to fix DELIA-26528, regression of RDKB-16206
+    ServerIP="https://fabric.webpa.comcast.net:8080"
+
     NwInterface=`get_webpa_string_parameter "DeviceNetworkInterface"`
     ServerPort=`get_webpa_number_parameter "ServerPort"`
     PingWaitTime=`get_webpa_max_waiting_time "MaxPingWaitTimeInSec"`
