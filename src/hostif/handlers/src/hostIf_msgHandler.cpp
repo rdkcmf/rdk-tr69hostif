@@ -271,10 +271,12 @@ bool hostIf_initalize_ConfigManger()
                 mgrName = HOSTIF_InterfaceStack;
             }
 #endif /* USE_INTFSTACK_PROFILE */
+#ifdef USE_ESTROIA
             else if(strcasecmp(mgr, "estoriaMgr") == 0)
             {
                 mgrName = HOSTIF_Estoria;
             }
+#endif /* USE_ESTROIA */
 #ifdef USE_STORAGESERVICE_PROFILE
             else if(strcasecmp(mgr, "storageSrvcMgr") == 0)
             {
@@ -367,9 +369,11 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
                 pRet = InterfaceStackClientReqHandler::getInstance();
                 break;
 #endif /* USE_INTFSTACK_PROFILE */
+#ifdef USE_ESTROIA
             case HOSTIF_Estoria:
                 pRet = EstoriaReqHandler::getInstance();
                 break;
+#endif /* USE_ESTROIA */
 #ifdef USE_STORAGESERVICE_PROFILE
             case HOSTIF_StorageSrvcMgr:
                 pRet = StorageSrvcReqHandler::getInstance();
