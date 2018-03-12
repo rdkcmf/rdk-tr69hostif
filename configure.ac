@@ -52,6 +52,7 @@ SYSTEMD_SDNOTIFY_LDFLAGS=" "
 HWSELFTEST_PROFILE_FLAG=" "
 TELEMETRY_LOGGER_FLAG=" "
 PAROUDS_ENABLE_FLAG=" "
+ESTORIA_ENABLE_FLAG=" "
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
 [AM_DEFAULT_VERBOSITY=1
@@ -308,6 +309,19 @@ AC_ARG_ENABLE([parodus],
            ],
          [echo "Parodus support is disabled"])
 
+AC_ARG_ENABLE([estoria],
+        AS_HELP_STRING([--enable-estoria],[enable Estoria (default is no)]),
+        [
+          case "${enableval}" in
+           yes) ESTORIA_ENABLE=true
+                ESTORIA_ENABLE_FLAG="-DUSE_ESTROIA" ;;
+           no) ESTORIA_ENABLE=false AC_MSG_ERROR([Estoria is disabled]) ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-estoria ]) ;;
+           esac
+           ],
+         [echo "Estoria is disabled"])
+
+
 
 AM_CONDITIONAL([WITH_MOCA_PROFILE], [test "x$enable_moca" = "xyes"])
 AM_CONDITIONAL([WITH_MOCA20], [test "x$enable_moca2" = "xyes"])
@@ -325,6 +339,7 @@ AM_CONDITIONAL([WITH_NOTIFICATION_SUPPORT], [test x$HAVE_VALUE_CHANGE_EVENT_ENAB
 AM_CONDITIONAL([WITH_SNMP_ADAPTER], [test x$SNMP_ADAPTER_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_TELEMETRY_LOGGER], [test x$TELEMETRY_LOGGER_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_PARODUS_SUPPORT], [test x$PARODUS_SUPPORT_ENABLED = xtrue])
+AM_CONDITIONAL([WITH_ESTORIA], [test x$ESTORIA_ENABLE = xtrue])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -378,6 +393,7 @@ AC_SUBST(SYSTEMD_SDNOTIFY_LDFLAGS)
 AC_SUBST(HWSELFTEST_PROFILE_FLAG)
 AC_SUBST(TELEMETRY_LOGGER_FLAG)
 AC_SUBST(PARODUS_ENABLE_FLAG)
+AC_SUBST(ESTORIA_ENABLE_FLAG)
 
 # files to generate via autotools (.am or .in source files)
 AC_CONFIG_FILES([Makefile])
