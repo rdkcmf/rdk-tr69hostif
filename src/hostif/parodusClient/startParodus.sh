@@ -22,6 +22,9 @@
 . $RDK_PATH/utils.sh
 WEBPA_CFG_OVERIDE_FILE="/opt/webpa_cfg.json"
 SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
+JWT_KEY="/etc/ssl/certs/webpa-rs256.pem"
+DNS_TEXT_URL="fabric.xmidt.comcast.net"
+ACQUIRE_JWT=1
 
 if [ -f "$WEBPA_CFG_OVERIDE_FILE" ] && [ "$BUILD_TYPE" != "prod" ]; then
     WEBPA_CFG_FILE=$WEBPA_CFG_OVERIDE_FILE
@@ -82,9 +85,7 @@ get_hardware_mac()
 parodus_start_up()
 {
     # Getting Webpa Parameters
-    #ServerIP=`get_webpa_string_parameter "ServerIP"`
-    # Hardcoded URL to fix DELIA-26528, regression of RDKB-16206
-    ServerIP="https://fabric.webpa.comcast.net:8080"
+    ServerIP=`get_webpa_string_parameter "ServerIP"`
 
     NwInterface=`get_webpa_string_parameter "DeviceNetworkInterface"`
     ServerPort=`get_webpa_number_parameter "ServerPort"`
@@ -94,7 +95,7 @@ parodus_start_up()
        echo "Failed to start Parodus, Can't fetch macAddress "
     else
        echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-interface-used=$NwInterface webpa-url=$ServerIP" 
-       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=comcast --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE"
+       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=comcast --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE  --acquire-jwt=$ACQUIRE_JWT --dns-txt-url=$DNS_TEXT_URL --jwt-public-key-file=$JWT_KEY --jwt-algo=RS256"
        echo "Parodus command set.." 
     fi
 }
