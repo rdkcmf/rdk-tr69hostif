@@ -31,8 +31,8 @@
 **/
 
 
-#ifndef DEVICE_WIFI_ENDPOINT_H_
-#define DEVICE_WIFI_ENDPOINT_H_
+#ifndef DEVICE_WIFI_ENDPOINT_SECURITY_H_
+#define DEVICE_WIFI_ENDPOINT_SECURITY_H_
 
 #include "hostIf_main.h"
 #include "hostIf_utils.h"
@@ -78,6 +78,16 @@ public:
     * @return Returns 0 on success, otherwise will return the appropriate error code.
     */
     int get_hostIf_WiFi_EndPoint_ModesSupported(HOSTIF_MsgData_t *stMsgData );
+
+    /**
+    * @brief Get the security mode enabled for wifi device. The value must be a member of the list
+    * reported by the ModesSupported parameter, indicates which security mode is enabled.
+    *
+    * @param[out] stMsgData TR-069 Host interface message request.
+    *
+    * @return Returns 0 on success, otherwise will return the appropriate error code.
+    */
+    int get_hostIf_WiFi_EndPoint_Security_ModesEnabled(HOSTIF_MsgData_t *stMsgData );
 
     /** @ */ //End of Doxygen tag TR69_HOSTIF_WIFI_ENDPOINT_SECURITY
 };

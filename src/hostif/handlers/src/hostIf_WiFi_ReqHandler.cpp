@@ -119,7 +119,7 @@ bool WiFiReqHandler::unInit()
 
     hostIf_WiFi_EndPoint::closeAllInstances();
     hostIf_WiFi_EndPoint_WPS::closeAllInstances();
-//    hostIf_WiFi_EndPoint_Security::closeAllInstances();
+    hostIf_WiFi_EndPoint_Security::closeAllInstances();
     hostIf_WiFi_EndPoint_Profile::closeAllInstances();
     hostIf_WiFi_EndPoint_Profile_Security::closeAllInstances();
 
@@ -393,8 +393,9 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         stMsgData->instanceNum = instanceNum;
         hostIf_WiFi_EndPoint *pWifiEndPoint = hostIf_WiFi_EndPoint::getInstance(stMsgData->instanceNum);
         hostIf_WiFi_EndPoint_WPS *pWifiEndPointWps  = hostIf_WiFi_EndPoint_WPS::getInstance(stMsgData->instanceNum);
+        hostIf_WiFi_EndPoint_Security *pWifiEndpointSec = hostIf_WiFi_EndPoint_Security::getInstance(stMsgData->instanceNum);
 
-        if ((!pWifiEndPoint) || (!pWifiEndPointWps))
+        if ((!pWifiEndPoint) || (!pWifiEndPointWps) || (!pWifiEndpointSec))
         {
             return NOK;
         }
@@ -438,6 +439,10 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         else if (strcasecmp(pSetting,"Stats.Retransmissions") == 0)
         {
             ret = pWifiEndPoint->get_Device_WiFi_EndPoint_Stats_Retransmissions(stMsgData);
+        }
+        else if(strcasecmp(pSetting,"Security.ModesEnabled") == 0)
+        {
+            ret = pWifiEndpointSec->get_hostIf_WiFi_EndPoint_Security_ModesEnabled(stMsgData);
         }
         else
         {
