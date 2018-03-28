@@ -500,6 +500,10 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIfaceSsid->get_Device_WiFi_SSID_Name(stMsgData);
         }
+        else if (strcasecmp(pSetting, "Alias") == 0)
+        {
+            ret = pIfaceSsid->get_Device_WiFi_SSID_Alias(stMsgData);
+        }
         else
         {
            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]  Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
