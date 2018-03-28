@@ -155,6 +155,10 @@ int XREClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     {
         ret = set_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreRefreshXreSession(stMsgData);
     }
+    else if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.Client.XRE.xreRefreshXreSessionWithRR") == 0)
+    {
+        ret = set_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreRefreshXreSessionWithRR(stMsgData);
+    }
     else if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.Client.XRE.xreRestartXreApp") == 0)
     {
         ret = set_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreRestartXreApp(stMsgData);
