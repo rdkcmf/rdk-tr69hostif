@@ -101,6 +101,8 @@ bool matchComponent(const char* pParam, const char *pKey, const char **pSetting,
 
 int get_int(const char *ptr);
 
+uint get_uint(char *ptr);
+
 void put_int(char *ptr, int val);
 
 bool get_boolean(const char *ptr);

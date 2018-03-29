@@ -100,6 +100,10 @@
 #define PREFERRED_GATEWAY_FILE		"/opt/prefered-gateway"
 #define GATEWAY_NAME_SIZE 4
 
+#define TR069DOSLIMIT_THRESHOLD "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Tr069DoSLimit.Threshold"
+#define MIN_TR69_DOS_THRESHOLD 0
+#define MAX_TR69_DOS_THRESHOLD 30
+
 GHashTable* hostIf_DeviceInfo::ifHash = NULL;
 GHashTable* hostIf_DeviceInfo::m_notifyHash = NULL;
 GMutex* hostIf_DeviceInfo::m_mutex = NULL;
@@ -2338,14 +2342,45 @@ int hostIf_DeviceInfo::set_xOpsDeviceMgmt_hwHealthTest_DramThreshold(HOSTIF_MsgD
 }
 #endif /* USE_HWSELFTEST_PROFILE */
 
+
+/*
+ * int hostIf_DeviceInfo::validate_ParamValue(HOSTIF_MsgData * sMsgData)
+ * in : stMsgData pointer
+ * out : int OK/NOK
+ *      this method is used to validate the RFC param Values limits for SET
+ */
+int hostIf_DeviceInfo::validate_ParamValue(HOSTIF_MsgData_t * stMsgData)
+{
+    int ret = OK;
+    if (strcasecmp(stMsgData->paramName,TR069DOSLIMIT_THRESHOLD) == 0)
+    {
+        int tmpVal = get_uint(stMsgData->paramValue);
+        if (tmpVal < MIN_TR69_DOS_THRESHOLD || tmpVal > MAX_TR69_DOS_THRESHOLD)
+        {
+            ret = NOK;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong Value,Value should be[0-30] for %s to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
+            stMsgData->faultCode = fcInvalidParameterValue;
+        }
+    }
+    return ret;
+
+}
 int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
 {
     int ret = NOK;
 
+    int validate_paramVal = validate_ParamValue(stMsgData);
     // set value
-    ret = m_rfcStorage.setValue(stMsgData);
-
-
+    if (validate_paramVal == OK)
+    {
+       ret = m_rfcStorage.setValue(stMsgData);
+    }
+    else
+    {
+        ret = NOK;
+        stMsgData->faultCode = fcInvalidParameterValue;
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Invalid ParamValue to SET for param [%s] \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+    }
     // any additional immediate handling
     if (strcasecmp(stMsgData->paramName,TR181_RFC_RESET_DATA) == 0) // used to clear out all data from storage
     {

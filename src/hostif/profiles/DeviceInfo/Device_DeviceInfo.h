@@ -802,6 +802,8 @@ public:
     int set_xOpsDeviceMgmt_hwHealthTest_DramThreshold(HOSTIF_MsgData_t *);
 #endif /* USE_HWSELFTEST_PROFILE */
 
+    int validate_ParamValue(HOSTIF_MsgData_t *);
+
     int set_xRDKCentralComRFC(HOSTIF_MsgData_t *);
     int get_xRDKCentralComRFC(HOSTIF_MsgData_t *);
 
