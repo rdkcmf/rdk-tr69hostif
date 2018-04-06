@@ -35,5 +35,3 @@ include_HEADERS = $(srcdir)/include/TR69BusAgent.h
 
 # the sources to add to the library and to add to the source distribution
 libTr69BusAgent_la_SOURCES = TR69BusAgent.cpp
-
-libTr69BusAgent_la_LDFLAGS = $(DIRECTFB_LIBS)

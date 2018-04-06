@@ -31,7 +31,7 @@ DIST_SUBDIRS += hostif/parodusClient
 endif
 
 AM_CXXFLAGS = $(GLIB_CFLAGS) $(GTHREAD_CFLAGS) \
-	$(SOUP_CFLAGS) $(DIRECTFB_CFLAGS) \
+	$(SOUP_CFLAGS) \
 	-I$(top_srcdir)/src/hostif/include \
 	-I$(top_srcdir)/src/hostif/handlers/include \
 	-I$(top_srcdir)/src/hostif/profiles/STBService \
@@ -82,14 +82,14 @@ endif
 if XRELIB_FLAG
 AM_LDFLAGS = $(GLIB_LDFLAGS) $(GLIB_LIBS) \
 	$(G_THREAD_LIBS) -lyajl $(SOUP_LIBS) \
-	$(NEXUS_LIB) -ldbus-1 -ldirect \
-	-lfusion ${DIRECTFB_LIBS} -lIARMBus -lrdkloggers\
+	$(NEXUS_LIB) -ldbus-1 \
+	-lIARMBus -lrdkloggers\
 	-lds -ldshalcli -ltr69ProfileXcaliber
 else
 AM_LDFLAGS = $(GLIB_LDFLAGS) $(GLIB_LIBS) \
 	$(G_THREAD_LIBS) -lyajl $(SOUP_LIBS) \
-	$(NEXUS_LIB) -ldbus-1 -ldirect \
-	-lfusion ${DIRECTFB_LIBS} -lIARMBus -lrdkloggers\
+	$(NEXUS_LIB) -ldbus-1 \
+	-lIARMBus -lrdkloggers\
 	-lds -ldshalcli
 endif
 

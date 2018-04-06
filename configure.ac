@@ -351,7 +351,6 @@ AC_PROG_CC
 AC_CHECK_HEADERS([stdlib.h unistd.h])
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.24.0])
 PKG_CHECK_MODULES([GTHREAD], [gthread-2.0 >= 2.24.0])
-PKG_CHECK_MODULES([DIRECTFB], [directfb >= 1.4.3])
 PKG_CHECK_MODULES([SOUP], [libsoup-2.4 >= 2.31.6])
 
 AC_CHECK_LIB(gthread-2.0, g_thread_init)
