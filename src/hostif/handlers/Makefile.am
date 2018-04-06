@@ -32,7 +32,6 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
 	-I$(top_srcdir)/src/hostif/profiles/DHCPv4 \
 	-I$(top_srcdir)/src/hostif/profiles/InterfaceStack \
 	-I$(top_srcdir)/src/hostif/profiles/StorageService \
-	-I$(PKG_CONFIG_SYSROOT_DIR)$(includedir)/directfb \
 	-I$(PKG_CONFIG_SYSROOT_DIR)$(includedir)/rdk/iarmmgrs/sysmgr \
 	-I$(top_srcdir)/src/tr69BusAgent/include \
 	-I$(top_srcdir)/src/hostif/profiles/moca \
@@ -83,11 +82,10 @@ if WITH_SNMP_ADAPTER
 AM_CXXFLAGS += -DSNMP_ADAPTER_ENABLED -I$(top_srcdir)/src/hostif/snmpAdapter
 endif
 
-AM_LDFLAGS = $(GLIB_LIBS) $(G_THREAD_LIBS) $(SOUP_LIBS) $(PROCPS_LIBS) -lIARMBus -lyajl -ldirect -lfusion -lds -ldshalcli -ldbus-1
+AM_LDFLAGS = $(GLIB_LIBS) $(G_THREAD_LIBS) $(SOUP_LIBS) $(PROCPS_LIBS) -lIARMBus -lyajl -lds -ldshalcli -ldbus-1
 if WIFI_CLIENT_ROAMING
 AM_CXXFLAGS += -DWIFI_CLIENT_ROAMING
 endif
-
 
 noinst_LTLIBRARIES = libMsgHandlers.la
 libMsgHandlers_la_SOURCES =	src/hostIf_IARM_ReqHandler.cpp \
