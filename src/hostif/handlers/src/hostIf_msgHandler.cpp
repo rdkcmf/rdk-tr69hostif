@@ -307,9 +307,10 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
     const char *pParam = stMsgHandlerData->paramName;
     HostIf_ParamMgr_t mgrId;
     msgHandler* pRet = NULL;
-    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] Get proper manager for parameter :- %s \n", __FUNCTION__,stMsgHandlerData->paramName);
+
     if(NULL != paramMgrhash)
     {
+        RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()] Get proper manager for parameter :- %s \n", __FUNCTION__,stMsgHandlerData->paramName);
         GList *keys = g_hash_table_get_keys(paramMgrhash);
         while(keys) {
             char *data = (char *)keys->data;

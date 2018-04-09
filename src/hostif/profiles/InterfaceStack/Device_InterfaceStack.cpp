@@ -290,7 +290,7 @@ hostif_InterfaceStack* hostif_InterfaceStack::getInstance(int dev_id)
 
     if(!pRet)
     {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"No instance is found with dev_id %d\n", dev_id);
+        RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"No instance is found with dev_id %d\n", dev_id);
     }
 
     return pRet;
