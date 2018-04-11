@@ -132,6 +132,7 @@ include_HEADERS = include/hostIf_msgHandler.h \
 endif
 
 if WITH_ESTORIA
+AM_CXXFLAGS += $(ESTORIA_ENABLE_FLAG)
 AM_LDFLAGS += -lestoria
 libMsgHandlers_la_SOURCES += src/hostIf_EstoriaClient_ReqHandler.cpp
 endif

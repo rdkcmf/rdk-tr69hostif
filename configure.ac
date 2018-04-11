@@ -314,7 +314,7 @@ AC_ARG_ENABLE([estoria],
         [
           case "${enableval}" in
            yes) ESTORIA_ENABLE=true
-                ESTORIA_ENABLE_FLAG="-DUSE_ESTROIA" ;;
+                ESTORIA_ENABLE_FLAG="-DUSE_ESTORIA" ;;
            no) ESTORIA_ENABLE=false AC_MSG_ERROR([Estoria is disabled]) ;;
           *) AC_MSG_ERROR([bad value ${enableval} for --enable-estoria ]) ;;
            esac
