@@ -633,7 +633,16 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_Description(HOSTIF_MsgData_t * stMs
 int hostIf_DeviceInfo::get_Device_DeviceInfo_ProductClass(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
-    return NOK;
+    stMsgData->paramtype = hostIf_StringType;
+    /* Fixed DELIA-27160, always returns as OK */
+    char *pc = NULL;
+    pc = getenv((const char *)"RECEIVER_PLAT_TYPE");
+
+    if(pc) {
+        snprintf((char *)stMsgData->paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN-1, "%s", pc);
+        stMsgData->paramLen = strlen(stMsgData->paramValue);
+    }
+    return OK;
 }
 
 /**
@@ -1441,7 +1450,8 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SupportedDataModelNumberOfEntries(H
 {
 //    put_int(stMsgData->paramValue, (unsigned int)DEVICE_SUPPORTED_DATA_MODEL_NUMBER_OF_ENTRIES);
 
-    return NOK;
+    /* Fixed DELIA-27160, always returns as OK */
+    return OK;
 }
 
 int hostIf_DeviceInfo::get_Device_DeviceInfo_ProcessorNumberOfEntries(HOSTIF_MsgData_t * stMsgData)
