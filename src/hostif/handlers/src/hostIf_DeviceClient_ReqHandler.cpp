@@ -243,7 +243,11 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
            stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Failed, since Attempt To Set a NonWritable Parameter \"%s\"\n", __FUNCTION__, stMsgData->paramName);
         }
-        stMsgData->faultCode = (OK == ret)?fcNoFault:fcRequestDenied;
+
+        if( ret == OK )
+        {
+            stMsgData->faultCode = fcNoFault;
+        }
 
     }
     hostIf_DeviceInfo::releaseLock();
