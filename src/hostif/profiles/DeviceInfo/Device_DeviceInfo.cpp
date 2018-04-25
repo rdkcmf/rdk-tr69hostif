@@ -611,8 +611,11 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgD
  */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_Description(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
-    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
-    return NOK;
+    stMsgData->paramtype = hostIf_StringType;
+    char *desc = "TR-181, TR-135 and Comcast specific Datamodel Configuration";
+    snprintf((char *)stMsgData->paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN-1, "%s", desc);
+    stMsgData->paramLen = strlen(stMsgData->paramValue);
+    return OK;
 }
 
 /**
