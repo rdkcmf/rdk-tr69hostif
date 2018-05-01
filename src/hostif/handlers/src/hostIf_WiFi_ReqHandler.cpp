@@ -144,9 +144,19 @@ bool WiFiReqHandler::unInit()
 int WiFiReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
-    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Found string as %s. Set command not supported.\n",
+/*    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Found string as %s. Set command not supported.\n",
              __FUNCTION__, __FILE__, stMsgData->paramName);
-    stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
+    stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;*/
+    if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_WiFiEnable") == 0)
+    {
+        hostIf_WiFi *pIface = hostIf_WiFi::getInstance (1);
+
+        if(!pIface)
+        {
+            return NOK;
+        }
+        ret = pIface->set_Device_WiFi_EnableWiFi(stMsgData);
+    }
     return ret;
 }
 
@@ -216,6 +226,16 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             return NOK;
         }
         ret = pIface->get_Device_WiFi_EndPointNumberOfEntries(stMsgData);
+    }
+    else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_WiFiEnable") == 0)
+    {
+        hostIf_WiFi *pIface = hostIf_WiFi::getInstance (1);
+
+        if(!pIface)
+        {
+            return NOK;
+        }
+        ret = pIface->get_Device_WiFi_EnableWiFi(stMsgData);
     }
     else if (matchComponent(stMsgData->paramName, "Device.WiFi.Radio", &pSetting, instanceNum))
     {

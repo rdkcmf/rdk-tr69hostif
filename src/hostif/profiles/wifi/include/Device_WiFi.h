@@ -232,7 +232,21 @@ public:
      */
     int get_Device_WiFi_EndPointNumberOfEntries(HOSTIF_MsgData_t *);
     
-    /** @} */ //End of Doxygen tag TR69_HOSTIF_WIFI_API
+    /**
+     * @brief    Get the wifi enable status.
+     *
+     * This function gets the value of enable or disable wifi.
+     *
+     */
+    int get_Device_WiFi_EnableWiFi(HOSTIF_MsgData_t *);
+    /**
+     * @brief    set the wifi enable status.
+     *
+     * This function sets the value for enable or disable wifi.
+     *
+     */
+    int set_Device_WiFi_EnableWiFi(HOSTIF_MsgData_t *);
+
     /* End of TR_069_DEVICE_WIFI_GETTER_API doxygen group. */
     /**
      * @}
