@@ -46,7 +46,7 @@ endif
 
 if WITH_MOCA_PROFILE
 NEXUS_LIB = -lnexus
-AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/profiles/moca/include
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/profiles/moca
 else
 NEXUS_LIB =
 endif
@@ -144,7 +144,7 @@ tr69hostif_LDADD += -ltr69ProfileHwSelfTest
 endif
 
 if WITH_MOCA_PROFILE
-tr69hostif_LDADD += $(top_builddir)/soc/hostif/profiles/moca/libhostIfMoCA.la
+tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/moca/libhostIfMoCA.la
 endif
 
 if XRELIB_FLAG

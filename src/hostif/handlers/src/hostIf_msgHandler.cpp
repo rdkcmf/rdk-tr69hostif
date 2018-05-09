@@ -92,7 +92,7 @@ int hostIf_GetMsgHandler(HOSTIF_MsgData_t *stMsgData)
 int hostIf_SetMsgHandler(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOK;
-    
+
     std::lock_guard<std::mutex> lock(set_handler_mutex);
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
 
@@ -130,7 +130,7 @@ int hostIf_SetAttributesMsgHandler(HOSTIF_MsgData_t *stMsgData)
     msgHandler *pMsgHandler = HostIf_GetMgr(stMsgData);
     if (NULL != pMsgHandler)
     {
-    	RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Valid Handler for %s", __FUNCTION__, __FILE__,stMsgData->paramName);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Valid Handler for %s", __FUNCTION__, __FILE__,stMsgData->paramName);
     }
     if(pMsgHandler)
         ret = pMsgHandler->handleSetAttributesMsg(stMsgData);
@@ -389,14 +389,14 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
                 ;
             }
         }
-        else{
-        	RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()]Not able to get Key  parameter :- %s \n", __FUNCTION__,stMsgHandlerData->paramName);
+        else {
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()]Not able to get Key  parameter :- %s \n", __FUNCTION__,stMsgHandlerData->paramName);
         }
 
     }
     else
     {
-    	 RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] paramMgrhash is Null  parameter :- %s \n", __FUNCTION__,stMsgHandlerData->paramName);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] paramMgrhash is Null  parameter :- %s \n", __FUNCTION__,stMsgHandlerData->paramName);
     }
     return pRet;
 }

@@ -23,7 +23,7 @@ DIST_SUBDIRS =
 AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
 	-I$(top_srcdir)/src/hostif/profiles/STBService \
 	-I$(top_srcdir)/src/hostif/profiles/X_COMCAST-COM/X_COMCAST-COM_Xcalibur/include \
-	-I$(top_srcdir)/soc/hostif/profiles/moca \
+	-I$(top_srcdir)/src/hostif/profiles/moca \
 	-I$(top_srcdir)/src/hostif/profiles/Ethernet \
 	-I$(top_srcdir)/src/hostif/profiles/DeviceInfo \
 	-I$(top_srcdir)/src/hostif/profiles/IP \
@@ -34,7 +34,7 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
 	-I$(top_srcdir)/src/hostif/profiles/StorageService \
 	-I$(PKG_CONFIG_SYSROOT_DIR)$(includedir)/rdk/iarmmgrs/sysmgr \
 	-I$(PKG_CONFIG_SYSROOT_DIR)$(includedir)/rdk/iarmmgrs/tr69Bus \
-	-I$(top_srcdir)/src/hostif/profiles/moca/include \
+	-I$(top_srcdir)/src/hostif/profiles/moca \
 	-I$(top_srcdir)/src/hostif/profiles/wifi/include \
 	-I./include $(GLIB_CFLAGS) $(G_THREAD_CFLAGS) \
 	$(XREMGR_FLAGS) $(MOCAMGR_FLAGS) $(SOUP_CFLAGS) $(MOCA2_FLAG) \

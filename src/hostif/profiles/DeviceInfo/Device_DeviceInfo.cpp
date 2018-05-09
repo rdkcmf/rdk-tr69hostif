@@ -1617,7 +1617,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus (HOSTIF
      **/
 
 #ifdef USE_MoCA_PROFILE
-    hostIf_MoCAInterface *mIf = hostIf_MoCAInterface::getInstance(dev_id);
+    MoCAInterface *mIf = MoCAInterface::getInstance(0);
     mocaStatus = mIf->check_MoCABootStatus(statusStr);
 #else
     check_AcsConnStatus = true;

@@ -20,7 +20,7 @@
 SUBDIRS = 
 
 AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include -I$(top_srcdir)/src/hostif/handlers/include -I$(top_srcdir)/src/hostif/profiles/IP \
-				-I$(top_srcdir)/src/hostif/profiles/Ethernet -I$(top_srcdir)/src/hostif/profiles/moca/include \
+				-I$(top_srcdir)/src/hostif/profiles/Ethernet -I$(top_srcdir)/src/hostif/profiles/moca \
                -I$(top_srcdir)/src/hostif/profiles/Ghn $(GLIB_CFLAGS) $(G_THREAD_CFLAGS) $(MOCAMGR_FLAGS) $(INTFSTACK_PROFILE_FLAG)
 
 noinst_LTLIBRARIES = libhostIfInterfaceStack.la

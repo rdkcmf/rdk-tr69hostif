@@ -88,65 +88,63 @@
  *
  *  @{
  */
-class hostIf_MoCAInterfaceQoS {
+class MoCAInterfaceQoS {
 
     static  GHashTable  *ifHash;
     int dev_id;
-    hostIf_MoCAInterfaceQoS(int dev_id):dev_id(dev_id) {};
-    ~hostIf_MoCAInterfaceQoS() {};
+    static class MoCAInterfaceQoS *Instance;
+    MoCAInterfaceQoS() {};
+    ~MoCAInterfaceQoS() {};
 
 public:
-    static class hostIf_MoCAInterfaceQoS *getInstance(int dev_id);
-    static void closeInstance(hostIf_MoCAInterfaceQoS *);
-    static void closeAllInstances();
-    static GList* getAllInstances();
+    static class MoCAInterfaceQoS *getInstance();
 
-   /**
-    * @ingroup TR69_HOSTIF_MOCA_INTERFACE_QOS
-    * @{
-    */
- 
-   /**
-    * @brief Get the number of QoS flows that this interface has from the MoCA network.
-    *
-    * This parameter is based on mocaIfEgressNodeNumFlows from [MOCA11-MIB].
-    *
-    * This function provides the output as a numeric value available in Device.MoCA.Interface.{i}.QoS.EgressNumFlow parameter.
-    *
-    * @param[out] stMsgData TR-069 Host interface message request.
-    * @param[out] pChanged pChange set to not NULL if the object value got changed.
-    *
-    * @return Returns 0 on success, otherwise will return the appropriate error code.
-    */
-    int get_Device_MoCA_Interface_QoS_EgressNumFlows(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
+    /**
+     * @ingroup TR69_HOSTIF_MOCA_INTERFACE_QOS
+     * @{
+     */
 
-   /**
-    * @brief Get the number of QoS flows that this interface has onto the MoCA network.
-    *
-    * This parameter is based on mocaIfIngressNodeNumFlows from [MOCA11-MIB].
-    *
-    * This function provides the output as a numeric value available in Device.MoCA.Interface.{i}.QoS.IngressNumFlows parameter.
-    *
-    * @param[out] stMsgData TR-069 Host interface message request.
-    * @param[out] pChanged pChange set to not NULL if the object value got changed.
-    *
-    * @return Returns 0 on success, otherwise will return the appropriate error code.
-    */
-    int get_Device_MoCA_Interface_QoS_IngressNumFlows(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
+    /**
+     * @brief Get the number of QoS flows that this interface has from the MoCA network.
+     *
+     * This parameter is based on mocaIfEgressNodeNumFlows from [MOCA11-MIB].
+     *
+     * This function provides the output as a numeric value available in Device.MoCA.Interface.{i}.QoS.EgressNumFlow parameter.
+     *
+     * @param[out] stMsgData TR-069 Host interface message request.
+     * @param[out] pChanged pChange set to not NULL if the object value got changed.
+     *
+     * @return Returns 0 on success, otherwise will return the appropriate error code.
+     */
+    int get_EgressNumFlows(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
 
-   /**
-    * @brief Get the number of entries in the FlowStats table.
-    *
-    * This function provides the output as a numeric value available in Device.MoCA.Interface.{i}.QoS.FlowStatsNumberOfEntries parameter.
-    *
-    * @param[in] stMsgData TR-069 Host interface message request.
-    * @param[out] pChanged pChange set to not NULL if the object value got changed.
-    *
-    * @return Returns 0 on success, otherwise will return the appropriate error code.
-    */
-    int get_Device_MoCA_Interface_QoS_FlowStatsNumberOfEntries(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
+    /**
+     * @brief Get the number of QoS flows that this interface has onto the MoCA network.
+     *
+     * This parameter is based on mocaIfIngressNodeNumFlows from [MOCA11-MIB].
+     *
+     * This function provides the output as a numeric value available in Device.MoCA.Interface.{i}.QoS.IngressNumFlows parameter.
+     *
+     * @param[out] stMsgData TR-069 Host interface message request.
+     * @param[out] pChanged pChange set to not NULL if the object value got changed.
+     *
+     * @return Returns 0 on success, otherwise will return the appropriate error code.
+     */
+    int get_IngressNumFlows(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
 
-   /** @} */ //End of Doxygen tag TR69_HOSTIF_MOCA_INTERFACE_QOS
+    /**
+     * @brief Get the number of entries in the FlowStats table.
+     *
+     * This function provides the output as a numeric value available in Device.MoCA.Interface.{i}.QoS.FlowStatsNumberOfEntries parameter.
+     *
+     * @param[in] stMsgData TR-069 Host interface message request.
+     * @param[out] pChanged pChange set to not NULL if the object value got changed.
+     *
+     * @return Returns 0 on success, otherwise will return the appropriate error code.
+     */
+    int get_FlowStatsNumberOfEntries(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
+
+    /** @} */ //End of Doxygen tag TR69_HOSTIF_MOCA_INTERFACE_QOS
 };
 /* End of TR_069_DEVICE_MOCA_INTERFACE_QOS_GETTER_API doxygen group */
 /**
