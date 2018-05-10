@@ -37,33 +37,34 @@ int EstoriaReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
 
-    if(strncasecmp(stMsgData->paramName,"Device.X_COMCAST_COM_Estoria", strlen("Device.X_COMCAST_COM_Estoria"))==0)
+    if(strncasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Estoria", strlen("Device.X_COMCAST-COM_Estoria"))==0)
     {
-        if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST_COM_Estoria.put") == 0)
+        if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Estoria.put") == 0)
         {
             lastCall = stMsgData->paramName;
 
             Estoria::getLock();
             lastCallResult = Estoria::getInstance()->putJson(stMsgData->paramValue) ? "Success" : "Failed";
             Estoria::releaseLock();
-
+            ret = OK;
         }
-        else if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST_COM_Estoria.get") == 0)
+        else if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Estoria.get") == 0)
         {
             lastCall = stMsgData->paramName;
 
             Estoria::getLock();
             lastCallResult = Estoria::getInstance()->getJson(stMsgData->paramValue);
             Estoria::releaseLock();
-
+            ret = OK;
         }
-        else if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST_COM_Estoria.getSigned") == 0)
+        else if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Estoria.getSigned") == 0)
         {
             lastCall = stMsgData->paramName;
 
             Estoria::getLock();
             lastCallResult = Estoria::getInstance()->getSignedJson(stMsgData->paramValue);
             Estoria::releaseLock();
+            ret = OK;
         }
     }
 
@@ -74,11 +75,11 @@ int EstoriaReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
 
-    if(strncasecmp(stMsgData->paramName,"Device.X_COMCAST_COM_Estoria", strlen("Device.X_COMCAST_COM_Estoria"))==0)
+    if(strncasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Estoria", strlen("Device.X_COMCAST-COM_Estoria"))==0)
     {
-        if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST_COM_Estoria.put") == 0)
+        if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Estoria.put") == 0)
         {
-            if(lastCall == "Device.X_COMCAST_COM_Estoria.put")
+            if(lastCall == "Device.X_COMCAST-COM_Estoria.put")
             {
                 Estoria::getLock();
 
@@ -97,9 +98,9 @@ int EstoriaReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             }
         }
 
-        else if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST_COM_Estoria.get") == 0)
+        else if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Estoria.get") == 0)
         {
-            if(lastCall == "Device.X_COMCAST_COM_Estoria.get")
+            if(lastCall == "Device.X_COMCAST-COM_Estoria.get")
             {
                 Estoria::getLock();
 
@@ -118,9 +119,9 @@ int EstoriaReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             }
         }
 
-        else if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST_COM_Estoria.getSigned") == 0)
+        else if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Estoria.getSigned") == 0)
         {
-            if(lastCall == "Device.X_COMCAST_COM_Estoria.getSigned")
+            if(lastCall == "Device.X_COMCAST_COM-Estoria.getSigned")
             {
                 Estoria::getLock();
 
