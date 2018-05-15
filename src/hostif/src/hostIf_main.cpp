@@ -48,6 +48,7 @@
 #include "libpd.h"
 #include <semaphore.h>
 #include <errno.h>
+#include "libIBus.h"
 
 #define LOG_FILE 		"./tr69hostIflog.txt"
 #ifdef WEBPA_RFC_ENABLED
@@ -423,6 +424,12 @@ int main(int argc, char *argv[])
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"tr69hostif sd notify envent  is sent  Successfully\n");
     #endif
 
+#ifdef PID_FILE_PATH
+#define xstr(s) str(s)
+#define str(s) #s
+    // write pidfile because sd_notify() does not work inside container
+    IARM_Bus_WritePIDFile(xstr(PID_FILE_PATH) "/tr69hostif.pid");
+#endif
 
     //------------------------------------------------------------------------------
     // updateHandler::init :  Update handler thread for polling table profiles

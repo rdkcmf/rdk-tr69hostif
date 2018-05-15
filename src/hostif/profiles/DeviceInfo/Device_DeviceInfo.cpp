@@ -1295,7 +1295,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProcessorNumberOfEntries(HOSTIF_Msg
 {
     FILE *fp = NULL;
     char resultBuff[200] = {'\0'};
-    char cmd[200] = "cat /proc/cpuinfo | grep processor | wc -l";
+    char cmd[200] = "/bin/cat /proc/cpuinfo | /bin/grep processor | /usr/bin/wc -l";
     int noOfProcessorEntries = 0;
 
     fp = popen(cmd,"r");

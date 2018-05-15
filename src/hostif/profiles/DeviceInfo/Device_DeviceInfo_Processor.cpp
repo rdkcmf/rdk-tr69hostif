@@ -136,7 +136,7 @@ unsigned int hostIf_DeviceProcessorInterface::getNumOfProcessorEntries(void) {
 
     FILE *fp = NULL;
     char resultBuff[BUF_LEN] = {'\0'};
-    char cmd[BUF_LEN] = "cat /proc/cpuinfo | grep processor | wc -l";
+    char cmd[BUF_LEN] = "/bin/cat /proc/cpuinfo | /bin/grep processor | /usr/bin/wc -l";
     int noOfProcessorEntries = 0;
 
     fp = popen(cmd,"r");
