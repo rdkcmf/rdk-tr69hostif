@@ -175,12 +175,14 @@ class hostIf_DeviceInfo {
     bool bCalledHardwareVersion;
     bool bCalledDeviceMAC;
     bool bCalledSerialNumber;
+    bool bCalledProductClass;
     bool bCalledAdditionalSoftwareVersion;
 
     char backupSoftwareVersion[TR69HOSTIFMGR_MAX_PARAM_LEN];
     char backupX_COMCAST_COM_STB_IP[TR69HOSTIFMGR_MAX_PARAM_LEN];
     char backupX_COMCAST_COM_FirmwareFilename[TR69HOSTIFMGR_MAX_PARAM_LEN];
     char backupSerialNumber[TR69HOSTIFMGR_MAX_PARAM_LEN];
+    char backupProductClass[TR69HOSTIFMGR_MAX_PARAM_LEN];
     char backupManufacturer[TR69HOSTIFMGR_MAX_PARAM_LEN];
     char backupManufacturerOUI[TR69HOSTIFMGR_MAX_PARAM_LEN];
     char backupModelName[TR69HOSTIFMGR_MAX_PARAM_LEN];

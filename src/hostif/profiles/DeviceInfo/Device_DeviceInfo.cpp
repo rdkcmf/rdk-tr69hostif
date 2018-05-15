@@ -133,6 +133,7 @@ hostIf_DeviceInfo::hostIf_DeviceInfo(int dev_id):
     bCalledX_COMCAST_COM_STB_IP(0),
     bCalledX_COMCAST_COM_FirmwareFilename(0),
     bCalledSerialNumber(false),
+    bCalledProductClass(false),
     bCalledAdditionalSoftwareVersion(false),
     bCalledManufacturer(false),
     bCalledManufacturerOUI(false),
@@ -142,6 +143,7 @@ hostIf_DeviceInfo::hostIf_DeviceInfo(int dev_id):
 {
     memset(backupSoftwareVersion, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupSerialNumber, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    memset(backupProductClass , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupManufacturer, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupManufacturerOUI, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupModelName, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
@@ -533,6 +535,8 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProductClass(HOSTIF_MsgData_t * stM
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
     stMsgData->paramtype = hostIf_StringType;
+
+#ifndef FETCH_PRODUCTCLASS_FROM_MFRLIB
     /* Fixed DELIA-27160, always returns as OK */
     char *pc = NULL;
     pc = getenv((const char *)"RECEIVER_PLAT_TYPE");
@@ -542,6 +546,49 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProductClass(HOSTIF_MsgData_t * stM
         stMsgData->paramLen = strlen(stMsgData->paramValue);
     }
     return OK;
+#else /* FETCH_PRODUCTCLASS_FROM_MFRLIB */
+    int ret;
+    IARM_Bus_MFRLib_GetSerializedData_Param_t param;
+    IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
+    memset(&param, 0, sizeof(param));
+    param.type = mfrSERIALIZED_TYPE_PRODUCTCLASS;
+    param.buffer[MAX_BUF] = {'\0'};
+    iarm_ret = IARM_Bus_Call(IARM_BUS_MFRLIB_NAME, IARM_BUS_MFRLIB_API_GetSerializedData, &param, sizeof(param));
+
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] IARM_BUS_MFRLIB_API_GetSerializedData returns params: %s with paramlen: %d.\r\n",__FUNCTION__, param.buffer, param.bufLen);
+    if(iarm_ret == IARM_RESULT_SUCCESS)
+    {
+        try
+        {
+            if( param.buffer && param.bufLen) {
+                strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
+                stMsgData->paramValue[param.bufLen+1] = '\0';
+                stMsgData->paramLen = param.bufLen;
+                if(bCalledProductClass && pChanged && strncmp(stMsgData->paramValue ,backupProductClass,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                {
+                    *pChanged =  true;
+                }
+                bCalledProductClass = true;
+                strncpy(backupProductClass ,stMsgData->paramValue ,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                stMsgData->paramtype = hostIf_StringType;
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
+                ret = OK;
+            }
+            else
+                ret = NOK;
+        } catch (const std::exception e)
+        {
+            RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
+            ret = NOK;
+        }
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName ,param.type, ret);
+        ret = NOK;
+    }
+    return ret;
+#endif /* FETCH_PRODUCTCLASS_FROM_MFRLIB */
 }
 
 int hostIf_DeviceInfo::get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
