@@ -34,6 +34,7 @@
 
 #define STATUS_STRING "Status"
 #define EDID_STRING "EDID"
+#define EDID_BYTES_STRING "EDID_BYTES"
 #define COMCAST_EDID_STRING "X_COMCAST_COM_EDID"
 #define SUPPORTED_RES_STRING "SupportedResolutions"
 #define PREF_RES_STRING "PreferredResolution"
@@ -65,6 +66,7 @@ hostIf_STBServiceDisplayDevice::hostIf_STBServiceDisplayDevice(int devId, device
 
     bCalledDisplayDeviceStatus = false;
     bCalledEDID = false;
+    bCalledEDIDBytes = false;
     bCalledSupportedResolution = false;
     bCalledPreferredResolution = false;
 }
@@ -114,6 +116,10 @@ int hostIf_STBServiceDisplayDevice::handleGetMsg(const char *paramName, HOSTIF_M
     else if (strcasecmp(paramName, EDID_STRING) == 0)
     {
         ret = getX_COMCAST_COM_EDID(stMsgData);
+    }
+    else if (strcasecmp(paramName, EDID_BYTES_STRING) == 0)
+    {
+        ret = getEDID_BYTES(stMsgData);
     }
     else if (strcasecmp(paramName, COMCAST_EDID_STRING) == 0)
     {
@@ -198,6 +204,21 @@ void hostIf_STBServiceDisplayDevice::doUpdates(const char *baseName, updateCallb
     if(bChanged)
     {
         snprintf(tmp_buff, PARAM_LEN, UPDATE_FORMAT_STRING, baseName, dev_id, DISPLAYDEVICE_OBJECT_NAME, EDID_STRING);
+        if(mUpdateCallback)
+        {
+            mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+        }
+    }
+
+    memset(&msgData,0,sizeof(msgData));
+    memset(tmp_buff,0,PARAM_LEN);
+    bChanged =  false;
+    msgData.instanceNum=dev_id;
+
+    getEDID_BYTES(&msgData,&bChanged);
+    if(bChanged)
+    {
+        snprintf(tmp_buff, PARAM_LEN, UPDATE_FORMAT_STRING, baseName, dev_id, DISPLAYDEVICE_OBJECT_NAME, EDID_BYTES_STRING);
         if(mUpdateCallback)
         {
             mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
@@ -328,6 +349,57 @@ int hostIf_STBServiceDisplayDevice::getX_COMCAST_COM_EDID(HOSTIF_MsgData_t *stMs
 
     return OK;
 }
+
+/************************************************************
+ * Description  : Get Display Device EDID Bytes
+ * Precondition : HDMI Display should be connected to STB
+ * Input        : stMsgData for result return.
+                  pChanged
+
+ * Return       : OK -> Success
+                  NOK -> Failure
+                  stMsgData->paramValue -> EDID Bytes
+
+************************************************************/
+
+int hostIf_STBServiceDisplayDevice::getEDID_BYTES(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
+{
+    try {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] vPort.isDisplayConnected(): %d \n",__FUNCTION__, vPort.isDisplayConnected());
+        if (true == vPort.isDisplayConnected()) {
+            std::vector<unsigned char> bytes;
+            vPort.getDisplay().getEDIDBytes(bytes);
+            if (bytes.size() > 256){
+                memset(stMsgData->paramValue, '\0', sizeof (stMsgData->paramValue));
+                RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] HDMI Display has EDID of %d bytes. We only support 256 bytes!\r\n",__FUNCTION__, bytes.size());
+            } else {
+                for(int j = 0; j < bytes.size(); j++)
+                    sprintf(&stMsgData->paramValue[2*j], "%02X", bytes[j]);
+                stMsgData->paramValue[2*bytes.size()]='\0';
+            }
+        }
+        else {
+            memset(stMsgData->paramValue, '\0', sizeof (stMsgData->paramValue));
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] HDMI Display is NOT connected\r\n",__FUNCTION__);
+        }
+        stMsgData->paramtype = hostIf_StringType;
+        stMsgData->paramLen = strlen(stMsgData->paramValue);
+        if(bCalledEDIDBytes && pChanged && strcmp(backupEDIDBytes, stMsgData->paramValue))
+        {
+            *pChanged = true;
+        }
+        bCalledEDIDBytes = true;
+        strncpy(backupEDIDBytes,stMsgData->paramValue,PARAM_LEN);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] In getHDMIDisplayDeviceEDIDBytes(): Value: %s \n",__FUNCTION__, stMsgData->paramValue);
+    }
+    catch (const std::exception e) {
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
+        return NOK;
+    }
+
+    return OK;
+}
+
 
 /************************************************************
  * Description  : List of Supported resolution by display device connected.

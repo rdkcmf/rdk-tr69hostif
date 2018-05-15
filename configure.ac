@@ -34,6 +34,7 @@ XREMGR_FLAGS=" "
 MOCAMGR_FLAGS=" "
 SUBDIRS_MOCA=" "
 SUBDIRS_WIFI=" "
+SUBDIRS_BUSAGENT="src/tr69BusAgent"
 MOCA2_FLAG=" "
 WIFI_PROFILE_FLAGS=" "
 XRDK_SDCARD_PROFILE_FLAG=" "
@@ -207,6 +208,17 @@ AC_ARG_ENABLE([notification],
            ],
          [echo "Notification support is disabled"])
 
+
+AC_ARG_ENABLE([skip-tr69busagent],
+        AS_HELP_STRING([--enable-skip-tr69busagent],[enable skipping tr69busagent (default is no)]),
+        [
+          case "${enableval}" in
+           yes) SUBDIRS_BUSAGENT=" " ;;
+           no) AC_MSG_ERROR([Skipping tr69busagent is disabled]) ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-skip-tr69busagent ]) ;;
+           esac
+           ],
+         [echo "Skipping tr69busagent is disabled"])
 
 AC_ARG_ENABLE([rf4ce],
         AS_HELP_STRING([--enable-rf4ce],[enable X_RDKCENTRAL_COM RF4CE profile (default is no)]),
@@ -388,6 +400,7 @@ AC_SUBST(XREMGR_FLAGS)
 AC_SUBST(MOCAMGR_FLAGS)
 AC_SUBST(SUBDIRS_MOCA)
 AC_SUBST(SUBDIRS_WIFI)
+AC_SUBST(SUBDIRS_BUSAGENT)
 AC_SUBST(SUBDIRS_STORAGESERVICE)
 AC_SUBST(SUBDIRS_DHCPv4)
 AC_SUBST(SUBDIRS_INTFSTACK)

@@ -16,8 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##########################################################################
-SUBDIRS = $(SUBDIRS_MOCA) $(SUBDIRS_WIFI) src src/tr69BusAgent
-DIST_SUBDIRS = $(SUBDIRS_MOCA) $(SUBDIRS_WIFI) src src/tr69BusAgent
+SUBDIRS = $(SUBDIRS_MOCA) $(SUBDIRS_WIFI) src $(SUBDIRS_BUSAGENT)
+DIST_SUBDIRS = $(SUBDIRS_MOCA) $(SUBDIRS_WIFI) src $(SUBDIRS_BUSAGENT)
 
 ## IPK Generation Support
 tr69hostif_IPK_OUTDIR = $(abs_top_builddir)/ipk

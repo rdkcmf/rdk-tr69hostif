@@ -94,16 +94,19 @@ class  hostIf_STBServiceDisplayDevice
 
     char backupDisplayDeviceStatus[PARAM_LEN];
     char backupEDID[PARAM_LEN];
+    char backupEDIDBytes[PARAM_LEN];
     char backupSupportedResolution[PARAM_LEN];
     char backupPreferredResolution[PARAM_LEN];
 
     bool bCalledDisplayDeviceStatus;
     bool bCalledEDID;
+    bool bCalledEDIDBytes;
     bool bCalledSupportedResolution;
     bool bCalledPreferredResolution;
 
 private:
     int getStatus(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
+    int getEDID_BYTES(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     int getX_COMCAST_COM_EDID(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     int getSupportedResolutions(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     int getPreferredResolution(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
