@@ -2414,7 +2414,21 @@ int hostIf_DeviceInfo::validate_ParamValue(HOSTIF_MsgData_t * stMsgData)
     int ret = OK;
     if (strcasecmp(stMsgData->paramName,TR069DOSLIMIT_THRESHOLD) == 0)
     {
-        int tmpVal = get_uint(stMsgData->paramValue);
+        long int tmpVal;
+        if(stMsgData->paramtype == hostIf_StringType )
+        {
+           tmpVal = strtol(stMsgData->paramValue,NULL,10);
+        }
+        else if(stMsgData->paramtype == hostIf_UnsignedIntType )
+        {
+           tmpVal = get_uint(stMsgData->paramValue);
+        }
+        else
+        {
+            ret = NOK;
+            stMsgData->faultCode = fcInvalidParameterType;
+            return ret;
+        }
         if (tmpVal < MIN_TR69_DOS_THRESHOLD || tmpVal > MAX_TR69_DOS_THRESHOLD)
         {
             ret = NOK;
@@ -2438,8 +2452,7 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     else
     {
         ret = NOK;
-        stMsgData->faultCode = fcInvalidParameterValue;
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Invalid ParamValue to SET for param [%s] \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Invalid ParamValue/Type to SET [%s] \n", __FUNCTION__, __LINE__, stMsgData->paramName);
     }
     // any additional immediate handling
     if (strcasecmp(stMsgData->paramName,TR181_RFC_RESET_DATA) == 0) // used to clear out all data from storage
