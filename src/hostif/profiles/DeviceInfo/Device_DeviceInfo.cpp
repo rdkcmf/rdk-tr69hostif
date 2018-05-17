@@ -2566,7 +2566,7 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCRetrieveNow(HOSTIF_MsgData_t *stMsgD
 
     LOG_ENTRY_EXIT;
 
-    sprintf(cmd, "sh /lib/rdk/RFCscript.sh &");
+    sprintf(cmd, "sh /lib/rdk/RFCbase.sh &");
     system (cmd);
     ret = OK;
     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully executed \"%s\" with \"%s\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, cmd);
