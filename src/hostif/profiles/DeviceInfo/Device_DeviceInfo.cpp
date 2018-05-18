@@ -2407,6 +2407,10 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     {
         ret = set_xRDKCentralComHdrRFCEnable(stMsgData);
     }
+    else if (strcasecmp(stMsgData->paramName,HDR_DV_RFC_ENABLE) == 0)
+    {
+        ret = set_xRDKCentralComHdrDVRFCEnable(stMsgData);
+    }
     else if (strcasecmp(stMsgData->paramName,UHD_RFC_ENABLE) == 0)
     {
         ret = set_xRDKCentralComUhdRFCEnable(stMsgData);
@@ -2496,6 +2500,24 @@ int hostIf_DeviceInfo::set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *st
     }
 
     return ret;
+}
+
+int hostIf_DeviceInfo::set_xRDKCentralComHdrDVRFCEnable(HOSTIF_MsgData_t *stMsgData)
+{
+    LOG_ENTRY_EXIT;
+    device::VideoDevice decoder = device::Host::getInstance().getVideoDevices().at(0);
+    if(strcasecmp(stMsgData->paramValue,"true") == 0)
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Successfully set \"%s\" to true", __FUNCTION__, __LINE__, stMsgData->paramName);
+        decoder.enableHDRDVSupport(true);
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Successfully set \"%s\" to false \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+        decoder.enableHDRDVSupport(false);
+    }
+
+    return OK;
 }
 
 int hostIf_DeviceInfo::set_xRDKCentralComHdrRFCEnable(HOSTIF_MsgData_t *stMsgData)

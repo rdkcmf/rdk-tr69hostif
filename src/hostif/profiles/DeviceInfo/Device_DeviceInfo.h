@@ -185,6 +185,7 @@
 #define HDR_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HdrEnable.Enable"
 #define UHD_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.UhdEnable.Enable"
 #define LE_RFC_ENABLE   "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LoudnessEquivalenceEnable"
+#define HDR_DV_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DolbyVision"
 
 
 #define RFC_WL_ROAM_TRIGGER_RF	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RoamTrigger"
@@ -250,6 +251,7 @@ class hostIf_DeviceInfo {
     int set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *);
     int set_xRDKCentralComHdrRFCEnable(HOSTIF_MsgData_t *);
     int set_xRDKCentralComUhdRFCEnable(HOSTIF_MsgData_t *);
+    int set_xRDKCentralComHdrDVRFCEnable(HOSTIF_MsgData_t *);
 
     // This is to set wl roam_trigger
     int set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *);
