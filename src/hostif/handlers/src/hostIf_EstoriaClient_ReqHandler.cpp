@@ -121,7 +121,7 @@ int EstoriaReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 
         else if (strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Estoria.getSigned") == 0)
         {
-            if(lastCall == "Device.X_COMCAST_COM-Estoria.getSigned")
+            if(lastCall == "Device.X_COMCAST-COM_Estoria.getSigned")
             {
                 Estoria::getLock();
 
