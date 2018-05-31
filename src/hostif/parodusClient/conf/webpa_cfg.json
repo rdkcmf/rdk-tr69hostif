@@ -1,7 +1,7 @@
 {
 	"EnablePa": "true",
 	"file-version": 1,
-	"ServerIP": "https://fabric.webpa.comcast.net:8080",
+	"ServerIP": "https://fabric.xmidt.comcast.net:8080",
 	"ServerPort": 8080,
 	"DeviceNetworkInterface": "",
 	"RetryIntervalInSec": 10,
