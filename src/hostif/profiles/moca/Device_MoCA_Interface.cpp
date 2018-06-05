@@ -1067,14 +1067,14 @@ int MoCAInterface::get_X_RDKCENTRAL_COM_NodePowerState(HOSTIF_MsgData_t *stMsgDa
     stMsgData->paramLen=sizeof(unsigned int);
     RMH_Handle rmh=(RMH_Handle)MoCADevice::getRmhContext();
     if (rmh) {
-        uint32_t response = 0;
-        RMH_Result ret =RMH_Power_GetSupportedModes(rmh, &response);
+        RMH_PowerMode response;
+        RMH_Result ret = RMH_Power_GetMode(rmh, &response);
         if (ret == RMH_SUCCESS) {
             put_int(stMsgData->paramValue,response);
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%u]RMH_Power_GetSupportedModes success with result %s value %d. \n", __FUNCTION__, __LINE__,  RMH_ResultToString(ret), response);
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%u]RMH_Power_GetMode success with result %s value %d. \n", __FUNCTION__, __LINE__,  RMH_ResultToString(ret), response);
             retval = OK;
         } else {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%uRMH_Power_GetSupportedModes failed with result %s.\n", __FUNCTION__, __LINE__,  RMH_ResultToString(ret));
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%u]RMH_Power_GetMode failed with result %s.\n", __FUNCTION__, __LINE__,  RMH_ResultToString(ret));
         }
     }
     return retval;
