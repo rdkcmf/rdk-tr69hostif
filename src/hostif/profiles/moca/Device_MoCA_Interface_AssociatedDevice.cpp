@@ -183,8 +183,21 @@ int MoCAInterfaceAssociatedDevice::get_PHYTxRate(HOSTIF_MsgData_t *stMsgData,uns
 {
     int ret = NOK;
     stMsgData->paramtype = hostIf_UnsignedIntType;
-    /* @TODO: */
-    sprintf(stMsgData->paramValue, "%s", "Not Implemented");
+    const RMH_Handle rmh = (RMH_Handle)MoCADevice::getRmhContext();
+    if(rmh) {
+        /* Get NodeID from associate ID*/
+        const uint32_t associatedId = associatedDeviceNum;
+        uint32_t nodeID;
+        if(RMH_SUCCESS != RMH_RemoteNode_GetNodeIdFromAssociatedId(rmh, associatedId, &nodeID)) {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in RMH_RemoteNode_GetNodeIdFromAssociatedId for AssociatedId (%d) \n",__FUNCTION__,associatedDeviceNum);
+            return NOK;
+        }
+        uint32_t response;
+        if(RMH_SUCCESS ==RMH_RemoteNode_GetTxUnicastPhyRate(rmh, nodeID, &response)) {
+            put_int(stMsgData->paramValue, response);
+            ret = OK;
+        }
+    }
     stMsgData->paramLen = sizeof(unsigned int);
     return ret;
 }
@@ -193,8 +206,21 @@ int MoCAInterfaceAssociatedDevice::get_PHYRxRate(HOSTIF_MsgData_t *stMsgData,uns
 {
     int ret = NOK;
     stMsgData->paramtype = hostIf_UnsignedIntType;
-    /* @TODO: */
-    sprintf(stMsgData->paramValue, "%s", "Not Implemented");
+    const RMH_Handle rmh = (RMH_Handle)MoCADevice::getRmhContext();
+    if(rmh) {
+        /* Get NodeID from associate ID*/
+        const uint32_t associatedId = associatedDeviceNum;
+        uint32_t nodeID;
+        if(RMH_SUCCESS != RMH_RemoteNode_GetNodeIdFromAssociatedId(rmh, associatedId, &nodeID)) {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in RMH_RemoteNode_GetNodeIdFromAssociatedId for AssociatedId (%d) \n",__FUNCTION__,associatedDeviceNum);
+            return NOK;
+        }
+        uint32_t response;
+        if(RMH_SUCCESS ==RMH_RemoteNode_GetRxUnicastPhyRate(rmh, nodeID, &response)) {
+            put_int(stMsgData->paramValue, response);
+            ret = OK;
+        }
+    }
     stMsgData->paramLen = sizeof(unsigned int);
     return ret;
 }
