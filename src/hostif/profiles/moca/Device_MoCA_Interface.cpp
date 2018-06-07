@@ -501,7 +501,7 @@ int MoCAInterface::get_HighestVersion(HOSTIF_MsgData_t *stMsgData, bool *pChange
         if (ret == RMH_SUCCESS) {
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%u] RMH_Self_GetHighestSupportedMoCAVersion success with result %s and value as %d. \n", __FUNCTION__, __LINE__,  RMH_ResultToString(ret), hVer);
             m_HighestVersion = hVer;
-            snprintf(stMsgData->paramValue, (TR69HOSTIFMGR_MAX_PARAM_LEN-1),  "%02X", hVer);
+            snprintf(stMsgData->paramValue, (TR69HOSTIFMGR_MAX_PARAM_LEN-1),  "%s", RMH_MoCAVersionToString(hVer));
             stMsgData->paramLen = strlen(stMsgData->paramValue);
             retval = OK;
         }
@@ -523,7 +523,7 @@ int MoCAInterface::get_CurrentVersion(HOSTIF_MsgData_t *stMsgData, bool *pChange
 
         if (ret == RMH_SUCCESS) {
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%u] RMH_Network_GetMoCAVersion success with result %s and value as %d. \n", __FUNCTION__, __LINE__,  RMH_ResultToString(ret), response);
-            snprintf(stMsgData->paramValue, (TR69HOSTIFMGR_MAX_PARAM_LEN-1),  "%02X", response);
+            snprintf(stMsgData->paramValue, (TR69HOSTIFMGR_MAX_PARAM_LEN-1),  "%s", RMH_MoCAVersionToString(response));
             stMsgData->paramLen = strlen(stMsgData->paramValue);
             retval = OK;
         }
