@@ -56,10 +56,10 @@ msgHandler* MoCAClientReqHandler::getInstance()
 
 void MoCAClientReqHandler::reset()
 {
-    hostIf_MoCAInterface::getLock();
+    MoCAInterface::getLock();
     memset(curNumOfDevices,0,sizeof(curNumOfDevices));
     numOfMocaMeshEntries = 0;
-    hostIf_MoCAInterface::releaseLock();
+    MoCAInterface::releaseLock();
 }
 
 /**
@@ -92,13 +92,13 @@ bool MoCAClientReqHandler::unInit()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
 
-    hostIf_MoCAInterface::closeAllInstances();
-    hostIf_MoCAInterfaceStats::closeAllInstances();
-    hostIf_MoCAInterfaceQoS::closeAllInstances();
-    hostIf_MoCAInterfaceQoSFlowStats::closeAllInstances();
-    hostIf_MoCAInterfaceAssociatedDevice::closeAllInstances();
+    MoCAInterface::closeInstance();
+    //MoCAInterfaceStats::closeAllInstances();
+    //MoCAInterfaceQoS::closeAllInstances();
+    //MoCAInterfaceQoSFlowStats::closeAllInstances();
+    //MoCAInterfaceAssociatedDevice::closeAllInstances();
 
-    MoCADevice::closeAllInstances();
+    MoCADevice::closeInstance();
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
     return true;
@@ -129,55 +129,55 @@ int MoCAClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
                       "Device.MoCA.Interface",&pSetting,instanceNumber))
     {
         stMsgData->instanceNum = instanceNumber;
-        hostIf_MoCAInterface::getLock();
+        MoCAInterface::getLock();
 
-        hostIf_MoCAInterface *pIface = hostIf_MoCAInterface::getInstance(instanceNumber);
+        MoCAInterface *pIface = MoCAInterface::getInstance(0);
 
         if(!pIface)
         {
-            hostIf_MoCAInterface::releaseLock();
+            MoCAInterface::releaseLock();
             return NOK;
         }
 
         if (strcasecmp(pSetting,"Enable") == 0)
         {
-            ret = pIface->set_Device_MoCA_Interface_Enable(stMsgData);
+            ret = pIface->set_Enable(stMsgData);
         }
         else if (strcasecmp(pSetting,"Alias") == 0)
         {
-            ret = pIface->set_Device_MoCA_Interface_Alias(stMsgData);
+            ret = pIface->set_Alias(stMsgData);
         }
         else if (strcasecmp(pSetting,"LowerLayers") == 0)
         {
-            ret = pIface->set_Device_MoCA_Interface_LowerLayers(stMsgData);
+            ret = pIface->set_LowerLayers(stMsgData);
         }
         else if (strcasecmp(pSetting,"PreferredNC") == 0)
         {
-            ret = pIface->set_Device_MoCA_Interface_PreferredNC(stMsgData);
+            ret = pIface->set_PreferredNC(stMsgData);
         }
         else if (strcasecmp(pSetting,"PrivacyEnabledSetting") == 0)
         {
-            ret = pIface->set_Device_MoCA_Interface_PrivacyEnabledSetting(stMsgData);
+            ret = pIface->set_PrivacyEnabledSetting(stMsgData);
         }
         else if (strcasecmp(pSetting,"FreqCurrentMaskSetting") == 0)
         {
-            ret = pIface->set_Device_MoCA_Interface_FreqCurrentMaskSetting(stMsgData);
+            ret = pIface->set_FreqCurrentMaskSetting(stMsgData);
         }
         else if (strcasecmp(pSetting,"KeyPassphrase") == 0)
         {
-            ret = pIface->set_Device_MoCA_Interface_KeyPassphrase(stMsgData);
+            ret = pIface->set_KeyPassphrase(stMsgData);
         }
         else if (strcasecmp(pSetting,"TxPowerLimit") == 0)
         {
-            ret = pIface->set_Device_MoCA_Interface_TxPowerLimit(stMsgData);
+            ret = pIface->set_TxPowerLimit(stMsgData);
         }
         else if (strcasecmp(pSetting,"PowerCntlPhyTarget") == 0)
         {
-            ret = pIface->set_Device_MoCA_Interface_PowerCntlPhyTarget(stMsgData);
+            ret = pIface->set_PowerCntlPhyTarget(stMsgData);
         }
         else if (strcasecmp(pSetting,"BeaconPowerLimit") == 0)
         {
-            ret = pIface->set_Device_MoCA_Interface_BeaconPowerLimit(stMsgData);
+            ret = pIface->set_BeaconPowerLimit(stMsgData);
         }
         else
         {
@@ -190,7 +190,7 @@ int MoCAClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
             stMsgData->faultCode = fcNoFault;
         }
     }
-    hostIf_MoCAInterface::releaseLock();
+    MoCAInterface::releaseLock();
     return ret;
 }
 
@@ -214,292 +214,308 @@ int MoCAClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     int instanceNumber;
     int subInstanceNumber;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-    hostIf_MoCAInterface::getLock();
+    MoCAInterface::getLock();
     if(strcasecmp(stMsgData->paramName,"Device.MoCA.InterfaceNumberOfEntries") == 0)
     {
-        ret = hostIf_MoCAInterface::get_Device_MoCA_InterfaceNumberOfEntries(stMsgData);
+        ret = MoCAInterface::get_InterfaceNumberOfEntries(stMsgData);
     }
     else if(matchComponent(stMsgData->paramName,
                            "Device.MoCA.Interface",&pSetting,instanceNumber))
     {
         stMsgData->instanceNum = instanceNumber;
-        hostIf_MoCAInterface *pIface = hostIf_MoCAInterface::getInstance(instanceNumber);
-        hostIf_MoCAInterfaceStats *pIfaceStats
-            = hostIf_MoCAInterfaceStats::getInstance(instanceNumber);
-        hostIf_MoCAInterfaceQoS *pIfaceQoS = hostIf_MoCAInterfaceQoS::getInstance(instanceNumber);
-        hostIf_MoCAInterfaceQoSFlowStats *pIfaceQoSFS
-            = hostIf_MoCAInterfaceQoSFlowStats::getInstance(instanceNumber);
-        hostIf_MoCAInterfaceAssociatedDevice *pIfaceAsstDev
-            = hostIf_MoCAInterfaceAssociatedDevice::getInstance(instanceNumber);
+        MoCAInterface *pIface = MoCAInterface::getInstance(0);
+        MoCAInterfaceStats *pIfaceStats
+            = MoCAInterfaceStats::getInstance();
+        MoCAInterfaceQoS *pIfaceQoS = MoCAInterfaceQoS::getInstance();
+        MoCAInterfaceQoSFlowStats *pIfaceQoSFS
+            = MoCAInterfaceQoSFlowStats::getInstance();
+        MoCAInterfaceAssociatedDevice *pIfaceAsstDev
+            = MoCAInterfaceAssociatedDevice::getInstance();
 
-        hostIf_MoCAInterfaceMeshTable *pIfaceMeshTableDev
-            = hostIf_MoCAInterfaceMeshTable::getInstance(instanceNumber);
+        X_RDKCENTRAL_COM_MeshTable *pIfaceMeshTableDev
+            = X_RDKCENTRAL_COM_MeshTable::getInstance(instanceNumber);
 
         if(!pIface)
         {
-            hostIf_MoCAInterface::releaseLock();
+            MoCAInterface::releaseLock();
             return NOK;
         }
 
         if (strcasecmp(pSetting,"Enable") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_Enable(stMsgData);
+            ret = pIface->get_Enable(stMsgData);
         }
         else if (strcasecmp(pSetting,"Status") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_Status(stMsgData);
+            ret = pIface->get_Status(stMsgData);
         }
         else if (strcasecmp(pSetting,"Alias") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_Alias(stMsgData);
+            ret = pIface->get_Alias(stMsgData);
         }
         else if (strcasecmp(pSetting,"Name") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_Name(stMsgData);
+            ret = pIface->get_Name(stMsgData);
         }
         else if (strcasecmp(pSetting,"LastChange") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_LastChange(stMsgData);
+            ret = pIface->get_LastChange(stMsgData);
         }
         else if (strcasecmp(pSetting,"LowerLayers") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_LowerLayers(stMsgData);
+            ret = pIface->get_LowerLayers(stMsgData);
         }
         else if (strcasecmp(pSetting,"Upstream") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_Upstream(stMsgData);
+            ret = pIface->get_Upstream(stMsgData);
         }
         else if (strcasecmp(pSetting,"MACAddress") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_MACAddress(stMsgData);
+            ret = pIface->get_MACAddress(stMsgData);
         }
         else if (strcasecmp(pSetting,"FirmwareVersion") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_FirmwareVersion(stMsgData);
+            ret = pIface->get_FirmwareVersion(stMsgData);
         }
         else if (strcasecmp(pSetting,"MaxBitRate") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_MaxBitRate(stMsgData);
+            ret = pIface->get_MaxBitRate(stMsgData);
         }
         else if (strcasecmp(pSetting,"MaxIngressBW") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_MaxIngressBW(stMsgData);
+            ret = pIface->get_MaxIngressBW(stMsgData);
         }
         else if (strcasecmp(pSetting,"MaxEgressBW") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_MaxEgressBW(stMsgData);
+            ret = pIface->get_MaxEgressBW(stMsgData);
         }
         else if (strcasecmp(pSetting,"HighestVersion") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_HighestVersion(stMsgData);
+            ret = pIface->get_HighestVersion(stMsgData);
         }
         else if (strcasecmp(pSetting,"CurrentVersion") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_CurrentVersion(stMsgData);
+            ret = pIface->get_CurrentVersion(stMsgData);
         }
         else if (strcasecmp(pSetting,"NetworkCoordinator") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_NetworkCoordinator(stMsgData);
+            ret = pIface->get_NetworkCoordinator(stMsgData);
         }
         else if (strcasecmp(pSetting,"NodeID") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_NodeID(stMsgData);
+            ret = pIface->get_NodeID(stMsgData);
         }
         else if (strcasecmp(pSetting,"MaxNodes") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_MaxNodes(stMsgData);
+            ret = pIface->get_MaxNodes(stMsgData);
         }
         else if (strcasecmp(pSetting,"PreferredNC") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_PreferredNC(stMsgData);
+            ret = pIface->get_PreferredNC(stMsgData);
         }
         else if (strcasecmp(pSetting,"BackupNC") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_BackupNC(stMsgData);
+            ret = pIface->get_BackupNC(stMsgData);
         }
         else if (strcasecmp(pSetting,"PrivacyEnabledSetting") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_PrivacyEnabledSetting(stMsgData);
+            ret = pIface->get_PrivacyEnabledSetting(stMsgData);
         }
         else if (strcasecmp(pSetting,"PrivacyEnabled") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_PrivacyEnabled(stMsgData);
+            ret = pIface->get_PrivacyEnabled(stMsgData);
         }
         else if (strcasecmp(pSetting,"FreqCapabilityMask") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_FreqCapabilityMask(stMsgData);
+            ret = pIface->get_FreqCapabilityMask(stMsgData);
         }
         else if (strcasecmp(pSetting,"FreqCurrentMaskSetting") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_FreqCurrentMaskSetting(stMsgData);
+            ret = pIface->get_FreqCurrentMaskSetting(stMsgData);
         }
         else if (strcasecmp(pSetting,"FreqCurrentMask") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_FreqCurrentMask(stMsgData);
+            ret = pIface->get_FreqCurrentMask(stMsgData);
         }
         else if (strcasecmp(pSetting,"CurrentOperFreq") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_CurrentOperFreq(stMsgData);
+            ret = pIface->get_CurrentOperFreq(stMsgData);
         }
         else if (strcasecmp(pSetting,"LastOperFreq") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_LastOperFreq(stMsgData);
+            ret = pIface->get_LastOperFreq(stMsgData);
         }
         else if (strcasecmp(pSetting,"KeyPassphrase") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_KeyPassphrase(stMsgData);
+            ret = pIface->get_KeyPassphrase(stMsgData);
         }
         else if (strcasecmp(pSetting,"TxPowerLimit") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_TxPowerLimit(stMsgData);
+            ret = pIface->get_TxPowerLimit(stMsgData);
         }
         else if (strcasecmp(pSetting,"PowerCntlPhyTarget") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_PowerCntlPhyTarget(stMsgData);
+            ret = pIface->get_PowerCntlPhyTarget(stMsgData);
         }
         else if (strcasecmp(pSetting,"BeaconPowerLimit") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_BeaconPowerLimit(stMsgData);
+            ret = pIface->get_BeaconPowerLimit(stMsgData);
         }
         else if (strcasecmp(pSetting,"NetworkTabooMask") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_NetworkTabooMask(stMsgData);
+            ret = pIface->get_NetworkTabooMask(stMsgData);
         }
         else if (strcasecmp(pSetting,"NodeTabooMask") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_NodeTabooMask(stMsgData);
+            ret = pIface->get_NodeTabooMask(stMsgData);
         }
         else if (strcasecmp(pSetting,"TxBcastRate") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_TxBcastRate(stMsgData);
+            ret = pIface->get_TxBcastRate(stMsgData);
         }
         else if (strcasecmp(pSetting,"TxBcastPowerReduction") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_TxBcastPowerReduction(stMsgData);
+            ret = pIface->get_TxBcastPowerReduction(stMsgData);
         }
         else if (strcasecmp(pSetting,"QAM256Capable") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_QAM256Capable(stMsgData);
+            ret = pIface->get_QAM256Capable(stMsgData);
         }
         else if (strcasecmp(pSetting,"PacketAggregationCapability") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_PacketAggregationCapability(stMsgData);
+            ret = pIface->get_PacketAggregationCapability(stMsgData);
         }
         else if (strcasecmp(pSetting,"AssociatedDeviceNumberOfEntries") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_AssociatedDeviceNumberOfEntries(stMsgData);
+            ret = pIface->get_AssociatedDeviceNumberOfEntries(stMsgData);
         }
         else if (strcasecmp(pSetting,"X_RDKCENTRAL-COM_MeshTableNumberOfEntries") == 0)
         {
-            ret = pIface->get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTableNumberOfEntries(stMsgData);
+            ret = pIface->get_X_RDKCENTRAL_COM_MeshTableNumberOfEntries(stMsgData);
+        }
+        else if (strcasecmp(pSetting,"X_RDKCENTRAL-COM_PrimaryChannelFreq") == 0)
+        {
+            ret = pIface->get_X_RDKCENTRAL_COM_PrimaryChannelFreq(stMsgData);
+        }
+        else if (strcasecmp(pSetting,"X_RDKCENTRAL-COM_SecondaryChannelFreq") == 0)
+        {
+            ret = pIface->get_X_RDKCENTRAL_COM_SecondaryChannelFreq(stMsgData);
+        }
+        else if (strcasecmp(pSetting,"X_RDKCENTRAL-COM_TurboMode") == 0)
+        {
+            ret = pIface->get_X_RDKCENTRAL_COM_TurboMode(stMsgData);
+        }
+        else if (strcasecmp(pSetting,"X_RDKCENTRAL-COM_NodePowerState") == 0)
+        {
+            ret = pIface->get_X_RDKCENTRAL_COM_NodePowerState(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.BytesSent") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_BytesSent(stMsgData);
+            ret = pIfaceStats->get_BytesSent(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.BytesReceived") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_BytesReceived(stMsgData);
+            ret = pIfaceStats->get_BytesReceived(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.PacketsSent") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_PacketsSent(stMsgData);
+            ret = pIfaceStats->get_PacketsSent(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.PacketsReceived") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_PacketsReceived(stMsgData);
+            ret = pIfaceStats->get_PacketsReceived(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.ErrorsSent") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_ErrorsSent(stMsgData);
+            ret = pIfaceStats->get_ErrorsSent(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.ErrorsReceived") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_ErrorsReceived(stMsgData);
+            ret = pIfaceStats->get_ErrorsReceived(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.UnicastPacketsSent") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_UnicastPacketsSent(stMsgData);
+            ret = pIfaceStats->get_UnicastPacketsSent(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.UnicastPacketsReceived") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_UnicastPacketsReceived(stMsgData);
+            ret = pIfaceStats->get_UnicastPacketsReceived(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.DiscardPacketsSent") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_DiscardPacketsSent(stMsgData);
+            ret = pIfaceStats->get_DiscardPacketsSent(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.DiscardPacketsReceived") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_DiscardPacketsReceived(stMsgData);
+            ret = pIfaceStats->get_DiscardPacketsReceived(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.MulticastPacketsSent") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_MulticastPacketsSent(stMsgData);
+            ret = pIfaceStats->get_MulticastPacketsSent(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.MulticastPacketsReceived") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_MulticastPacketsReceived(stMsgData);
+            ret = pIfaceStats->get_MulticastPacketsReceived(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.BroadcastPacketsSent") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_BroadcastPacketsSent(stMsgData);
+            ret = pIfaceStats->get_BroadcastPacketsSent(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.BroadcastPacketsReceived") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_BroadcastPacketsReceived(stMsgData);
+            ret = pIfaceStats->get_BroadcastPacketsReceived(stMsgData);
         }
         else if (strcasecmp(pSetting,"Stats.UnknownProtoPacketsReceived") == 0)
         {
-            ret = pIfaceStats->get_Device_MoCA_Interface_Stats_UnknownProtoPacketsReceived(stMsgData);
+            ret = pIfaceStats->get_UnknownProtoPacketsReceived(stMsgData);
         }
         else if (strcasecmp(pSetting,"QoS.EgressNumFlows") == 0)
         {
-            ret = pIfaceQoS->get_Device_MoCA_Interface_QoS_EgressNumFlows(stMsgData);
+            ret = pIfaceQoS->get_EgressNumFlows(stMsgData);
         }
         else if (strcasecmp(pSetting,"QoS.IngressNumFlows") == 0)
         {
-            ret = pIfaceQoS->get_Device_MoCA_Interface_QoS_IngressNumFlows(stMsgData);
+            ret = pIfaceQoS->get_IngressNumFlows(stMsgData);
         }
         else if (strcasecmp(pSetting,"QoS.FlowStatsNumberOfEntries") == 0)
         {
-            ret = pIfaceQoS->get_Device_MoCA_Interface_QoS_FlowStatsNumberOfEntries(stMsgData);
+            ret = pIfaceQoS->get_FlowStatsNumberOfEntries(stMsgData);
         }
         else if (matchComponent(pSetting,"QoS.FlowStats",
                                 &pSubSetting,subInstanceNumber))
         {
             if (strcasecmp(pSubSetting,"FlowID") == 0)
             {
-                ret = pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_FlowID(stMsgData,subInstanceNumber);
+                ret = pIfaceQoSFS->get_FlowID(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"PacketDA") == 0)
             {
-                ret = pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_PacketDA(stMsgData,subInstanceNumber);
+                ret = pIfaceQoSFS->get_PacketDA(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"MaxRate") == 0)
             {
-                ret = pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_MaxRate(stMsgData,subInstanceNumber);
+                ret = pIfaceQoSFS->get_MaxRate(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"MaxBurstSize") == 0)
             {
-                ret = pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_MaxBurstSize(stMsgData,subInstanceNumber);
+                ret = pIfaceQoSFS->get_MaxBurstSize(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"LeaseTime") == 0)
             {
-                ret = pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_LeaseTime(stMsgData,subInstanceNumber);
+                ret = pIfaceQoSFS->get_LeaseTime(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"LeaseTimeLeft") == 0)
             {
-                ret = pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_LeaseTimeLeft(stMsgData,subInstanceNumber);
+                ret = pIfaceQoSFS->get_LeaseTimeLeft(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"FlowPackets") == 0)
             {
-                ret = pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_FlowPackets(stMsgData,subInstanceNumber);
+                ret = pIfaceQoSFS->get_FlowPackets(stMsgData,subInstanceNumber);
             }
             else
             {
-               stMsgData->faultCode = fcInvalidParameterName;
-               ret =  NOK;
+                stMsgData->faultCode = fcInvalidParameterName;
+                ret =  NOK;
             }
 
         }
@@ -508,99 +524,104 @@ int MoCAClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             if (strcasecmp(pSubSetting,"MACAddress") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_MACAddress(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_MACAddress(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"NodeID") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_NodeID(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_NodeID(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"PreferredNC") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_PreferredNC(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_PreferredNC(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"HighestVersion") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_HighestVersion(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_HighestVersion(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"PHYTxRate") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_PHYTxRate(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_PHYTxRate(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"PHYRxRate") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_PHYRxRate(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_PHYRxRate(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"TxPowerControlReduction") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_TxPowerControlReduction(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_TxPowerControlReduction(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"RxPowerLevel") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_RxPowerLevel(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_RxPowerLevel(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"TxBcastRate") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_TxBcastRate(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_TxBcastRate(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"RxBcastPowerLevel") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_RxBcastPowerLevel(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_RxBcastPowerLevel(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"TxPackets") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_TxPackets(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_TxPackets(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"RxPackets") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_RxPackets(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_RxPackets(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"RxErroredAndMissedPackets") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_RxErroredAndMissedPackets(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_RxErroredAndMissedPackets(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"QAM256Capable") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_QAM256Capable(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_QAM256Capable(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"PacketAggregationCapability") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_PacketAggregationCapability(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_PacketAggregationCapability(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"RxSNR") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_RxSNR(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_RxSNR(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"Active") == 0)
             {
-                ret = pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_Active(stMsgData,subInstanceNumber);
+                ret = pIfaceAsstDev->get_Active(stMsgData,subInstanceNumber);
             }
             else
             {
-               stMsgData->faultCode = fcInvalidParameterName;
-               ret =  NOK;
+                stMsgData->faultCode = fcInvalidParameterName;
+                ret =  NOK;
             }
         }
         else if(matchComponent(pSetting,"X_RDKCENTRAL-COM_MeshTable", &pSubSetting, subInstanceNumber))
         {
             if(strcasecmp(pSubSetting,"MeshTxNodeId") == 0)
             {
-                ret = pIfaceMeshTableDev->get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTable_MeshTxNodeId(stMsgData,subInstanceNumber);
+                ret = pIfaceMeshTableDev->get_MeshTxNodeId(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"MeshRxNodeId") == 0)
             {
-                ret = pIfaceMeshTableDev->get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTable_MeshRxNodeId(stMsgData,subInstanceNumber);
+                ret = pIfaceMeshTableDev->get_MeshRxNodeId(stMsgData,subInstanceNumber);
             }
             else if(strcasecmp(pSubSetting,"MeshPHYTxRate") == 0)
             {
-                ret = pIfaceMeshTableDev->get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTable_MeshPHYTxRate(stMsgData,subInstanceNumber);
+                ret = pIfaceMeshTableDev->get_MeshPHYTxRate(stMsgData,subInstanceNumber);
             }
+            else if(strcasecmp(pSubSetting,"BondedChannel") == 0)
+            {
+                ret = pIfaceMeshTableDev->get_BondedChannel(stMsgData,subInstanceNumber);
+            }
+
             else
             {
-               stMsgData->faultCode = fcInvalidParameterName;
-               ret =  NOK;
+                stMsgData->faultCode = fcInvalidParameterName;
+                ret =  NOK;
             }
         }
-        else 
+        else
         {
             stMsgData->faultCode = fcInvalidParameterName;
             ret =  NOK;
@@ -611,20 +632,20 @@ int MoCAClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         stMsgData->faultCode = fcInvalidParameterName;
         ret =  NOK;
     }
-    hostIf_MoCAInterface::releaseLock();
+    MoCAInterface::releaseLock();
     return ret;
 }
 int MoCAClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
     int instanceNumber = 0;
-    hostIf_MoCAInterface::getLock();
+    MoCAInterface::getLock();
     // TODO: Retrieve notification value from DeviceInfo structure for given parameter
-    hostIf_MoCAInterface *pIface = hostIf_MoCAInterface::getInstance(instanceNumber);
+    MoCAInterface *pIface = MoCAInterface::getInstance(0);
     stMsgData->instanceNum = instanceNumber;
     if(!pIface)
     {
-        hostIf_MoCAInterface::releaseLock();
+        MoCAInterface::releaseLock();
         return NOK;
     }
 
@@ -640,7 +661,7 @@ int MoCAClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
     {
         ret = NOK;
     }
-    hostIf_MoCAInterface::releaseLock();
+    MoCAInterface::releaseLock();
     return ret;
 }
 
@@ -648,13 +669,13 @@ int MoCAClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
     int instanceNumber = 0;
-    hostIf_MoCAInterface::getLock();
+    MoCAInterface::getLock();
     // TODO: Set notification value from DeviceInfo structure for given parameter
-    hostIf_MoCAInterface *pIface = hostIf_MoCAInterface::getInstance(instanceNumber);
+    MoCAInterface *pIface = MoCAInterface::getInstance(0);
     stMsgData->instanceNum = instanceNumber;
     if(!pIface)
     {
-        hostIf_MoCAInterface::releaseLock();
+        MoCAInterface::releaseLock();
         return NOK;
     }
     GHashTable* notifyhash = pIface->getNotifyHash();
@@ -687,7 +708,7 @@ int MoCAClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] MoCAClientReqHandler Not able to get notifyhash  %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
     }
 
-    hostIf_MoCAInterface::releaseLock();
+    MoCAInterface::releaseLock();
     return ret;
 }
 
@@ -703,17 +724,17 @@ void MoCAClientReqHandler::checkForUpdates()
     GList *elem;
     int index = 1;
     char tmp_buff[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    hostIf_MoCAInterface::getLock();
+    MoCAInterface::getLock();
 
     //RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s]Entering \n", __FILE__, __FUNCTION__ );
 
-    hostIf_MoCAInterface *pIface = hostIf_MoCAInterface::getInstance((int)0);
+    MoCAInterface *pIface = MoCAInterface::getInstance(0);
 
     if(pIface)
     {
         memset(&msgData,0,sizeof(msgData));
         memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
-        if(pIface->get_Device_MoCA_Interface_AssociatedDeviceNumberOfEntries(&msgData) == OK)
+        if(pIface->get_AssociatedDeviceNumberOfEntries(&msgData) == OK)
         {
             int tmpNoDev = get_int(msgData.paramValue);
             char tmp[TR69HOSTIFMGR_MAX_PARAM_LEN] = "";
@@ -736,7 +757,7 @@ void MoCAClientReqHandler::checkForUpdates()
 
         memset(&msgData,0,sizeof(msgData));
         memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
-        if(pIface->get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTableNumberOfEntries(&msgData) == OK)
+        if(pIface->get_X_RDKCENTRAL_COM_MeshTableNumberOfEntries(&msgData) == OK)
         {
             int tmpNoDev = get_int(msgData.paramValue);
             char tmp[TR69HOSTIFMGR_MAX_PARAM_LEN] = "";
@@ -759,7 +780,7 @@ void MoCAClientReqHandler::checkForUpdates()
 
 
     }
-    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] BEFORE THE HAVE VALUE CHANGE EVENT block \n"__FILE__, __FUNCTION__);
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] BEFORE THE HAVE VALUE CHANGE EVENT block \n",__FILE__, __FUNCTION__);
 #ifdef HAVE_VALUE_CHANGE_EVENT
     int instanceNumber = 0;
     GHashTable* notifyhash;
@@ -799,7 +820,7 @@ void MoCAClientReqHandler::checkForUpdates()
                     continue;
                 }/*Creating MoCAInterface object as InstanceNumber might be different*/
                 RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] before getting MoCA instance with instance number [%d]  \n", __FILE__, __FUNCTION__,instanceNumber);
-                hostIf_MoCAInterface *mocaIface = hostIf_MoCAInterface::getInstance(instanceNumber);
+                MoCAInterface *mocaIface = MoCAInterface::getInstance(0);
                 if(mocaIface)
                 {
                     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] mocaIface instance is created inside if(mocaIface) \n", __FILE__, __FUNCTION__);
@@ -810,13 +831,13 @@ void MoCAClientReqHandler::checkForUpdates()
                     if(matchComponent((const char*)buff,"QoS.FlowStats",&pSubSetting,subInstanceNumber))
                     {
                         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.QoS.FlowStats  matched n pSubSetting is: [%s] and subInstanceNumber [%d]  \n", __FILE__, __FUNCTION__,instanceNumber,pSubSetting,subInstanceNumber);
-                        hostIf_MoCAInterfaceQoSFlowStats *pIfaceQoSFS = hostIf_MoCAInterfaceQoSFlowStats::getInstance(subInstanceNumber);
+                        MoCAInterfaceQoSFlowStats *pIfaceQoSFS = MoCAInterfaceQoSFlowStats::getInstance();
                         memset(&msgData,subInstanceNumber,sizeof(msgData));
                         // memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
                         bChanged = false;
                         if(strcasecmp(pSubSetting,"FlowID")==0)
                         {
-                            pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_FlowID(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceQoSFS->get_FlowID(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"FlowID");
@@ -828,7 +849,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"PacketDA")==0)
                         {
-                            pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_PacketDA(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceQoSFS->get_PacketDA(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"PacketDA");
@@ -840,7 +861,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"MaxRate")==0)
                         {
-                            pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_MaxRate(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceQoSFS->get_MaxRate(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"MaxRate");
@@ -852,7 +873,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"MaxBurstSize")==0)
                         {
-                            pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_MaxBurstSize(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceQoSFS->get_MaxBurstSize(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"MaxBurstSize");
@@ -864,7 +885,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"LeaseTime")==0)
                         {
-                            pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_LeaseTime(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceQoSFS->get_LeaseTime(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"LeaseTime");
@@ -876,7 +897,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"LeaseTimeLeft")==0)
                         {
-                            pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_LeaseTimeLeft(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceQoSFS->get_LeaseTimeLeft(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"LeaseTimeLeft");
@@ -888,7 +909,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"FlowPackets")==0)
                         {
-                            pIfaceQoSFS->get_Device_MoCA_Interface_QoS_FlowStats_FlowPackets(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceQoSFS->get_FlowPackets(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"FlowPackets");
@@ -902,13 +923,13 @@ void MoCAClientReqHandler::checkForUpdates()
                     else if(matchComponent((const char*)buff,"AssociatedDevice",&pSubSetting,subInstanceNumber))
                     {
                         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.AssociatedDevice matched n subInstanceNumber is: [%d] and pSubSetting is [%s]  \n", __FILE__, __FUNCTION__,instanceNumber,subInstanceNumber,pSubSetting);
-                        hostIf_MoCAInterfaceAssociatedDevice *pIfaceAsstDev = hostIf_MoCAInterfaceAssociatedDevice::getInstance(subInstanceNumber);
+                        MoCAInterfaceAssociatedDevice *pIfaceAsstDev = MoCAInterfaceAssociatedDevice::getInstance();
                         memset(&msgData,0,sizeof(msgData));
                         // memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
                         bChanged = false;
                         if(strcasecmp(pSubSetting,"MACAddress")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_MACAddress(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_MACAddress(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"MACAddress");
@@ -920,7 +941,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"NodeID")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_NodeID(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_NodeID(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 //   sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"NodeID");
@@ -932,7 +953,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"PreferredNC")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_PreferredNC(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_PreferredNC(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 //   sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"PreferredNC");
@@ -944,7 +965,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"HighestVersion")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_HighestVersion(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_HighestVersion(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"HighestVersion");
@@ -956,7 +977,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"PHYTxRate")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_PHYTxRate(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_PHYTxRate(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"PHYTxRate");
@@ -968,7 +989,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"PHYRxRate")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_PHYRxRate(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_PHYRxRate(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"PHYRxRate");
@@ -980,7 +1001,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"TxPowerControlReduction")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_TxPowerControlReduction(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_TxPowerControlReduction(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"TxPowerControlReduction");
@@ -992,7 +1013,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"RxPowerLevel")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_RxPowerLevel(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_RxPowerLevel(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"RxPowerLevel");
@@ -1004,7 +1025,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"TxBcastRate")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_TxBcastRate(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_TxBcastRate(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"TxBcastRate");
@@ -1016,7 +1037,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"RxBcastPowerLevel")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_RxBcastPowerLevel(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_RxBcastPowerLevel(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"RxBcastPowerLevel");
@@ -1028,7 +1049,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"TxPackets")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_TxPackets(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_TxPackets(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"TxPackets");
@@ -1040,7 +1061,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"RxPackets")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_RxPackets(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_RxPackets(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"RxPackets");
@@ -1052,7 +1073,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"RxErroredAndMissedPackets")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_RxErroredAndMissedPackets(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_RxErroredAndMissedPackets(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"RxErroredAndMissedPackets");
@@ -1064,7 +1085,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"QAM256Capable")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_QAM256Capable(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_QAM256Capable(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"QAM256Capable");
@@ -1076,7 +1097,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"PacketAggregationCapability")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_PacketAggregationCapability(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_PacketAggregationCapability(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"PacketAggregationCapability");
@@ -1088,7 +1109,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"RxSNR")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_RxSNR(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_RxSNR(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"RxSNR");
@@ -1100,7 +1121,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }
                         else if(strcasecmp(pSubSetting,"Active")==0)
                         {
-                            pIfaceAsstDev->get_Device_MoCA_Interface_AssociatedDevice_Active(&msgData,subInstanceNumber,&bChanged);
+                            pIfaceAsstDev->get_Active(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"Active");
@@ -1115,13 +1136,13 @@ void MoCAClientReqHandler::checkForUpdates()
                     else if(strncmp(buff,"Stats",5)==0)
                     {
                         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.Stats matched pSetting is[%s] \n", __FILE__, __FUNCTION__,instanceNumber,pSetting);
-                        hostIf_MoCAInterfaceStats *pIfaceStats = hostIf_MoCAInterfaceStats::getInstance((int)0);
+                        MoCAInterfaceStats *pIfaceStats = MoCAInterfaceStats::getInstance();
                         memset(&msgData,0,sizeof(msgData));
                         //memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
                         bChanged = false;
                         if(strcmp(buff,"Stats.BytesSent")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_BytesSent(&msgData,&bChanged);
+                            pIfaceStats->get_BytesSent(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"BytesSent");
@@ -1133,7 +1154,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//BytesSent close
                         else if (strcmp(buff,"Stats.BytesReceived")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_BytesReceived(&msgData,&bChanged);
+                            pIfaceStats->get_BytesReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"BytesReceived");
@@ -1145,7 +1166,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//BytesReceived close
                         else if (strcmp(buff,"Stats.PacketsSent")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_PacketsSent(&msgData,&bChanged);
+                            pIfaceStats->get_PacketsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"PacketsSent");
@@ -1157,7 +1178,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//PacketsSent close
                         else if (strcmp(buff,"Stats.PacketsReceived")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_PacketsReceived(&msgData,&bChanged);
+                            pIfaceStats->get_PacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"PacketsReceived");
@@ -1169,7 +1190,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//PacketsReceived close
                         else if (strcmp(buff,"Stats.ErrorsSent")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_ErrorsSent(&msgData,&bChanged);
+                            pIfaceStats->get_ErrorsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"ErrorsSent");
@@ -1181,7 +1202,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//ErrorsSent close
                         else if (strcmp(buff,"Stats.ErrorsReceived")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_ErrorsReceived(&msgData,&bChanged);
+                            pIfaceStats->get_ErrorsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"ErrorsReceived");
@@ -1193,7 +1214,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//ErrorsReceived close
                         else if (strcmp(buff,"Stats.UnicastPacketsSent")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_UnicastPacketsSent(&msgData,&bChanged);
+                            pIfaceStats->get_UnicastPacketsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"UnicastPacketsSent");
@@ -1205,7 +1226,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//UnicastPacketsSent close
                         else if (strcmp(buff,"Stats.UnicastPacketsReceived")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_UnicastPacketsReceived(&msgData,&bChanged);
+                            pIfaceStats->get_UnicastPacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"UnicastPacketsReceived");
@@ -1217,7 +1238,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//UnicastPacketsReceived close
                         else if (strcmp(buff,"Stats.DiscardPacketsSent")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_DiscardPacketsSent(&msgData,&bChanged);
+                            pIfaceStats->get_DiscardPacketsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"DiscardPacketsSent");
@@ -1229,7 +1250,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//DiscardPacketsSent close
                         else if (strcmp(buff,"Stats.DiscardPacketsReceived")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_DiscardPacketsReceived(&msgData,&bChanged);
+                            pIfaceStats->get_DiscardPacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"DiscardPacketsReceived");
@@ -1241,7 +1262,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//DiscardPacketsReceived close
                         else if (strcmp(buff,"Stats.MulticastPacketsSent")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_MulticastPacketsSent(&msgData,&bChanged);
+                            pIfaceStats->get_MulticastPacketsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"MulticastPacketsSent");
@@ -1253,7 +1274,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//MulticastPacketsSent close
                         else if (strcmp(buff,"Stats.MulticastPacketsReceived")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_MulticastPacketsReceived(&msgData,&bChanged);
+                            pIfaceStats->get_MulticastPacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"MulticastPacketsReceived");
@@ -1265,7 +1286,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//MulticastPacketsReceived close
                         else if (strcmp(buff,"Stats.BroadcastPacketsSent")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_BroadcastPacketsSent(&msgData,&bChanged);
+                            pIfaceStats->get_BroadcastPacketsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"BroadcastPacketsSent");
@@ -1277,7 +1298,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//BroadcastPacketsSent close
                         else if (strcmp(buff,"Stats.BroadcastPacketsReceived")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_BroadcastPacketsReceived(&msgData,&bChanged);
+                            pIfaceStats->get_BroadcastPacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"BroadcastPacketsReceived");
@@ -1289,7 +1310,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//BroadcastPacketsReceived close
                         else if (strcmp(buff,"Stats.UnknownProtoPacketsReceived")==0)
                         {
-                            pIfaceStats->get_Device_MoCA_Interface_Stats_UnknownProtoPacketsReceived(&msgData,&bChanged);
+                            pIfaceStats->get_UnknownProtoPacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"UnknownProtoPacketsReceived");
@@ -1303,13 +1324,13 @@ void MoCAClientReqHandler::checkForUpdates()
                     else if(strncmp(buff,"QoS",3)==0)
                     {
                         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.QoS matched n pSetting is [%s] \n", __FILE__, __FUNCTION__,instanceNumber,pSetting);
-                        hostIf_MoCAInterfaceQoS *pIfaceQoS = hostIf_MoCAInterfaceQoS::getInstance((int)0);
+                        MoCAInterfaceQoS *pIfaceQoS = MoCAInterfaceQoS::getInstance();
                         memset(&msgData,0,sizeof(msgData));
                         // memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
                         bChanged = false;
                         if(strcmp(buff,"QoS.EgressNumFlows")==0)
                         {
-                            pIfaceQoS->get_Device_MoCA_Interface_QoS_EgressNumFlows(&msgData,&bChanged);
+                            pIfaceQoS->get_EgressNumFlows(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.%s",instanceNumber,"EgressNumFlows");
@@ -1321,7 +1342,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//QoS.EgressNumFlows   Close
                         else if (strcmp(buff,"QoS.IngressNumFlows")==0)
                         {
-                            pIfaceQoS->get_Device_MoCA_Interface_QoS_IngressNumFlows(&msgData,&bChanged);
+                            pIfaceQoS->get_IngressNumFlows(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.%s",instanceNumber,"IngressNumFlows");
@@ -1333,7 +1354,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//QoS.IngressNumFlows close
                         else if (strcmp(buff,"QoS.FlowStatsNumberOfEntries")==0)
                         {
-                            pIfaceQoS->get_Device_MoCA_Interface_QoS_FlowStatsNumberOfEntries(&msgData,&bChanged);
+                            pIfaceQoS->get_FlowStatsNumberOfEntries(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.%s",instanceNumber,"FlowStatsNumberOfEntries");
@@ -1351,7 +1372,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         bChanged =  false;
                         if(strcmp(pSetting,"Enable")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_Enable(&msgData,&bChanged);
+                            mocaIface->get_Enable(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"Enable");
@@ -1363,7 +1384,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//Enable close
                         else if(strcmp(pSetting,"Status")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_Status(&msgData,&bChanged);
+                            mocaIface->get_Status(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"Status");
@@ -1375,7 +1396,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//Status close
                         else if(strcmp(pSetting,"Alias")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_Alias(&msgData,&bChanged);
+                            mocaIface->get_Alias(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"Alias");
@@ -1387,7 +1408,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//Alias close
                         else if(strcmp(pSetting,"Name")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_Name(&msgData,&bChanged);
+                            mocaIface->get_Name(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"Name");
@@ -1399,7 +1420,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//Name close
                         else if(strcmp(pSetting,"LastChange")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_LastChange(&msgData,&bChanged);
+                            mocaIface->get_LastChange(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"LastChange");
@@ -1411,7 +1432,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//LastChange close
                         else if(strcmp(pSetting,"LowerLayers")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_LowerLayers(&msgData,&bChanged);
+                            mocaIface->get_LowerLayers(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"LowerLayers");
@@ -1423,7 +1444,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//LowerLayers close
                         else if(strcmp(pSetting,"Upstream")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_Upstream(&msgData,&bChanged);
+                            mocaIface->get_Upstream(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"Upstream");
@@ -1435,7 +1456,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//Upstream close
                         else if(strcmp(pSetting,"MACAddress")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_MACAddress(&msgData,&bChanged);
+                            mocaIface->get_MACAddress(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"MACAddress");
@@ -1447,7 +1468,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//MACAddress close
                         else if(strcmp(pSetting,"FirmwareVersion")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_FirmwareVersion(&msgData,&bChanged);
+                            mocaIface->get_FirmwareVersion(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"FirmwareVersion");
@@ -1459,7 +1480,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//FirmwareVersion close
                         else if(strcmp(pSetting,"MaxBitRate")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_MaxBitRate(&msgData,&bChanged);
+                            mocaIface->get_MaxBitRate(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"MaxBitRate");
@@ -1471,7 +1492,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//MaxBitRate close
                         else if(strcmp(pSetting,"MaxIngressBW")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_MaxIngressBW(&msgData,&bChanged);
+                            mocaIface->get_MaxIngressBW(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"MaxIngressBW");
@@ -1483,7 +1504,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//MaxIngressBW close
                         else if(strcmp(pSetting,"MaxEgressBW")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_MaxEgressBW(&msgData,&bChanged);
+                            mocaIface->get_MaxEgressBW(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"MaxEgressBW");
@@ -1495,7 +1516,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//MaxEgressBW close
                         else if(strcmp(pSetting,"HighestVersion")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_HighestVersion(&msgData,&bChanged);
+                            mocaIface->get_HighestVersion(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"HighestVersion");
@@ -1507,7 +1528,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//HighestVersion close
                         else if(strcmp(pSetting,"CurrentVersion")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_CurrentVersion(&msgData,&bChanged);
+                            mocaIface->get_CurrentVersion(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"CurrentVersion");
@@ -1519,7 +1540,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//CurrentVersion close
                         else if(strcmp(pSetting,"NetworkCoordinator")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_NetworkCoordinator(&msgData,&bChanged);
+                            mocaIface->get_NetworkCoordinator(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"NetworkCoordinator");
@@ -1531,7 +1552,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//NetworkCoordinator close
                         else if(strcmp(pSetting,"NodeID")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_NodeID(&msgData,&bChanged);
+                            mocaIface->get_NodeID(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"NodeID");
@@ -1543,7 +1564,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//NodeID close
                         else if(strcmp(pSetting,"MaxNodes")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_MaxNodes(&msgData,&bChanged);
+                            mocaIface->get_MaxNodes(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"MaxNodes");
@@ -1555,7 +1576,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//MaxNodes close
                         else if(strcmp(pSetting,"PreferredNC")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_PreferredNC(&msgData,&bChanged);
+                            mocaIface->get_PreferredNC(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"PreferredNC");
@@ -1567,7 +1588,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//PreferredNC close
                         else if(strcmp(pSetting,"BackupNC")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_BackupNC(&msgData,&bChanged);
+                            mocaIface->get_BackupNC(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"BackupNC");
@@ -1579,7 +1600,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//BackupNC close
                         else if(strcmp(pSetting,"PrivacyEnabledSetting")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_PrivacyEnabledSetting(&msgData,&bChanged);
+                            mocaIface->get_PrivacyEnabledSetting(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"PrivacyEnabledSetting");
@@ -1591,7 +1612,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//PrivacyEnabledSetting close
                         else if(strcmp(pSetting,"PrivacyEnabled")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_PrivacyEnabled(&msgData,&bChanged);
+                            mocaIface->get_PrivacyEnabled(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"PrivacyEnabled");
@@ -1603,7 +1624,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//PrivacyEnabled close
                         else if(strcmp(pSetting,"FreqCapabilityMask")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_FreqCapabilityMask(&msgData,&bChanged);
+                            mocaIface->get_FreqCapabilityMask(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"FreqCapabilityMask");
@@ -1616,7 +1637,7 @@ void MoCAClientReqHandler::checkForUpdates()
 
                         else if(strcmp(pSetting,"FreqCurrentMaskSetting")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_FreqCurrentMaskSetting(&msgData,&bChanged);
+                            mocaIface->get_FreqCurrentMaskSetting(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"FreqCurrentMaskSetting");
@@ -1628,7 +1649,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//FreqCurrentMaskSetting close
                         else if(strcmp(pSetting,"FreqCurrentMask")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_FreqCurrentMask(&msgData,&bChanged);
+                            mocaIface->get_FreqCurrentMask(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"FreqCurrentMask");
@@ -1640,7 +1661,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//FreqCurrentMask close
                         else if(strcmp(pSetting,"CurrentOperFreq")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_CurrentOperFreq(&msgData,&bChanged);
+                            mocaIface->get_CurrentOperFreq(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"CurrentOperFreq");
@@ -1652,7 +1673,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//CurrentOperFreq close
                         else if(strcmp(pSetting,"LastOperFreq")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_LastOperFreq(&msgData,&bChanged);
+                            mocaIface->get_LastOperFreq(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"LastOperFreq");
@@ -1664,7 +1685,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//LastOperFreq close
                         else if(strcmp(pSetting,"KeyPassphrase")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_KeyPassphrase(&msgData,&bChanged);
+                            mocaIface->get_KeyPassphrase(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"KeyPassphrase");
@@ -1676,7 +1697,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//KeyPassphrase close
                         else if(strcmp(pSetting,"TxPowerLimit")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_TxPowerLimit(&msgData,&bChanged);
+                            mocaIface->get_TxPowerLimit(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"TxPowerLimit");
@@ -1688,7 +1709,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//TxPowerLimit close
                         else if(strcmp(pSetting,"PowerCntlPhyTarget")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_PowerCntlPhyTarget(&msgData,&bChanged);
+                            mocaIface->get_PowerCntlPhyTarget(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"PowerCntlPhyTarget");
@@ -1700,7 +1721,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//PowerCntlPhyTarget close
                         else if(strcmp(pSetting,"BeaconPowerLimit")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_BeaconPowerLimit(&msgData,&bChanged);
+                            mocaIface->get_BeaconPowerLimit(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"BeaconPowerLimit");
@@ -1712,7 +1733,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//BeaconPowerLimit close
                         else if(strcmp(pSetting,"NetworkTabooMask")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_NetworkTabooMask(&msgData,&bChanged);
+                            mocaIface->get_NetworkTabooMask(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"NetworkTabooMask");
@@ -1724,7 +1745,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//NetworkTabooMask close
                         else if(strcmp(pSetting,"NodeTabooMask")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_NodeTabooMask(&msgData,&bChanged);
+                            mocaIface->get_NodeTabooMask(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"NodeTabooMask");
@@ -1736,7 +1757,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//NodeTabooMask close
                         else if(strcmp(pSetting,"TxBcastRate")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_TxBcastRate(&msgData,&bChanged);
+                            mocaIface->get_TxBcastRate(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"TxBcastRate");
@@ -1748,7 +1769,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//TxBcastRate close
                         else if(strcmp(pSetting,"TxBcastPowerReduction")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_TxBcastPowerReduction(&msgData,&bChanged);
+                            mocaIface->get_TxBcastPowerReduction(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"TxBcastPowerReduction");
@@ -1760,7 +1781,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//TxBcastPowerReduction close
                         else if(strcmp(pSetting,"QAM256Capable")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_QAM256Capable(&msgData,&bChanged);
+                            mocaIface->get_QAM256Capable(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"QAM256Capable");
@@ -1772,7 +1793,7 @@ void MoCAClientReqHandler::checkForUpdates()
                         }//QAM256Capable close
                         else if(strcmp(pSetting,"PacketAggregationCapability")==0)
                         {
-                            mocaIface->get_Device_MoCA_Interface_PacketAggregationCapability(&msgData,&bChanged);
+                            mocaIface->get_PacketAggregationCapability(&msgData,&bChanged);
                             if(bChanged)
                             {
                                 //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"PacketAggregationCapability");
@@ -1787,23 +1808,23 @@ void MoCAClientReqHandler::checkForUpdates()
                 }//if mocaIface  close
                 else
                 {
-                    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface couldn't get mocaIface instance else of (mocaIface)\n"__FILE__, __FUNCTION__);
+                    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface couldn't get mocaIface instance else of (mocaIface)\n",__FILE__, __FUNCTION__);
 
                 } // else mocaIface close
             }//Device.MoCA.Interface close
             else
             {
-                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface is NOT MATCHED \n"__FILE__, __FUNCTION__);
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface is NOT MATCHED \n",__FILE__, __FUNCTION__);
             }
         }//while close
     }//NULL != notifyhash close
     else
     {
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Couldn't get #####notifyhash###### instance \n"__FILE__, __FUNCTION__);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Couldn't get #####notifyhash###### instance \n", __FILE__, __FUNCTION__);
 
     }
 #endif /* HAVE_VALUE_CHANGE_EVENT */
-    hostIf_MoCAInterface::releaseLock();
+    MoCAInterface::releaseLock();
 }
 #endif /* USE_MoCA_PROFILE */
 

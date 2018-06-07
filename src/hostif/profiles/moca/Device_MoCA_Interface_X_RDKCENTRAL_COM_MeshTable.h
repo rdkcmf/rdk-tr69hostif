@@ -86,13 +86,13 @@
  *  @{
  */
 
-class hostIf_MoCAInterfaceMeshTable {
+class X_RDKCENTRAL_COM_MeshTable {
 
     static  GHashTable  *ifHash;
     int dev_id;
 
-    hostIf_MoCAInterfaceMeshTable(int dev_id);
-    ~hostIf_MoCAInterfaceMeshTable() {};
+    X_RDKCENTRAL_COM_MeshTable(int dev_id);
+    ~X_RDKCENTRAL_COM_MeshTable() {};
 
     unsigned int backupTxNodeID;
     unsigned int backupRxNodeID;
@@ -103,8 +103,8 @@ class hostIf_MoCAInterfaceMeshTable {
     bool bCalledPHYTxRate;
 
 public:
-    static class hostIf_MoCAInterfaceMeshTable *getInstance(int dev_id);
-    static void closeInstance(hostIf_MoCAInterfaceMeshTable *);
+    static class X_RDKCENTRAL_COM_MeshTable *getInstance(int dev_id);
+    static void closeInstance(X_RDKCENTRAL_COM_MeshTable *);
     static void closeAllInstances();
     static GList* getAllAssociateDevs();
 
@@ -118,7 +118,7 @@ public:
      * See @ref dev_moca_if_assocdev_getter
      *
      */
-    int get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTable_MeshTxNodeId(HOSTIF_MsgData_t *stMsgData ,unsigned int associatedDeviceNum,bool *pChanged = NULL);
+    int get_MeshTxNodeId(HOSTIF_MsgData_t *stMsgData ,unsigned int associatedDeviceNum,bool *pChanged = NULL);
 
     /**
      * @brief   Get the node ID of the receive MoCA node from MoCA mesh table of MoCA connected device.
@@ -130,7 +130,7 @@ public:
      * See @ref dev_moca_if_assocdev_getter
      *
      */
-    int get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTable_MeshRxNodeId(HOSTIF_MsgData_t *stMsgData ,unsigned int associatedDeviceNum,bool *pChanged = NULL);
+    int get_MeshRxNodeId(HOSTIF_MsgData_t *stMsgData ,unsigned int associatedDeviceNum,bool *pChanged = NULL);
 
     /**
      * @brief   Get the Associated Device's presence indicator.
@@ -149,7 +149,8 @@ public:
      * See @ref dev_moca_if_assocdev_getter
      *
      */
-    int get_Device_MoCA_Interface_X_RDKCENTRAL_COM_MeshTable_MeshPHYTxRate(HOSTIF_MsgData_t *stMsgData ,unsigned int associatedDeviceNum,bool *pChanged = NULL);
+    int get_MeshPHYTxRate(HOSTIF_MsgData_t *stMsgData ,unsigned int associatedDeviceNum,bool *pChanged = NULL);
+    int get_BondedChannel(HOSTIF_MsgData_t *stMsgData ,unsigned int associatedDeviceNum,bool *pChanged = NULL);
 
 };
 

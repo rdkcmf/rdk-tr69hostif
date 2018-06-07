@@ -104,9 +104,9 @@ AC_ARG_ENABLE([morty],
         [
         PKG_CHECK_MODULES([PROCPS], [libproc >= 3.2.8])])
 
-m4_syscmd([test -d soc/hostif/profiles/moca])
-m4_if(m4_sysval,[0],[AC_CONFIG_FILES([soc/hostif/profiles/moca/Makefile])])
-m4_if(m4_sysval,[0],[SUBDIRS_MOCA="soc/hostif/profiles/moca"])
+m4_syscmd([test -d src/hostif/profiles/moca])
+m4_if(m4_sysval,[0],[AC_CONFIG_FILES([src/hostif/profiles/moca/Makefile])])
+m4_if(m4_sysval,[0],[SUBDIRS_MOCA="src/hostif/profiles/moca"])
 
 AC_ARG_ENABLE([wifi],
         AS_HELP_STRING([--enable-wifi],[enable WiFi profile (default is no)]),
