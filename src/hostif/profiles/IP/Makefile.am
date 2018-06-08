@@ -19,7 +19,7 @@
 
 SUBDIRS = 
 
-AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include -I$(top_srcdir)/src/hostif/handlers/include  $(GLIB_CFLAGS) $(G_THREAD_CFLAGS)
+AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include -I$(top_srcdir)/src/hostif/handlers/include  $(GLIB_CFLAGS) $(G_THREAD_CFLAGS) $(YOCTO_FLAG)
 
 if WITH_IPV6_SUPPORT
 AM_CXXFLAGS += $(IPV6_SUPPORT_FLAG)
@@ -33,6 +33,9 @@ libhostIfIP_la_SOURCES =  Device_IP_ActivePort.cpp \
 				Device_IP_Interface_Stats.cpp \
 				Device_IP_Diagnostics_IPPing.cpp
 
+if IS_YOCTO_ENABLED
+libhostIfIP_la_LDFLAGS = -lsecure_wrapper
+endif
 if WITH_IPV6_SUPPORT
 libhostIfIP_la_SOURCES += Device_IP_Interface_IPv6Address.cpp
 endif				

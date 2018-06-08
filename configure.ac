@@ -53,6 +53,8 @@ HWSELFTEST_PROFILE_FLAG=" "
 TELEMETRY_LOGGER_FLAG=" "
 PAROUDS_ENABLE_FLAG=" "
 ESTORIA_ENABLE_FLAG=" "
+YOCTO_FLAG=" "
+IS_YOCTO_ENABLED=" "
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
 [AM_DEFAULT_VERBOSITY=1
@@ -320,6 +322,20 @@ AC_ARG_ENABLE([estoria],
            esac
            ],
          [echo "Estoria is disabled"])
+
+
+AC_ARG_ENABLE([yocto],
+        AS_HELP_STRING([--enable-yocto],[enable yocto (default is no)]),
+        [
+          case "${enableval}" in
+           yes) IS_YOCTO_ENABLED=true ;;
+           no)  IS_YOCTO_ENABLED=false ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-yocto]) ;;
+           esac
+           ],
+        [echo "yocto is disabled"])
+AM_CONDITIONAL([IS_YOCTO_ENABLED], [test x$IS_YOCTO_ENABLED = xtrue])
+AC_SUBST(YOCTO_FLAG)
 
 
 
