@@ -109,6 +109,7 @@ class hostIf_WiFi_Radio {
     static  GHashTable *ifHash;
 
     int dev_id;
+    time_t radioFirstExTime;
     hostIf_WiFi_Radio(int dev_id);
     ~hostIf_WiFi_Radio() {};
 
