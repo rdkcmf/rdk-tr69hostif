@@ -22,6 +22,7 @@
 . $RDK_PATH/utils.sh
 . $RDK_PATH/getPartnerId.sh
 WEBPA_CFG_OVERIDE_FILE="/opt/webpa_cfg.json"
+CRUD_CONFIG_FILE="/opt/parodus_cfg.json"
 SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
 JWT_KEY="/etc/ssl/certs/webpa-rs256.pem"
 DNS_TEXT_URL="fabric.xmidt.comcast.net"
@@ -98,7 +99,7 @@ parodus_start_up()
        echo "Failed to start Parodus, Can't fetch macAddress "
     else
        echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-interface-used=$NwInterface webpa-url=$ServerIP partner-id=$(getPartnerId)"
-       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=$(getPartnerId) --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE  --acquire-jwt=$ACQUIRE_JWT --dns-txt-url=$DNS_TEXT_URL --jwt-public-key-file=$JWT_KEY --jwt-algo=RS256"
+       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=$(getPartnerId) --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE  --acquire-jwt=$ACQUIRE_JWT --dns-txt-url=$DNS_TEXT_URL --jwt-public-key-file=$JWT_KEY --jwt-algo=RS256 --crud-config-file=$CRUD_CONFIG_FILE"
        echo "Parodus command set.." 
     fi
 }
