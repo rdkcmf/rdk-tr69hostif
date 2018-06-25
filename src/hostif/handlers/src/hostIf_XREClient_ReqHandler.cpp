@@ -437,6 +437,8 @@ int XREClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     else if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.TRM.trmGatewaySTBMAC") == 0)
     {
         ret = get_Device_X_COMCAST_COM_Xcalibur_TRM_trmGatewaySTBMAC(stMsgData);
+        ret = OK;                // always returning OK to fix Delia-28157
+
     }
     else if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.TRM.trmGatewayMoCAMAC") == 0)
     {
