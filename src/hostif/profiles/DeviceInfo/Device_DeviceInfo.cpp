@@ -112,7 +112,9 @@ void *ResetFunc(void *);
 static int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t *);
 static char stbMacCache[TR69HOSTIFMGR_MAX_PARAM_LEN] = {'\0'};
 static string reverseSSHArgs;
+static string stunnelSSHArgs;
 const string sshCommand = "/lib/rdk/startTunnel.sh";
+const string stunnelCommand = "/lib/rdk/startStunnel.sh";
 
 string hostIf_DeviceInfo::m_xFirmwareDownloadProtocol;
 string hostIf_DeviceInfo::m_xFirmwareDownloadURL;
@@ -1599,7 +1601,7 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(HOSTIF_MsgDa
     if(val[0] == '\0')
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s():] Set as NULL. Fail to execute \'X_COMCAST_COM_Reset\'Please give the correct input value as \
-        		a \'Cold\', \'Factory\', \'Warehouse\' or \'Customer\' String. \n",__FUNCTION__);
+                       a \'Cold\', \'Factory\', \'Warehouse\' or \'Customer\' String. \n",__FUNCTION__);
         return ret;
     }
     if (0 == strcasecmp(val,"Cold"))
@@ -1693,7 +1695,7 @@ int hostIf_DeviceInfo::set_xOpsDMUploadLogsNow (HOSTIF_MsgData_t *stMsgData)
     else
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s]Failed, the set value is %d, so failed to execute . Please set as true(1)\
-        		to execute trigger upload now. \n",__FUNCTION__, triggerUploadLog );
+                to execute trigger upload now. \n",__FUNCTION__, triggerUploadLog );
         return OK;
     }
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
@@ -2028,37 +2030,51 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
         }
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] parsed Values are : %s\n",__FUNCTION__,parsedValues.c_str());
 
-        reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":";
+        // two paths to follow either reversessh or stunnel based on whether the parsed map contains type key
+        if (!parsedMap.count("type")) {
+            reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":";
 
-        if (ipv6Enabled)
-        {
-            reverseSSHArgs += "[" + getEstbIp() + "]";
+            if (ipv6Enabled)
+            {
+                reverseSSHArgs += "[" + getEstbIp() + "]";
+            }
+            else
+            {
+                reverseSSHArgs += getEstbIp();
+            }
+
+            reverseSSHArgs +=  ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
+            if (parsedMap.find("sshport") != parsedMap.end())
+            {
+                reverseSSHArgs += " -p " + parsedMap["sshport"];
+            }
+
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] String is  : %s\n",__FUNCTION__,reverseSSHArgs.c_str());
+
+            string::const_iterator it = std::find_if(reverseSSHArgs.begin(), reverseSSHArgs.end(), [](char c) {
+                return !(isalnum(c) || (c == ' ') || (c == ':') || (c == '-') || (c == '.') || (c == '@') || (c == '_') || (c == '[') || (c == ']'));
+            });
+
+            if (it  != reverseSSHArgs.end())
+            {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Exception Accured... \n",__FUNCTION__);
+                reverseSSHArgs = "";
+                return NOK;
+            }
+
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] ReverseSSH Args = %s \n",__FUNCTION__,reverseSSHArgs.c_str());
+        } else {
+            string localIP = getEstbIp();
+
+            // for arguments for script in the form " ip_version_number localIP + remoteIP + remotePort"
+            stunnelSSHArgs = parsedMap.at("type") + " " + localIP + " " + parsedMap.at("host") + " " + parsedMap.at("callbackport");
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] StunnelSSH Args = %s \n",__FUNCTION__,stunnelSSHArgs.c_str());
+
+            string runCommand = stunnelCommand + " " + stunnelSSHArgs + " &";
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] StunnelSSH Command = %s \n",__FUNCTION__,runCommand.c_str());
+
+            system(runCommand.c_str());
         }
-        else
-        {
-            reverseSSHArgs += getEstbIp();
-        }
-
-        reverseSSHArgs +=  ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
-        if (parsedMap.find("sshport") != parsedMap.end())
-        {
-            reverseSSHArgs += " -p " + parsedMap["sshport"];
-        }
-
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] String is  : %s\n",__FUNCTION__,reverseSSHArgs.c_str());
-
-        string::const_iterator it = std::find_if(reverseSSHArgs.begin(), reverseSSHArgs.end(), [](char c) {
-            return !(isalnum(c) || (c == ' ') || (c == ':') || (c == '-') || (c == '.') || (c == '@') || (c == '_') || (c == '[') || (c == ']'));
-        });
-
-        if (it  != reverseSSHArgs.end())
-        {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Exception Accured... \n",__FUNCTION__);
-            reverseSSHArgs = "";
-            return NOK;
-        }
-
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] ReverseSSH Args = %s \n",__FUNCTION__,reverseSSHArgs.c_str());
     } catch (const std::exception e) {
         std::cout << __FUNCTION__ << "An exception occurred. " << e.what() << endl;
 
