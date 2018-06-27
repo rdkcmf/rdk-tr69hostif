@@ -75,7 +75,7 @@
 #include "dsError.h"
 #include "audioOutputPort.hpp"
 #include "sysMgr.h"
-#ifdef USE_MoCA_PROFILE
+#ifdef MEDIA_CLIENT
 #include "netsrvmgrIarm.h"
 #endif
 #include <map>
@@ -1052,12 +1052,28 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgDat
 string hostIf_DeviceInfo::getEstbIp()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]Entering..\n", __FUNCTION__);
+    string retAddr;
+#if MEDIA_CLIENT
+    IARM_Result_t ret = IARM_RESULT_SUCCESS;
+    IARM_BUS_NetSrvMgr_Iface_EventData_t param;
+    memset(&param, 0, sizeof(param));
+    try
+    {
+        ret = IARM_Bus_Call(IARM_BUS_NM_SRV_MGR_NAME,IARM_BUS_NETSRVMGR_API_getSTBip, (void*)&param, sizeof(param));
+        if (ret != IARM_RESULT_SUCCESS )
+        {
+            RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s():%d] IARM_BUS_NETSRVMGR_API_getActiveInterface failed \n", __FUNCTION__, __LINE__);
+        }
+        retAddr=param.activeIfaceIpaddr;
+    }
+    //Legacy way of getting estb ip.
+#else
 
     struct ifaddrs *ifAddrStr = NULL;
     struct ifaddrs * ifa = NULL;
     void * tmpAddrPtr = NULL;
     char tmp_buff[TR69HOSTIFMGR_MAX_PARAM_LEN] = {'\0'};
-    string retAddr;
+
 
     const char *ipv6_fileName = "/tmp/estb_ipv6";
     const char *Wifi_Enable_file = "/tmp/wifi-on";
@@ -1067,12 +1083,12 @@ string hostIf_DeviceInfo::getEstbIp()
         bool ipv6Enabled = (!access (ipv6_fileName, F_OK))?true:false;
         bool isWifiEnabled = (!access (Wifi_Enable_file, F_OK))?true:false;
         const char* ip_if = NULL;
-#ifdef MEDIA_CLIENT
+//#ifdef MEDIA_CLIENT
         /* Get configured moca interface */
-        ip_if = "MOCA_INTERFACE";
-#else
+//        ip_if = "MOCA_INTERFACE";
+//#else
         ip_if = "DEFAULT_ESTB_INTERFACE";
-#endif
+//#endif
         char *ethIf = getenvOrDefault (ip_if, "");
         RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s():%d] ipv6Enabled : %d; isWifiEnabled : %d ethIf : %s\n",
                 __FUNCTION__, __LINE__, ipv6Enabled, isWifiEnabled, ethIf);
@@ -1150,6 +1166,7 @@ string hostIf_DeviceInfo::getEstbIp()
             retAddr = tmp_buff;
         }
     }
+#endif
     catch (const std::exception &e)
     {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s()]Exception caught %s\n", __FUNCTION__, e.what());
