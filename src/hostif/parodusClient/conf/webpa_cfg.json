@@ -3,6 +3,7 @@
 	"file-version": 1,
 	"ServerIP": "https://fabric.xmidt.comcast.net:8080",
 	"ServerPort": 8080,
+	"acquire-jwt": 1,
 	"DeviceNetworkInterface": "",
 	"RetryIntervalInSec": 10,
         "ParodusURL" : "tcp://127.0.0.1:6666",

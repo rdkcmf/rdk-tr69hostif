@@ -25,7 +25,6 @@ WEBPA_CFG_OVERIDE_FILE="/opt/webpa_cfg.json"
 SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
 JWT_KEY="/etc/ssl/certs/webpa-rs256.pem"
 DNS_TEXT_URL="fabric.xmidt.comcast.net"
-ACQUIRE_JWT=1
 
 if [ -f "$WEBPA_CFG_OVERIDE_FILE" ] && [ "$BUILD_TYPE" != "prod" ]; then
     WEBPA_CFG_FILE=$WEBPA_CFG_OVERIDE_FILE
@@ -87,7 +86,10 @@ parodus_start_up()
 {
     # Getting Webpa Parameters
     ServerIP=`get_webpa_string_parameter "ServerIP"`
-
+    ACQUIRE_JWT =`get_webpa_number_parameter "acquire-jwt"`
+    if [ -z $ACQUIRE_JWT ]; then
+	ACQUIRE_JWT=1
+    fi
     NwInterface=`get_webpa_string_parameter "DeviceNetworkInterface"`
     ServerPort=`get_webpa_number_parameter "ServerPort"`
     PingWaitTime=`get_webpa_max_waiting_time "MaxPingWaitTimeInSec"`
