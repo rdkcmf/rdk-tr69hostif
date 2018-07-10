@@ -335,6 +335,19 @@ AC_ARG_ENABLE([estoria],
            ],
          [echo "Estoria is disabled"])
 
+# Enable wifi client Roaming
+WIFI_CLIENT_ROAMING=" "
+AC_ARG_ENABLE([client_roaming],
+        AS_HELP_STRING([--enable-client-roaming],[This will enable/disable wifi client roaming.]),
+        [
+          case "${enableval}" in
+           yes) WIFI_CLIENT_ROAMING=true
+                echo " wifi-client-roaming is enabled";;
+           no) WIFI_CLIENT_ROAMING=false ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-client-roaming ]) ;;
+           esac
+           ],
+         [echo " wifi-client-roaming is disabled"])
 
 AC_ARG_ENABLE([yocto],
         AS_HELP_STRING([--enable-yocto],[enable yocto (default is no)]),
@@ -351,6 +364,7 @@ AC_SUBST(YOCTO_FLAG)
 
 
 
+AM_CONDITIONAL([WIFI_CLIENT_ROAMING], [test x$WIFI_CLIENT_ROAMING = xtrue])
 AM_CONDITIONAL([WITH_MOCA_PROFILE], [test "x$enable_moca" = "xyes"])
 AM_CONDITIONAL([WITH_MOCA20], [test "x$enable_moca2" = "xyes"])
 AM_CONDITIONAL([WITH_WIFI_PROFILE], [test x$WIFI_PROFILE_ENABLE = xtrue])
@@ -422,6 +436,7 @@ AC_SUBST(HWSELFTEST_PROFILE_FLAG)
 AC_SUBST(TELEMETRY_LOGGER_FLAG)
 AC_SUBST(PARODUS_ENABLE_FLAG)
 AC_SUBST(ESTORIA_ENABLE_FLAG)
+AC_SUBST(WIFI_CLIENT_ROAMING)
 
 # files to generate via autotools (.am or .in source files)
 AC_CONFIG_FILES([Makefile])

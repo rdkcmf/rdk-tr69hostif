@@ -51,6 +51,10 @@
 #include "Device_WiFi_SSID.h"
 #include "Device_WiFi_SSID_Stats.h"
 
+#ifdef WIFI_CLIENT_ROAMING
+#include "Device_WiFi_X_RDKCENTRAL_COM_ClientRoaming.h"
+#endif
+
 WiFiReqHandler* WiFiReqHandler::pInstance = NULL;
 updateCallback WiFiReqHandler::mUpdateCallback = NULL;
 int WiFiReqHandler::savedSSIDNumberOfEntries = 0;
@@ -122,6 +126,9 @@ bool WiFiReqHandler::unInit()
     hostIf_WiFi_EndPoint_Security::closeAllInstances();
     hostIf_WiFi_EndPoint_Profile::closeAllInstances();
     hostIf_WiFi_EndPoint_Profile_Security::closeAllInstances();
+#ifdef WIFI_CLIENT_ROAMING
+    hostIf_WiFi_Xrdk_ClientRoaming::closeAllInstances();
+#endif
 
     WiFiDevice::closeAllInstances();
 
@@ -156,6 +163,36 @@ int WiFiReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
             return NOK;
         }
         ret = pIface->set_Device_WiFi_EnableWiFi(stMsgData);
+    }
+#ifdef WIFI_CLIENT_ROAMING
+    else if(strncasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming",strlen("Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming"))==0)
+    {
+        //Setting Roaming params
+        hostIf_WiFi_Xrdk_ClientRoaming* clntRoamInst =  hostIf_WiFi_Xrdk_ClientRoaming::getInstance(stMsgData->instanceNum);
+        if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.Enable") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_Enable(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PreAssn_BestThresholdLevel") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_PreAssn_BestThresholdLevel(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PreAssn_BestDeltaLevel") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_PreAssn_BestDeltaLevel(stMsgData);
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]  Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+            stMsgData->faultCode = fcInvalidParameterName;
+            ret = NOK;
+        }
+    }
+#endif
+    else
+    {
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Found string as %s. Set command not supported.\n", __FUNCTION__, __FILE__, stMsgData->paramName);
+        stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
     }
     return ret;
 }
@@ -537,6 +574,31 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         }
 
     }
+#ifdef WIFI_CLIENT_ROAMING
+    else if (strncasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming",strlen("Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming")) == 0)
+    {
+        // Get Client Roaming Settings
+        hostIf_WiFi_Xrdk_ClientRoaming* clntRoamInst =  hostIf_WiFi_Xrdk_ClientRoaming::getInstance(stMsgData->instanceNum);
+        if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.Enable") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_Enable(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PreAssn_BestThresholdLevel") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_PreAssn_BestThresholdLevel(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PreAssn_BestDeltaLevel") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_PreAssn_BestDeltaLevel(stMsgData);
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]  Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+            stMsgData->faultCode = fcInvalidParameterName;
+            ret = NOK;
+        }
+    }
+#endif
     else
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]  Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
@@ -558,7 +620,7 @@ int WiFiReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 int WiFiReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
 
-	int ret = NOT_HANDLED;
+        int ret = NOT_HANDLED;
 /*	int instanceNumber = 0;
 	hostIf_WiFi::getLock();
 	// TODO: Set notification value from DeviceInfo structure for given parameter
@@ -567,22 +629,21 @@ int WiFiReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 	stMsgData->instanceNum = instanceNumber;
 	if(!pIface)
 	{
-		RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] pIface is failed. For param as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-		hostIf_WiFi::releaseLock();
-			return NOK;
+	    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] pIface is failed. For param as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+	    hostIf_WiFi::releaseLock();
+	    return NOK;
 	}
-
 	GHashTable* notifyhash = pIface->getNotifyHash();
 	if(notifyhash != NULL)
 	{
-		RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] notifyhash is not Null %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-	int notifyvalue = get_int(stMsgData->paramValue);
-	g_hash_table_insert(notifyhash,stMsgData->paramName,(gpointer) notifyvalue);
-	ret = OK;
+	    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] notifyhash is not Null %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+	    int notifyvalue = get_int(stMsgData->paramValue);
+	    g_hash_table_insert(notifyhash,stMsgData->paramName,(gpointer) notifyvalue);
+	    ret = OK;
 	}
 	else
 	{
-		RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] notifyhash is Null %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+	   RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] notifyhash is Null %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
 	   ret = NOK;
 	}
 	hostIf_WiFi::releaseLock();*/

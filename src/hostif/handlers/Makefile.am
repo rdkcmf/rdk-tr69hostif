@@ -82,6 +82,10 @@ if WITH_SNMP_ADAPTER
 AM_CXXFLAGS += -DSNMP_ADAPTER_ENABLED -I$(top_srcdir)/src/hostif/snmpAdapter
 endif
 
+if WIFI_CLIENT_ROAMING
+AM_CXXFLAGS += -DWIFI_CLIENT_ROAMING
+endif
+
 AM_LDFLAGS = $(GLIB_LIBS) $(G_THREAD_LIBS) $(SOUP_LIBS) $(PROCPS_LIBS) -lIARMBus -lyajl -lds -ldshalcli -ldbus-1
 
 noinst_LTLIBRARIES = libMsgHandlers.la
