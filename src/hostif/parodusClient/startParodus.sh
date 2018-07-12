@@ -86,7 +86,7 @@ parodus_start_up()
 {
     # Getting Webpa Parameters
     ServerIP=`get_webpa_string_parameter "ServerIP"`
-    ACQUIRE_JWT =`get_webpa_number_parameter "acquire-jwt"`
+    ACQUIRE_JWT=`get_webpa_number_parameter "acquire-jwt"`
     if [ -z $ACQUIRE_JWT ]; then
 	ACQUIRE_JWT=1
     fi
