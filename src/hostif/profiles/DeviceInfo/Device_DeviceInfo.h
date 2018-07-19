@@ -196,6 +196,8 @@
 
 #define xFirmwareDownloadNow_STR	"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadNow" /* boolean [w] Trigger download on set true. */
 
+#define IPREMOTE_SUPPORT  "Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.Enable"
+
 /**
  * @brief This class provides the interface for getting device information.
  * @ingroup TR69_HOSTIF_DEVICEINFO_CLASSES
@@ -711,6 +713,9 @@ public:
     * @retval NOK if operation fails.
     */
     int set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t *);
+
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+    int set_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *);
 
 #ifdef USE_HWSELFTEST_PROFILE
     /**

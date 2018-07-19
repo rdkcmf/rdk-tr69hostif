@@ -190,6 +190,10 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_xOpsDeviceMgmtRPCRebootNow (stMsgData);
         }
+        else if (strcasecmp(stMsgData->paramName,IPREMOTE_SUPPORT) == 0)
+        {
+            ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(stMsgData);
+        }
         else if (strstr(stMsgData->paramName,TR181_RFC_PREFIX) != NULL)
         {
             RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] parameter %s is being set with value %s \n", __FUNCTION__, stMsgData->paramName, stMsgData->paramValue);
@@ -542,6 +546,10 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         else if (strcasecmp(stMsgData->paramName,xOpsDMUploadLogsNow_STR) == 0)
         {
             ret = pIface->get_xOpsDMUploadLogsNow(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,IPREMOTE_SUPPORT) == 0)
+        {
+            ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(stMsgData);
         }
         else if (strcasecmp(stMsgData->paramName,XRDK_BOOT_TIME) == 0)
         {

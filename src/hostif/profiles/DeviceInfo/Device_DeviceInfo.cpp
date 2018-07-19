@@ -99,6 +99,7 @@
 #define SOC_ID_FILE			"/var/log/socprov.log"
 #define PREFERRED_GATEWAY_FILE		"/opt/prefered-gateway"
 #define GATEWAY_NAME_SIZE 4
+#define IPREMOTE_SUPPORT_STATUS_FILE    "/opt/.ipremote_status"
 
 #define TR069DOSLIMIT_THRESHOLD "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Tr069DoSLimit.Threshold"
 #define MIN_TR69_DOS_THRESHOLD 0
@@ -2142,6 +2143,38 @@ int hostIf_DeviceInfo::set_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
     return OK;
 }
 
+int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *stMsgData)
+{
+    const char *status = stMsgData->paramValue;
+  
+    if(0 == strcasecmp(status,"false"))
+    {
+       
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] IPRemoteSupport disable request\n", __FUNCTION__);
+        ifstream ifp(IPREMOTE_SUPPORT_STATUS_FILE);
+        if(ifp.is_open())
+        {
+            if(remove(IPREMOTE_SUPPORT_STATUS_FILE) == 0)
+            {
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Removed File %s, IPRemoteSupport is disabled\n", __FUNCTION__, IPREMOTE_SUPPORT_STATUS_FILE);
+            }
+        }
+       
+    }
+    else if(0 == strcasecmp(status,"true"))
+    {
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] IPRemoteSupport enable request\n", __FUNCTION__);
+        ofstream ofp(IPREMOTE_SUPPORT_STATUS_FILE);       
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Created File %s, IPRemoteSupport is enabled\n", __FUNCTION__, IPREMOTE_SUPPORT_STATUS_FILE);      
+    }
+    else
+    {
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] Value not passed for the param, IPRemoteSupport Status unchanged \n", __FUNCTION__); 
+    }
+
+    return OK;
+}
+
 int hostIf_DeviceInfo::set_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
 {
     unsigned int mocaLogDuration  = 3600;
@@ -2182,6 +2215,29 @@ int hostIf_DeviceInfo::get_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
 #endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
     return OK;
+}
+
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
+{
+    char *status = "false";
+    ifstream ifp(IPREMOTE_SUPPORT_STATUS_FILE);
+    if(ifp.is_open())
+    {
+        status="true";
+        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s] %s exists, IpRemoteSupport Status is enabled\n", __FUNCTION__, IPREMOTE_SUPPORT_STATUS_FILE);
+        
+    }
+    else
+    {
+        status="false";
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] File not exists, IpRemoteSupport Status is Disabled\n", __FUNCTION__);
+    } 
+
+    snprintf((char *)stMsgData->paramValue, strlen(stMsgData->paramValue)-1, "%s", status);
+    stMsgData->paramtype = hostIf_StringType;
+    stMsgData->paramLen = strlen(stMsgData->paramValue);
+
+    return OK;   
 }
 
 int hostIf_DeviceInfo::get_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
