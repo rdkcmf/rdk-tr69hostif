@@ -53,7 +53,7 @@
 #include <mutex>
 extern "C" {
 #include "btmgr.h"
-#include "btmgr_iarm_interface.h"
+#include "lemgr_iarm_interface.h"
 }
 
 BTRMGR_DiscoveredDevicesList_t hostIf_DeviceInfoRdk_xBT::disDevList;
@@ -113,7 +113,9 @@ void hostIf_DeviceInfoRdk_xBT::reset()
  */
 hostIf_DeviceInfoRdk_xBT::hostIf_DeviceInfoRdk_xBT()
 {
-
+    this->tile_Id="";
+    this->sessionId="";
+    this->triggerFlag = false;
 }
 
 /**
@@ -269,6 +271,27 @@ int hostIf_DeviceInfoRdk_xBT::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         else if (strncasecmp(paramName, BT_DEV_INFO_RSSI_STRING, strlen(BT_DEV_INFO_RSSI_STRING)) == 0)
         {
             ret = getDeviceInfo_RSSI(stMsgData);
+        }
+        else if (strncasecmp(paramName, BT_TILE_ID_STRING, strlen(BT_TILE_ID_STRING)) == 0)
+        {
+            snprintf(stMsgData->paramValue, (TR69HOSTIFMGR_MAX_PARAM_LEN -1), "%s", this->tile_Id.c_str());
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: :Parameter name : \"%s \"and value \"%d\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, this->triggerFlag);
+            stMsgData->paramtype=hostIf_StringType;
+            ret = OK;
+        }
+        else if (strncasecmp(paramName, BT_TILE_SESSION_ID_STRING, strlen(BT_TILE_SESSION_ID_STRING)) == 0)
+        {
+            snprintf(stMsgData->paramValue, (TR69HOSTIFMGR_MAX_PARAM_LEN -1), "%s", this->sessionId.c_str());
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: :Parameter name : \"%s \"and value \"%d\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, this->triggerFlag);
+            stMsgData->paramtype=hostIf_StringType;
+            ret = OK;
+        }
+        else if (strncasecmp(paramName, BT_TILE_TRIGGER_STRING, strlen(BT_TILE_TRIGGER_STRING)) == 0)
+        {
+            put_boolean(stMsgData->paramValue,  this->triggerFlag);
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: :Parameter name : \"%s \"and value \"%d\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, this->triggerFlag);
+            stMsgData->paramtype=hostIf_BooleanType;
+            ret = OK;
         }
         /* For Discovered Devices */
         else if(matchComponent(stMsgData->paramName, X_BT_DISCOVERED_DEV_OBJ, &tblAttName, index))
@@ -1187,7 +1210,7 @@ int hostIf_DeviceInfoRdk_xBT::getDeviceInfo_DeviceID(HOSTIF_MsgData_t *stMsgData
         if(handle_devInfo) {
             RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: The Device ID is \'%llu\'.\n", __FUNCTION__, __LINE__, deviceProperty.m_deviceHandle);
             memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
-            sprintf(stMsgData->paramValue,"%llu" ,deviceProperty.m_deviceHandle);
+            sprintf(stMsgData->paramValue,"%llu",deviceProperty.m_deviceHandle);
         }
         else
         {
