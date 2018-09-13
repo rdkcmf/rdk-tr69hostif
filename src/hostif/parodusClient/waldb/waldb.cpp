@@ -520,11 +520,9 @@ void checkforParameterNameMatch(TiXmlNode *pParent, const char *ObjectName, cons
         return;
     }
 
-    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"checkforAttributeMatch : pParent->Value() : %s\n", pParent->Value());
-    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"pParent->Type() = %d\n", pParent->Type());
+    RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"checkforAttributeMatch : pParent->Value() : %s\n", pParent->Value());
     if(pParent->Type() == TiXmlNode::TINYXML_ELEMENT)
     {
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"pParent->Type() is TINYXML_ELEMENT...\n");
         TiXmlElement* pElement = pParent->ToElement();
         TiXmlAttribute* pAttrib = pElement->FirstAttribute();
         if(!strcmp(pParent->Value(),"parameter") && pAttrib)
@@ -539,14 +537,12 @@ void checkforParameterNameMatch(TiXmlNode *pParent, const char *ObjectName, cons
             {
                 TiXmlNode *pSyntaxNode = NULL;
                 TiXmlNode *pSyntaxChildNode = NULL;
-
+                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"Match found : Extracting parameter attributes\n");
                 dmParam->objectName = strdup(paramName);
                 if(pElement->Attribute("base") != NULL)
                     dmParam->paramName = strdup(pElement->Attribute("base"));
                 if(pElement->Attribute("access") != NULL)
                     dmParam->access = strdup(pElement->Attribute("access"));
-
-                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"retrieving data type and default value\n");
 
                 pSyntaxNode = pElement->FirstChild("syntax");
                 for(pSyntaxChildNode = pSyntaxNode->FirstChild(); pSyntaxChildNode != NULL; pSyntaxChildNode = pSyntaxChildNode->NextSibling())
@@ -555,6 +551,7 @@ void checkforParameterNameMatch(TiXmlNode *pParent, const char *ObjectName, cons
                     {
                         TiXmlElement *pDefaultElement = pSyntaxChildNode->ToElement();
                         dmParam->defaultValue = strdup(pDefaultElement->Attribute("value"));
+                        RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"Default Value : %s\n", dmParam->defaultValue);
                     }
                     else
                     {
@@ -576,16 +573,14 @@ void checkforObjectMatch(TiXmlNode *pParent,const char *objectName,int *pMatch,D
         return;
     }
 
-    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"checkforObjectMatch : pParent->Value() : %s\n", pParent->Value());
-    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"pParent->Type() = %d\n", pParent->Type());
+    RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"checkforObjectMatch : pParent->Value() : %s\n", pParent->Value());
     if(pParent->Type() == TiXmlNode::TINYXML_ELEMENT)
     {
-    	RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"pParent->Type() is TINYXML_ELEMENT...\n");
         TiXmlElement* pElement = pParent->ToElement();
         TiXmlAttribute* pAttrib = pElement->FirstAttribute();
         if(!strcmp(pParent->Value(),"object") && pAttrib)
         {
-            RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"Comparing with object : %s\n", pAttrib->Value());
+            RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"Comparing with object : %s\n", pAttrib->Value());
 
             if(!strcmp(pAttrib->Value(),objectName))
             {
@@ -622,7 +617,7 @@ void checkforParameterMatch(TiXmlNode *pParent,const char *paramName,int *pMatch
         paramObject[MAX_PARAMETER_LENGTH] = '\0';
     }
 
-    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"Looking for object : %s\n", paramObject);
+    RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"Looking for object : %s\n", paramObject);
     for(pChild = pParent->FirstChild("dm:document")->FirstChild("model")->FirstChild("object"); pChild != NULL; pChild = pChild->NextSibling())
     {
         if(pChild->Type() != TiXmlNode::TINYXML_ELEMENT)

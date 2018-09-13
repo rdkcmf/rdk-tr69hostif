@@ -114,9 +114,12 @@ string hostIf_DeviceInfo::m_xFirmwareDownloadProtocol;
 string hostIf_DeviceInfo::m_xFirmwareDownloadURL;
 string hostIf_DeviceInfo::m_xFirmwareToDownload;
 bool hostIf_DeviceInfo::m_xFirmwareDownloadNow;
-XRFCStorage hostIf_DeviceInfo::m_rfcStorage;
+
 #ifndef NEW_HTTP_SERVER_DISABLE
 XRFCStore* hostIf_DeviceInfo::m_rfcStore;
+XRFCStorage hostIf_DeviceInfo::m_rfcStorage;
+#else
+XRFCStorage hostIf_DeviceInfo::m_rfcStorage;
 #endif
 string hostIf_DeviceInfo::m_xrPollingAction = "0";
 
@@ -137,7 +140,6 @@ hostIf_DeviceInfo::hostIf_DeviceInfo(int dev_id):
     bCalledHardwareVersion(false),
     bCalledDeviceMAC(false)
 {
-
     memset(backupSoftwareVersion, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupSerialNumber, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupManufacturer, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
@@ -149,7 +151,8 @@ hostIf_DeviceInfo::hostIf_DeviceInfo(int dev_id):
     memset(backupX_COMCAST_COM_STB_IP, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     memset(backupX_COMCAST_COM_FirmwareFilename, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
 #ifndef NEW_HTTP_SERVER_DISABLE
-    m_rfcStore = XRFCStore::getInstance();
+    if(!legacyRFCEnabled())
+        m_rfcStore = XRFCStore::getInstance();
 #endif
 }
 hostIf_DeviceInfo::~hostIf_DeviceInfo()
@@ -2106,26 +2109,68 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     if (strcasecmp(stMsgData->paramName,TR181_RFC_RESET_DATA_START) == 0) // used to clear out all data from storage
     {
 #ifndef NEW_HTTP_SERVER_DISABLE
-    	if(stMsgData->requestor == requestorRfc)
-            m_rfcStore->clearAll();
-    	else
-#endif
+        if(!legacyRFCEnabled())
+        {
+            string stringValue = getStringValue(stMsgData);
+            if(!strcasecmp(stringValue.c_str(), "true") || !strcmp(stringValue.c_str(), "1"))
+            {
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling clearAll in New RFC Store I/O\n",__FUNCTION__);
+                m_rfcStore->clearAll();
+                ret = OK;
+                stMsgData->faultCode = fcNoFault;
+            }
+            else
+            {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Invalid Value : Only true is allowed\n",__FUNCTION__);
+                stMsgData->faultCode = fcInternalError;
+            }
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling clearAll in Old RFC Storage I/O\n",__FUNCTION__);
             m_rfcStorage.clearAll();
+        }
+#else
+        m_rfcStorage.clearAll();
+#endif
     }
     else if(strcasecmp(stMsgData->paramName, TR181_RFC_RESET_DATA_END) == 0)
     {
 #ifndef NEW_HTTP_SERVER_DISABLE
-    	m_rfcStore->reloadCache();
+        if(!legacyRFCEnabled())
+        {
+            string stringValue = getStringValue(stMsgData);
+            if(!strcasecmp(stringValue.c_str(), "true") || !strcmp(stringValue.c_str(), "1"))
+            {
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling reloadCache in New RFC Store I/O\n",__FUNCTION__);
+                m_rfcStore->reloadCache();
+                ret = OK;
+                stMsgData->faultCode = fcNoFault;
+            }
+            else
+            {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Invalid Value : Only true is allowed\n",__FUNCTION__);
+                stMsgData->faultCode = fcInternalError;
+            }
+        }
 #endif
     }
     else
     {
 #ifndef NEW_HTTP_SERVER_DISABLE
-        if(stMsgData->requestor == requestorRfc)
+        if(!legacyRFCEnabled())
+        {
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling setValue in New RFC Store I/O\n",__FUNCTION__);
             ret = m_rfcStore->setValue(stMsgData);
+        }
         else
-#endif
+        {
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling setValue in Old RFC Storage I/O\n",__FUNCTION__);
             ret = m_rfcStorage.setValue(stMsgData);
+        }
+#else
+            ret = m_rfcStorage.setValue(stMsgData);
+#endif
     }
 
     if (strcasecmp(stMsgData->paramName,RFC_WL_ROAM_TRIGGER_RF) == 0)
@@ -2191,11 +2236,19 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
 int hostIf_DeviceInfo::get_xRDKCentralComRFC(HOSTIF_MsgData_t *stMsgData)
 {
 #ifndef NEW_HTTP_SERVER_DISABLE
-    if(stMsgData->requestor == requestorRfc)
+    if(!legacyRFCEnabled())
+    {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling getValue in New RFC Store I/O\n",__FUNCTION__);
         return m_rfcStore->getValue(stMsgData);
+    }
     else
-#endif
+    {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling getValue in Old RFC Storage I/O\n",__FUNCTION__);
         return m_rfcStorage.getValue(stMsgData);
+    }
+#else
+        return m_rfcStorage.getValue(stMsgData);
+#endif
 }
 
 
@@ -2301,11 +2354,10 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCRetrieveNow(HOSTIF_MsgData_t *stMsgD
         stMsgData->paramLen = sizeof(hostIf_UnsignedIntType);
         // set the time in Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.RetrieveNow parameter
 #ifndef NEW_HTTP_SERVER_DISABLE
-        if(stMsgData->requestor == requestorRfc)
             ret = m_rfcStore->setValue(stMsgData);
-        else
-#endif
+#else
             ret = m_rfcStorage.setValue(stMsgData);
+#endif
     }
 
     return ret;

@@ -17,46 +17,39 @@
  * limitations under the License.
 */
 
-#ifndef XRDKCENTRALCOMRFCVAR_H
-#define XRDKCENTRALCOMRFCVAR_H
-
-#include "hostIf_tr69ReqHandler.h"
+#ifndef XRDKCENTRALCOMRFCVARSTORE_H
+#define XRDKCENTRALCOMRFCVARSTORE_H
 
 #include <unordered_map>
 #include <string>
 
 using namespace std;
 
-class XRFCVarStorage
+#define XRFC_VAR_STORE_RELOADCACHE     "RFC_CONTROL_RELOADCACHE"
+
+class XRFCVarStore
 {
 public:
-    static XRFCVarStorage* getInstance();
-    void clearAll();
+    static XRFCVarStore* getInstance();
+
+    string  getValue(const string &key);
     void reloadCache();
-
-    faultCode_t  getValue(HOSTIF_MsgData_t *stMsgData);
-    faultCode_t  setValue(HOSTIF_MsgData_t *stMsgData);
-
-    string getRawValue(const string &key);
-    bool setRawValue(const string &key, const string &value);
 
 private:
 
-    static XRFCVarStorage* xrfcVarInstance;
+    static XRFCVarStore* xrfcVarStoreInstance;
     string m_filename;
     bool initDone;
-    bool updateInProgress;
 
 
     std::unordered_map<std::string, std::string> m_dict;
 
-    XRFCVarStorage();
-    XRFCVarStorage(XRFCVarStorage const&){};
-    XRFCVarStorage& operator=(XRFCVarStorage const&){};
+    XRFCVarStore();
+    XRFCVarStore(XRFCVarStore const&){};
+    XRFCVarStore& operator=(XRFCVarStore const&){};
 
     void initRFCVarFileName();
     bool loadRFCVarIntoCache();
-    bool validateParamValue(const string &paramName, HostIf_ParamType_t dataType);
 };
 
-#endif // XRDKCENTRALCOMRFCVAR_H
+#endif // XRDKCENTRALCOMRFCVARSTORE_H

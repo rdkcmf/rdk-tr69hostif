@@ -94,10 +94,12 @@
 #include "hostIf_main.h"
 #include "hostIf_tr69ReqHandler.h"
 #include "hostIf_utils.h"
-#include "XrdkCentralComRFC.h"
 
 #ifndef NEW_HTTP_SERVER_DISABLE
 #include "XrdkCentralComRFCStore.h"
+#include "XrdkCentralComRFC.h"
+#else
+#include "XrdkCentralComRFC.h"
 #endif
 
 #include "hostIf_updateHandler.h"
@@ -191,9 +193,11 @@ class hostIf_DeviceInfo {
     static string m_xFirmwareToDownload;
     static bool m_xFirmwareDownloadNow;
 
-    static XRFCStorage m_rfcStorage;
 #ifndef NEW_HTTP_SERVER_DISABLE
     static XRFCStore *m_rfcStore;
+    static XRFCStorage m_rfcStorage;
+#else
+    static XRFCStorage m_rfcStorage;
 #endif
     static string m_xrPollingAction;
 

@@ -42,6 +42,9 @@
 
 static bool gAcsConnStatus = false;
 static bool gGatewayConnStatus = false;
+#ifndef NEW_HTTP_SERVER_DISABLE
+static bool legacyRFC = false;
+#endif
 
 EntryExitLogger::EntryExitLogger (const char* func, const char* file) :
         func (func), file (file)
@@ -461,6 +464,16 @@ long timeValDiff(struct timespec *starttime, struct timespec *finishtime)
     msec=(finishtime->tv_sec-starttime->tv_sec)*1000;
     msec+=(finishtime->tv_nsec-starttime->tv_nsec)/1000000;
     return msec;
+}
+
+void setLegacyRFCEnabled(bool value)
+{
+    legacyRFC = value;
+}
+
+bool legacyRFCEnabled()
+{
+    return legacyRFC;
 }
 #endif
 /** @} */

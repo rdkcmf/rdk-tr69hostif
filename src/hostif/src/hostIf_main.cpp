@@ -24,6 +24,10 @@
 * @defgroup hostif
 * @{
 **/
+
+#ifndef NEW_HTTP_SERVER_DISABLE
+#include <fstream>
+#endif
 #include "hostIf_main.h"
 #include "hostIf_tr69ReqHandler.h"
 //#include "hostIf_dsClient_ReqHandler.h"
@@ -32,6 +36,7 @@
 #ifndef NEW_HTTP_SERVER_DISABLE
 #include "hostIf_msgHandler.h"
 #include "http_server.h"
+#include "hostIf_utils.h"
 #endif
 
 #include "hostIf_updateHandler.h"
@@ -61,6 +66,7 @@
 GThread *hostIf_JsonIfThread = NULL;
 #ifndef NEW_HTTP_SERVER_DISABLE
 GThread *HTTPServerThread = NULL;
+#define LEGACY_RFC_ENABLED_PATH "/opt/RFC/.RFC_LegacyRFCEnabled.ini"
 #endif
 //GTimeVal timeval;
 static GMainLoop *main_loop = NULL;
@@ -362,6 +368,19 @@ int main(int argc, char *argv[])
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed to hostIf_initalize_ConfigManger()\n");
     }
 
+#ifndef NEW_HTTP_SERVER_DISABLE
+    ifstream ifs_legacyEnabled(LEGACY_RFC_ENABLED_PATH);
+    if(!ifs_legacyEnabled.is_open())
+    {
+        setLegacyRFCEnabled(false);
+    }
+    else
+    {
+        setLegacyRFCEnabled(true);
+        ifs_legacyEnabled.close();
+    }
+#endif
+
     if(false == hostIf_IARM_IF_Start() )
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed to start hostIf_IARM_IF_Start()\n");
@@ -378,15 +397,22 @@ int main(int argc, char *argv[])
         g_critical("Thread create failed: %s!!\n", err1->message );
         g_error_free (err1);
     }
-
 #ifndef NEW_HTTP_SERVER_DISABLE
-    if( (HTTPServerThread = g_thread_create(    (GThreadFunc)HTTPServerStartThread,
+    if(!legacyRFCEnabled())
+    {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"legacyRFC Set to False, Starting New HTTP Server\n");
+        if((HTTPServerThread = g_thread_create((GThreadFunc)HTTPServerStartThread,
                                (void *)HTTPServerName,
                                FALSE,
                                &httpError)) == NULL)
+        {
+            g_critical("New HTTP Server Thread Create failed: %s!!\n", httpError->message );
+            g_error_free (httpError);
+        }
+    }
+    else
     {
-        g_critical("Thread create failed: %s!!\n", httpError->message );
-        g_error_free (httpError);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"legacyRFC Set to True, New HTTP Server is not started\n");
     }
 #endif
 

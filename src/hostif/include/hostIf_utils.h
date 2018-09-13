@@ -159,6 +159,9 @@ int GetStdoutFromCommand(char *cmd, string &consoleString);
 #ifndef NEW_HTTP_SERVER_DISABLE
 void getCurrentTime(struct timespec *timer);
 long timeValDiff(struct timespec *starttime, struct timespec *finishtime);
+
+void setLegacyRFCEnabled(bool value);
+bool legacyRFCEnabled();
 #endif
 
 #endif /* HOSTIF_UTILS_H_*/

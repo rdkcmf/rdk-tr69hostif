@@ -20,6 +20,7 @@
 #include <glib.h>
 #include <cJSON.h>
 #include <stdlib.h>
+#include <fstream>
 
 #ifdef __cplusplus
 extern "C"
@@ -41,35 +42,6 @@ extern "C"
 extern T_ARGLIST argList;
 static SoupServer  *http_server = NULL;
 
-void printRespSt(res_struct *respSt)
-{
-    if(respSt != NULL)
-    {
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"reqType = %d\n", respSt->reqType);
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"paramCnt = %d\n", respSt->paramCnt);
-        switch(respSt->reqType)
-        {
-            case GET:
-                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"get_res_t -> paramCnt = %d\n", respSt->u.getRes->paramCnt);
-                for(int i = 0; i < respSt->u.getRes->paramCnt; i++)
-                {
-                    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"paramName[%d] : %s\n", i, respSt->u.getRes->paramNames[i]);
-                    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"retParamCnt = %d\n", respSt->u.getRes->retParamCnt[i]);
-                    for(int j = 0; j < respSt->u.getRes->retParamCnt[i]; j++)
-                    {
-                        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"param[%d][%d].name = %s\n", i, j, respSt->u.getRes->params[i][j].name);
-                        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"param[%d][%d].value = %s\n", i, j, respSt->u.getRes->params[i][j].value);
-                        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"param[%d][%d].type = %d\n", i, j, respSt->u.getRes->params[i][j].type);
-                    }
-                    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"retStatus[%d] = %d\n", i, respSt->retStatus[i]);
-                }
-                break;
-            default:
-                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"Not a GET response\n");
-        };
-    }
-}
-
 static void HTTPRequestHandler(
     SoupServer        *server,
     SoupMessage       *msg,
@@ -87,7 +59,7 @@ static void HTTPRequestHandler(
     startPtr = &start;
     endPtr = &end;
 
-    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+    RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     getCurrentTime(startPtr);
     if (!msg->request_body ||
             !msg->request_body->data ||
@@ -98,24 +70,33 @@ static void HTTPRequestHandler(
         return;
     }
 
+    const char *pcCallerID = (char *)soup_message_headers_get_one(msg->request_headers, "CallerID");
+
     jsonRequest = cJSON_Parse((const char *) msg->request_body->data);
 
     if(jsonRequest)
     {
-    	reqSt = (req_struct *)malloc(sizeof(req_struct));
-    	if(reqSt == NULL)
-    	{
+        reqSt = (req_struct *)malloc(sizeof(req_struct));
+        if(reqSt == NULL)
+        {
             soup_message_set_status_full (msg, SOUP_STATUS_INTERNAL_SERVER_ERROR, "Cannot create return object");
             RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%s] Exiting.. Failed to create req_struct\n", __FUNCTION__, __FILE__);
             return;
-    	}
-    	memset(reqSt, 0, sizeof(req_struct));
+        }
+        memset(reqSt, 0, sizeof(req_struct));
 
-    	if(!strcmp(msg->method, "GET"))
-    	{
+        if(!strcmp(msg->method, "GET"))
+        {
+            if(!pcCallerID || !strlen(pcCallerID))
+            {
+                pcCallerID = strdup("Unknown");
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s:%s] Unknown Caller ID, GET is allowed by default\n", __FUNCTION__, __FILE__);
+            }
+            else
+                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s:%s] GET with CallerID : %s..\n", __FUNCTION__, __FILE__, pcCallerID);
+
             parse_get_request(jsonRequest, &reqSt, WDMP_TR181);
-            RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"Calling handleWebPARequest...\n");
-            respSt = handleRequest(reqSt);
+            respSt = handleRequest(pcCallerID, reqSt);
             if(respSt)
             {
                 jsonResponse = cJSON_CreateObject();
@@ -134,9 +115,18 @@ static void HTTPRequestHandler(
         }
         else if(!strcmp(msg->method, "POST"))
         {
+            if(!pcCallerID || !strlen(pcCallerID))
+            {
+                soup_message_set_status_full (msg, SOUP_STATUS_INTERNAL_SERVER_ERROR, "POST Not Allowed without CallerID");
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%s] Exiting.. POST operation not allowed with unknown CallerID\n", __FUNCTION__, __FILE__);
+                return;
+            }
+            else
+                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s:%s] POST with CallerID : %s..\n", __FUNCTION__, __FILE__, pcCallerID);
+
             parse_set_request(jsonRequest, &reqSt, WDMP_TR181);
-            RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"Calling handleWebPARequest...\n");
-            respSt = handleRequest(reqSt);
+            RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"Calling handleRequest...\n");
+            respSt = handleRequest(pcCallerID, reqSt);
             if(respSt)
             {
                 jsonResponse = cJSON_CreateObject();
@@ -162,33 +152,25 @@ static void HTTPRequestHandler(
         soup_message_set_response(msg, (const char *) "application/json", SOUP_MEMORY_COPY, buf, strlen(buf));
         soup_message_set_status (msg, SOUP_STATUS_OK);
 
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"freeing reqSt\n");
         wdmp_free_req_struct(reqSt);
         reqSt = NULL;
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"freeing jsonRequest\n");
         cJSON_Delete(jsonRequest);
-
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"freeing jsonResponse\n");
         cJSON_Delete(jsonResponse);
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"freeing respSt\n");
-//        printRespSt(respSt);
         wdmp_free_res_struct(respSt);
         respSt = NULL;
-
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"freeing json buf\n");
         free(buf);
         buf = NULL;
     }
     else
     {
-    	soup_message_set_status_full (msg, SOUP_STATUS_BAD_REQUEST, "Bad Request");
-    	RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%s] Exiting.. Failed to parse JSON Message \n", __FUNCTION__, __FILE__);
-    	return;
+        soup_message_set_status_full (msg, SOUP_STATUS_BAD_REQUEST, "Bad Request");
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%s] Exiting.. Failed to parse JSON Message \n", __FUNCTION__, __FILE__);
+        return;
     }
 
     getCurrentTime(endPtr);
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Curl Request Processing Time : %lu ms\n", timeValDiff(startPtr, endPtr));
-    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+    RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
     return;
 }
 
@@ -200,7 +182,7 @@ void *HTTPServerStartThread(void *msg)
     int status =-1;
     guint httpServerPort = argList.httpServerPort;
 
-    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+    RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
 
 #ifndef GLIB_VERSION_2_36
     g_type_init ();
@@ -214,12 +196,12 @@ void *HTTPServerStartThread(void *msg)
     }
 
     if(http_server == NULL)
-    http_server = soup_server_new (SOUP_SERVER_SERVER_HEADER, "HTTPServer", NULL);
+        http_server = soup_server_new (SOUP_SERVER_SERVER_HEADER, "HTTPServer", NULL);
 
     if (!http_server)
     {
-    	RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"SERVER: Could not create server.\n");
-    	return NULL;
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"SERVER: Could not create server.\n");
+        return NULL;
     }
     else
     {
@@ -227,22 +209,29 @@ void *HTTPServerStartThread(void *msg)
 
         if(FALSE == soup_server_listen_local (http_server,  httpServerPort, SOUP_SERVER_LISTEN_IPV4_ONLY, &error))
         {
-           RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"SERVER: failed in soup_server_listen_local. (%s).\n", error->message);
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"SERVER: failed in soup_server_listen_local. (%s).\n", error->message);
         }
+
+        //Create a .http_server_ready file in /tmp for RFC to check whether http server is ready to accept requests
+        ofstream ofs("/tmp/.tr69hostif_http_server_ready", ios::trunc | ios::out);
+        if(!ofs.is_open())
+            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "Failed to open : /tmp/.tr69hostif_http_server_ready \n");
+        else
+            ofs.close();
 
         RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"SERVER: Started server successfully.\n");
     }
 
-    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+    RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
     return NULL;
 }
 
 void HttpServerStop()
 {
-    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"SERVER: Stopping HTTP Server....\n");
+    RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"SERVER: Stopping HTTP Server....\n");
     if(http_server) {
         soup_server_disconnect(http_server);
-        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"SERVER: Stopped server successfully.\n");
+        RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"SERVER: Stopped server successfully.\n");
     }
 }
 

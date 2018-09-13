@@ -30,23 +30,19 @@ using namespace std;
 class XRFCStore
 {
 public:
-	static XRFCStore* getInstance();
+    static XRFCStore* getInstance();
     void clearAll();
     void reloadCache();
 
     faultCode_t  getValue(HOSTIF_MsgData_t *stMsgData);
     faultCode_t  setValue(HOSTIF_MsgData_t *stMsgData);
 
-    string getRawValue(const string &key);
-    bool setRawValue(const string &key, const string &value);
-
 private:
 
     static XRFCStore* xrfcInstance;
     string	m_filename;
-    bool initDone;
-    bool updateInProgress;
-
+    bool m_initDone;
+    bool m_updateInProgress;
 
     std::unordered_map<std::string, std::string> m_dict;
 
@@ -54,9 +50,12 @@ private:
     XRFCStore(XRFCStore const&){};
     XRFCStore& operator=(XRFCStore const&){};
 
+    bool init();
+    string getRawValue(const string &key);
+    bool setRawValue(const string &key, const string &value);
+
     void initTR181PropertiesFileName();
     bool loadTR181PropertiesIntoCache();
-    bool validateParamValue(const string &paramName, HostIf_ParamType_t dataType);
 };
 
 #endif // XRDKCENTRALCOMRFCSTORE_H

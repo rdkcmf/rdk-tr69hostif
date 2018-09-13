@@ -34,8 +34,7 @@ extern "C"
 #include "XrdkCentralComRFCVar.h"
 
 #define MAX_NUM_PARAMETERS 2048
-#define WEBPA_DEVICE_REBOOT_PARAM          "Device.X_CISCO_COM_DeviceControl.RebootDevice"
-#define WEBPA_DEVICE_REBOOT_VALUE          "Device"
+#define DEVICE_REBOOT_PARAM          "Device.X_CISCO_COM_DeviceControl.RebootDevice"
 
 static DATA_TYPE getWdmpDataType(char *dmParamDataType)
 {
@@ -100,96 +99,208 @@ static HostIf_ParamType_t getHostIfParamType(DATA_TYPE wdmpDataType)
     return hostIfDataType;
 }
 
+static void convertAndAssignParamValue (HOSTIF_MsgData_t *param, char *value)
+{
+    switch (param->paramtype)
+    {
+        case hostIf_StringType:
+        case hostIf_DateTimeType:
+            snprintf(param->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN, "%s", value);
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, ">> Type: String/Date, Value = %s\n", param->paramValue);
+            break;
+        case hostIf_IntegerType:
+        case hostIf_UnsignedIntType:
+            {
+                int ivalue = atoi(value);
+                int *iptr = (int *)param->paramValue;
+                *iptr = ivalue;
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, ">> Type: Integer/UnsignedInt, Value = %d\n", param->paramValue);
+            }
+            break;
+        case hostIf_UnsignedLongType:
+            {
+                long lvalue = atol(value);
+                long *lptr = (long *)param->paramValue;
+                *lptr = lvalue;
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, ">> Type: UnsignedLong, Value = %ul\n", param->paramValue);
+            }
+            break;
+        case hostIf_BooleanType:
+            {
+                bool *bptr = (bool *)param->paramValue;
+                *bptr = (0 == strncasecmp(value, "TRUE", 4)|| (isdigit(value[0]) && value[0] != '0' ));
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, ">> Type: Boolean, Value = %d\n", param->paramValue);
+            }
+            break;
+        default:
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, ">> This path should never be reached. param type is %d\n", param->paramtype);
+    }
+}
+static char* getStringValue(HostIf_ParamType_t paramType, char *value)
+{
+    char tempValue[TR69HOSTIFMGR_MAX_PARAM_LEN] = {'\0'};
+    switch (paramType)
+    {
+        case hostIf_StringType:
+        case hostIf_DateTimeType:
+            snprintf(tempValue,TR69HOSTIFMGR_MAX_PARAM_LEN, "%s", value);
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, ">> String value of String = %s\n", tempValue);
+            break;
+        case hostIf_IntegerType:
+        case hostIf_UnsignedIntType:
+            {
+                snprintf(tempValue,TR69HOSTIFMGR_MAX_PARAM_LEN, "%d", *((int *)value));
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, ">> String value of Integer/UnsignedInt = %s\n", tempValue);
+            }
+            break;
+        case hostIf_UnsignedLongType:
+            {
+                snprintf(tempValue,TR69HOSTIFMGR_MAX_PARAM_LEN, "%lu", *((unsigned long *)value));
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, ">> String value of UnsignedLong = %s\n", tempValue);
+            }
+            break;
+        case hostIf_BooleanType:
+            {
+                if(*((bool*)value) == true)
+                    strncpy(tempValue, "true", 4);
+                else
+                    strncpy(tempValue, "false", 5);
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, ">> String value of Boolean = %s\n", tempValue);
+            }
+            break;
+        default:
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, ">> This path should never be reached. param type is %d\n", paramType);
+    }
+    return strdup(tempValue);
+}
+
+static bool validateParamValue(const string &paramValue, HostIf_ParamType_t dataType)
+{
+    bool ret = true;
+    size_t index = 0;
+    switch(dataType)
+    {
+        case hostIf_StringType:
+        case hostIf_DateTimeType:
+            if(paramValue.length() > TR69HOSTIFMGR_MAX_PARAM_LEN)
+            {
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Parameter Value greater than allowed %d\n", TR69HOSTIFMGR_MAX_PARAM_LEN);
+                ret = false;
+            }
+            break;
+
+        case hostIf_IntegerType:
+            if(isdigit(paramValue[0]))
+            {
+                int value = stoi(paramValue, &index);
+                if(index != paramValue.length())
+                {
+                    RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Invalid Parameter Value for an Integer Type\n");
+                    ret = false;
+                }
+            }
+            else
+            {
+                ret = false;
+            }
+            break;
+
+        case hostIf_UnsignedIntType:
+        case hostIf_UnsignedLongType:
+            if(isdigit(paramValue[0]))
+            {
+                unsigned long value = stoul(paramValue, &index);
+                if(index != paramValue.length())
+                {
+                    RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Invalid Parameter Value for an UnsignedInt or UnsignedLong Type\n");
+                    ret = false;
+                }
+            }
+            else
+            {
+                ret = false;
+            }
+            break;
+
+        case hostIf_BooleanType:
+            if(!strcasecmp(paramValue.c_str(), "true")
+                    || !strcasecmp(paramValue.c_str(), "false")
+                    || !strcmp(paramValue.c_str(), "1")
+                    || !strcmp(paramValue.c_str(), "0"))
+            {
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Valid Boolean Value\n");
+            }
+            else
+            {
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Invalid Parameter Value for a Boolean\n");
+                ret = false;
+            }
+            break;
+
+        default:
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Unknown Data Type\n");
+            ret = false;
+            break;
+    };
+
+    return ret;
+}
+
 static void getHostIfParamStFromRequest(REQ_TYPE reqType, param_t *param, HOSTIF_MsgData_t *hostIfParam)
 {
    strncpy(hostIfParam->paramName, param->name, strlen(param->name));
    hostIfParam->paramName[strlen(param->name)] = '\0';
 
-   RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Entering %s\n", __FUNCTION__);
+   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Entering %s\n", __FUNCTION__);
    switch(reqType)
    {
         case GET:
             hostIfParam->reqType = HOSTIF_GET;
+            hostIfParam->paramtype = getHostIfParamType(param->type);
              break;
-
-        case GET_ATTRIBUTES:
-            hostIfParam->reqType = HOSTIF_GETATTRIB;
-            break;
 
         case SET:
             hostIfParam->reqType = HOSTIF_SET;
             hostIfParam->paramtype = getHostIfParamType(param->type);
-            strncpy(hostIfParam->paramValue, param->value, strlen(param->value));
-            hostIfParam->paramValue[strlen(param->value)] = '\0';
+            convertAndAssignParamValue(hostIfParam, param->value);
             break;
 
-        case SET_ATTRIBUTES:
-            hostIfParam->reqType = HOSTIF_SETATTRIB;
-            hostIfParam->paramtype = getHostIfParamType(param->type);
-            strncpy(hostIfParam->paramValue, param->value, strlen(param->value));
-            hostIfParam->paramValue[strlen(param->value)] = '\0';
-            break;
-
-        case ADD_ROWS:
-        case DELETE_ROW:
-        case REPLACE_ROWS:
-        case TEST_AND_SET:
         default:
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Operation not handled \n");
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s : Operation not handled : Shouldn't come here\n", __FUNCTION__);
             break;
    };
 
-   RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Leaving %s\n", __FUNCTION__);
+   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Leaving %s\n", __FUNCTION__);
 }
 
 static WDMP_STATUS handleRFCRequest(REQ_TYPE reqType, param_t *param)
 {
    WDMP_STATUS wdmpStatus = WDMP_SUCCESS;
-   faultCode_t result = fcNoFault;
-   HOSTIF_MsgData_t hostIfParam;
-   memset(&hostIfParam,0,sizeof(HOSTIF_MsgData_t));
 
-   RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Entering %s\n", __FUNCTION__);
-   getHostIfParamStFromRequest(reqType, param, &hostIfParam);
+   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Entering %s\n", __FUNCTION__);
 
    switch(reqType)
    {
       case GET:
-         result = XRFCVarStorage::getInstance()->getValue(&hostIfParam);
+         param->value = strdup(XRFCVarStore::getInstance()->getValue(param->name).c_str());
+         if(strlen(param->value) == 0)
+             wdmpStatus = WDMP_ERR_VALUE_IS_NULL;
          break;
 
       case SET:
-         result = XRFCVarStorage::getInstance()->setValue(&hostIfParam);
+         if(!strcmp(param->name, XRFC_VAR_STORE_RELOADCACHE) && (!strcasecmp(param->value, "true") || !strcmp(param->value, "1")))
+             XRFCVarStore::getInstance()->reloadCache();
+         else
+         {
+             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"SET operation not supported\n");
+             wdmpStatus = WDMP_ERR_METHOD_NOT_SUPPORTED;
+         }
          break;
 
       default:
-         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Invalid operation - Not Supported\n");
+         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s : Invalid operation - Not Supported\n", __FUNCTION__);
    };
-
-   if(result == fcNoFault)
-   {
-      if(strlen(hostIfParam.paramValue))
-      {
-          param->value = strdup(hostIfParam.paramValue);
-          RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"The value for param: %s = %s\n", hostIfParam.paramName, param->value);
-      }
-      else
-      {
-         param->value = strdup("");
-         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Error in HostIf : %d\n", hostIfParam.faultCode);
-         wdmpStatus = WDMP_FAILURE;
-      }
-   }
-   else
-   {
-      param->value = strdup("");
-      RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in hostIf_msgHandler, with return value: %d\n", result);
-      if(result == fcInvalidParameterValue)
-         wdmpStatus = WDMP_ERR_INVALID_PARAMETER_VALUE;
-      else
-         wdmpStatus = WDMP_ERR_INTERNAL_ERROR;
-   }
-   RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Leaving %s\n", __FUNCTION__);
+   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Leaving %s\n", __FUNCTION__);
    return wdmpStatus;
 }
 
@@ -199,9 +310,8 @@ static WDMP_STATUS invokeHostIfAPI(REQ_TYPE reqType, param_t *param)
    int result = NOK;
    HOSTIF_MsgData_t hostIfParam;
    memset(&hostIfParam,0,sizeof(HOSTIF_MsgData_t));
-   //This new field is used to check whether the request is from new tr181 command or old tr181Set command
-   hostIfParam.requestor = requestorRfc;
-   RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Entering %s\n", __FUNCTION__);
+   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Entering %s\n", __FUNCTION__);
+
    getHostIfParamStFromRequest(reqType, param, &hostIfParam);
 
    switch(reqType)
@@ -211,24 +321,24 @@ static WDMP_STATUS invokeHostIfAPI(REQ_TYPE reqType, param_t *param)
             break;
 
       case SET:
-            result = hostIf_SetMsgHandler(&hostIfParam);
-            break;
-
-      case GET_ATTRIBUTES:
-            break;
-
-      case SET_ATTRIBUTES:
+            if(!validateParamValue(param->value, getHostIfParamType(param->type)))
+            {
+                result = fcInvalidParameterValue;
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Invalid Parameter Value\n");
+            }
+            else
+                result = hostIf_SetMsgHandler(&hostIfParam);
             break;
 
       default:
-         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Invalid operation - Not Supported\n");
+         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s : Invalid operation - Not Supported\n", __FUNCTION__);
    };
 
    if(result == OK)
    {
-        if(hostIfParam.faultCode == fcNoFault && strlen(hostIfParam.paramValue))
+        if(hostIfParam.faultCode == fcNoFault)
         {
-            param->value = strdup(hostIfParam.paramValue);
+        	param->value = getStringValue(hostIfParam.paramtype, hostIfParam.paramValue);
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"The value for param: %s = %s\n", hostIfParam.paramName, param->value);
         }
         else
@@ -248,7 +358,7 @@ static WDMP_STATUS invokeHostIfAPI(REQ_TYPE reqType, param_t *param)
          wdmpStatus = WDMP_ERR_INTERNAL_ERROR;
    }
 
-   RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Leaving %s\n", __FUNCTION__);
+   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Leaving %s\n", __FUNCTION__);
    return wdmpStatus;
 }
 
@@ -258,28 +368,32 @@ static WDMP_STATUS validateAgainstDataModel(REQ_TYPE reqType, char* paramName, c
    DataModelParam dmParam = {0};
    WDMP_STATUS ret = WDMP_SUCCESS;
 
-   RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Entering... validateAgainstDataModel for paramName : %s\n", paramName);
+   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Entering... %s\n", __FUNCTION__);
 
    const char* dbParamName = paramName;
    if(!getParamInfoFromDataModel(getDataModelHandle(), dbParamName, &dmParam))
    {
-      RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Invalid parameter name : paramName doesn't exist in data-model \n");
+      RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Invalid parameter name %s: doesn't exist in data-model %s\n", paramName);
       return WDMP_ERR_INVALID_PARAMETER_NAME;
    }
-   else if(reqType == SET || reqType == SET_ATTRIBUTES)
+   else if(reqType == GET)
+   {
+       *dataType = getWdmpDataType(dmParam.dataType);
+       if(dmParam.defaultValue)
+          *defaultValue = strdup(dmParam.defaultValue);
+   }
+   else if(reqType == SET)
    {
       RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Validating paramValue and dataType against data-model\n");
       if(paramValue == NULL || *dataType >= WDMP_NONE)
       {
          RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"ParameterValue is NULL or Unknown Datatype\n");
          ret = WDMP_ERR_VALUE_IS_NULL;
-         goto end;
       }
       else if(dmParam.access != NULL && !strcasecmp(dmParam.access, "readOnly"))
       {
          RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Parameter is readOnly\n");
          ret = WDMP_ERR_NOT_WRITABLE;
-         goto end;
       }
       else if (getWdmpDataType(dmParam.dataType) != *dataType)
       {
@@ -287,13 +401,12 @@ static WDMP_STATUS validateAgainstDataModel(REQ_TYPE reqType, char* paramName, c
          ret = WDMP_ERR_INVALID_PARAMETER_TYPE;
       }
    }
+   else
+   {
+       RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s : Invalid operation - Not Supported\n", __FUNCTION__);
+       ret = WDMP_FAILURE;
+   }
 
-   *dataType = getWdmpDataType(dmParam.dataType);
-
-   if(dmParam.defaultValue)
-      *defaultValue = strdup(dmParam.defaultValue);
-
-end:
    if(dmParam.objectName)
       free(dmParam.objectName);
    if(dmParam.paramName)
@@ -305,30 +418,8 @@ end:
    if(dmParam.defaultValue)
       free(dmParam.defaultValue);
 
-   RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Leaving... validateAgainstDataModel\n");
+   RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Leaving... %s\n", __FUNCTION__);
    return ret;
-}
-
-/**
- * @brief Set Last Reboot Reason
- *
- * @param[in] param arry if parameters
- * @param[in] WebPa Set Type
- */
-static param_t* getRebootReason(param_t inputParam)
-{
-    param_t *rebootParam = NULL;
-    // Detect device reboot through WEBPA and log message for device reboot through webpa
-    if(strcmp(inputParam.name, WEBPA_DEVICE_REBOOT_PARAM) == 0 && strcmp(inputParam.value, WEBPA_DEVICE_REBOOT_VALUE) == 0)
-    {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"RDKB_REBOOT : Reboot triggered through WEBPA\n");
-
-        rebootParam = (param_t *) malloc(sizeof(param_t));
-        rebootParam->name = strdup("Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason");
-        rebootParam->value = strdup("webpa-reboot");
-        rebootParam->type = WDMP_STRING;
-    }
-    return rebootParam;
 }
 
 static void freeParam(param_t *param)
@@ -341,16 +432,26 @@ static void freeParam(param_t *param)
    }
 }
 
+static bool isAuthorized(const char* pcCallerID, const char* pcParamName)
+{
+    if(!strcmp(pcParamName, DEVICE_REBOOT_PARAM))
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s : Invalid operation - Device Reboot Not Allowed Using tr181 command/RFC API\n", __FUNCTION__);
+        return false;
+    }
+    else
+        return true;
+}
+
 static bool allocate_res_struct_members(res_struct *respSt, req_struct *reqSt)
 {
-    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Entering.. allocate_res_struct_members\n");
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Entering... %s\n", __FUNCTION__);
     respSt->reqType = reqSt->reqType;
     respSt->timeSpan = NULL;
-    
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Allocating res_struct for reqType : ... %d\n", reqSt->reqType);
     switch(reqSt->reqType)
     {
         case GET:
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Allocating for GET\n");
             if(reqSt->u.getReq->paramCnt == 0)
                return false;
 
@@ -388,37 +489,9 @@ static bool allocate_res_struct_members(res_struct *respSt, req_struct *reqSt)
             }
             break;
             
-        case GET_ATTRIBUTES:
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Allocating for GET_ATTRIBUTES\n");
-            if(reqSt->u.getReq->paramCnt == 0)
-               return false;
-
-            respSt->paramCnt = reqSt->u.getReq->paramCnt;
-            respSt->retStatus = (WDMP_STATUS *)calloc(respSt->paramCnt, sizeof(WDMP_STATUS));
-            respSt->u.paramRes = (param_res_t *)malloc(sizeof(param_res_t));
-            if(respSt->u.paramRes != NULL)
-            {
-                memset(respSt->u.paramRes, 0, sizeof(param_res_t));
-                
-                respSt->u.paramRes->params = (param_t *)malloc(sizeof(param_t *) * reqSt->u.getReq->paramCnt);
-                if(respSt->u.paramRes->params == NULL)
-                {
-                    free(respSt->u.paramRes);
-                    return false;
-                }
-                else
-                {
-                    memset(respSt->u.paramRes, 0, sizeof(param_res_t) * reqSt->u.getReq->paramCnt);
-                }
-            }
-            break;
-            
         case SET:
-        case SET_ATTRIBUTES:
             if(reqSt->u.setReq->paramCnt == 0)
                return false;
-
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Allocating for SET/SET_ATTRIBUTES\n");
 
             respSt->paramCnt = reqSt->u.setReq->paramCnt;
             respSt->retStatus = (WDMP_STATUS *)calloc(respSt->paramCnt, sizeof(WDMP_STATUS));
@@ -440,19 +513,19 @@ static bool allocate_res_struct_members(res_struct *respSt, req_struct *reqSt)
             }
             break;
         default:
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Invalid Request Type\n");
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s : Invalid Request Type\n", __FUNCTION__);
             return false;
     };
     return true;
 }
 
-res_struct* handleRequest(req_struct *reqSt)
+res_struct* handleRequest(const char* pcCallerID, req_struct *reqSt)
 {
     unsigned int paramIndex = 0;
     res_struct *respSt = NULL;
     DATA_TYPE dataType = WDMP_NONE;
 
-    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Entering... %s\n", __FUNCTION__);
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Entering... %s\n", __FUNCTION__);
     respSt = (res_struct *) malloc(sizeof(res_struct));
     if(respSt == NULL)
     {
@@ -579,7 +652,7 @@ res_struct* handleRequest(req_struct *reqSt)
                            else // Temporary handling for RFC Variables - handled using RFC API.
                               respSt->retStatus[paramIndex] = handleRFCRequest(reqSt->reqType, respSt->u.getRes->params[paramIndex]);
 
-                           if(respSt->retStatus[paramIndex] == WDMP_FAILURE)
+                           if(respSt->retStatus[paramIndex] != WDMP_SUCCESS)
                            {
                               if(defaultValue)
                               {
@@ -602,51 +675,32 @@ res_struct* handleRequest(req_struct *reqSt)
                 }
                 break;
 
-        case GET_ATTRIBUTES:
-                for(paramIndex = 0; paramIndex < respSt->paramCnt; paramIndex++)
-                {
-                    if(isWildCardParam(reqSt->u.getReq->paramNames[paramIndex]))
-                    {
-                        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Wildcard SET/SET-ATTRIBUTES is not supported \n");
-                        respSt->retStatus[paramIndex] = WDMP_ERR_WILDCARD_NOT_SUPPORTED;
-                        continue;
-                    }
-                    respSt->retStatus[paramIndex] = validateAgainstDataModel(reqSt->reqType, reqSt->u.getReq->paramNames[paramIndex], NULL, &dataType, NULL);
-                    if(WDMP_SUCCESS != respSt->retStatus[paramIndex])
-                    {
-                        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Operation not permitted : %d\n", respSt->retStatus[paramIndex]);
-                        continue;
-                    }
-
-                    respSt->u.paramRes->params = (param_t *)malloc(sizeof(param_t));
-                    respSt->u.paramRes->params[paramIndex].name = strdup(reqSt->u.getReq->paramNames[paramIndex]);
-                    respSt->u.paramRes->params[paramIndex].value = NULL;
-                    respSt->u.paramRes->params[paramIndex].type = dataType;
-                    respSt->retStatus[paramIndex] = WDMP_SUCCESS;
-
-                    respSt->retStatus[paramIndex] = invokeHostIfAPI(reqSt->reqType, respSt->u.paramRes->params + paramIndex);
-                }
-                break;
-
         case SET:
-        case SET_ATTRIBUTES:
                 for(paramIndex = 0; paramIndex < respSt->paramCnt; paramIndex++)
                 {
-                    param_t *rebootReasonParam = getRebootReason(reqSt->u.setReq->param[paramIndex]);
                     bool rfcParam = false;
 
                     respSt->u.paramRes->params[paramIndex].name = strdup(reqSt->u.setReq->param[paramIndex].name);
-                    if(isWildCardParam(reqSt->u.setReq->param[paramIndex].name))
+                    if(!isAuthorized(pcCallerID, reqSt->u.setReq->param[paramIndex].name))
+                    {
+                        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"CallerID : %s is not allowed to SET : %s\n", pcCallerID, reqSt->u.setReq->param[paramIndex].name);
+                        respSt->retStatus[paramIndex] = WDMP_FAILURE;
+                        continue;
+                    }
+                    else if(isWildCardParam(reqSt->u.setReq->param[paramIndex].name))
                     {
                         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Wildcard SET/SET-ATTRIBUTES is not supported \n");
                         respSt->retStatus[paramIndex] = WDMP_ERR_WILDCARD_NOT_SUPPORTED;
+                        continue;
                     }
-                    if(reqSt->u.setReq->param[paramIndex].value == NULL)
+                    else if(reqSt->u.setReq->param[paramIndex].value == NULL)
                     {
                         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Parameter value is null\n");
                         respSt->retStatus[paramIndex] = WDMP_ERR_VALUE_IS_NULL;
-                    } 
-                    else {
+                        continue;
+                    }
+                    else
+                    {
                         respSt->u.paramRes->params[paramIndex].value = strdup(reqSt->u.setReq->param[paramIndex].value);
                     }
 
@@ -663,30 +717,10 @@ res_struct* handleRequest(req_struct *reqSt)
                         if(WDMP_SUCCESS != respSt->retStatus[paramIndex])
                         {
                             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Operation not permitted : %d\n", respSt->retStatus[paramIndex]);
-                            if(rebootReasonParam)
-                            {
-                                freeParam(rebootReasonParam);
-                            }
                             continue;
                         }
-                        else if(rebootReasonParam)
-                        {
-                           WDMP_STATUS ret = invokeHostIfAPI(SET, rebootReasonParam);
-                           if(ret != WDMP_SUCCESS)
-                           {
-                              RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed to set Reboot reason - \n");
-                              freeParam(rebootReasonParam);
-                              wdmp_free_res_struct(respSt);
-                              respSt = NULL;
-                              break;
-                           }
-                           freeParam(rebootReasonParam);
-                        }
-
                         respSt->retStatus[paramIndex] = invokeHostIfAPI(reqSt->reqType, reqSt->u.setReq->param + paramIndex);
                     }
-
-                    freeParam(rebootReasonParam);
                 }
                 break;
 
@@ -696,6 +730,6 @@ res_struct* handleRequest(req_struct *reqSt)
                 respSt = NULL;
     };
 
-    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Leaving... %s\n", __FUNCTION__);
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Leaving... %s\n", __FUNCTION__);
     return respSt;
 }
