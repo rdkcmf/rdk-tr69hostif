@@ -146,6 +146,46 @@ int WiFiReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_PreAssn_BestDeltaLevel(stMsgData);
         }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_BestDeltaLevelConnected") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelConnected(stMsgData);
+        }
+        else if(strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_BestDeltaLevelDisconnected") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelDisconnected(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_SelfSteerThresholdLevel") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerThreshold(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_SelfSteerTimeframe") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerTimeframe(stMsgData);
+        }
+       /* else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_SelfSteerBeaconsMissedTime") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerBeaconsMissedTime(stMsgData);
+        }*/
+        else if(strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_APcontrolThresholdLevel") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolThresholdLevel(stMsgData);
+        }
+        else if(strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_APcontrolTimeframe") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolTimeframe(stMsgData);
+        }
+        else if(strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.SelfSteer_OverrideEnable") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_SelfSteerOverride(stMsgData);
+        }
+        else if(strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_BackOffTime") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_postAssnBackOffTime(stMsgData);
+        }
+        else if(strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.80211kvrEnable") == 0)
+        {
+            ret = clntRoamInst->set_Device_WiFi_X_Rdkcentral_clientRoaming_80211kvrEnable(stMsgData);
+        }
         else
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]  Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
@@ -543,6 +583,50 @@ int WiFiReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PreAssn_BestDeltaLevel") == 0)
         {
             ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_PreAssn_BestDeltaLevel(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.SelfSteer_Override") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_SelfSteerOverride(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_BestDeltaLevelConnected") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelConnected(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_BestDeltaLevelDisconnected") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelDisconnected(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_SelfSteerThresholdLevel") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerThreshold(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_SelfSteerTimeframe") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerTimeframe(stMsgData);
+        }
+       /* else if (strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_SelfSteerBeaconsMissedTime") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerBeaconsMissedTime(stMsgData);
+        }*/
+        else if(strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_APcontrolThresholdLevel") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolThresholdLevel(stMsgData);
+        }
+        else if(strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_APcontrolTimeframe") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolTimeframe(stMsgData);
+        }
+        else if(strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.SelfSteer_OverrideEnable") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_SelfSteerOverride(stMsgData);
+        }
+        else if(strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.PostAssn_BackOffTime") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_postAssnBackOffTime(stMsgData);
+        }
+        else if(strcasecmp(stMsgData->paramName,"Device.WiFi.X_RDKCENTRAL-COM_ClientRoaming.80211kvrEnable") == 0)
+        {
+            ret = clntRoamInst->get_Device_WiFi_X_Rdkcentral_clientRoaming_80211kvrEnable(stMsgData);
         }
         else
         {

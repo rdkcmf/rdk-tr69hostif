@@ -190,7 +190,7 @@ static bool validateParamValue(const string &paramValue, HostIf_ParamType_t data
             break;
 
         case hostIf_IntegerType:
-            if(isdigit(paramValue[0]))
+            if(isdigit(paramValue[0]) || (paramValue[0] == '-' && isdigit(paramValue[1])))
             {
                 int value = stoi(paramValue, &index);
                 if(index != paramValue.length())

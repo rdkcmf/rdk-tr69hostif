@@ -115,6 +115,16 @@ public:
     int preassnProbeRetryCnt;
     int preassnBestThreshold;
     int preassnBestDelta;
+    int postAssnLevelDeltaConnected;
+    int postAssnLevelDeltaDisconnected;
+    int postAssnSelfSteerThreshold;
+    int postAssnSelfSteerTimeframe;
+    int postAssnSelfSteerBeaconsMissedTime;
+    int postAssnAPcontrolThresholdLevel;
+    int postAssnAPcontrolTimeframe;
+    int postAssnBackOffTime;
+    bool postAssnSelfSteerOverrideEnable;
+    bool roaming80211kvrEnable;
 
     /**
      * 	@brief Enables or disables the Client Romaing
@@ -159,8 +169,8 @@ public:
      *
      *
      */
-    int set_Device_WiFi_X_Rdkcentral_clientRoaming_PreAssn_BestThresholdLevel(HOSTIF_MsgData_t *stMsgData);
 
+    int set_Device_WiFi_X_Rdkcentral_clientRoaming_PreAssn_BestThresholdLevel(HOSTIF_MsgData_t *stMsgData);
     /**
      *  @brief get_Device_WiFi_X_Rdkcentral_clientRoaming_PreAssn_BestDeltaLevel
      *
@@ -174,6 +184,128 @@ public:
      *
      */
     int set_Device_WiFi_X_Rdkcentral_clientRoaming_PreAssn_BestDeltaLevel(HOSTIF_MsgData_t *stMsgData);
+    
+    /**
+     * @brief get_Device_WiFi_X_Rdkcentral_clientRoaming_SelfSteerOverride
+     *
+     *
+     */
+    int get_Device_WiFi_X_Rdkcentral_clientRoaming_SelfSteerOverride(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief set_Device_WiFi_X_Rdkcentral_clientRoaming_SelfSteerOverride
+     *
+     *
+     */
+    int set_Device_WiFi_X_Rdkcentral_clientRoaming_SelfSteerOverride(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelConnected
+     *
+     *
+     */
+    int get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelConnected(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelConnected
+     *
+     *
+     */
+    int set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelConnected(HOSTIF_MsgData_t *stMsgData);
+     /**
+     * @brief get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelDisconnected
+     *
+     *
+     */
+    int get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelDisconnected(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelDisconnected
+     *
+     *
+     */
+    int set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_BestDeltaLevelDisconnected(HOSTIF_MsgData_t *stMsgData);
+
+    /**
+     * @brief get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerThreshold
+     *
+     *
+     */
+    int get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerThreshold(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerThreshold
+     *
+     *
+     */
+    int set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerThreshold(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerTimeframe
+     *
+     *
+     */
+    int get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerTimeframe(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerTimeframe
+     *
+     *
+     */
+    int set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerTimeframe(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerBeaconsMissedTime
+     *
+     *
+     */
+    //int get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerBeaconsMissedTime(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerBeaconsMissedTime
+     *
+     *
+     */
+    //int set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_SelfSteerBeaconsMissedTime(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolThresholdLevel
+     *
+     *
+     */
+    int get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolThresholdLevel(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolThresholdLevel
+     *
+     *
+     */
+    int set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolThresholdLevel(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolTimeframe
+     *
+     *
+     */
+    int get_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolTimeframe(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolTimeframe
+     * 
+     *
+     */
+    int set_Device_WiFi_X_Rdkcentral_clientRoaming_PostAssn_APcontrolTimeframe(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief get_Device_WiFi_X_Rdkcentral_clientRoaming_postAssnBackOffTime
+     *
+     *
+     */ 
+    int get_Device_WiFi_X_Rdkcentral_clientRoaming_postAssnBackOffTime(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief set_Device_WiFi_X_Rdkcentral_clientRoaming_postAssnBackOffTime
+     * 
+     *
+     */
+    int set_Device_WiFi_X_Rdkcentral_clientRoaming_postAssnBackOffTime(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief get_Device_WiFi_X_Rdkcentral_clientRoaming_80211kvrEnable
+     *
+     *
+     */
+    int get_Device_WiFi_X_Rdkcentral_clientRoaming_80211kvrEnable(HOSTIF_MsgData_t *stMsgData);
+    /**
+     * @brief set_Device_WiFi_X_Rdkcentral_clientRoaming_80211kvrEnable
+     * 
+     *
+     */
+    int set_Device_WiFi_X_Rdkcentral_clientRoaming_80211kvrEnable(HOSTIF_MsgData_t *stMsgData);
 };
 
 /* End of TR069_HOSTIF_DEVICE_WIFI_X_RDKCENTRAL_COM_CLIENTROAMING_H_ doxygen group */
