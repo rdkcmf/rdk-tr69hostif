@@ -156,6 +156,7 @@
 #define LE_RFC_ENABLE   "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LoudnessEquivalence.Enable"
 #define HDR_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HdrEnable.Enable"
 #define UHD_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.UhdEnable.Enable"
+#define XRE_CONTAINER_RFC_ENABLE "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LXC.XRE.Enable"
 
 #define RFC_CTL_RETRIEVE_NOW	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.RetrieveNow"
 
@@ -232,6 +233,7 @@ class hostIf_DeviceInfo {
     int set_xRDKCentralComHdrRFCEnable(HOSTIF_MsgData_t *);
     int set_xRDKCentralComUhdRFCEnable(HOSTIF_MsgData_t *);
     int set_xRDKCentralComHdrDVRFCEnable(HOSTIF_MsgData_t *);
+    int set_xRDKCentralComXREContainerRFCEnable(HOSTIF_MsgData_t *);
 
     // This is to set wl roam_trigger
     int set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *);
