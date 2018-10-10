@@ -26,7 +26,7 @@ Type=notify
 SyslogIdentifier="tr69hostif"
 EnvironmentFile=/etc/device.properties
 ExecStartPre=/bin/mkdir -p /opt/tr-181
-ExecStartPre=/bin/sh -c 'if [ "$BUILD_TYPE" != "prod" ];then /lib/rdk/opt-override.sh; fi'
+ExecStartPre=/bin/sh -c '/lib/rdk/opt-override.sh'
 ExecStart=/usr/bin/tr69hostif -c /etc/mgrlist.conf -p 10999 -s 11999 -d $DEBUGINIFILE -w $WEBPANOTIFYINCFG
 ExecStop=/bin/kill -15 $MAINPID
 RestartSec=10s
