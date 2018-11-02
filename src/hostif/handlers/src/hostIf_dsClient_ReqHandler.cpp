@@ -66,7 +66,14 @@ bool DSClientReqHandler::init()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] Device manager Initializing\n", __FUNCTION__);
-    device::Manager::Initialize();
+    try
+    {
+       device::Manager::Initialize();
+    }
+    catch(const std::exception e)
+    {
+       RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Exception thrown while initializing device manager %s\n", e.what());
+    }
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
     return true;
 }
