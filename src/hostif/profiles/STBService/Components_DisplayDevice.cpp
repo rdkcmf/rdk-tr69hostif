@@ -30,8 +30,8 @@
 #include "Components_DisplayDevice.h"
 
 #define STATUS_STRING "Status"
-#define EDID_STRING "EDID"
-#define COMCAST_EDID_STRING "X_COMCAST_COM_EDID"
+#define EEDID_STRING "EEDID"
+#define COMCAST_EDID_STRING "X_COMCAST-COM_EDID"
 #define EDID_BYTES_STRING "EDID_BYTES"
 #define SUPPORTED_RES_STRING "SupportedResolutions"
 #define PREF_RES_STRING "PreferredResolution"
@@ -74,7 +74,7 @@ int hostIf_STBServiceDisplayDevice::handleGetMsg(const char *paramName, HOSTIF_M
     {
         ret = getStatus(stMsgData);
     }
-    else if (strcasecmp(paramName, EDID_STRING) == 0)
+    else if (strcasecmp(paramName, EEDID_STRING) == 0)
     {
         ret = getX_COMCAST_COM_EDID(stMsgData);
     }
@@ -156,7 +156,7 @@ void hostIf_STBServiceDisplayDevice::doUpdates(const char *baseName, updateCallb
     getX_COMCAST_COM_EDID(&msgData,&bChanged);
     if(bChanged)
     {
-        snprintf(tmp_buff, PARAM_LEN, UPDATE_FORMAT_STRING, baseName, dev_id, DISPLAYDEVICE_OBJECT_NAME, EDID_STRING);
+        snprintf(tmp_buff, PARAM_LEN, UPDATE_FORMAT_STRING, baseName, dev_id, DISPLAYDEVICE_OBJECT_NAME, EEDID_STRING);
         if(mUpdateCallback)
         {
             mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
