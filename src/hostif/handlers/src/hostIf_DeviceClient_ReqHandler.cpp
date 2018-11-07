@@ -503,6 +503,14 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(stMsgData);
         }
+        else if (strcasecmp(stMsgData->paramName,IPREMOTE_IPADDRESS) == 0)
+        {
+            ret= pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpaddress(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,IPREMOTE_MACADDRESS) == 0)
+        {
+            ret= pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMACaddress(stMsgData);
+        }
         else if (strcasecmp(stMsgData->paramName,XRPOLLING_ACTION) == 0)
         {
             ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(stMsgData);

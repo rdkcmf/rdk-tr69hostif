@@ -96,6 +96,7 @@
 #define PREFERRED_GATEWAY_FILE		"/opt/prefered-gateway"
 #define GATEWAY_NAME_SIZE 4
 #define IPREMOTE_SUPPORT_STATUS_FILE    "/opt/.ipremote_status"
+#define IPREMOTE_INTERFACE_INFO         "/tmp/ipremote_interface_info"
 
 GHashTable* hostIf_DeviceInfo::ifHash = NULL;
 GHashTable* hostIf_DeviceInfo::m_notifyHash = NULL;
@@ -1768,6 +1769,94 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEna
     stMsgData->paramLen = strlen(stMsgData->paramValue);
 
     return OK;   
+}
+
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpaddress(HOSTIF_MsgData_t *stMsgData)
+{
+    string line;
+    char ipAddress[100] = {'\0'};
+    ifstream remoteInterface_file(IPREMOTE_INTERFACE_INFO);
+    try
+    {
+        if (remoteInterface_file.is_open())
+        {
+            while ( getline (remoteInterface_file,line) )
+            {
+                if (line.find("Ipv4_Address") !=string::npos)
+                {
+                    char *tmpStr = strstr((char *)line.c_str(), "=")  ;
+                    tmpStr++;
+                    while(isspace(*tmpStr)) {
+                        tmpStr++;
+                    }
+                    strcpy(ipAddress, tmpStr);
+                }
+            }
+            remoteInterface_file.close();
+            snprintf((char *)stMsgData->paramValue, strlen(stMsgData->paramValue)-1, "%s",ipAddress);
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] File not exists, IpRemoteInterface file open failed \n", __FUNCTION__);
+
+            //values not populated so unknown.
+            strcpy(ipAddress,"unknown");
+            snprintf((char *)stMsgData->paramValue, strlen(stMsgData->paramValue)-1, "%s"  ,ipAddress);
+        }
+
+        stMsgData->paramtype = hostIf_StringType;
+        stMsgData->paramLen = strlen(stMsgData->paramValue);
+
+        return OK;
+    }
+    catch (const std::exception e) {
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s()]Exception caught.  \n", __FUNCTION__);
+        return NOK;
+    }
+}
+
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMACaddress(HOSTIF_MsgData_t *stMsgData)
+{
+    string line;
+    char macAddress[100] = {'\0'};
+    ifstream remoteInterface_file(IPREMOTE_INTERFACE_INFO);
+    try
+    {
+        if (remoteInterface_file.is_open())
+        {
+            while ( getline (remoteInterface_file,line) )
+            {
+                if (line.find("MAC_Address") !=string::npos)
+                {
+                    char *tmpStr = strstr((char *)line.c_str(), "=")  ;
+                    tmpStr++;
+                    while(isspace(*tmpStr)) {
+                        tmpStr++;
+                    }
+                    strcpy(macAddress, tmpStr);
+                }
+            }
+            remoteInterface_file.close();
+            snprintf((char *)stMsgData->paramValue, strlen(stMsgData->paramValue)-1, "%s",macAddress);
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] File not exists, IpRemoteInterface file open failed \n", __FUNCTION__);
+
+            //values not populated so unknown.
+            strcpy(macAddress,"unknown");
+            snprintf((char *)stMsgData->paramValue, strlen(stMsgData->paramValue)-1, "%s"  ,macAddress);
+        }
+
+        stMsgData->paramtype = hostIf_StringType;
+        stMsgData->paramLen = strlen(stMsgData->paramValue);
+
+        return OK;
+    }
+    catch (const std::exception e) {
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s()]Exception caught.  \n", __FUNCTION__);
+        return NOK;
+    }
 }
 
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(HOSTIF_MsgData_t *stMsgData, bool *pChanged)

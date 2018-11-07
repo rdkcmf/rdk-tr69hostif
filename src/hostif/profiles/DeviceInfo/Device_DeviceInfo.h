@@ -142,6 +142,8 @@
 #define xFirmwareDownloadNow_STR	"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadNow" /* boolean [w] Trigger download on set true. */
 
 #define IPREMOTE_SUPPORT  "Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.Enable"
+#define IPREMOTE_IPADDRESS "Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.IPAddr"
+#define IPREMOTE_MACADDRESS "Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.MACAddr"
 #define XRPOLLING_ACTION  "Device.DeviceInfo.X_RDKCENTRAL-COM_XRPolling.Action"
 
 /**
@@ -986,6 +988,34 @@ public:
 
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *, bool *pChanged = NULL);
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *);
+
+   /*
+    * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpaddress
+    *
+    * This method is to get the ipremote interface ipaddress.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.IPAddr
+    *   Data type: String - Arguments Ipaddress
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpaddress(HOSTIF_MsgData_t *);
+
+   /*
+    * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMACaddress
+    *
+    * This method is to get the ipremote interface MAC address.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.MACAddr
+    *   Data type: String - Arguments MACaddress
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMACaddress(HOSTIF_MsgData_t *);
 
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(HOSTIF_MsgData_t *, bool *pChanged = NULL);
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(HOSTIF_MsgData_t *);
