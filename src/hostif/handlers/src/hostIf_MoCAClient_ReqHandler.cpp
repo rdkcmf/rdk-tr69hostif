@@ -701,7 +701,7 @@ void MoCAClientReqHandler::checkForUpdates()
             {
                 sprintf(tmp,"%s.",tmp_buff);
                 if(mUpdateCallback) mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_ADD,tmp, NULL, hostIf_IntegerType);
-                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s]Sending ADD Event for params: [%s] \n", __FILE__, __FUNCTION__ ,tmp);
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s]Sending ADD Event for params: [%s] \n", __FILE__, __FUNCTION__ ,tmp);
                 tmpNoDev--;
             }
             curNumOfDevices[index] = get_int(msgData.paramValue);
@@ -724,7 +724,7 @@ void MoCAClientReqHandler::checkForUpdates()
             {
                 sprintf(tmp,"%s.",tmp_buff);
                 if(mUpdateCallback) mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_ADD,tmp, NULL, hostIf_IntegerType);
-                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s]Sending ADD Event for params: [%s] \n", __FILE__, __FUNCTION__ ,tmp);
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s]Sending ADD Event for params: [%s] \n", __FILE__, __FUNCTION__ ,tmp);
                 tmpNoDev--;
             }
             numOfMocaMeshEntries = get_int(msgData.paramValue);
@@ -732,7 +732,6 @@ void MoCAClientReqHandler::checkForUpdates()
 
 
     }
-    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] BEFORE THE HAVE VALUE CHANGE EVENT block \n",__FILE__, __FUNCTION__);
 #ifdef HAVE_VALUE_CHANGE_EVENT
     int instanceNumber = 0;
     GHashTable* notifyhash;
@@ -750,7 +749,7 @@ void MoCAClientReqHandler::checkForUpdates()
     // Iterate through Ghash Table
     if(NULL != notifyhash)
     {
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] NotifyHash is available before Ghash iterator \n", __FILE__, __FUNCTION__ );
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] NotifyHash is available before Ghash iterator \n", __FILE__, __FUNCTION__ );
         GHashTableIter notifyHashIterator;
         gpointer paramName;
         gpointer notifyEnable;
@@ -766,33 +765,31 @@ void MoCAClientReqHandler::checkForUpdates()
             instanceNumber = 0;
             if(matchComponent((const char*)paramName,"Device.MoCA.Interface",&pSetting,instanceNumber))
             {
-                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface matched n pSetting is: [%s] and instance Number [%d]  \n", __FILE__, __FUNCTION__,pSetting,instanceNumber);
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface matched n pSetting is: [%s] and instance Number [%d]  \n", __FILE__, __FUNCTION__,pSetting,instanceNumber);
                 if(!instanceNumber)
                 {   // MoCA settings not found in Notify Hash Table
                     continue;
                 }/*Creating MoCAInterface object as InstanceNumber might be different*/
-                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] before getting MoCA instance with instance number [%d]  \n", __FILE__, __FUNCTION__,instanceNumber);
+                //RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] before getting MoCA instance with instance number [%d]  \n", __FILE__, __FUNCTION__,instanceNumber);
                 MoCAInterface *mocaIface = MoCAInterface::getInstance(0);
                 if(mocaIface)
                 {
-                    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] mocaIface instance is created inside if(mocaIface) \n", __FILE__, __FUNCTION__);
+                    //RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] mocaIface instance is created inside if(mocaIface) \n", __FILE__, __FUNCTION__);
                     char *buff =(char*)malloc(strlen(pSetting)+1);
                     strcpy(buff,pSetting);
                     int subInstanceNumber;
                     const char *pSubSetting = (char*)malloc(strlen(pSetting)+1);
                     if(matchComponent((const char*)buff,"QoS.FlowStats",&pSubSetting,subInstanceNumber))
                     {
-                        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.QoS.FlowStats  matched n pSubSetting is: [%s] and subInstanceNumber [%d]  \n", __FILE__, __FUNCTION__,instanceNumber,pSubSetting,subInstanceNumber);
+                        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.QoS.FlowStats  matched n pSubSetting is: [%s] and subInstanceNumber [%d]  \n", __FILE__, __FUNCTION__,instanceNumber,pSubSetting,subInstanceNumber);
                         MoCAInterfaceQoSFlowStats *pIfaceQoSFS = MoCAInterfaceQoSFlowStats::getInstance();
                         memset(&msgData,subInstanceNumber,sizeof(msgData));
-                        // memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
                         bChanged = false;
                         if(strcasecmp(pSubSetting,"FlowID")==0)
                         {
                             pIfaceQoSFS->get_FlowID(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"FlowID");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -804,7 +801,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceQoSFS->get_PacketDA(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"PacketDA");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -816,7 +812,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceQoSFS->get_MaxRate(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"MaxRate");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -828,7 +823,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceQoSFS->get_MaxBurstSize(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"MaxBurstSize");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -840,7 +834,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceQoSFS->get_LeaseTime(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"LeaseTime");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -852,7 +845,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceQoSFS->get_LeaseTimeLeft(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"LeaseTimeLeft");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -864,7 +856,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceQoSFS->get_FlowPackets(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.FlowStats.%d.%s",instanceNumber,subInstanceNumber,"FlowPackets");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -874,17 +865,15 @@ void MoCAClientReqHandler::checkForUpdates()
                     }
                     else if(matchComponent((const char*)buff,"AssociatedDevice",&pSubSetting,subInstanceNumber))
                     {
-                        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.AssociatedDevice matched n subInstanceNumber is: [%d] and pSubSetting is [%s]  \n", __FILE__, __FUNCTION__,instanceNumber,subInstanceNumber,pSubSetting);
+                        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.AssociatedDevice matched n subInstanceNumber is: [%d] and pSubSetting is [%s]  \n", __FILE__, __FUNCTION__,instanceNumber,subInstanceNumber,pSubSetting);
                         MoCAInterfaceAssociatedDevice *pIfaceAsstDev = MoCAInterfaceAssociatedDevice::getInstance();
                         memset(&msgData,0,sizeof(msgData));
-                        // memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
                         bChanged = false;
                         if(strcasecmp(pSubSetting,"MACAddress")==0)
                         {
                             pIfaceAsstDev->get_MACAddress(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"MACAddress");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -896,7 +885,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_NodeID(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                //   sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"NodeID");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -908,7 +896,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_PreferredNC(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                //   sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"PreferredNC");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -920,7 +907,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_HighestVersion(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"HighestVersion");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -932,7 +918,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_PHYTxRate(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"PHYTxRate");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -944,7 +929,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_PHYRxRate(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"PHYRxRate");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -956,7 +940,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_TxPowerControlReduction(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"TxPowerControlReduction");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -968,7 +951,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_RxPowerLevel(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"RxPowerLevel");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -980,7 +962,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_TxBcastRate(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"TxBcastRate");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -992,7 +973,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_RxBcastPowerLevel(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"RxBcastPowerLevel");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1004,7 +984,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_TxPackets(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"TxPackets");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1016,7 +995,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_RxPackets(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"RxPackets");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1028,7 +1006,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_RxErroredAndMissedPackets(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"RxErroredAndMissedPackets");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1040,7 +1017,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_QAM256Capable(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"QAM256Capable");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1052,7 +1028,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_PacketAggregationCapability(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"PacketAggregationCapability");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1064,7 +1039,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_RxSNR(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"RxSNR");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1076,7 +1050,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceAsstDev->get_Active(&msgData,subInstanceNumber,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.AssociatedDevice.%d.%s",instanceNumber,subInstanceNumber,"Active");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1087,17 +1060,15 @@ void MoCAClientReqHandler::checkForUpdates()
                     }
                     else if(strncmp(buff,"Stats",5)==0)
                     {
-                        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.Stats matched pSetting is[%s] \n", __FILE__, __FUNCTION__,instanceNumber,pSetting);
+                        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.Stats matched pSetting is[%s] \n", __FILE__, __FUNCTION__,instanceNumber,pSetting);
                         MoCAInterfaceStats *pIfaceStats = MoCAInterfaceStats::getInstance();
                         memset(&msgData,0,sizeof(msgData));
-                        //memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
                         bChanged = false;
                         if(strcmp(buff,"Stats.BytesSent")==0)
                         {
                             pIfaceStats->get_BytesSent(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"BytesSent");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1109,7 +1080,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_BytesReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"BytesReceived");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1121,7 +1091,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_PacketsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"PacketsSent");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1133,7 +1102,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_PacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"PacketsReceived");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1145,7 +1113,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_ErrorsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"ErrorsSent");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1157,7 +1124,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_ErrorsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"ErrorsReceived");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1169,7 +1135,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_UnicastPacketsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"UnicastPacketsSent");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1181,7 +1146,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_UnicastPacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"UnicastPacketsReceived");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1193,7 +1157,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_DiscardPacketsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"DiscardPacketsSent");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1205,7 +1168,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_DiscardPacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"DiscardPacketsReceived");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1217,7 +1179,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_MulticastPacketsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"MulticastPacketsSent");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1229,7 +1190,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_MulticastPacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"MulticastPacketsReceived");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1241,7 +1201,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_BroadcastPacketsSent(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"BroadcastPacketsSent");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1253,7 +1212,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_BroadcastPacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"BroadcastPacketsReceived");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1265,7 +1223,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceStats->get_UnknownProtoPacketsReceived(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.Stats.%s",instanceNumber,"UnknownProtoPacketsReceived");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1275,17 +1232,15 @@ void MoCAClientReqHandler::checkForUpdates()
                     }//Stats close
                     else if(strncmp(buff,"QoS",3)==0)
                     {
-                        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.QoS matched n pSetting is [%s] \n", __FILE__, __FUNCTION__,instanceNumber,pSetting);
+                        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] Device.MoCA.Interface.%d.QoS matched n pSetting is [%s] \n", __FILE__, __FUNCTION__,instanceNumber,pSetting);
                         MoCAInterfaceQoS *pIfaceQoS = MoCAInterfaceQoS::getInstance();
                         memset(&msgData,0,sizeof(msgData));
-                        // memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
                         bChanged = false;
                         if(strcmp(buff,"QoS.EgressNumFlows")==0)
                         {
                             pIfaceQoS->get_EgressNumFlows(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.%s",instanceNumber,"EgressNumFlows");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1297,7 +1252,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceQoS->get_IngressNumFlows(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.%s",instanceNumber,"IngressNumFlows");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1309,7 +1263,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             pIfaceQoS->get_FlowStatsNumberOfEntries(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.QoS.%s",instanceNumber,"FlowStatsNumberOfEntries");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1320,14 +1273,12 @@ void MoCAClientReqHandler::checkForUpdates()
                     else
                     {
                         memset(&msgData,0,sizeof(msgData));
-                        // memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
                         bChanged =  false;
                         if(strcmp(pSetting,"Enable")==0)
                         {
                             mocaIface->get_Enable(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"Enable");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1339,7 +1290,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_Status(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"Status");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1351,7 +1301,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_Alias(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"Alias");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1363,7 +1312,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_Name(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"Name");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1375,7 +1323,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_LastChange(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"LastChange");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1387,7 +1334,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_LowerLayers(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"LowerLayers");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1399,7 +1345,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_Upstream(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"Upstream");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1411,7 +1356,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_MACAddress(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"MACAddress");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1423,7 +1367,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_FirmwareVersion(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"FirmwareVersion");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1435,7 +1378,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_MaxBitRate(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"MaxBitRate");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1447,7 +1389,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_MaxIngressBW(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"MaxIngressBW");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1459,7 +1400,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_MaxEgressBW(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"MaxEgressBW");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1471,7 +1411,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_HighestVersion(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"HighestVersion");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1483,7 +1422,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_CurrentVersion(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"CurrentVersion");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1495,7 +1433,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_NetworkCoordinator(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"NetworkCoordinator");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1507,7 +1444,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_NodeID(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"NodeID");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1519,7 +1455,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_MaxNodes(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"MaxNodes");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1531,7 +1466,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_PreferredNC(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"PreferredNC");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1543,7 +1477,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_BackupNC(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"BackupNC");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1555,7 +1488,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_PrivacyEnabledSetting(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"PrivacyEnabledSetting");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1567,7 +1499,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_PrivacyEnabled(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"PrivacyEnabled");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1592,7 +1523,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_FreqCurrentMaskSetting(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"FreqCurrentMaskSetting");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1604,7 +1534,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_FreqCurrentMask(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"FreqCurrentMask");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1616,7 +1545,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_CurrentOperFreq(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"CurrentOperFreq");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1628,7 +1556,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_LastOperFreq(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"LastOperFreq");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1640,7 +1567,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_KeyPassphrase(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"KeyPassphrase");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1652,7 +1578,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_TxPowerLimit(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"TxPowerLimit");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1664,7 +1589,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_PowerCntlPhyTarget(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"PowerCntlPhyTarget");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1676,7 +1600,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_BeaconPowerLimit(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"BeaconPowerLimit");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1688,7 +1611,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_NetworkTabooMask(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //  sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"NetworkTabooMask");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1700,7 +1622,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_NodeTabooMask(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"NodeTabooMask");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1712,7 +1633,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_TxBcastRate(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"TxBcastRate");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1724,7 +1644,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_TxBcastPowerReduction(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                // sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"TxBcastPowerReduction");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1736,7 +1655,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_QAM256Capable(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"QAM256Capable");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);
@@ -1748,7 +1666,6 @@ void MoCAClientReqHandler::checkForUpdates()
                             mocaIface->get_PacketAggregationCapability(&msgData,&bChanged);
                             if(bChanged)
                             {
-                                //sprintf(tmp_buff,"Device.MoCA.Interface.%d.%s",index,"PacketAggregationCapability");
                                 if(mUpdateCallback && (*isNotifyEnabled == 1))
                                 {
                                     mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,(const char*)paramName, msgData.paramValue, msgData.paramtype);

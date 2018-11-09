@@ -304,7 +304,7 @@ void hostIf_SetReqHandler(void *arg)
     if(stMsgData)
     {
         ret = hostIf_SetMsgHandler(stMsgData);
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[hostIf_SetReqHandler : hostIf_MsgHandler()] Return value : %d\n", ret);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[hostIf_SetReqHandler : hostIf_MsgHandler()] Return value : %d\n", ret);
         /*
 
                 if(ret == OK)
