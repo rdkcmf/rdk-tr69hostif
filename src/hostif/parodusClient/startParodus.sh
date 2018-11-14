@@ -95,11 +95,18 @@ parodus_start_up()
     ServerPort=`get_webpa_number_parameter "ServerPort"`
     PingWaitTime=`get_webpa_max_waiting_time "MaxPingWaitTimeInSec"`
     HwMac=`get_hardware_mac`
+    PartnerId=$(getPartnerId)
+    if [ $PartnerId = "unknown" ]; then
+	PartnerId=""
+    else 
+	PartnerId=*,$PartnerId
+    fi
+
     if [ -z $HwMac ]; then
        echo "Failed to start Parodus, Can't fetch macAddress "
     else
        echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-interface-used=$NwInterface webpa-url=$ServerIP partner-id=$(getPartnerId)"
-       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=$(getPartnerId) --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE  --acquire-jwt=$ACQUIRE_JWT --dns-txt-url=$DNS_TEXT_URL --jwt-public-key-file=$JWT_KEY --jwt-algo=RS256 --crud-config-file=$CRUD_CONFIG_FILE"
+       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=$PartnerId --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE  --acquire-jwt=$ACQUIRE_JWT --dns-txt-url=$DNS_TEXT_URL --jwt-public-key-file=$JWT_KEY --jwt-algo=RS256 --crud-config-file=$CRUD_CONFIG_FILE"
        echo "Parodus command set.." 
     fi
 }
