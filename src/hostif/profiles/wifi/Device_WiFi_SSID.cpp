@@ -1,0 +1,282 @@
+/*
+* ============================================================================
+* RDK MANAGEMENT, LLC CONFIDENTIAL AND PROPRIETARY
+* ============================================================================
+* This file (and its contents) are the intellectual property of RDK Management, LLC.
+* It may not be used, copied, distributed or otherwise  disclosed in whole or in
+* part without the express written permission of RDK Management, LLC.
+* ============================================================================
+* Copyright (c) 2016 RDK Management, LLC. All rights reserved.
+* ============================================================================
+*/
+
+/**
+ * @file Device_WiFi_SSID.cpp
+ *
+ * @brief Device_WiFi_SSID API Implementation.
+ *
+ * This is the implementation of the WiFi API.
+ *
+ * @par Document
+ */
+/** @addtogroup TR-069 WiFi Implementation
+ *  This is the implementation of the Device Public API.
+ *  @{
+ */
+
+/*****************************************************************************
+ * STANDARD INCLUDE FILES
+ *****************************************************************************/
+#ifdef USE_WIFI_PROFILE
+
+#include "Device_WiFi_SSID.h"
+
+extern "C" {
+    /* #include "c_only_header.h"*/
+#include "wifi_common_hal.h"
+#include "wifiSrvMgrIarmIf.h"
+};
+
+static time_t firstExTime = 0;
+
+GHashTable* hostIf_WiFi_SSID::ifHash = NULL;
+
+hostIf_WiFi_SSID* hostIf_WiFi_SSID::getInstance(int dev_id)
+{
+    static hostIf_WiFi_SSID* pRet = NULL;
+
+    if(ifHash)
+    {
+        pRet = (hostIf_WiFi_SSID *)g_hash_table_lookup(ifHash,(gpointer) dev_id);
+    }
+    else
+    {
+        ifHash = g_hash_table_new(NULL,NULL);
+    }
+
+    if(!pRet)
+    {
+        try {
+            pRet = new hostIf_WiFi_SSID(dev_id);
+        } catch(int e)
+        {
+            RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"Caught exception, not able create hostIf_WiFi_SSID instance..\n");
+        }
+        g_hash_table_insert(ifHash, (gpointer)dev_id, pRet);
+    }
+    return pRet;
+}
+
+GList* hostIf_WiFi_SSID::getAllInstances()
+{
+    if(ifHash)
+        return g_hash_table_get_keys(ifHash);
+    return NULL;
+}
+
+void hostIf_WiFi_SSID::closeInstance(hostIf_WiFi_SSID *pDev)
+{
+    if(pDev)
+    {
+        g_hash_table_remove(ifHash, (gconstpointer)pDev->dev_id);
+        delete pDev;
+    }
+}
+
+void hostIf_WiFi_SSID::closeAllInstances()
+{
+    if(ifHash)
+    {
+        GList* tmp_list = g_hash_table_get_values (ifHash);
+
+        while(tmp_list)
+        {
+            hostIf_WiFi_SSID* pDev = (hostIf_WiFi_SSID *)tmp_list->data;
+            tmp_list = tmp_list->next;
+            closeInstance(pDev);
+        }
+    }
+}
+
+
+
+hostIf_WiFi_SSID::hostIf_WiFi_SSID(int dev_id):
+    enable(false),
+    LastChange(0)
+{
+    memset(status,0 , BUFF_LENGTH_64);
+    memset(alias, 0, BUFF_LENGTH_64);
+    memset(name,0, BUFF_LENGTH_32);
+    memset(LowerLayers,0, BUFF_LENGTH_1024);
+    memset(BSSID,0, BUFF_MAC);
+    memset(MACAddress,0, BUFF_MAC);
+    memset(SSID,0, BUFF_LENGTH_32);
+}
+
+int hostIf_WiFi_SSID::get_Device_WiFi_SSID_Fields(int ssidIndex)
+{
+    IARM_Result_t retVal = IARM_RESULT_SUCCESS;
+    IARM_BUS_WiFi_DiagsPropParam_t param = {0};
+    int ret;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+
+    hostIf_WiFi_SSID *pDev = hostIf_WiFi_SSID::getInstance(dev_id);
+    if (pDev)
+    {
+        retVal = IARM_Bus_Call(IARM_BUS_NM_SRV_MGR_NAME, IARM_BUS_WIFI_MGR_API_getSSIDProps, (void *)&param, sizeof(param));
+        if (IARM_RESULT_SUCCESS != retVal)
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] IARM BUS CALL failed with  : %d.\n", __FILE__, __FUNCTION__, retVal);
+            return NOK;
+        }
+        strcpy(name,param.data.ssid.params.name);
+        strcpy(BSSID,param.data.ssid.params.bssid);
+        strcpy(MACAddress,param.data.ssid.params.macaddr);
+        strcpy(SSID,param.data.ssid.params.ssid);
+        strcpy(status,param.data.ssid.params.status);
+        enable=param.data.ssid.params.enable;
+        firstExTime = time (NULL);
+        RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+        return OK;
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s]Error!  Unable to connect to wifi instance\n", __FILE__, __FUNCTION__);
+        return NOK;
+    }
+}
+
+void hostIf_WiFi_SSID::checkWifiSSIDFetch(int ssidIndex)
+{
+    int ret = NOK;
+    time_t currExTime = time (NULL);
+    if ((currExTime - firstExTime ) > QUERY_INTERVAL)
+    {
+        ret = get_Device_WiFi_SSID_Fields(ssidIndex);
+        if( OK != ret)
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Failed to fetch   : %d.\n", __FILE__, __FUNCTION__, ret);
+        }
+    }
+}
+
+int hostIf_WiFi_SSID::get_Device_WiFi_SSID_Enable(HOSTIF_MsgData_t *stMsgData )
+{
+    int ssidIndex=1;
+    int ret=OK;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+    checkWifiSSIDFetch(ssidIndex);
+    put_boolean(stMsgData->paramValue, enable);
+    stMsgData->paramtype = hostIf_BooleanType;
+    stMsgData->paramLen=1;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+
+    return ret;
+}
+int hostIf_WiFi_SSID::set_Device_WiFi_SSID_Enable(HOSTIF_MsgData_t *stMsgData )
+{
+    return OK;
+}
+
+int hostIf_WiFi_SSID::get_Device_WiFi_SSID_Status(HOSTIF_MsgData_t *stMsgData )
+{
+    char            ssidStatus[32] = "Down";
+    int             ret = OK;
+    int ssidIndex=1;
+
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+    checkWifiSSIDFetch(ssidIndex);
+    stMsgData->paramtype = hostIf_StringType;
+    stMsgData->paramLen = strlen(status);
+    snprintf(stMsgData->paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN, status);
+
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+
+    return ret;
+}
+
+int hostIf_WiFi_SSID::get_Device_WiFi_SSID_Alias(HOSTIF_MsgData_t *stMsgData )
+{
+    return OK;
+}
+int hostIf_WiFi_SSID::set_Device_WiFi_SSID_Alias(HOSTIF_MsgData_t *stMsgData )
+{
+    return OK;
+}
+
+int hostIf_WiFi_SSID::get_Device_WiFi_SSID_Name(HOSTIF_MsgData_t *stMsgData )
+{
+    int ssidIndex=1;
+    int ret=OK;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+    checkWifiSSIDFetch(ssidIndex);
+    snprintf(stMsgData->paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN, name);
+    stMsgData->paramtype = hostIf_StringType;
+    stMsgData->paramLen = strlen(name);
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+    return OK;
+}
+
+int hostIf_WiFi_SSID::get_Device_WiFi_SSID_LastChange(HOSTIF_MsgData_t *stMsgData )
+{
+    return OK;
+}
+
+int hostIf_WiFi_SSID::get_Device_WiFi_SSID_LowerLayers(HOSTIF_MsgData_t *stMsgData )
+{
+    return OK;
+}
+
+int hostIf_WiFi_SSID::set_Device_WiFi_SSID_LowerLayers(HOSTIF_MsgData_t *stMsgData )
+{
+    return OK;
+}
+
+int hostIf_WiFi_SSID::hostIf_WiFi_SSID::get_Device_WiFi_SSID_BSSID(HOSTIF_MsgData_t *stMsgData )
+{
+
+    int ssidIndex=1;
+    int ret=OK;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+    checkWifiSSIDFetch(ssidIndex);
+    snprintf(stMsgData->paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN, BSSID);
+    stMsgData->paramtype = hostIf_StringType;
+    stMsgData->paramLen = strlen(BSSID);
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+
+    return ret;
+}
+
+int hostIf_WiFi_SSID::hostIf_WiFi_SSID::get_Device_WiFi_SSID_MACAddress(HOSTIF_MsgData_t *stMsgData )
+{
+    int ssidIndex=1;
+    int ret=OK;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+    checkWifiSSIDFetch(ssidIndex);
+    snprintf(stMsgData->paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN, MACAddress);
+    stMsgData->paramtype = hostIf_StringType;
+    stMsgData->paramLen = strlen(MACAddress);
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+    return ret;
+}
+
+int hostIf_WiFi_SSID::get_Device_WiFi_SSID_SSID(HOSTIF_MsgData_t *stMsgData )
+{
+    int ssidIndex=1;
+    int ret=OK;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+    checkWifiSSIDFetch(ssidIndex);
+    snprintf(stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN, SSID);
+    stMsgData->paramtype = hostIf_StringType;
+    stMsgData->paramLen = strlen(SSID);
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+
+    return ret;
+}
+int hostIf_WiFi_SSID::set_Device_WiFi_SSID_SSID(HOSTIF_MsgData_t *stMsgData )
+{
+    return OK;
+}
+
+#endif /* #ifdef USE_WIFI_PROFILE */
+
