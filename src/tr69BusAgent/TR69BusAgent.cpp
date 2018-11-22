@@ -44,7 +44,6 @@ extern "C"
 
 #include "libIBus.h"
 #include "libIARMCore.h"
-#include "tr69BusMgr.h"
 #include "TR69BusAgent.h"
 #include "rdk_debug.h"
 #define LOG_TR69HOSTIF  "LOG.RDK.TR69HOSTIF"
@@ -53,7 +52,7 @@ extern "C"
 
     fpIncomingTR69Request tr69AgentCallback;
 
-    TR69BusAgent_Error_Type_t TR69Bus_ProcessSharedMalloc(size_t size, void **ptr)
+    faultCode_t TR69Bus_ProcessSharedMalloc(size_t size, void **ptr)
     {
         IARM_Result_t retCode = IARM_Malloc(IARM_MEMTYPE_PROCESSLOCAL, size, ptr);
 
@@ -63,19 +62,19 @@ extern "C"
         switch (retCode)
         {
         case IARM_RESULT_SUCCESS:
-            return TR69BUSAGENT_RESULT_SUCCESS;
+            return fcNoFault;
         case IARM_RESULT_OOM:
-            return TR69BUSAGENT_RESULT_NO_MEM;
+            return fcRequestDenied;
         case IARM_RESULT_INVALID_PARAM:
         case IARM_RESULT_IPCCORE_FAIL:
         default:
-            return TR69BUSAGENT_RESULT_GENERAL_ERROR;
+            return fcInternalError;
         }
     }
 
     IARM_Result_t _TR69AgentCallback_FuncWrapper(void *arg)
     {
-        TR69RequestInfo_t *requestInfo = (TR69RequestInfo_t *) arg;
+        HOSTIF_MsgData_t *requestInfo = (HOSTIF_MsgData_t *) arg;
 //        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] Enter \n", __FILE__, __FUNCTION__, __LINE__);
         if (NULL == requestInfo)
         {
@@ -100,7 +99,6 @@ extern "C"
     {
         IARM_Result_t ret = IARM_RESULT_SUCCESS;
 
-        IARM_Bus_TR69_BUS_RegisterAgent_Param_t registerAgentParam;
 
         if (!pOwnerName)
         {
@@ -131,71 +129,32 @@ extern "C"
         	}
         	sleep (2);
 		}
-
-        /* Registering Agent to tr69Bus */
-        strcpy(registerAgentParam.agentName, pOwnerName);
-
-        for(int loop = 0; loop < MAX_RETRY_LOOP; loop++)
-        {
-        	ret = IARM_Bus_Call(IARM_BUS_TR69_BUS_MGR_NAME,
-                            IARM_BUS_TR69_BUS_MGR_API_RegisterAgent,
-                            &registerAgentParam,
-                            sizeof(registerAgentParam));
-
-        	if (ret == IARM_RESULT_SUCCESS && (registerAgentParam.status == 1))
-        	{
-        		RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] Success on IARM_Bus_Call for %s to RPC: %s.\n",__FILE__, __FUNCTION__, __LINE__, IARM_BUS_TR69_BUS_MGR_NAME, IARM_BUS_TR69_BUS_MGR_API_RegisterAgent);
-        		break;
-        	}
-        	else {
-				RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Failed to IARM_Bus_Call for %s to RPC: %s with return status [%d], so retrying [%d]\n",__FILE__, __FUNCTION__, __LINE__,
-						IARM_BUS_TR69_BUS_MGR_NAME, IARM_BUS_TR69_BUS_MGR_API_RegisterAgent, registerAgentParam.status, loop);
-			}
-        	sleep (2);
-        }
-
         return true;
     }
 
     bool tr69UnRegister(const char *pOwnerName)
     {
         IARM_Result_t ret = IARM_RESULT_SUCCESS;
-        IARM_Bus_TR69_BUS_UnRegisterAgent_Param_t unRegisterAgentParam;
         if (!pOwnerName)
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s: Owner's name cannot be null \r\n", __FUNCTION__);
             return false;
         }
-
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"%s: Staring Un-Registration of agent (%s) from %s\r\n", __FUNCTION__, pOwnerName, IARM_BUS_TR69_BUS_MGR_NAME);
-        strncpy(unRegisterAgentParam.agentName, pOwnerName, strlen(pOwnerName));
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] Un-Registering %s with %s \n", __FILE__, __FUNCTION__, __LINE__, unRegisterAgentParam.agentName, IARM_BUS_TR69_BUS_MGR_NAME);
-        ret = IARM_Bus_Call(IARM_BUS_TR69_BUS_MGR_NAME, IARM_BUS_TR69_BUS_MGR_API_UnRegisterAgent, &unRegisterAgentParam,sizeof(unRegisterAgentParam));
-
-        if(ret != IARM_RESULT_SUCCESS)
-        {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Error unregistering %s with %s, ret %d\n", pOwnerName, IARM_BUS_TR69_BUS_MGR_NAME, ret);
-            return false;
-        }
-        else
-        {
-            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Successfully unregistered %s with %s\n", pOwnerName, IARM_BUS_TR69_BUS_MGR_NAME);
-        }
         return true;
     }
 
-    bool tr69RequestComplete(TR69RequestInfo_t *requestInfo)
+    bool tr69RequestComplete(HOSTIF_MsgData_t *requestInfo)
     {
         char *paramValue = NULL;
 
-        if (TR69BUSAGENT_RESULT_SUCCESS != requestInfo->err_no)
+        if (fcNoFault != requestInfo->faultCode)
             return false;
 
-        if (TR69_MODE_GET == requestInfo->mode)
+        if (HOSTIF_GET == requestInfo->reqType)
         {
             if ('\0' == requestInfo->paramValue[0])
             {
-                requestInfo->err_no = TR69BUSAGENT_RESULT_NULL_VALUE;
+                requestInfo->faultCode = fcInvalidParameterValue;
                 return false;
             }
         }

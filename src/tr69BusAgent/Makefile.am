@@ -20,8 +20,7 @@ SUBDIRS =
 
 # additional include pathes necessary to compile the C++ library
 AM_CXXFLAGS = -I$(top_srcdir)/include -I$(srcdir)/include $(DIRECTFB_CFLAGS) \
--I=/usr/include/rdk/iarmbus/ \
--I=/usr/include/rdk/iarmmgrs/tr69Bus/
+-I=/usr/include/rdk/iarmbus/
 
 ###############################################################################
 # THE LIBRARIES TO BUILD
