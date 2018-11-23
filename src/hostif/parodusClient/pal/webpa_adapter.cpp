@@ -55,7 +55,7 @@ extern "C"
 /*----------------------------------------------------------------------------*/
 /*                            File Scoped Variables                           */
 /*----------------------------------------------------------------------------*/
-
+char* webPANotifySource = NULL;
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
 /*----------------------------------------------------------------------------*/
@@ -162,6 +162,9 @@ void setInitialNotify()
     {
         RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Initial Notification list is empty\n");
     }
+    // Update the Notify Source (ESTB MAC) During Intialization
+    webPANotifySource = getNotifySource();
+    
     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"**********************End of setInitial Notify************************\n");
 }
 
@@ -381,7 +384,7 @@ void notificationCallBack()
             NotifyData *notifyMsg = (NotifyData*) g_async_queue_timeout_pop (notificationQueue,1000);
             if(NULL != notifyMsg)
             {
-                notifySource = getNotifySource();
+                notifySource = webPANotifySource; 
                 notifyDest = getNotifyDestination(notifyDest);
                 RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Calling Process request \n");
                 notifyPayload = processNotification(notifyMsg,notifyPayload);
