@@ -695,7 +695,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t *
     }
 #endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
-    return ret;
+    return OK; // For any failures return OK for now to get empty results.
 }
 
 
