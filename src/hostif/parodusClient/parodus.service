@@ -18,6 +18,7 @@
 ##########################################################################
 [Unit]
 Description=Webpa parodus Daemon
+After=update-device-details.service update-reboot-info.service
 
 [Service]
 SyslogIdentifier="parodus"

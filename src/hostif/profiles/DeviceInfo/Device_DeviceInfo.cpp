@@ -283,11 +283,14 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t * stM
                 strncpy(backupSerialNumber,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
                 ret = OK;
             }
-            else
+            else {
                 ret = NOK;
+                stMsgData->faultCode = fcInvalidParameterValue;
+            }
         } catch (const std::exception e)
         {
             RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
+            stMsgData->faultCode = fcInvalidParameterValue;
             ret = NOK;
         }
     }
@@ -297,7 +300,29 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t * stM
         ret = NOK;
     }
 #else
-    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s]This parameter \"%s\" is not handled. No data source available.\n",__FUNCTION__, stMsgData->paramName);
+    {
+        IARM_Bus_SYSMgr_GetSystemStates_Param_t param;
+        if(IARM_RESULT_SUCCESS == IARM_Bus_Call(IARM_BUS_SYSMGR_NAME, IARM_BUS_SYSMGR_API_GetSystemStates, &param, sizeof(param)))
+        {
+            if (param.stb_serial_no.payload != NULL)
+            {
+                snprintf(stMsgData->paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN, "%s", param.stb_serial_no.payload);
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] SerialNumber : \"%s\".\n",__FUNCTION__, param.stb_serial_no.payload );
+                ret = OK;
+            }
+            else
+            {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Null for SerialNumber from \"%s\".\n",__FUNCTION__,IARM_BUS_SYSMGR_NAME);
+                stMsgData->faultCode = fcInvalidParameterValue;
+                ret = NOK;
+            }
+        }
+        else {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] The parameter \"%s\" is failed to get from \"%s\".\n",__FUNCTION__, stMsgData->paramName, IARM_BUS_SYSMGR_NAME);
+            stMsgData->faultCode = fcInvalidParameterValue;
+            ret = NOK;
+        }
+    }
 #endif //!defined (USE_DEV_PROPERTIES_CONF)
     return ret;
 }

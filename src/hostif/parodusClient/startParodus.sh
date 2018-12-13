@@ -27,6 +27,9 @@ SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
 JWT_KEY="/etc/ssl/certs/webpa-rs256.pem"
 DNS_TEXT_URL="fabric.xmidt.comcast.net"
 
+Serial=""
+BootTime=""
+
 if [ -f "$WEBPA_CFG_OVERIDE_FILE" ] && [ "$BUILD_TYPE" != "prod" ]; then
     WEBPA_CFG_FILE=$WEBPA_CFG_OVERIDE_FILE
 else
@@ -83,6 +86,39 @@ get_hardware_mac()
 
 }
 
+get_ImageName()
+{
+  image=$(cat /version.txt | grep ^imagename:$versionTag2 | cut -d ":" -f 2)
+  echo "$image"
+}
+
+get_SerialNumber()
+{
+   local serial
+   serial=$(grep "serial_number" /tmp/.deviceDetails.cache | cut -d'=' -f2)
+
+   if [[ ! -z "$serial" ]]; then
+       Serial=$serial
+   else
+       serial=$(curl -d '{"paramList" : [{"name" : "Device.DeviceInfo.SerialNumber"}]}' http://127.0.0.1:10999 | rev | cut -d\" -f2 | rev)
+       if [[ -z "$serial" ]]; then
+           echo "Failed to fetch the Serial Number."
+       else
+           Serial=$serial
+       fi
+    fi
+}
+
+get_BootTime()
+{
+   local boot_time=$(curl -d '{"paramList" : [{"name" : "Device.DeviceInfo.X_RDKCENTRAL-COM_BootTime"}]}' http://127.0.0.1:10999 | grep -oE "[^:]+$"  | cut -d\} -f1)
+   if [[ -z "$boot_time" ]]; then
+       echo "Failed to fetch the Boot time value."
+   else
+       BootTime=$boot_time
+   fi
+}
+
 parodus_start_up()
 {
     # Getting Webpa Parameters
@@ -95,6 +131,22 @@ parodus_start_up()
     ServerPort=`get_webpa_number_parameter "ServerPort"`
     PingWaitTime=`get_webpa_max_waiting_time "MaxPingWaitTimeInSec"`
     HwMac=`get_hardware_mac`
+
+    local Manufacture
+    if [[ -z ${MANUFACTURE} ]]; then
+        echo "Manufacturer is undefined."
+    else
+        Manufacture=${MANUFACTURE}
+    fi
+
+    local Model
+    if [[ -z ${MODEL_NUM} ]]; then
+        echo "Model number is undefined"
+    else
+        Model=${MODEL_NUM}
+    fi
+
+
     PartnerId=$(getPartnerId)
     if [ $PartnerId = "unknown" ]; then
 	PartnerId=""
@@ -102,11 +154,21 @@ parodus_start_up()
 	PartnerId=*,$PartnerId
     fi
 
+    local reboot_reason=$(grep PreviousRebootReason /opt/logs/rebootInfo.log | cut -d: -f2)
+    if [[ -z "reboot_reason" || ' ' = $reboot_reason  ]]; then
+       echo "Last Reboot reason is not Known."
+    fi
+
+    Image=`get_ImageName`
+
+    get_SerialNumber
+    get_BootTime
+
     if [ -z $HwMac ]; then
        echo "Failed to start Parodus, Can't fetch macAddress "
     else
-       echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-interface-used=$NwInterface webpa-url=$ServerIP partner-id=$(getPartnerId)"
-       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=$PartnerId --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE  --acquire-jwt=$ACQUIRE_JWT --dns-txt-url=$DNS_TEXT_URL --jwt-public-key-file=$JWT_KEY --jwt-algo=RS256 --crud-config-file=$CRUD_CONFIG_FILE"
+       echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-interface-used=$NwInterface webpa-url=$ServerIP partner-id=$(getPartnerId) --hw-manufacturer=$Manufacture --fw-name=$Image --hw-model=$Model --hw-serial-number=$Serial --boot-time=$BootTime --hw-last-reboot-reason=$reboot_reason"
+       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=$PartnerId --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE  --acquire-jwt=$ACQUIRE_JWT --dns-txt-url=$DNS_TEXT_URL --jwt-public-key-file=$JWT_KEY --jwt-algo=RS256 --crud-config-file=$CRUD_CONFIG_FILE  --hw-manufacturer=$Manufacture --fw-name=$Image --hw-model=$Model --hw-serial-number=$Serial --boot-time=$BootTime --hw-last-reboot-reason=$reboot_reason"
        echo "Parodus command set.." 
     fi
 }
