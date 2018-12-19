@@ -373,7 +373,7 @@ static WDMP_STATUS validateAgainstDataModel(REQ_TYPE reqType, char* paramName, c
    const char* dbParamName = paramName;
    if(!getParamInfoFromDataModel(getDataModelHandle(), dbParamName, &dmParam))
    {
-      RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Invalid parameter name %s: doesn't exist in data-model %s\n", paramName);
+      RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Invalid parameter name %s: doesn't exist in data-model\n", paramName);
       return WDMP_ERR_INVALID_PARAMETER_NAME;
    }
    else if(reqType == GET)
