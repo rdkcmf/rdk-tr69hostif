@@ -104,6 +104,8 @@ int get_int(const char *ptr);
 
 void put_int(char *ptr, int val);
 
+uint get_uint(char *ptr);
+
 bool get_boolean(const char *ptr);
 
 void put_boolean(char *ptr, bool val);
