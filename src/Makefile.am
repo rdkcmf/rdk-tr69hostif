@@ -52,7 +52,7 @@ endif
 
 if WITH_WIFI_PROFILE
 AM_CXXFLAGS += -DUSE_WIFI_PROFILE
-AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/profiles/wifi/include
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/profiles/wifi
 endif
 if WITH_DHCP_PROFILE
 AM_CXXFLAGS += -DUSE_DHCPv4_PROFILE
@@ -142,7 +142,7 @@ tr69hostif_LDADD += -ltr69ProfileXcaliber
 endif
 
 if WITH_WIFI_PROFILE
-tr69hostif_LDADD += $(top_builddir)/soc/hostif/profiles/wifi/libhostIfWiFi.la
+tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/wifi/libhostIfWiFi.la
 endif
 
 if WITH_SNMP_ADAPTER

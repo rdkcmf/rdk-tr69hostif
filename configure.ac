@@ -115,9 +115,9 @@ AC_ARG_ENABLE([wifi],
           case "${enableval}" in
            yes) WIFI_PROFILE_ENABLE=true 
                 WIFI_PROFILE_FLAG="-DUSE_WIFI_PROFILE"
-		m4_syscmd([test -d soc/hostif/profiles/wifi])
-		m4_if(m4_sysval,[0],[AC_CONFIG_FILES([soc/hostif/profiles/wifi/Makefile])])
-		m4_if(m4_sysval,[0],[SUBDIRS_WIFI="soc/hostif/profiles/wifi"])  ;;
+		m4_syscmd([test -d src/hostif/profiles/wifi])
+		m4_if(m4_sysval,[0],[AC_CONFIG_FILES([src/hostif/profiles/wifi/Makefile])])
+		m4_if(m4_sysval,[0],[SUBDIRS_WIFI="src/hostif/profiles/wifi"])  ;;
            no) WIFI_PROFILE_ENABLE=false AC_MSG_ERROR([wifi profile is disabled]) ;;
           *) AC_MSG_ERROR([bad value ${enableval} for --enable-wifi ]) ;;
            esac

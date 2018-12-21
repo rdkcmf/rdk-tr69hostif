@@ -27,6 +27,10 @@ endif
 if WITH_INTFSTACK_PROFILE
 SUBDIRS += InterfaceStack 
 endif
+if WITH_WIFI_PROFILE
+SUBDIRS += wifi
+endif
+
 
 DIST_SUBDIRS =  STBService DeviceInfo Ethernet IP Time  
 if WITH_DHCP_PROFILE
@@ -37,4 +41,7 @@ DIST_SUBDIRS += StorageService
 endif
 if WITH_INTFSTACK_PROFILE
 DIST_SUBDIRS += InterfaceStack 
+endif
+if WITH_WIFI_PROFILE
+DIST_SUBDIRS += wifi
 endif
