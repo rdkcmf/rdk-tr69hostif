@@ -98,6 +98,10 @@
 #define IPREMOTE_SUPPORT_STATUS_FILE    "/opt/.ipremote_status"
 #define IPREMOTE_INTERFACE_INFO         "/tmp/ipremote_interface_info"
 
+#define TR069DOSLIMIT_THRESHOLD "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Tr069DoSLimit.Threshold"
+#define MIN_TR69_DOS_THRESHOLD 0
+#define MAX_TR69_DOS_THRESHOLD 30
+
 GHashTable* hostIf_DeviceInfo::ifHash = NULL;
 GHashTable* hostIf_DeviceInfo::m_notifyHash = NULL;
 GMutex* hostIf_DeviceInfo::m_mutex = NULL;
@@ -2147,10 +2151,46 @@ int hostIf_DeviceInfo::set_xOpsDeviceMgmt_hwHealthTest_DramThreshold(HOSTIF_MsgD
     return hwselftest::set_Device_DeviceInfo_xOpsDeviceMgmt_hwHealthTest_DramThreshold(LOG_TR69HOSTIF, stMsgData)? OK : NOK;
 }
 #endif /* USE_HWSELFTEST_PROFILE */
+/*
+ * * int hostIf_DeviceInfo::validate_ParamValue(HOSTIF_MsgData * sMsgData)
+ * * in : stMsgData pointer
+ * * out : int OK/NOK
+ * * this method is used to validate the RFC param Values limits for SET
+ * */
+int hostIf_DeviceInfo::validate_ParamValue(HOSTIF_MsgData_t * stMsgData)
+{
+    int ret = OK;
+    if (strcasecmp(stMsgData->paramName,TR069DOSLIMIT_THRESHOLD) == 0)
+    {
+       long int tmpVal;
+       if(stMsgData->paramtype == hostIf_StringType )
+       {
+           tmpVal = strtol(stMsgData->paramValue,NULL,10);
+       }
+       else if(stMsgData->paramtype == hostIf_UnsignedIntType )
+       {
+           tmpVal = get_uint(stMsgData->paramValue);
+       }
+       else
+       {
+           ret = NOK;
+           stMsgData->faultCode = fcInvalidParameterType;
+           return ret;
+       }
+       if (tmpVal < MIN_TR69_DOS_THRESHOLD || tmpVal > MAX_TR69_DOS_THRESHOLD)
+       {
+           ret = NOK;
+           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong Value,Value should be[0-30] for %s to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
+           stMsgData->faultCode = fcInvalidParameterValue;
+       }
+    }
+    return ret;
+}
 
 int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
 {
     int ret = NOK;
+    int validate_paramVal;
 
     // any additional immediate handling
     if (strcasecmp(stMsgData->paramName,TR181_RFC_RESET_DATA_START) == 0) // used to clear out all data from storage
@@ -2204,6 +2244,9 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     }
     else
     {
+      validate_paramVal = validate_ParamValue(stMsgData);
+      if(validate_paramVal == OK)
+      {
 #ifndef NEW_HTTP_SERVER_DISABLE
         if(!legacyRFCEnabled())
         {
@@ -2218,6 +2261,13 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
 #else
             ret = m_rfcStorage.setValue(stMsgData);
 #endif
+      }
+      else
+      {
+          ret = NOK;
+          stMsgData->faultCode = fcInvalidParameterValue;
+          RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Invalid ParamValue/Type to SET for param [%s] \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+      }
     }
 
     if (strcasecmp(stMsgData->paramName,RFC_WL_ROAM_TRIGGER_RF) == 0)
