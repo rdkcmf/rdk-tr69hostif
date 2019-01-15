@@ -24,8 +24,10 @@
 WEBPA_CFG_OVERIDE_FILE="/opt/webpa_cfg.json"
 CRUD_CONFIG_FILE="/opt/parodus_cfg.json"
 SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
+CONFIG_RES_FILE="/tmp/adzvfchig-res.mch"
 JWT_KEY="/etc/ssl/certs/webpa-rs256.pem"
 DNS_TEXT_URL="fabric.xmidt.comcast.net"
+TOKEN_SERVER_URL="https://issuer.xmidt.comcast.net:8080/issue"
 
 Serial=""
 BootTime=""
@@ -34,6 +36,12 @@ if [ -f "$WEBPA_CFG_OVERIDE_FILE" ] && [ "$BUILD_TYPE" != "prod" ]; then
     WEBPA_CFG_FILE=$WEBPA_CFG_OVERIDE_FILE
 else
     WEBPA_CFG_FILE="/etc/webpa_cfg.json"
+fi
+
+if [ -f /usr/bin/GetConfigFile ];then
+	GetConfigFile $CONFIG_RES_FILE
+else
+	echo "Error: GetConfigFile Not Found"
 fi
 
 MAX_PARODUS_WAIT_TIME=120
@@ -187,11 +195,18 @@ parodus_start_up()
     get_SerialNumber
     get_BootTime
 
+    if [ -f $CONFIG_RES_FILE ]; then
+	clientCertPath=$CONFIG_RES_FILE
+    else
+	echo "Failure in CFG response"
+	clientCertPath=""
+    fi
+
     if [ -z $HwMac ]; then
        echo "Failed to start Parodus, Can't fetch macAddress "
     else
        echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-interface-used=$NwInterface webpa-url=$ServerIP partner-id=$PartnerId --hw-manufacturer=$Manufacture --fw-name=$Image --hw-model=$Model --hw-serial-number=$Serial --boot-time=$BootTime --hw-last-reboot-reason=$reboot_reason"
-       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=$PartnerId --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE  --acquire-jwt=$ACQUIRE_JWT --dns-txt-url=$DNS_TEXT_URL --jwt-public-key-file=$JWT_KEY --jwt-algo=RS256 --crud-config-file=$CRUD_CONFIG_FILE  --hw-manufacturer=$Manufacture --fw-name=$Image --hw-model=$Model --hw-serial-number=$Serial --boot-time=$BootTime --hw-last-reboot-reason=$reboot_reason"
+       /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=$PartnerId --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE  --acquire-jwt=$ACQUIRE_JWT --dns-txt-url=$DNS_TEXT_URL --jwt-public-key-file=$JWT_KEY --jwt-algo=RS256 --crud-config-file=$CRUD_CONFIG_FILE  --hw-manufacturer=$Manufacture --fw-name=$Image --hw-model=$Model --hw-serial-number=$Serial --boot-time=$BootTime --hw-last-reboot-reason=$reboot_reason --client-cert-path=$clientCertPath --token-server-url=$TOKEN_SERVER_URL"
        echo "Parodus command set.." 
     fi
 }
