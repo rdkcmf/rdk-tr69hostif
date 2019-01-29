@@ -129,7 +129,7 @@
 #define TR181_RFC_PREFIX	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC"
 #define TR181_RFC_RESET_DATA_START     "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.ClearDB"
 #define TR181_RFC_RESET_DATA_END		"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.ClearDBEnd"
-#define HDR_DV_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DolbyVision"
+#define HDR_DV_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DolbyVision.Enable"
 
 
 #define RFC_WL_ROAM_TRIGGER_RF	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RoamTrigger"
