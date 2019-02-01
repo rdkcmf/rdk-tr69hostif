@@ -288,8 +288,8 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BytesSent(HOSTIF_MsgD
     bCalledBytesSent = true;
     backupBytesSent = curntIpStat.bytesSent;
     put_int(stMsgData->paramValue,curntIpStat.bytesSent);
-    stMsgData->paramtype = hostIf_UnsignedIntType;
-    stMsgData->paramLen = 4;
+    stMsgData->paramtype = hostIf_UnsignedLongType;
+    stMsgData->paramLen = sizeof(unsigned long);
 
     return OK;
 }
@@ -306,8 +306,8 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BytesReceived(HOSTIF_
     bCalledBytesReceived = true;
     backupBytesReceived = curntIpStat.bytesReceived;
     put_int(stMsgData->paramValue,curntIpStat.bytesReceived);
-    stMsgData->paramtype = hostIf_UnsignedIntType;
-    stMsgData->paramLen = 4;
+    stMsgData->paramtype = hostIf_UnsignedLongType;
+    stMsgData->paramLen = sizeof(unsigned long);
 
     return OK;
 }
@@ -323,8 +323,8 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_PacketsSent(HOSTIF_Ms
     bCalledPacketsSent = true;
     backupPacketsSent = curntIpStat.packetsSent;
     put_int(stMsgData->paramValue,curntIpStat.packetsSent);
-    stMsgData->paramtype = hostIf_UnsignedIntType;
-    stMsgData->paramLen = 4;
+    stMsgData->paramtype = hostIf_UnsignedLongType;
+    stMsgData->paramLen = sizeof(unsigned long);
 
     return OK;
 }
@@ -343,8 +343,8 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_PacketsReceived(HOSTI
     bCalledPacketsReceived = true;
     backupPacketsReceived = curntIpStat.packetsReceived;
     put_int(stMsgData->paramValue,curntIpStat.packetsReceived);
-    stMsgData->paramtype = hostIf_UnsignedIntType;
-    stMsgData->paramLen = 4;
+    stMsgData->paramtype = hostIf_UnsignedLongType;
+    stMsgData->paramLen = sizeof(unsigned long);
 
     return OK;
 }
@@ -394,8 +394,8 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnicastPacketsSent(HO
     bCalledUnicastPacketsSent = true;
     backupUnicastPacketsSent = curntIpStat.unicastPacketsSent;
     put_int(stMsgData->paramValue,curntIpStat.unicastPacketsSent);
-    stMsgData->paramtype = hostIf_UnsignedIntType;
-    stMsgData->paramLen = 4;
+    stMsgData->paramtype = hostIf_UnsignedLongType;
+    stMsgData->paramLen = sizeof(unsigned long);
 
     return OK;
 }
@@ -411,8 +411,8 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_UnicastPacketsReceive
     bCalledUnicastPacketsReceived = true;
     backupUnicastPacketsReceived = curntIpStat.unicastPacketsReceived;
     put_int(stMsgData->paramValue,curntIpStat.unicastPacketsReceived);
-    stMsgData->paramtype = hostIf_UnsignedIntType;
-    stMsgData->paramLen = 4;
+    stMsgData->paramtype = hostIf_UnsignedLongType;
+    stMsgData->paramLen = sizeof(unsigned long);
 
     return OK;
 }
@@ -462,8 +462,8 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_MulticastPacketsSent(
     bCalledMulticastPacketsSent = true;
     backupMulticastPacketsSent = curntIpStat.multicastPacketsSent;
     put_int(stMsgData->paramValue,curntIpStat.multicastPacketsSent);
-    stMsgData->paramtype = hostIf_UnsignedIntType;
-    stMsgData->paramLen = 4;
+    stMsgData->paramtype = hostIf_UnsignedLongType;
+    stMsgData->paramLen = sizeof(unsigned long);
 
     return OK;
 }
@@ -479,8 +479,8 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_MulticastPacketsRecei
     bCalledMulticastPacketsReceived = true;
     backupMulticastPacketsReceived = curntIpStat.multicastPacketsReceived;
     put_int(stMsgData->paramValue,curntIpStat.multicastPacketsReceived);
-    stMsgData->paramtype = hostIf_UnsignedIntType;
-    stMsgData->paramLen = 4;
+    stMsgData->paramtype = hostIf_UnsignedLongType;
+    stMsgData->paramLen = sizeof(unsigned long);
 
     return OK;
 }
@@ -496,8 +496,8 @@ int hostIf_IPInterfaceStats::get_Device_IP_Interface_Stats_BroadcastPacketsSent(
     bCalledBroadcastPacketsSent = true;
     backupBroadcastPacketsSent = curntIpStat.broadcastPacketsSent;
     put_int(stMsgData->paramValue,curntIpStat.broadcastPacketsSent);
-    stMsgData->paramtype = hostIf_UnsignedIntType;
-    stMsgData->paramLen = 4;
+    stMsgData->paramtype = hostIf_UnsignedLongType;
+    stMsgData->paramLen = sizeof(unsigned long);
 
     return OK;
 }
