@@ -146,8 +146,31 @@ parodus_start_up()
         Model=${MODEL_NUM}
     fi
 
+    # Get Partner ID :
+    # Added Auth service query to get the Partner ID,
+    # If empty then, then again query after 2 sec interval 
+    # till max of 2 min. After max timeout, leave it empty.
+    timer=0
+    time_interval=2
 
-    PartnerId=$(getPartnerId)
+    while :
+      do
+        param=$(curl -s -d POST http://127.0.0.1:50050/authService/getDeviceId | cut -d\, -f2 | tr -d \} | cut -d: -f2 | tr -d \" | xargs)
+        if [[ -z "$param" ]]; then
+          timer=$(( $timer + $time_interval ))
+          echo "$(date) Failed to get the Partner-id, retrying after $time_interval sec."
+          sleep $time_interval
+          if [ "$timer" = "$MAX_PARODUS_WAIT_TIME" ]; then
+            echo "$(date) Failed to get the Partner-id, retried till max time out of $MAX_PARODUS_WAIT_TIME sec."
+            break
+          fi
+       else
+         echo "$(date) Got the Partner id as \"$param"\"
+         break
+       fi
+    done
+
+    PartnerId=$param
     if [ $PartnerId = "unknown" ]; then
 	PartnerId=""
     else 
@@ -167,7 +190,7 @@ parodus_start_up()
     if [ -z $HwMac ]; then
        echo "Failed to start Parodus, Can't fetch macAddress "
     else
-       echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-interface-used=$NwInterface webpa-url=$ServerIP partner-id=$(getPartnerId) --hw-manufacturer=$Manufacture --fw-name=$Image --hw-model=$Model --hw-serial-number=$Serial --boot-time=$BootTime --hw-last-reboot-reason=$reboot_reason"
+       echo "Starting parodus with arguments hw-mac=$HwMac webpa-ping-time=$PingWaitTime webpa-interface-used=$NwInterface webpa-url=$ServerIP partner-id=$PartnerId --hw-manufacturer=$Manufacture --fw-name=$Image --hw-model=$Model --hw-serial-number=$Serial --boot-time=$BootTime --hw-last-reboot-reason=$reboot_reason"
        /bin/systemctl set-environment PARODUS_CMD=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=$PartnerId --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE  --acquire-jwt=$ACQUIRE_JWT --dns-txt-url=$DNS_TEXT_URL --jwt-public-key-file=$JWT_KEY --jwt-algo=RS256 --crud-config-file=$CRUD_CONFIG_FILE  --hw-manufacturer=$Manufacture --fw-name=$Image --hw-model=$Model --hw-serial-number=$Serial --boot-time=$BootTime --hw-last-reboot-reason=$reboot_reason"
        echo "Parodus command set.." 
     fi
