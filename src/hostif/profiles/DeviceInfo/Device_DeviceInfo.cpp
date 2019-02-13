@@ -2,7 +2,7 @@
  * If not stated otherwise in this file or this component's Licenses.txt file the
  * following copyright and licenses apply:
  *
- * Copyright 2016 RDK Management
+ * Copyright 2016-2019 RDK Management
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2770,7 +2770,28 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     {
         ret = set_xRDKCentralComRFCRetrieveNow(stMsgData);
     }
-
+#ifdef USE_HWSELFTEST_PROFILE
+    else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.Enable"))
+    {
+        ret = set_xOpsDeviceMgmt_hwHealthTest_Enable(stMsgData);
+    }
+    else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.EnablePeriodicRun"))
+    {
+        ret = set_xOpsDeviceMgmt_hwHealthTest_EnablePeriodicRun(stMsgData);
+    }
+    else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.PeriodicRunFrequency"))
+    {
+        ret = set_xOpsDeviceMgmt_hwHealthTest_PeriodicRunFrequency(stMsgData);
+    }
+    else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.cpuThreshold"))
+    {
+        ret = set_xOpsDeviceMgmt_hwHealthTest_CpuThreshold(stMsgData);
+    }
+    else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.dramThreshold"))
+    {
+        ret = set_xOpsDeviceMgmt_hwHealthTest_DramThreshold(stMsgData);
+    }
+#endif /* USE_HWSELFTEST_PROFILE */
     return ret;
 }
 
