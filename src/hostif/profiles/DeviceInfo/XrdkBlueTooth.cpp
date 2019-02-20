@@ -162,6 +162,38 @@ int hostIf_DeviceInfoRdk_xBT::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = setDeviceInfo(stMsgData);
         }
+        else if (strncasecmp(paramName, BT_TILE_ID_STRING, strlen(BT_TILE_ID_STRING)) == 0)
+        {
+            this->tile_Id = stMsgData->paramValue;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]]xBlueTooth: :Set for parameters %s and value %s. \n", __FUNCTION__, __LINE__, stMsgData->paramName, stMsgData->paramValue);
+            ret = OK;
+        }
+        else if (strncasecmp(paramName, BT_TILE_SESSION_ID_STRING, strlen(BT_TILE_SESSION_ID_STRING)) == 0)
+        {
+            this->sessionId = stMsgData->paramValue;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]]xBlueTooth: :Set for parameters %s and value %s. \n", __FUNCTION__, __LINE__, stMsgData->paramName, stMsgData->paramValue);
+            ret = OK;
+        }
+        else if (strncasecmp(paramName, BT_TILE_TRIGGER_STRING, strlen(BT_TILE_TRIGGER_STRING)) == 0)
+        {
+            bool triggerFlag = get_boolean(stMsgData->paramValue);
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%d]]xBlueTooth: :Set for parameters %s and value %d. \n", __FUNCTION__, __LINE__, stMsgData->paramName, triggerFlag);
+
+            if(triggerFlag == true && (!tile_Id.empty())) // && !sessionId.empty() ))
+            {
+                this->triggerFlag  = triggerFlag;
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d]]xBlueTooth: :Trigger Ring a tile. \n", __FUNCTION__, __LINE__);
+                this->do_Ring_A_Tile(triggerFlag);
+                ret = OK;
+            }
+            else {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]]xBlueTooth::Empty tile Id or session id. Please set these parameters first. \n", __FUNCTION__, __LINE__);
+            }
+        }
+        else if (strncasecmp(paramName, BT_TILE_CMD_REQUEST_STRING, strlen(BT_TILE_CMD_REQUEST_STRING))== 0)
+        {
+           ret = process_TileCmdRequest(stMsgData);    
+        }
         else
         {
             stMsgData->faultCode = fcInvalidParameterName;
@@ -1739,6 +1771,66 @@ void hostIf_DeviceInfoRdk_xBT::checkForUpdates()
     fetch_Bluetooth_DiscoveredDevicesList ();
     fetch_Bluetooth_PairedDevicesList ();
     fetch_Bluetooth_ConnectedDevicesList ();
+}
+
+
+int hostIf_DeviceInfoRdk_xBT::do_Ring_A_Tile(bool enable)
+{
+    if(enable == true) {
+        leRingATileHandleParam_t param;
+        memset(&param, 0, sizeof(param));
+
+        snprintf (param.Id, TILE_ID_MAX_SIZE-1,"%s", this->tile_Id.c_str());
+        snprintf (param.sessionId, SESSION_ID_MAX_SIZE-1,"%s", this->sessionId.c_str());
+        param.triggerCmd = this->triggerFlag;
+
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: BLE Tile: ID : %s \n", __FUNCTION__, __LINE__, param.Id);
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: BLE Tile: Session ID : %s \n", __FUNCTION__, __LINE__, param.sessionId);
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: BLE Tile: Ring Trigger :  %d . \n", __FUNCTION__, __LINE__, param.triggerCmd);
+
+        IARM_Result_t retVal = IARM_RESULT_SUCCESS;
+
+        retVal = IARM_Bus_Call(IARM_BUS_BTRLEMGR_NAME, IARM_BUS_LEMGR_API_leRingATile, (void *)&param, sizeof(leRingATileHandleParam_t ));
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n***********************************\n");
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n \"%s\",  \"%s\"", IARM_BUS_LEMGR_API_leRingATile , ((param.triggerCmd)?"true":"false"));
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n***********************************\n");
+
+        if(retVal == IARM_RESULT_SUCCESS) { // && param.status) {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Successfully Set the Ring.\n", __FUNCTION__, __LINE__);
+            this->tile_Id.clear();
+            this->sessionId.clear();
+            this->triggerFlag = false;
+        }
+    }
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exiting..\n", __FUNCTION__, __LINE__);
+    return OK;
+}
+
+int hostIf_DeviceInfoRdk_xBT::process_TileCmdRequest(HOSTIF_MsgData_t *stMsgData)
+{
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering..\n", __FUNCTION__, __LINE__);
+
+    leTileRequestHandleParam_t param;
+    memset(&param, 0, sizeof(param));
+    IARM_Result_t retVal = IARM_RESULT_SUCCESS;
+    snprintf(param.request, TILE_REQUEST_MAX_SIZE -1, stMsgData->paramValue);
+
+    retVal = IARM_Bus_Call(IARM_BUS_BTRLEMGR_NAME, IARM_BUS_LEMGR_API_leTileRequest, (void *)&param, sizeof(leTileRequestHandleParam_t ));
+    
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n***********************************\n");
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n \"%s\",  \"%s\"\n", IARM_BUS_LEMGR_API_leTileRequest, ((retVal == IARM_RESULT_SUCCESS) ?"Successfully set.":"Failed."));
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n***********************************\n");
+
+    if(retVal == IARM_RESULT_SUCCESS) { // && param.status) {
+       RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Successfully forwarded Tile.Cmd.Request to btrLeAppMgr..\n", __FUNCTION__, __LINE__);
+    }
+    else {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed to process Tile Cmd Request..\n", __FUNCTION__, __LINE__);
+        return NOK;
+    }
+    
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exiting..\n", __FUNCTION__, __LINE__);
+    return OK;
 }
 
 #endif // USE_XRDK_BT_PROFILE
