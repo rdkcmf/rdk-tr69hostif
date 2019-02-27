@@ -34,7 +34,7 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
 	-I$(top_srcdir)/src/hostif/profiles/StorageService \
 	-I$(PKG_CONFIG_SYSROOT_DIR)$(includedir)/directfb \
 	-I$(PKG_CONFIG_SYSROOT_DIR)$(includedir)/rdk/iarmmgrs/sysmgr \
-	-I$(PKG_CONFIG_SYSROOT_DIR)$(includedir)/rdk/iarmmgrs/tr69Bus \
+	-I$(top_srcdir)/src/tr69BusAgent/include \
 	-I$(top_srcdir)/src/hostif/profiles/moca \
 	-I$(top_srcdir)/src/hostif/profiles/wifi \
 	-I./include $(GLIB_CFLAGS) $(G_THREAD_CFLAGS) \

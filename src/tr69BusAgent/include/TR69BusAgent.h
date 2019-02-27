@@ -41,51 +41,12 @@
 extern "C"
 {
 #endif
-
+#include "hostIf_tr69ReqHandler.h"
 #define TR69_BUF_MIN 64
 #define TR69_BUF_MAX 1024
-    /*! Types of errors that could be Reported by TRBus Agent (Can be extended)*/
-    typedef enum _TR69_Error_Type_t {
-        TR69BUSAGENT_RESULT_SUCCESS,
-        TR69BUSAGENT_RESULT_NO_SUCH_PARAM,
-        TR69BUSAGENT_RESULT_INVALID_PARAM_TYPE,
-        TR69BUSAGENT_RESULT_NULL_VALUE,
-        TR69BUSAGENT_RESULT_NO_MEM,
-        TR69BUSAGENT_RESULT_UNSUPPORTED_MODE,
-        TR69BUSAGENT_RESULT_GENERAL_ERROR
-    }
-    TR69BusAgent_Error_Type_t;
+#define IARM_BUS_TR69_COMMON_API_AgentParameterHandler      "agentParameterHandler"
 
-    /* Parameter type
-     */
-    typedef enum _ParamterType
-    {
-        TR69_TYPE_String,
-        TR69_TYPE_Int,
-        TR69_TYPE_UnsignedInt,
-        TR69_TYPE_Boolean,
-        TR69_TYPE_DateTime
-    } TR69BusAgent_Param_Type_t;
-
-    typedef enum _TR69_Request_Type_t
-    {
-        TR69_MODE_GET,
-        TR69_MODE_SET
-    } TR69BusAgent_Request_Type_t;
-
-    typedef struct _TR69BUSAgent_RequestInfo_Param_t {
-        char ownerName[TR69_BUF_MIN];                                  /*!< [in] Pointer to shared memory location having null terminated name of the Agent owner (This will be deleted by the caller, like "XRE", "UPNP")*/
-        char paramName[TR69_BUF_MIN];                                   /*!< [in] Pointer to shared memory location having null terminated name of the param (This will be deleted by the caller)*/
-        TR69BusAgent_Param_Type_t paramType;                /*!< [in] er to shared memory location having data (This data will be allocated by callee and will be deleted by the caller)*/
-        char paramValue[TR69_BUF_MAX];                                  /*!< [out] Pointer to shared memory location having data (This data will be allocated by callee and will be deleted by the caller)*/
-        short  paramLen;                                    /*!< [out] size of the data pointed by pData*/
-        TR69BusAgent_Request_Type_t mode;                   /*!< [in] Request type (set/get)*/
-        short instanceNumber;				/*!< [in] Instance Number [Scalar =0, Tabular = 1..n] */
-        TR69BusAgent_Error_Type_t err_no;          		/*!< [out] error number will be set by the callee on the failure of the call */
-    } TR69RequestInfo_t;
-
-
-    TR69BusAgent_Error_Type_t TR69Bus_ProcessSharedMalloc(size_t , void **);
+    faultCode_t TR69Bus_ProcessSharedMalloc(size_t , void **);
 
     /**
      * @brief TR69 Incoming Request function pointer.
@@ -95,7 +56,7 @@ extern "C"
      * @return bool true/false.
      */
 
-    typedef bool (*fpIncomingTR69Request) (TR69RequestInfo_t *);
+    typedef bool (*fpIncomingTR69Request) (HOSTIF_MsgData_t *);
     /**
      * @brief Starts the TR69 Register Callback.
      *
@@ -133,7 +94,7 @@ extern "C"
      * @return bool true/false.
      */
 
-    bool tr69RequestComplete(TR69RequestInfo_t * );
+    bool tr69RequestComplete(HOSTIF_MsgData_t *);
 
 #ifdef __cplusplus
 }
