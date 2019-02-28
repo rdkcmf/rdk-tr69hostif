@@ -2317,8 +2317,9 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     }
     else if (strcasecmp(stMsgData->paramName,MS12_DAPV2_RFC_ENABLE) == 0)
     {
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MS12->DAPV2 RFC status:%s\n",__FUNCTION__,stMsgData->paramValue);
-        if(strcasecmp(stMsgData->paramValue,"true") == 0)
+        bool enable = get_boolean(stMsgData->paramValue);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MS12->DAPV2 RFC status:%d\n",__FUNCTION__, enable);
+        if(enable)
         {
             device::Host::getInstance().getAudioOutputPort("HDMI0").enableMS12Config(dsMS12FEATURE_DAPV2,1);
         }
@@ -2329,8 +2330,9 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     }
     else if (strcasecmp(stMsgData->paramName,MS12_DE_RFC_ENABLE) == 0)
     {
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MS12->DE RFC status:%s\n",__FUNCTION__,stMsgData->paramValue);
-        if(strcasecmp(stMsgData->paramValue,"true") == 0)
+        bool enable = get_boolean(stMsgData->paramValue);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] MS12->DE RFC status:%d\n",__FUNCTION__, enable);
+        if(enable)
         {
             device::Host::getInstance().getAudioOutputPort("HDMI0").enableMS12Config(dsMS12FEATURE_DE,1);
         }
