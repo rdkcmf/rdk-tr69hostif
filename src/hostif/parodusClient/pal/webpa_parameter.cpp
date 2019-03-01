@@ -227,45 +227,42 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
         else // Not a wildcard Parameter Lets fill it
         {
             RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Get Request for a Non-WildCard Parameter \n");
-            *paramCountPtr = 1;
+            *paramCountPtr = 0;
             DataModelParam dmParam = {0};
 
-            // allocate parametervalPtr as a single param_t and initialize varribales
-            (*parametervalPtrPtr)[index] = (param_t*) calloc (1, sizeof(param_t));
-            (*parametervalPtrPtr)[index][0].name = (char*) calloc (strlen(pParameterName)+1, sizeof(char));
-            (*parametervalPtrPtr)[index][0].value = NULL;
-            (*parametervalPtrPtr)[index][0].type = WDMP_STRING;
-
-            if (NULL == (*parametervalPtrPtr)[index])
-            {
-                RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
-                ret = WDMP_FAILURE;
-            }
-            else if (getParamInfoFromDataModel(dataBaseHandle, const_cast<char*> (pParameterName), &dmParam))
+            if (getParamInfoFromDataModel(dataBaseHandle, const_cast<char*> (pParameterName), &dmParam))
             {
                 RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Valid Parameter..! \n ");
                 strncpy (Param.paramName, pParameterName, MAX_PARAM_LENGTH - 1);
                 Param.paramName[MAX_PARAM_LENGTH - 1] = '\0';
-
                 converttohostIfType (dmParam.dataType, &(Param.paramtype));
                 freeDataModelParam(dmParam);
                 Param.instanceNum = 0;
-
-                // Convert Param.paramtype to ParamVal.type
-                RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo Param.paramtype is %d\n", Param.paramtype);
-                converttoWalType (Param.paramtype, (WAL_DATA_TYPE *) &(*parametervalPtrPtr)[index][0].type);
-                RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo parametervalPtr->type is %d\n",((*parametervalPtrPtr)[index][0].type));
-                RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo\n");
                 ret = get_ParamValues_tr69hostIf (&Param);
                 if (ret == WDMP_SUCCESS)
                 {
+                    // allocate parametervalPtr as a single param_t and initialize variables
+                    (*parametervalPtrPtr)[index] = (param_t*) calloc (1, sizeof(param_t));
+                    (*parametervalPtrPtr)[index][0].name = (char*) calloc (strlen(pParameterName)+1, sizeof(char));
                     (*parametervalPtrPtr)[index][0].value = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
-                    if (NULL == (*parametervalPtrPtr)[index][0].name || NULL == (*parametervalPtrPtr)[index][0].value)
+                    (*parametervalPtrPtr)[index][0].type = WDMP_STRING;
+
+                    if (NULL == (*parametervalPtrPtr)[index] || NULL == (*parametervalPtrPtr)[index][0].name || NULL == (*parametervalPtrPtr)[index][0].value)
                     {
                         RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
+                        //de-allocating if not NULL and not required
+                        if((*parametervalPtrPtr)[index][0].value != NULL) free((*parametervalPtrPtr)[index][0].value);
+                        if((*parametervalPtrPtr)[index][0].name != NULL) free((*parametervalPtrPtr)[index][0].name);
+                        if((*parametervalPtrPtr)[index] != NULL) free((*parametervalPtrPtr)[index]);
                         ret = WDMP_FAILURE;
                     }
                     else {
+                        RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo Param.paramtype is %d\n", Param.paramtype);
+                        // Convert Param.paramtype to ParamVal.type
+                        converttoWalType (Param.paramtype, (WAL_DATA_TYPE *) &(*parametervalPtrPtr)[index][0].type);
+                        RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo parametervalPtr->type is %d\n",((*parametervalPtrPtr)[index][0].type));
+                        RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo\n");
+
                         strncpy((*parametervalPtrPtr)[index][0].name, Param.paramName, strlen(pParameterName)+1);
                         switch (Param.paramtype)
                         {
@@ -287,19 +284,18 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                             break;
                         }
                         RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo value is %s\n", (*parametervalPtrPtr)[index][0].value);
+                        *paramCountPtr = 1;
                         ret = WDMP_SUCCESS;
                     }
                 }
                 else
                 {
                     RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Failed get_ParamValues_tr69hostIf() Param Name :-  %s \n",pParameterName);                   
-                    *paramCountPtr = 0;
                 }
             }
             else
             {
                 RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Invalid Parameter Name  :-  %s \n",pParameterName);
-                (*parametervalPtrPtr)[index][0].value = strdup("");
                 ret = WDMP_ERR_INVALID_PARAMETER_NAME;
             }
         }

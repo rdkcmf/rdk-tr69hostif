@@ -145,10 +145,11 @@ int getNumberofInstances(const char* paramName)
             getParamList[0] = (char*) calloc(1,MAX_PARAMETER_LENGTH);
             strncpy(getParamList[0],numberOfEntitiesParam,MAX_PARAMETER_LENGTH);
             param_t **parametervalArr = (param_t **) malloc(sizeof(param_t**));
+            *parametervalArr = NULL;
             ret = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS *)*1);
             retCount = (size_t *) malloc(sizeof(size_t) * 1);
             getValues(const_cast<const char**>(getParamList), 1, &parametervalArr, &retCount,&ret);
-            if( (NULL != parametervalArr) && NULL != (*parametervalArr)[0].value)
+            if( *retCount > 0 && (NULL != parametervalArr) && NULL != (*parametervalArr)[0].value )
             {
                 instanceCount = strtol(const_cast<const char*>((*parametervalArr)[0].value),NULL,10);
             }
@@ -159,12 +160,13 @@ int getNumberofInstances(const char* paramName)
                 free(ret);
             if(retCount)
                 free(retCount);
-            if(NULL != parametervalArr)
+            if(NULL != parametervalArr && NULL != *parametervalArr)
             {
                 if((*parametervalArr)[0].value)
                     free((*parametervalArr)[0].value);
                 if((*parametervalArr)[0].name)
                     free((*parametervalArr)[0].name);
+                free(*parametervalArr);
                 free(parametervalArr);
             }
         }

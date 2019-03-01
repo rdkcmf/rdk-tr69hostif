@@ -118,8 +118,8 @@ int TimeClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
            stMsgData->faultCode = fcInvalidParameterName;
            ret = NOK;
         }
+        hostIf_Time::releaseLock();
     }
-    hostIf_Time::releaseLock();
     return ret;
 }
 
@@ -141,11 +141,11 @@ int TimeClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     const char *pSetting;
     int instanceNumber;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-    hostIf_Time::getLock();
 
     if(strncasecmp(stMsgData->paramName,"Device.Time",strlen("Device.Time"))==0)
     {
         stMsgData->instanceNum = 0;
+        hostIf_Time::getLock();
         hostIf_Time *pIface = hostIf_Time::getInstance(instanceNumber);
 
         if(!pIface)
@@ -168,6 +168,7 @@ int TimeClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
            stMsgData->faultCode = fcInvalidParameterName;
            ret = NOK;
         }
+        hostIf_Time::releaseLock();
     }
     else
     {
@@ -175,7 +176,6 @@ int TimeClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
        stMsgData->faultCode = fcInvalidParameterName;
        ret = NOK;
     }
-    hostIf_Time::releaseLock();
     return ret;
 }
 
