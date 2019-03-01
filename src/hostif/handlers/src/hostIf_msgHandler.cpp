@@ -220,6 +220,7 @@ bool hostIf_initalize_ConfigManger()
     {
         while (fscanf( fp, "%s %s", param, mgr) != EOF)
         {
+            mgrName = HOSTIF_INVALID_Mgr;
             if(strcasecmp(mgr, "deviceMgr") == 0)
             {
                 mgrName = HOSTIF_DeviceMgr;
@@ -282,8 +283,12 @@ bool hostIf_initalize_ConfigManger()
                 mgrName = HOSTIF_SNMPAdapterMgr;
             }
 #endif
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"param: %s \tMgr: [%s => %d]\n", param, mgr, mgrName);
-            g_hash_table_insert(paramMgrhash, (gpointer)g_strdup(param), (gpointer)mgrName);
+            if(mgrName != HOSTIF_INVALID_Mgr) {
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"param: %s \tMgr: [%s => %d]\n", param, mgr, mgrName);
+                g_hash_table_insert(paramMgrhash, (gpointer)g_strdup(param), (gpointer)mgrName);
+            } else {
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Invalid Hostif Manager for param %s, Skipping...\n", param);
+            }
         }
         fclose(fp);
     }
@@ -306,7 +311,7 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
         GList *keys = g_hash_table_get_keys(paramMgrhash);
         while(keys) {
             char *data = (char *)keys->data;
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] DATA = ",__FUNCTION__, data);
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] DATA = %s",__FUNCTION__, data);
             if(strncmp(data,pParam,strlen(data)) == 0)
             {
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] pParam: %s data:%s\n", __FUNCTION__,pParam, data);
@@ -316,7 +321,11 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
         }
         if(keys)
         {
-            gpointer item_ptr = (gpointer)g_hash_table_lookup(paramMgrhash, (char *)keys->data);
+            gpointer item_ptr = g_hash_table_lookup(paramMgrhash, (char *)keys->data);
+            if(item_ptr == NULL) {
+                 RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Not able to find proper manager for param %s.\n",pParam);
+                 return pRet;
+            }
             mgrId = (HostIf_ParamMgr_t)GPOINTER_TO_INT(item_ptr);
 
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s][For Parameter path: \"%s\"; Manager :%d ] \n", __FUNCTION__, pParam, mgrId);
