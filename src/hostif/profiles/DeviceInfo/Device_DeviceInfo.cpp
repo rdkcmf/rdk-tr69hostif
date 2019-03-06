@@ -120,6 +120,7 @@ string hostIf_DeviceInfo::m_xFirmwareDownloadProtocol;
 string hostIf_DeviceInfo::m_xFirmwareDownloadURL;
 string hostIf_DeviceInfo::m_xFirmwareToDownload;
 bool hostIf_DeviceInfo::m_xFirmwareDownloadNow;
+bool hostIf_DeviceInfo::m_xFirmwareDownloadUseCodebig;
 
 #ifndef NEW_HTTP_SERVER_DISABLE
 XRFCStore* hostIf_DeviceInfo::m_rfcStore;
@@ -1246,6 +1247,15 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadURL (
         return NOK;
 }
 
+// Get the Codebig flag value (from /opt/fwdnldstatus.txt) which is already set using 'Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadUseCodebig' tr-181 parameter
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadUseCodebig(HOSTIF_MsgData_t* stMsgData, bool *pChanged)
+{
+    if(OK == readFirmwareInfo((char *)"Codebig_Enable", stMsgData))
+        return OK;
+    else
+        return NOK;
+}
+
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadPercent (HOSTIF_MsgData_t* stMsgData, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -1665,6 +1675,14 @@ void *ResetFunc( void *)
     sleep(2);
     triggerResetScript();
 
+}
+
+// Set 'm_xFirmwareDownloadUseCodebig' based on 'Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadUseCodebig' request
+int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadUseCodebig(HOSTIF_MsgData_t *stMsgData)
+{
+    m_xFirmwareDownloadUseCodebig = get_boolean(stMsgData->paramValue);
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s]Successfully set \"%s\" to \"%d\". \n", __FUNCTION__, stMsgData->paramName, m_xFirmwareDownloadUseCodebig);
+    return OK;
 }
 
 int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(HOSTIF_MsgData_t *stMsgData)
@@ -2653,7 +2671,7 @@ int hostIf_DeviceInfo::set_xFirmwareDownloadNow(HOSTIF_MsgData_t *stMsgData)
                     (!m_xFirmwareDownloadURL.empty()) && (!m_xFirmwareToDownload.empty())) {
 
                 char cmd[200] = {'\0'};
-                sprintf(cmd, "%s %s %s %s &",userTriggerDwScr, m_xFirmwareDownloadProtocol.c_str(), m_xFirmwareDownloadURL.c_str(), m_xFirmwareToDownload.c_str() );
+                sprintf(cmd, "%s %s %s %s %d &",userTriggerDwScr, m_xFirmwareDownloadProtocol.c_str(), m_xFirmwareDownloadURL.c_str(), m_xFirmwareToDownload.c_str(), m_xFirmwareDownloadUseCodebig);
 
                 ret = system (cmd);
 
@@ -2668,6 +2686,7 @@ int hostIf_DeviceInfo::set_xFirmwareDownloadNow(HOSTIF_MsgData_t *stMsgData)
                 m_xFirmwareToDownload.clear();
                 m_xFirmwareDownloadURL.clear();
                 m_xFirmwareDownloadNow = false;
+                m_xFirmwareDownloadUseCodebig = false;
                 ret = OK;
             }
             else {

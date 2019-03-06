@@ -194,6 +194,7 @@ class hostIf_DeviceInfo {
     static string m_xFirmwareDownloadURL;
     static string m_xFirmwareToDownload;
     static bool m_xFirmwareDownloadNow;
+    static bool m_xFirmwareDownloadUseCodebig;
 
 #ifndef NEW_HTTP_SERVER_DISABLE
     static XRFCStore *m_rfcStore;
@@ -655,6 +656,21 @@ public:
      */
     int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadURL (HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
+    /**
+     * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadUseCodebig.
+     *
+     * Get the Codebig flag which is already set via TR-069 ACS.
+     *
+     * @return The Codebig flag value either '0' or '1' based on the value already set
+     * @retval OK if it is successful.
+     * @retval ERR_INTERNAL_ERROR if not able to fetch from device.
+     *
+     * @sideeffect All necessary structures and buffers are deallocated.
+     * @execution Synchronous.
+     *
+     */
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadUseCodebig(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
     int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadPercent (HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareUpdateState (HOSTIF_MsgData_t *, bool *pChanged = NULL);
@@ -888,6 +904,7 @@ public:
     int set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadProtocol(HOSTIF_MsgData_t *);
     int set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadURL (HOSTIF_MsgData_t *);
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayType(HOSTIF_MsgData_t *);
+    int set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadUseCodebig(HOSTIF_MsgData_t *);
 
     /**
     * @brief set_xOpsDMUploadLogsNow.
