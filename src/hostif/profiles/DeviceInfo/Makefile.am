@@ -58,4 +58,9 @@ endif
 if WITH_XRDK_BT_PROFILE
 libdeviceinfo_la_SOURCES +=	XrdkBlueTooth.cpp
 endif
+
+if ENABLE_BLE_TILE_PROFILE
+AM_CXXFLAGS += $(BLE_TILE_PROFILE)
+endif
+
 libdeviceinfo_la_CXXFLAGS = $(AM_CXXFLAGS) -std=c++0x
