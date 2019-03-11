@@ -53,7 +53,9 @@
 #include <mutex>
 extern "C" {
 #include "btmgr.h"
+#ifdef BLE_TILE_PROFILE
 #include "lemgr_iarm_interface.h"
+#endif
 }
 
 BTRMGR_DiscoveredDevicesList_t hostIf_DeviceInfoRdk_xBT::disDevList;
@@ -164,6 +166,7 @@ int hostIf_DeviceInfoRdk_xBT::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = setDeviceInfo(stMsgData);
         }
+#ifdef BLE_TILE_PROFILE
         else if (strncasecmp(paramName, BT_TILE_ID_STRING, strlen(BT_TILE_ID_STRING)) == 0)
         {
             this->tile_Id = stMsgData->paramValue;
@@ -196,6 +199,7 @@ int hostIf_DeviceInfoRdk_xBT::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
            ret = process_TileCmdRequest(stMsgData);    
         }
+#endif
         else
         {
             stMsgData->faultCode = fcInvalidParameterName;
@@ -304,6 +308,7 @@ int hostIf_DeviceInfoRdk_xBT::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = getDeviceInfo_RSSI(stMsgData);
         }
+#ifdef BLE_TILE_PROFILE
         else if (strncasecmp(paramName, BT_TILE_ID_STRING, strlen(BT_TILE_ID_STRING)) == 0)
         {
             snprintf(stMsgData->paramValue, (TR69HOSTIFMGR_MAX_PARAM_LEN -1), "%s", this->tile_Id.c_str());
@@ -325,6 +330,7 @@ int hostIf_DeviceInfoRdk_xBT::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             stMsgData->paramtype=hostIf_BooleanType;
             ret = OK;
         }
+#endif
         /* For Discovered Devices */
         else if(matchComponent(stMsgData->paramName, X_BT_DISCOVERED_DEV_OBJ, &tblAttName, index))
         {
@@ -1796,7 +1802,7 @@ void hostIf_DeviceInfoRdk_xBT::checkForUpdates()
     fetch_Bluetooth_ConnectedDevicesList ();
 }
 
-
+#ifdef BLE_TILE_PROFILE
 int hostIf_DeviceInfoRdk_xBT::do_Ring_A_Tile(bool enable)
 {
     if(enable == true) {
@@ -1855,7 +1861,7 @@ int hostIf_DeviceInfoRdk_xBT::process_TileCmdRequest(HOSTIF_MsgData_t *stMsgData
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exiting..\n", __FUNCTION__, __LINE__);
     return OK;
 }
-
+#endif // BLE_TILE_PROFILE
 #endif // USE_XRDK_BT_PROFILE
 
 /* End of doxygen group */
