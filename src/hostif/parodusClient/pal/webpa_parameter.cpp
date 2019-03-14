@@ -294,7 +294,6 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                 {
                     RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Failed get_ParamValues_tr69hostIf() Param Name :-  %s \n",pParameterName);                   
                     *paramCountPtr = 0;
-                    ret = WDMP_FAILURE;
                 }
             }
             else
