@@ -672,7 +672,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgD
 int hostIf_DeviceInfo::get_Device_DeviceInfo_Description(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
     stMsgData->paramtype = hostIf_StringType;
-    char *desc = "TR-181, TR-135 and Comcast specific Datamodel Configuration";
+    const char *desc = "TR-181, TR-135 and Comcast specific Datamodel Configuration";
     snprintf((char *)stMsgData->paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN-1, "%s", desc);
     stMsgData->paramLen = strlen(stMsgData->paramValue);
     return OK;
@@ -1040,51 +1040,51 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgDat
     param.type = mfrSERIALIZED_TYPE_DEVICEMAC;
     int len = strlen(stbMacCache);
 
-    try 
+    try
     {
-    	if((stbMacCache[0] == '\0') && (len == 0)) {
-    	iarm_ret = IARM_Bus_Call(IARM_BUS_MFRLIB_NAME, IARM_BUS_MFRLIB_API_GetSerializedData, &param, sizeof(param));
+        if((stbMacCache[0] == '\0') && (len == 0)) {
+            iarm_ret = IARM_Bus_Call(IARM_BUS_MFRLIB_NAME, IARM_BUS_MFRLIB_API_GetSerializedData, &param, sizeof(param));
 
-    	RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] IARM_BUS_MFRLIB_API_GetSerializedData returns params: %s with paramlen: %d.\r\n",__FUNCTION__, param.buffer, param.bufLen);
-    	if(iarm_ret == IARM_RESULT_SUCCESS)
-    	{
-            if(param.buffer && param.bufLen) {
-                strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
-                stMsgData->paramValue[param.bufLen+1] = '\0';
-                stMsgData->paramLen = param.bufLen;
-                if(bCalledDeviceMAC && pChanged && strncmp(stMsgData->paramValue,backupDeviceMAC,TR69HOSTIFMGR_MAX_PARAM_LEN ))
-                {
-                    *pChanged =  true;
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] IARM_BUS_MFRLIB_API_GetSerializedData returns params: %s with paramlen: %d.\r\n",__FUNCTION__, param.buffer, param.bufLen);
+            if(iarm_ret == IARM_RESULT_SUCCESS)
+            {
+                if(param.buffer && param.bufLen) {
+                    strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
+                    stMsgData->paramValue[param.bufLen+1] = '\0';
+                    stMsgData->paramLen = param.bufLen;
+                    if(bCalledDeviceMAC && pChanged && strncmp(stMsgData->paramValue,backupDeviceMAC,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                    {
+                        *pChanged =  true;
+                    }
+                    bCalledDeviceMAC = true;
+                    strncpy(backupDeviceMAC,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                    memset(stbMacCache, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
+                    strncpy(stbMacCache, param.buffer, param.bufLen);
+                    stMsgData->paramtype = hostIf_StringType;
+                    ret = OK;
                 }
-                bCalledDeviceMAC = true;
-                strncpy(backupDeviceMAC,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
-                memset(stbMacCache, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
-                strncpy(stbMacCache, param.buffer, param.bufLen);
-                stMsgData->paramtype = hostIf_StringType;
-                ret = OK;
-              }
-	      else {
-	    	RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in \'IARM_BUS_MFRLIB_API_GetSerializedData\' for parameter : %s [ Value :%s with size :%d]\n",stMsgData->paramName, param.buffer, param.bufLen);
-		ret = NOK;
-	      }
-	    }
+                else {
+                    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in \'IARM_BUS_MFRLIB_API_GetSerializedData\' for parameter : %s [ Value :%s with size :%d]\n",stMsgData->paramName, param.buffer, param.bufLen);
+                    ret = NOK;
+                }
+            }
             else {
                 RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
                 ret = NOK;
-	    }
-	}
-	else 
-	{
-          memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
-          stMsgData->paramLen = len;
-          strncpy(stMsgData->paramValue, stbMacCache, stMsgData->paramLen);
-          stMsgData->paramtype = hostIf_StringType;
-          ret = OK;
-	}	
+            }
+        }
+        else
+        {
+            memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
+            stMsgData->paramLen = len;
+            strncpy(stMsgData->paramValue, stbMacCache, stMsgData->paramLen);
+            stMsgData->paramtype = hostIf_StringType;
+            ret = OK;
+        }
     } catch (const std::exception& e)
     {
-       RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
-       ret = NOK;
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
+        ret = NOK;
     }
 #else //if defined (USE_DEV_PROPERTIES_CONF)
     memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
@@ -1602,7 +1602,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProcessorNumberOfEntries(HOSTIF_Msg
 
     pclose(fp);
 
-	RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Processors Count: [%d]\n", __FUNCTION__, noOfProcessorEntries);
+    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Processors Count: [%d]\n", __FUNCTION__, noOfProcessorEntries);
 
     put_int(stMsgData->paramValue,noOfProcessorEntries);
     stMsgData->paramtype = hostIf_UnsignedIntType;
@@ -1771,6 +1771,21 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus (HOSTIF
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] BootStatus: %s GatewayConnStatuss: %d\n", __FILE__, __FUNCTION__, statusStr, get_GatewayConnStatus());
     }
 
+
+    /*
+     *
+     * */
+    HOSTIF_MsgData_t stTR069SupportData = {0};
+    snprintf(stTR069SupportData.paramName, TR69HOSTIFMGR_MAX_PARAM_LEN-1, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.TR069support.Enable");
+    stTR069SupportData.paramtype = hostIf_BooleanType;
+    get_xRDKCentralComRFC(&stTR069SupportData);
+
+    bool isTr69RfcEnabled = get_boolean(stTR069SupportData.paramValue);
+
+    check_AcsConnStatus = (isTr69RfcEnabled)?true:false;
+
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] %s: %d\n",  __FUNCTION__, __LINE__, stTR069SupportData.paramName, isTr69RfcEnabled);
+
     /**
      * Check for ACS Connection State
      *   6. Contacting ACS
@@ -1786,36 +1801,29 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus (HOSTIF
         }
 //	RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] BootStatus: %s gAcsConnStatus: %d\n", __FILE__, __FUNCTION__, statusBuf, get_ACSStatus());
     }
+    else {
+        check_XreConnStatus = true;
+    }
 
     /**
      * Check for Xre Connection State
      *   6. XRE connection established - Successful
      */
 
-    if(check_XreConnStatus)
-    {
 #ifdef USE_XRESRC
-        if(get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_ConnectionTable_xreConnStatus(stMsgData) == OK)
-        {
-            if(strcasecmp(stMsgData->paramValue, "Connected" ) == 0)
-            {
-                memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
-                strcpy(statusStr, "XRE connection established - Successful");
-            }
-        }
-    }else{
-	    if(get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_ConnectionTable_xreConnStatus(stMsgData) == OK)
-	    {
-		    if(strcasecmp(stMsgData->paramValue, "Connected" ) == 0)
-		    {
-			    memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
-			    strcpy(statusStr, "XRE connection established, ACS connection in progress");
-		    }
-	    }
-#endif /*USE_XRESRC*/
-    }
+    if(get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_ConnectionTable_xreConnStatus(stMsgData) == OK)
+    {
+        const char* xreConn = "XRE connection established - Successful";
+        const char* xreConnAcs = "XRE connection established, ACS connection in progresss";
 
-	RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] BootStatus string: %s \n", __FILE__, __FUNCTION__, statusStr);
+        if(strcasecmp(stMsgData->paramValue, "Connected" ) == 0) {
+            memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
+            snprintf(statusStr, TR69HOSTIFMGR_MAX_PARAM_LEN -1, ((check_XreConnStatus)?xreConn:((check_AcsConnStatus)?xreConnAcs:xreConn)));
+        }
+    }
+#endif /*USE_XRESRC*/
+
+    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] BootStatus string: %s \n", __FILE__, __FUNCTION__, statusStr);
     strncpy(stMsgData->paramValue, statusStr, TR69HOSTIFMGR_MAX_PARAM_LEN);
     stMsgData->paramLen = strlen(statusStr);
     stMsgData->paramtype = hostIf_StringType;
@@ -1843,7 +1851,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_CPUTemp(HOSTIF_Msg
     cpuTemp = (int)round(dsCpuTemp);
 
     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] Current CPU temperature  is: %+7.2fC and roundoff CPUTemp : [%d] \n",
-           __FILE__, __FUNCTION__, dsCpuTemp, cpuTemp);
+            __FILE__, __FUNCTION__, dsCpuTemp, cpuTemp);
 
     put_int(stMsgData->paramValue, cpuTemp);
     stMsgData->paramtype = hostIf_IntegerType;
@@ -2177,10 +2185,10 @@ int hostIf_DeviceInfo::set_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
 int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *stMsgData)
 {
     const char *status = getStringValue(stMsgData).c_str();
-  
+
     if(0 == strcasecmp(status,"false"))
     {
-       
+
         RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] IPRemoteSupport disable request\n", __FUNCTION__);
         ifstream ifp(IPREMOTE_SUPPORT_STATUS_FILE);
         if(ifp.is_open())
@@ -2190,17 +2198,17 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEna
                 RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Removed File %s, IPRemoteSupport is disabled\n", __FUNCTION__, IPREMOTE_SUPPORT_STATUS_FILE);
             }
         }
-       
+
     }
     else if(0 == strcasecmp(status,"true"))
     {
         RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] IPRemoteSupport enable request\n", __FUNCTION__);
-        ofstream ofp(IPREMOTE_SUPPORT_STATUS_FILE);       
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Created File %s, IPRemoteSupport is enabled\n", __FUNCTION__, IPREMOTE_SUPPORT_STATUS_FILE);      
+        ofstream ofp(IPREMOTE_SUPPORT_STATUS_FILE);
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Created File %s, IPRemoteSupport is enabled\n", __FUNCTION__, IPREMOTE_SUPPORT_STATUS_FILE);
     }
     else
     {
-        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] Value not passed for the param, IPRemoteSupport Status unchanged \n", __FUNCTION__); 
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] Value not passed for the param, IPRemoteSupport Status unchanged \n", __FUNCTION__);
     }
 
     return OK;
@@ -2258,25 +2266,25 @@ int hostIf_DeviceInfo::get_xOpsDMMoCALogEnabled (HOSTIF_MsgData_t *stMsgData)
 
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
 {
-    char *status = "false";
+    const char *status = "false";
     ifstream ifp(IPREMOTE_SUPPORT_STATUS_FILE);
     if(ifp.is_open())
     {
         status="true";
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s] %s exists, IpRemoteSupport Status is enabled\n", __FUNCTION__, IPREMOTE_SUPPORT_STATUS_FILE);
-        
+
     }
     else
     {
         status="false";
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] File not exists, IpRemoteSupport Status is Disabled\n", __FUNCTION__);
-    } 
+    }
 
     snprintf((char *)stMsgData->paramValue, strlen(stMsgData->paramValue)-1, "%s", status);
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stMsgData->paramValue);
 
-    return OK;   
+    return OK;
 }
 
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpaddress(HOSTIF_MsgData_t *stMsgData)
@@ -2630,27 +2638,27 @@ int hostIf_DeviceInfo::validate_ParamValue(HOSTIF_MsgData_t * stMsgData)
     int ret = OK;
     if (strcasecmp(stMsgData->paramName,TR069DOSLIMIT_THRESHOLD) == 0)
     {
-       long int tmpVal;
-       if(stMsgData->paramtype == hostIf_StringType )
-       {
-           tmpVal = strtol(stMsgData->paramValue,NULL,10);
-       }
-       else if(stMsgData->paramtype == hostIf_UnsignedIntType )
-       {
-           tmpVal = get_uint(stMsgData->paramValue);
-       }
-       else
-       {
-           ret = NOK;
-           stMsgData->faultCode = fcInvalidParameterType;
-           return ret;
-       }
-       if (tmpVal < MIN_TR69_DOS_THRESHOLD || tmpVal > MAX_TR69_DOS_THRESHOLD)
-       {
-           ret = NOK;
-           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong Value,Value should be[0-30] for %s to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
-           stMsgData->faultCode = fcInvalidParameterValue;
-       }
+        long int tmpVal;
+        if(stMsgData->paramtype == hostIf_StringType )
+        {
+            tmpVal = strtol(stMsgData->paramValue,NULL,10);
+        }
+        else if(stMsgData->paramtype == hostIf_UnsignedIntType )
+        {
+            tmpVal = get_uint(stMsgData->paramValue);
+        }
+        else
+        {
+            ret = NOK;
+            stMsgData->faultCode = fcInvalidParameterType;
+            return ret;
+        }
+        if (tmpVal < MIN_TR69_DOS_THRESHOLD || tmpVal > MAX_TR69_DOS_THRESHOLD)
+        {
+            ret = NOK;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong Value,Value should be[0-30] for %s to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
+            stMsgData->faultCode = fcInvalidParameterValue;
+        }
     }
     return ret;
 }
@@ -2719,30 +2727,30 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     }
     else
     {
-      validate_paramVal = validate_ParamValue(stMsgData);
-      if(validate_paramVal == OK)
-      {
+        validate_paramVal = validate_ParamValue(stMsgData);
+        if(validate_paramVal == OK)
+        {
 #ifndef NEW_HTTP_SERVER_DISABLE
-        if(!legacyRFCEnabled())
-        {
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling setValue in New RFC Store I/O\n",__FUNCTION__);
-            ret = m_rfcStore->setValue(stMsgData);
-        }
-        else
-        {
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling setValue in Old RFC Storage I/O\n",__FUNCTION__);
-            ret = m_rfcStorage.setValue(stMsgData);
-        }
+            if(!legacyRFCEnabled())
+            {
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling setValue in New RFC Store I/O\n",__FUNCTION__);
+                ret = m_rfcStore->setValue(stMsgData);
+            }
+            else
+            {
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling setValue in Old RFC Storage I/O\n",__FUNCTION__);
+                ret = m_rfcStorage.setValue(stMsgData);
+            }
 #else
             ret = m_rfcStorage.setValue(stMsgData);
 #endif
-      }
-      else
-      {
-          ret = NOK;
-          stMsgData->faultCode = fcInvalidParameterValue;
-          RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Invalid ParamValue/Type to SET for param [%s] \n", __FUNCTION__, __LINE__, stMsgData->paramName);
-      }
+        }
+        else
+        {
+            ret = NOK;
+            stMsgData->faultCode = fcInvalidParameterValue;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Invalid ParamValue/Type to SET for param [%s] \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+        }
     }
 
     if (strcasecmp(stMsgData->paramName,RFC_WL_ROAM_TRIGGER_RF) == 0)
@@ -2847,7 +2855,7 @@ int hostIf_DeviceInfo::get_xRDKCentralComRFC(HOSTIF_MsgData_t *stMsgData)
         return m_rfcStorage.getValue(stMsgData);
     }
 #else
-        return m_rfcStorage.getValue(stMsgData);
+    return m_rfcStorage.getValue(stMsgData);
 #endif
 }
 
@@ -2858,8 +2866,8 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *stMsgD
     LOG_ENTRY_EXIT;
     //if(stMsgData->paramtype)
     {
- 	char execBuf[100] = {'\0'};
-	sprintf(execBuf, "wl roam_trigger %s &", stMsgData->paramValue);
+        char execBuf[100] = {'\0'};
+        sprintf(execBuf, "wl roam_trigger %s &", stMsgData->paramValue);
         system(execBuf);
         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully executed \"%s\" with \"%s\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, execBuf);
         ret = OK;
@@ -2955,9 +2963,9 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCRetrieveNow(HOSTIF_MsgData_t *stMsgD
         stMsgData->paramLen = sizeof(hostIf_UnsignedIntType);
         // set the time in Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.RetrieveNow parameter
 #ifndef NEW_HTTP_SERVER_DISABLE
-            ret = m_rfcStore->setValue(stMsgData);
+        ret = m_rfcStore->setValue(stMsgData);
 #else
-            ret = m_rfcStorage.setValue(stMsgData);
+        ret = m_rfcStorage.setValue(stMsgData);
 #endif
     }
 
