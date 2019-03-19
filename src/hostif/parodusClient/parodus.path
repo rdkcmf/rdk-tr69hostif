@@ -21,6 +21,7 @@ Description=Webpa parodus
 
 [Path]
 PathExists=/tmp/route_available
+PathExistsGlob=/tmp/addressaquired_ipv*
 Unit=parodus.service
 
 [Install]

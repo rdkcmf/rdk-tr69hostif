@@ -212,3 +212,4 @@ parodus_start_up()
 }
 
 parodus_start_up
+sleep 10

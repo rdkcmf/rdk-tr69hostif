@@ -19,6 +19,8 @@
 [Unit]
 Description=Webpa parodus Daemon
 After=update-device-details.service update-reboot-info.service
+ConditionPathExistsGlob=/tmp/addressaquired_ipv*
+ConditionPathExists=/tmp/route_available
 
 [Service]
 SyslogIdentifier="parodus"
