@@ -42,6 +42,7 @@
 #ifdef SNMP_ADAPTER_ENABLED
 #include "hostIf_SNMPClient_ReqHandler.h"
 #endif
+#include "waldb.h"
 
 static bool TR69_HostIf_Mgr_Init();
 static bool TR69_HostIf_Mgr_Connect();
@@ -287,6 +288,8 @@ void hostIf_SetReqHandler(void *arg)
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     if(stMsgData)
     {
+        stMsgData->requestor = HOSTIF_SRC_IARM;
+        stMsgData->bsUpdate = HOSTIF_NONE;
         ret = hostIf_SetMsgHandler(stMsgData);
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[hostIf_SetReqHandler : hostIf_MsgHandler()] Return value : %d\n", ret);
         /*
@@ -322,6 +325,7 @@ static IARM_Result_t _Settr69HostIfMgr(void *arg)
     return IARM_RESULT_SUCCESS;
 }
 
+
 //----------------------------------------------------------------------
 //Initialization: This shall be initialized tr69 application to IARM bus.
 //----------------------------------------------------------------------
@@ -334,6 +338,26 @@ void hostIf_GetReqHandler(void *arg)
 
     if(stMsgData)
     {
+        DataModelParam dmParam = {0};
+        if(!getParamInfoFromDataModel(getDataModelHandle(), stMsgData->paramName, &dmParam))
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s: Invalid parameter name %s: doesn't exist in data-model\n", __FUNCTION__, stMsgData->paramName);
+        }
+        stMsgData->bsUpdate = getBSUpdateEnum(dmParam.bsUpdate);
+        if(dmParam.objectName)
+           free(dmParam.objectName);
+        if(dmParam.paramName)
+           free(dmParam.paramName);
+        if(dmParam.bsUpdate)
+           free(dmParam.bsUpdate);
+        if(dmParam.access)
+           free(dmParam.access);
+        if(dmParam.dataType)
+           free(dmParam.dataType);
+        if(dmParam.defaultValue)
+           free(dmParam.defaultValue);
+
+        stMsgData->requestor = HOSTIF_SRC_IARM;
         ret = hostIf_GetMsgHandler(stMsgData);
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[hostIf_GetReqHandler : hostIf_MsgHandler()] Return value : %d\n", ret);
 

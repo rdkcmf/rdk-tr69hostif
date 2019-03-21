@@ -38,7 +38,8 @@ AM_CXXFLAGS = $(GLIB_CFLAGS) $(GTHREAD_CFLAGS) \
 	-I$(top_srcdir)/src/hostif/profiles/STBService \
 	-I$(top_srcdir)/src/hostif/profiles/Ethernet \
 	-I$(top_srcdir)/src/hostif/profiles/IP \
-	-I$(top_srcdir)/src/hostif/profiles/Time
+	-I$(top_srcdir)/src/hostif/profiles/Time \
+	-I$(top_srcdir)/src/hostif/profiles/DeviceInfo
 
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/parodusClient/pal \
                -I$(top_srcdir)/src/hostif/parodusClient/waldb 

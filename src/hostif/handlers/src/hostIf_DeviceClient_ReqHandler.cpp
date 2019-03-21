@@ -129,7 +129,24 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
 
-    if(strncasecmp(stMsgData->paramName,"Device.DeviceInfo",strlen("Device.DeviceInfo"))==0)
+    if (stMsgData->bsUpdate != HOSTIF_NONE)
+    {
+        if ( (stMsgData->bsUpdate == HOSTIF_SRC_RFC && stMsgData->requestor == HOSTIF_SRC_RFC) ||
+             (stMsgData->bsUpdate == HOSTIF_SRC_ALL && (stMsgData->requestor == HOSTIF_SRC_RFC || stMsgData->requestor == HOSTIF_SRC_WEBPA)) )
+         {
+            hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
+            stMsgData->instanceNum = instanceNumber;
+            if(!pIface)
+            {
+                hostIf_DeviceInfo::releaseLock();
+                return NOK;
+            }
+            ret = pIface->set_xRDKCentralComBootstrap(stMsgData);
+         }
+         else
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] Not setting the bootstrap param:%s [bsUpdate=%d, requestor=%d]\n", __FUNCTION__, stMsgData->paramName, stMsgData->bsUpdate, stMsgData->requestor);
+    }
+    else if(strncasecmp(stMsgData->paramName,"Device.DeviceInfo",strlen("Device.DeviceInfo"))==0)
     {
         hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
         stMsgData->instanceNum = instanceNumber;
@@ -273,7 +290,19 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     hostIf_DeviceInfo::getLock();
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-    if(matchComponent(stMsgData->paramName,"Device.DeviceInfo.ProcessStatus.Process",&pSetting,instanceNumber))
+
+    if (stMsgData->bsUpdate != HOSTIF_NONE)
+    {
+        hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
+        stMsgData->instanceNum = instanceNumber;
+        if(!pIface)
+        {
+            hostIf_DeviceInfo::releaseLock();
+            return NOK;
+        }
+        ret = pIface->get_xRDKCentralComBootstrap(stMsgData);
+    }
+    else if(matchComponent(stMsgData->paramName,"Device.DeviceInfo.ProcessStatus.Process",&pSetting,instanceNumber))
     {
         hostIf_DeviceProcess *pIfaceProcess = hostIf_DeviceProcess::getInstance(instanceNumber);
         stMsgData->instanceNum = instanceNumber;
@@ -383,6 +412,7 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             hostIf_DeviceInfo::releaseLock();
             return NOK;
         }
+
         if(strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM.BootStatus") == 0)
         {
             ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus(stMsgData);

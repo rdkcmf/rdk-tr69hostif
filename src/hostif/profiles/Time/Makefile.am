@@ -20,6 +20,7 @@
 SUBDIRS = 
 
 AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include -I$(top_srcdir)/src/hostif/handlers/include  $(GLIB_CFLAGS) $(G_THREAD_CFLAGS)
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/profiles/DeviceInfo
 
 noinst_LTLIBRARIES = libhostIfTime.la
 libhostIfTime_la_SOURCES =  Device_Time.cpp

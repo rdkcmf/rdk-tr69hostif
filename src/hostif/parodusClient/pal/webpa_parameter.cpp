@@ -31,6 +31,7 @@
 #include "rdk_debug.h"
 #include "waldb.h"
 #include "hostIf_msgHandler.h"
+#include "hostIf_utils.h"
 
 
 /*----------------------------------------------------------------------------*/
@@ -107,6 +108,8 @@ void freeDataModelParam(DataModelParam dmParam)
 		free(dmParam.dataType);
 	if(dmParam.defaultValue)
 		free(dmParam.defaultValue);
+	if(dmParam.bsUpdate)
+                free(dmParam.bsUpdate);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -235,6 +238,9 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                 RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Valid Parameter..! \n ");
                 strncpy (Param.paramName, pParameterName, MAX_PARAM_LENGTH - 1);
                 Param.paramName[MAX_PARAM_LENGTH - 1] = '\0';
+                Param.requestor = HOSTIF_SRC_WEBPA;
+                Param.bsUpdate = getBSUpdateEnum(dmParam.bsUpdate);
+
                 converttohostIfType (dmParam.dataType, &(Param.paramtype));
                 freeDataModelParam(dmParam);
                 Param.instanceNum = 0;
@@ -326,6 +332,8 @@ static WAL_STATUS SetParamInfo(ParamVal paramVal)
     {
         WAL_DATA_TYPE walType;
         converttohostIfType(dmParam.dataType,&(Param.paramtype));
+        Param.bsUpdate = getBSUpdateEnum(dmParam.bsUpdate);
+        Param.requestor = HOSTIF_SRC_WEBPA;
         freeDataModelParam(dmParam);
         // Convert Param.paramtype to ParamVal.type
         converttoWalType(Param.paramtype,&walType);

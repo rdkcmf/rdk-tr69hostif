@@ -30,7 +30,7 @@ $(GLIB_CFLAGS) $(G_THREAD_CFLAGS) $(XREMGR_FLAGS) $(MOCAMGR_FLAGS) $(PROCPS_CFLA
 -I=/usr/include/rdk/iarmmgrs/mfr/ \
 -I=/usr/include/rdk/iarmmgrs-hal/
 
-AM_LDFLAGS = $(PROCPS_LIBS) -lIARMBus -lyajl -lds -ldshalcli -ldbus-1
+AM_LDFLAGS = $(PROCPS_LIBS) -lIARMBus -lyajl -lds -ldshalcli -ldbus-1 -lcurl
 
 if WITH_XRDK_BT_PROFILE
 AM_CXXFLAGS += $(XRDK_BT_PROFILE_FLAG)
@@ -46,7 +46,9 @@ libdeviceinfo_la_SOURCES = 	Device_DeviceInfo.cpp\
 				Device_DeviceInfo_Processor.cpp\
 				Device_DeviceInfo_ProcessStatus_Process.cpp \
 				Device_DeviceInfo_ProcessStatus.cpp \
-				XrdkCentralComRFC.cpp
+				XrdkCentralComRFC.cpp \
+                                XrdkCentralComBSStore.cpp \
+                                XrdkCentralComBSStoreJournal.cpp
 if !WITH_NEW_HTTP_SERVER_DISABLE
 libdeviceinfo_la_SOURCES +=     XrdkCentralComRFCStore.cpp
 else

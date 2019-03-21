@@ -32,6 +32,7 @@ extern "C"
 #include "request_handler.h"
 #include "waldb.h"
 #include "XrdkCentralComRFCVar.h"
+#include "hostIf_utils.h"
 
 #define MAX_NUM_PARAMETERS 2048
 #define DEVICE_REBOOT_PARAM          "Device.X_CISCO_COM_DeviceControl.RebootDevice"
@@ -304,12 +305,14 @@ static WDMP_STATUS handleRFCRequest(REQ_TYPE reqType, param_t *param)
    return wdmpStatus;
 }
 
-static WDMP_STATUS invokeHostIfAPI(REQ_TYPE reqType, param_t *param)
+static WDMP_STATUS invokeHostIfAPI(REQ_TYPE reqType, param_t *param, HostIf_Source_Type_t bsUpdate)
 {
    WDMP_STATUS wdmpStatus = WDMP_SUCCESS;
    int result = NOK;
    HOSTIF_MsgData_t hostIfParam;
    memset(&hostIfParam,0,sizeof(HOSTIF_MsgData_t));
+   hostIfParam.requestor = HOSTIF_SRC_RFC;
+   hostIfParam.bsUpdate = bsUpdate;
    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Entering %s\n", __FUNCTION__);
 
    getHostIfParamStFromRequest(reqType, param, &hostIfParam);
@@ -362,8 +365,7 @@ static WDMP_STATUS invokeHostIfAPI(REQ_TYPE reqType, param_t *param)
    return wdmpStatus;
 }
 
-
-static WDMP_STATUS validateAgainstDataModel(REQ_TYPE reqType, char* paramName, const char* paramValue, DATA_TYPE *dataType, char **defaultValue)
+static WDMP_STATUS validateAgainstDataModel(REQ_TYPE reqType, char* paramName, const char* paramValue, DATA_TYPE *dataType, char **defaultValue, HostIf_Source_Type_t *bsUpdate)
 {
    DataModelParam dmParam = {0};
    WDMP_STATUS ret = WDMP_SUCCESS;
@@ -376,7 +378,8 @@ static WDMP_STATUS validateAgainstDataModel(REQ_TYPE reqType, char* paramName, c
       RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Invalid parameter name %s: doesn't exist in data-model\n", paramName);
       return WDMP_ERR_INVALID_PARAMETER_NAME;
    }
-   else if(reqType == GET)
+   *bsUpdate = getBSUpdateEnum(dmParam.bsUpdate);
+   if(reqType == GET)
    {
        *dataType = getWdmpDataType(dmParam.dataType);
        if(dmParam.defaultValue)
@@ -411,6 +414,8 @@ static WDMP_STATUS validateAgainstDataModel(REQ_TYPE reqType, char* paramName, c
       free(dmParam.objectName);
    if(dmParam.paramName)
       free(dmParam.paramName);
+   if(dmParam.bsUpdate)
+      free(dmParam.bsUpdate);
    if(dmParam.access)
       free(dmParam.access);
    if(dmParam.dataType)
@@ -599,7 +604,7 @@ res_struct* handleRequest(const char* pcCallerID, req_struct *reqSt)
                                 childParams[childParamIndex].value = NULL;
 
                                 //retStatus represents the first error while trying to retrieve the values of a wild card parameter name.
-                                if(WDMP_SUCCESS != invokeHostIfAPI(reqSt->reqType, childParams+childParamIndex) && respSt->retStatus[paramIndex] == WDMP_SUCCESS)
+                                if(WDMP_SUCCESS != invokeHostIfAPI(reqSt->reqType, childParams+childParamIndex, HOSTIF_NONE) && respSt->retStatus[paramIndex] == WDMP_SUCCESS)
                                 {
                                    respSt->retStatus[paramIndex] = WDMP_ERR_VALUE_IS_EMPTY;
                                 }
@@ -625,6 +630,7 @@ res_struct* handleRequest(const char* pcCallerID, req_struct *reqSt)
                         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Not a wildcard param - validating against data model...\n");
                         char *defaultValue = NULL;
                         bool rfcParam = false;
+                        HostIf_Source_Type_t bsUpdate = HOSTIF_NONE;
 
                         // Temporary handling for RFC Variables - Which are not validated against data-model.xml
                         if(strncmp(respSt->u.getRes->paramNames[paramIndex], "RFC_", 4) == 0 && strchr(respSt->u.getRes->paramNames[paramIndex], '.') == NULL)
@@ -635,7 +641,7 @@ res_struct* handleRequest(const char* pcCallerID, req_struct *reqSt)
                         }
                         else
                         {
-                           respSt->retStatus[paramIndex] = validateAgainstDataModel(respSt->reqType, respSt->u.getRes->paramNames[paramIndex], NULL, &dataType, &defaultValue);
+                           respSt->retStatus[paramIndex] = validateAgainstDataModel(respSt->reqType, respSt->u.getRes->paramNames[paramIndex], NULL, &dataType, &defaultValue, &bsUpdate);
                         }
 
                         respSt->u.getRes->retParamCnt[paramIndex] = 1;
@@ -648,7 +654,7 @@ res_struct* handleRequest(const char* pcCallerID, req_struct *reqSt)
                         if(WDMP_SUCCESS == respSt->retStatus[paramIndex])
                         {
                            if(!rfcParam)
-                              respSt->retStatus[paramIndex] = invokeHostIfAPI(reqSt->reqType, respSt->u.getRes->params[paramIndex]);
+                              respSt->retStatus[paramIndex] = invokeHostIfAPI(reqSt->reqType, respSt->u.getRes->params[paramIndex], bsUpdate);
                            else // Temporary handling for RFC Variables - handled using RFC API.
                               respSt->retStatus[paramIndex] = handleRFCRequest(reqSt->reqType, respSt->u.getRes->params[paramIndex]);
 
@@ -671,6 +677,8 @@ res_struct* handleRequest(const char* pcCallerID, req_struct *reqSt)
                            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Failed in data-model validation\n");
                            respSt->u.getRes->params[paramIndex][0].value = strdup("");
                         }
+                        if(defaultValue)
+                           free(defaultValue);
                     }
                 }
                 break;
@@ -713,13 +721,14 @@ res_struct* handleRequest(const char* pcCallerID, req_struct *reqSt)
                     }
                     else
                     {
-                        respSt->retStatus[paramIndex] = validateAgainstDataModel(reqSt->reqType, reqSt->u.setReq->param[paramIndex].name, reqSt->u.setReq->param[paramIndex].value, &reqSt->u.setReq->param[paramIndex].type, NULL);
+                        HostIf_Source_Type_t bsUpdate = HOSTIF_NONE;
+                        respSt->retStatus[paramIndex] = validateAgainstDataModel(reqSt->reqType, reqSt->u.setReq->param[paramIndex].name, reqSt->u.setReq->param[paramIndex].value, &reqSt->u.setReq->param[paramIndex].type, NULL, &bsUpdate);
                         if(WDMP_SUCCESS != respSt->retStatus[paramIndex])
                         {
                             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Operation not permitted : %d\n", respSt->retStatus[paramIndex]);
                             continue;
                         }
-                        respSt->retStatus[paramIndex] = invokeHostIfAPI(reqSt->reqType, reqSt->u.setReq->param + paramIndex);
+                        respSt->retStatus[paramIndex] = invokeHostIfAPI(reqSt->reqType, reqSt->u.setReq->param + paramIndex, bsUpdate);
                     }
                 }
                 break;

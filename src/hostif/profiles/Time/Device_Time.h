@@ -82,6 +82,7 @@
 #include "hostIf_tr69ReqHandler.h"
 #include "hostIf_utils.h"
 #include "hostIf_updateHandler.h"
+#include "XrdkCentralComBSStore.h"
 
 /** @defgroup TR_069_DEVICE_TIME_API TR-069 Device.Time object API.
  *  @ingroup TR_069_API
@@ -137,6 +138,8 @@ class hostIf_Time {
     static GMutex *m_mutex;
 
     static  GHashTable  *m_notifyHash;
+
+    static XBSStore *m_bsStore;
 
     int dev_id;
 
@@ -405,6 +408,22 @@ public:
      */
 
     int set_Device_Time_LocalTimeZone(HOSTIF_MsgData_t*);
+
+    /**
+     * @brief    Set the bootstrap parameters.
+     *
+     * This function sets the bootstrap parameters
+     *
+     */
+    int set_xRDKCentralComBootstrap(HOSTIF_MsgData_t *);
+
+    /**
+     * @brief    Get the bootstrap parameters.
+     *
+     * This function gets the bootstrap parameters
+     *
+     */
+    int get_xRDKCentralComBootstrap(HOSTIF_MsgData_t *);
 
 };
 /* End of TR_069_DEVICE_TIME_SETTER_API doxygen group. */

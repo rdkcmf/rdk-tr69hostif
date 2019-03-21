@@ -476,5 +476,20 @@ bool legacyRFCEnabled()
     return legacyRFC;
 }
 #endif
+
+HostIf_Source_Type_t getBSUpdateEnum(const char *bsUpdate)
+{
+    if (!bsUpdate)
+        return HOSTIF_NONE;
+
+    if (strcasecmp(bsUpdate, "allUpdate") == 0)
+        return HOSTIF_SRC_ALL;
+    else if (strcasecmp(bsUpdate, "rfcUpdate") == 0)
+        return HOSTIF_SRC_RFC;
+    else if (strcasecmp(bsUpdate, "default") == 0)
+        return HOSTIF_SRC_DEFAULT;
+    return HOSTIF_NONE;
+}
+
 /** @} */
 /** @} */

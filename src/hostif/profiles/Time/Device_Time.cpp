@@ -53,6 +53,7 @@
 GHashTable* hostIf_Time::ifHash = NULL;
 GMutex* hostIf_Time::m_mutex = NULL;
 GHashTable* hostIf_Time::m_notifyHash = NULL;
+XBSStore* hostIf_Time::m_bsStore;
 
 /****************************************************************************************************************************************************/
 // Device.DeviceInfo Profile. Getters:
@@ -64,6 +65,7 @@ hostIf_Time::hostIf_Time(int dev_id):
 {
     strcpy(backupLocalTimeZone,"");
     strcpy(backupCurrentLocalTime,"");
+    m_bsStore = XBSStore::getInstance();
 }
 
 hostIf_Time* hostIf_Time::getInstance(int dev_id)
@@ -246,6 +248,16 @@ int hostIf_Time::get_Device_Time_CurrentLocalTime(HOSTIF_MsgData_t *stMsgData, b
     stMsgData->paramLen = strlen(stMsgData->paramValue);
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FILE__, __FUNCTION__);
     return OK;
+}
+
+int hostIf_Time::get_xRDKCentralComBootstrap(HOSTIF_MsgData_t *stMsgData)
+{
+   return m_bsStore->getValue(stMsgData);
+}
+
+int hostIf_Time::set_xRDKCentralComBootstrap(HOSTIF_MsgData_t * stMsgData)
+{
+    return  m_bsStore->overrideValue(stMsgData);
 }
 
 int hostIf_Time::set_Device_Time_Enable(HOSTIF_MsgData_t* stMsgData)

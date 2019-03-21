@@ -104,7 +104,14 @@ static void HTTPRequestHandler(
 
                 // WDMP Code sets a generic statusCode, the following lines replace it with an actual error code.
                 cJSON_DeleteItemFromObject(jsonResponse, "statusCode");
-                cJSON_AddNumberToObject(jsonResponse, "statusCode", respSt->retStatus[respSt->paramCnt-1]);
+                for(int paramIndex = 0; paramIndex < respSt->paramCnt; paramIndex++)
+                {
+                   if(respSt->retStatus[paramIndex] != 0 || paramIndex == respSt->paramCnt-1)
+                   {
+                      cJSON_AddNumberToObject(jsonResponse, "statusCode", respSt->retStatus[paramIndex]);
+                      break;
+                   }
+               }
             }
             else
             {
@@ -133,7 +140,14 @@ static void HTTPRequestHandler(
                 wdmp_form_set_response(respSt, jsonResponse);
                 // WDMP Code sets a generic statusCode, the following lines replace it with an actual error code.
                 cJSON_DeleteItemFromObject(jsonResponse, "statusCode");
-                cJSON_AddNumberToObject(jsonResponse, "statusCode", respSt->retStatus[respSt->paramCnt-1]);
+                for(int paramIndex = 0; paramIndex < respSt->paramCnt; paramIndex++)
+                {
+                   if(respSt->retStatus[paramIndex] != 0 || paramIndex == respSt->paramCnt-1)
+                   {
+                      cJSON_AddNumberToObject(jsonResponse, "statusCode", respSt->retStatus[paramIndex]);
+                      break;
+                   }
+                }
              }
              else
              {

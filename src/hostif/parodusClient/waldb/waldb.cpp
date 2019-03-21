@@ -543,6 +543,8 @@ void checkforParameterNameMatch(TiXmlNode *pParent, const char *ObjectName, cons
                 dmParam->objectName = strdup(paramName);
                 if(pElement->Attribute("base") != NULL)
                     dmParam->paramName = strdup(pElement->Attribute("base"));
+                if(pElement->Attribute("bsUpdate") != NULL)
+                    dmParam->bsUpdate = strdup(pElement->Attribute("bsUpdate"));
                 if(pElement->Attribute("access") != NULL)
                     dmParam->access = strdup(pElement->Attribute("access"));
 
@@ -595,7 +597,8 @@ void checkforObjectMatch(TiXmlNode *pParent,const char *objectName,int *pMatch,D
 
 void checkforParameterMatch(TiXmlNode *pParent,const char *paramName,int *pMatch,DataModelParam *dmParam)
 {
-    TiXmlNode *pChild;
+    TiXmlNode *pChild = NULL;
+    TiXmlNode *pParam = NULL;
     if(!pParent)
     {
         RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"pParent is Null - returning\n");
@@ -630,14 +633,12 @@ void checkforParameterMatch(TiXmlNode *pParent,const char *paramName,int *pMatch
             if(*pMatch)
             {
                 *pMatch = 0;
-                for(pChild = pChild->FirstChild(); pChild != NULL; pChild = pChild->NextSibling())
+                for(pParam = pChild->FirstChild(); pParam != NULL; pParam = pParam->NextSibling())
                 {
-                    checkforParameterNameMatch(pChild, paramObject, paramName, pMatch, dmParam);
+                    checkforParameterNameMatch(pParam, paramObject, paramName, pMatch, dmParam);
                     if(*pMatch)
                         goto end;
                 }
-                if(!pChild)
-                    break;
             }
         }
     }

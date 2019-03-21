@@ -139,6 +139,17 @@ typedef enum _faultCodes
     fcAttemptToSetaNonWritableParameter = 9008,
 } faultCode_t;
 
+/*! Host IF source type used for various purposes*/
+typedef enum _HostIf_Source_Type_t
+{
+    HOSTIF_NONE = 0,
+    HOSTIF_SRC_ALL,
+    HOSTIF_SRC_WEBPA,
+    HOSTIF_SRC_RFC,
+    HOSTIF_SRC_IARM,
+    HOSTIF_SRC_DEFAULT
+} HostIf_Source_Type_t;
+
 /*! Host IF Message Request data*/
 typedef struct _HostIf_MsgData_t {
     char paramName[TR69HOSTIFMGR_MAX_PARAM_LEN];   			/*!< Parameter name with complete request path */
@@ -148,6 +159,8 @@ typedef struct _HostIf_MsgData_t {
     HostIf_ParamType_t paramtype;	/*!< Parameter type */
     HostIf_ReqType_t reqType;		/*!< Host interface request type [HOSTIF_GET/HOSTIF_SET]*/
     faultCode_t faultCode;          /*!< Fault codes as per BroadBand cwmp amendment*/
+    HostIf_Source_Type_t requestor;   /*!< Requestor that made the set/get request*/
+    HostIf_Source_Type_t bsUpdate; /*!< Bootstrap update level*/
 } HOSTIF_MsgData_t;
 
 /*! Events published from TR69 host interface */
