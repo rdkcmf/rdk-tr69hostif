@@ -108,7 +108,18 @@ int TimeClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
             return NOK;
         }
 
-        if (strcasecmp(stMsgData->paramName,"Device.Time.Enable") == 0)
+        if (stMsgData->bsUpdate != HOSTIF_NONE)
+        {
+           if ( (stMsgData->bsUpdate == HOSTIF_SRC_RFC && stMsgData->requestor == HOSTIF_SRC_RFC) ||
+             (stMsgData->bsUpdate == HOSTIF_SRC_ALL && (stMsgData->requestor == HOSTIF_SRC_RFC || stMsgData->requestor == HOSTIF_SRC_WEBPA)) )
+         {
+            ret = pIface->set_xRDKCentralComBootstrap(stMsgData);
+         }
+         else
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] Not setting the bootstrap param:%s [bsUpdate=%d, requestor=%d]\n", __FUNCTION__, stMsgData->paramName, stMsgData->bsUpdate, stMsgData->requestor);
+
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.Time.Enable") == 0)
         {
             ret = pIface->set_Device_Time_Enable(stMsgData);
         }
@@ -154,7 +165,11 @@ int TimeClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             return NOK;
         }
 
-        if (strcasecmp(stMsgData->paramName,"Device.Time.LocalTimeZone") == 0)
+        if (stMsgData->bsUpdate != HOSTIF_NONE)
+        {
+           ret = pIface->get_xRDKCentralComBootstrap(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.Time.LocalTimeZone") == 0)
         {
             ret = pIface->get_Device_Time_LocalTimeZone(stMsgData);
         }

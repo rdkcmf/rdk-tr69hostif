@@ -43,6 +43,7 @@ typedef struct __DataModelParam
 	char *dataType;
 	char *access;
 	char *defaultValue;
+	char *bsUpdate;
 }DataModelParam;
 
 /* @brief Loads the Parameter count query string to memory

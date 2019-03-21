@@ -120,6 +120,7 @@ XRFCStorage hostIf_DeviceInfo::m_rfcStorage;
 #else
 XRFCStorage hostIf_DeviceInfo::m_rfcStorage;
 #endif
+XBSStore* hostIf_DeviceInfo::m_bsStore;
 string hostIf_DeviceInfo::m_xrPollingAction = "0";
 
 /****************************************************************************************************************************************************/
@@ -161,6 +162,7 @@ hostIf_DeviceInfo::hostIf_DeviceInfo(int dev_id):
     if(!legacyRFCEnabled())
         m_rfcStore = XRFCStore::getInstance();
 #endif
+    m_bsStore = XBSStore::getInstance();
 }
 hostIf_DeviceInfo::~hostIf_DeviceInfo()
 {
@@ -2653,6 +2655,13 @@ int hostIf_DeviceInfo::validate_ParamValue(HOSTIF_MsgData_t * stMsgData)
     return ret;
 }
 
+int hostIf_DeviceInfo::set_xRDKCentralComBootstrap(HOSTIF_MsgData_t * stMsgData)
+{
+    int ret = NOK;
+    ret = m_bsStore->overrideValue(stMsgData);
+    return ret;
+}
+
 int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
 {
     int ret = NOK;
@@ -2817,6 +2826,11 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     }
 #endif /* USE_HWSELFTEST_PROFILE */
     return ret;
+}
+
+int hostIf_DeviceInfo::get_xRDKCentralComBootstrap(HOSTIF_MsgData_t *stMsgData)
+{
+   return m_bsStore->getValue(stMsgData);
 }
 
 int hostIf_DeviceInfo::get_xRDKCentralComRFC(HOSTIF_MsgData_t *stMsgData)

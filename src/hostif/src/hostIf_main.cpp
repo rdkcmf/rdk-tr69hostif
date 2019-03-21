@@ -40,6 +40,7 @@
 #endif
 
 #include "hostIf_updateHandler.h"
+#include "XrdkCentralComBSStore.h"
 
 #if defined(USE_WIFI_PROFILE)
 #include "Device_WiFi.h"
@@ -510,6 +511,7 @@ void exit_gracefully (int sig_received)
 #endif
 
        updateHandler::stop();
+       XBSStore::getInstance()->stop();
 
        if(logfile) fclose (logfile);
 

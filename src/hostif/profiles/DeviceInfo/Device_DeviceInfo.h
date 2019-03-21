@@ -118,7 +118,7 @@
 #else
 #include "XrdkCentralComRFC.h"
 #endif
-
+#include "XrdkCentralComBSStore.h"
 #include "hostIf_updateHandler.h"
 
 #define CDL_FLASH_FILE "/opt/cdl_flashed_file_name"
@@ -219,6 +219,7 @@ class hostIf_DeviceInfo {
 #else
     static XRFCStorage m_rfcStorage;
 #endif
+    static XBSStore *m_bsStore;
     static string m_xrPollingAction;
 
     string getEstbIp();
@@ -1157,6 +1158,9 @@ public:
 
     int set_xRDKCentralComRFC(HOSTIF_MsgData_t *);
     int get_xRDKCentralComRFC(HOSTIF_MsgData_t *);
+
+    int set_xRDKCentralComBootstrap(HOSTIF_MsgData_t *);
+    int get_xRDKCentralComBootstrap(HOSTIF_MsgData_t *);
 
     int readFirmwareInfo(char *, HOSTIF_MsgData_t *);
     int writeFirmwareInfo(char *, HOSTIF_MsgData_t *);

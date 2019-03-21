@@ -165,6 +165,7 @@ long timeValDiff(struct timespec *starttime, struct timespec *finishtime);
 void setLegacyRFCEnabled(bool value);
 bool legacyRFCEnabled();
 #endif
+HostIf_Source_Type_t getBSUpdateEnum(const char *bsUpdate);
 
 #endif /* HOSTIF_UTILS_H_*/
 
