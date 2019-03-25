@@ -2429,8 +2429,9 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *stMsgD
 int hostIf_DeviceInfo::set_xRDKCentralComHdrDVRFCEnable(HOSTIF_MsgData_t *stMsgData)
 {
     LOG_ENTRY_EXIT;
+    string stringValue = getStringValue(stMsgData);
     device::VideoDevice decoder = device::Host::getInstance().getVideoDevices().at(0);
-    if(strcasecmp(stMsgData->paramValue,"true") == 0)
+    if(strcasecmp(stringValue.c_str(),"true") == 0)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Successfully set \"%s\" to true", __FUNCTION__, __LINE__, stMsgData->paramName);
         decoder.enableHDRDVSupport(true);
