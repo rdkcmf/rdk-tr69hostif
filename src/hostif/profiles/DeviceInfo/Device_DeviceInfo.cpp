@@ -493,7 +493,21 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t * stM
         ret = NOK;
     }
 #else
-    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s]This parameter \"%s\" is not handled. No data source available.\n",__FUNCTION__, stMsgData->paramName);
+    // Try to get the value from property files
+    char* manufact = NULL;
+    manufact = getenvOrDefault("MANUFACTURE","");
+    if(manufact !=  NULL) {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] manufact = %s.\n",__FUNCTION__, __FILE__, __LINE__,manufact);
+        int len = strlen(manufact);
+        strncpy((char *)stMsgData->paramValue, manufact, len);
+        stMsgData->paramValue[len+1] = '\0';
+        stMsgData->paramLen = len;
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s stMsgData->paramLen: %d \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue,stMsgData->paramLen);
+        ret = OK;
+    } else {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Failed to get manufacturer from device properties..!!\n",__FUNCTION__, __FILE__, __LINE__);
+        ret = NOK;
+    }
 #endif //  #if !defined (USE_DEV_PROPERTIES_CONF)
     return ret;
 }
@@ -621,6 +635,22 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgD
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
+#else 
+    // Try to get MODEL NUM from Device Properties file
+    char* modelName = NULL;
+    modelName = getenvOrDefault("MODEL_NUM","");
+    if(modelName !=  NULL) {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] modelName = %s.\n",__FUNCTION__, __FILE__, __LINE__,modelName);
+        int len = strlen(modelName);
+        strncpy((char *)stMsgData->paramValue, modelName, len);
+        stMsgData->paramValue[len+1] = '\0';
+        stMsgData->paramLen = len;
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s stMsgData->paramLen: %d \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue,stMsgData->paramLen);
+        ret = OK;
+    } else {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Failed to get model name from device properties..!!\n",__FUNCTION__, __FILE__, __LINE__);
+        ret = NOK;
+    } 
 #endif //#if !defined (USE_DEV_PROPERTIES_CONF)
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
     return ret;
@@ -738,7 +768,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t * 
 {
     int ret=NOT_HANDLED;
     stMsgData->paramtype = hostIf_StringType;
-#if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
     memset(&param, 0, sizeof(param));
@@ -778,9 +807,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t * 
         ret = NOK;
     }
 
-#else  //#if !defined (USE_DEV_PROPERTIES_CONF)
-
-#endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
     return ret;
 }
@@ -888,7 +914,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t *
 {
     int ret=NOT_HANDLED;
     stMsgData->paramtype = hostIf_StringType;
-#if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
     memset(&param, 0, sizeof(param));
@@ -924,7 +949,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProvisioningCode(HOSTIF_MsgData_t *
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
-#endif
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
     return OK; // For any failures return OK for now to get empty results.
 }
