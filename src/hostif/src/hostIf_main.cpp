@@ -78,6 +78,7 @@ int rdk_logger_enabled = 0;
 GHashTable* paramMgrhash = NULL;
 static void usage();
 T_ARGLIST argList = {{'\0'}, 0};
+static int isShutdownTriggered = 0;
 
 // Parodus Init Thread
 pthread_t parodus_init_tid;
@@ -489,9 +490,9 @@ void quit_handler (int sig_received)
 
 void exit_gracefully (int sig_received)
 {
-
-    if(pthread_mutex_trylock(&graceful_exit_mutex) == 0) {
+    if((pthread_mutex_trylock(&graceful_exit_mutex) == 0) && (isShutdownTriggered == 0)) {
         RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
+        isShutdownTriggered = 1;
 
 #if defined(USE_WIFI_PROFILE)
         /* Perform the necessary operations to shut down the WiFi device */
