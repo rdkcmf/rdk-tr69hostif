@@ -46,6 +46,7 @@
 #include "rdk_moca_hal.h"
 
 #define MOCA_INTERFACE_NUMBER_OF_ENTRIES 1
+#define MAX_WAIT_FOR_RMH_SECONDS         10
 #define HIGHEST_MOCA_VERSION    0X20
 
 MoCADevice* MoCADevice::Instance = NULL;
@@ -63,14 +64,39 @@ void* MoCADevice::getRmhContext()
 {
     /* Initialized the RMH Context */
     static RMH_Handle rmhContext = NULL;
+    uint32_t waitedSeconds = 0;
 
-    if(!rmhContext) {
-        rmhContext = RMH_Initialize(NULL, NULL);
-        if(NULL == rmhContext) {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"(%s)Failed in RMH_Initialize.\n", __FUNCTION__);
-            throw 1;
+    /* If we have an RMH handle, ensure it's still valid */
+    if (rmhContext) {
+        RMH_Result ret = RMH_ValidateHandle(rmhContext);
+        if (ret == RMH_UNIMPLEMENTED || ret == RMH_NOT_SUPPORTED) {
+            RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"RMH_ValidateHandle returned %s. We will not be able to monitor to make sure the handle remains valid\n", RMH_ResultToString(ret));
+        }
+        else if (ret != RMH_SUCCESS) {
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"The RMH handle %p seems to no longer be valid. Closing\n", rmhContext);
+            RMH_Destroy(rmhContext);
+            rmhContext=NULL;
         }
     }
+
+    /* If we don't have an RMH handle, create one*/
+    while (rmhContext == NULL) {
+        rmhContext = RMH_Initialize(NULL, NULL);
+        if(NULL != rmhContext) {
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Created RMH handle %p\n", rmhContext);
+            break;
+        }
+
+        if (waitedSeconds >= MAX_WAIT_FOR_RMH_SECONDS) {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"(%s) Maximum wait for MoCA reached. Aborting!\n", __FUNCTION__);
+            throw 1;
+        }
+
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"(%s)Failed in RMH_Initialize. Assuming MoCA isn't ready. Waiting...\n", __FUNCTION__);
+        usleep(1*1000000);
+        waitedSeconds++;
+    }
+
     return rmhContext;
 }
 
