@@ -207,16 +207,7 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
             {
                 RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Request:> paramNames[%d] = %s\n",i,reqObj->u.getReq->paramNames[i]);
                 param = reqObj->u.getReq->paramNames[i];
-                if(strlen(param) > MAX_PARAMETERNAME_LEN)
-                {
-                    *resObj->retStatus = WDMP_ERR_INVALID_PARAM;
-                    error = 1;
-                    break;
-                }
-                else
-                {
-                    getParamList[i] = strdup(param); // Freed from wdmp_free_res_struct()
-                }
+                getParamList[i] = strdup(param); // Freed from wdmp_free_res_struct()
             }
 
             if(error != 1 && paramCount > 0)
@@ -244,6 +235,7 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
                     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",i,resObj->retStatus[i]);
                 }
             }
+            
         }
         break;
 

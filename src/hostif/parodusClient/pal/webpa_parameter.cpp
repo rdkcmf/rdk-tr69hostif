@@ -75,9 +75,14 @@ void getValues (const char *paramName[], const unsigned int paramCount, param_t 
     for (cnt = 0; cnt < paramCount; cnt++)
     {
         // GetParamInfo is responsible for generating the output response including wild card. Allocate the memory for
-        (*retStatus)[cnt] =  GetParamInfo (paramName[cnt], paramValArr, &numParams,cnt);
-        (*retValCount)[cnt] = numParams;
-        RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Parameter Name: %s return: %d\n", paramName[cnt], (*retStatus)[cnt]);
+        if(strlen(paramName[cnt]) < MAX_PARAMETERNAME_LEN) {
+            (*retStatus)[cnt] =  GetParamInfo (paramName[cnt], paramValArr, &numParams,cnt);
+            (*retValCount)[cnt] = numParams;
+            RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Parameter Name: %s return: %d\n", paramName[cnt], (*retStatus)[cnt]);
+        } else {
+            (*retStatus)[cnt] = WDMP_ERR_INVALID_PARAMETER_NAME;
+            (*retValCount)[cnt] = 0; 
+        }
     }
 }
 /**
