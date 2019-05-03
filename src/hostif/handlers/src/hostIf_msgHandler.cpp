@@ -308,7 +308,8 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] Get proper manager for parameter :- %s \n", __FUNCTION__,stMsgHandlerData->paramName);
     if(NULL != paramMgrhash)
     {
-        GList *keys = g_hash_table_get_keys(paramMgrhash);
+        GList *list = g_hash_table_get_keys(paramMgrhash);
+        GList *keys = list;
         while(keys) {
             char *data = (char *)keys->data;
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] DATA = %s",__FUNCTION__, data);
@@ -323,72 +324,75 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
         {
             gpointer item_ptr = g_hash_table_lookup(paramMgrhash, (char *)keys->data);
             if(item_ptr == NULL) {
-                 RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Not able to find proper manager for param %s.\n",pParam);
-                 return pRet;
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Not able to find proper manager for param %s.\n",pParam);
             }
-            mgrId = (HostIf_ParamMgr_t)GPOINTER_TO_INT(item_ptr);
+            else
+            {
+                mgrId = (HostIf_ParamMgr_t)GPOINTER_TO_INT(item_ptr);
 
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s][For Parameter path: \"%s\"; Manager :%d ] \n", __FUNCTION__, pParam, mgrId);
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s][For Parameter path: \"%s\"; Manager :%d ] \n", __FUNCTION__, pParam, mgrId);
 
-            switch (mgrId) {
-            case HOSTIF_DSMgr:
-                pRet = DSClientReqHandler::getInstance();
-                break;
+                switch (mgrId) {
+                case HOSTIF_DSMgr:
+                    pRet = DSClientReqHandler::getInstance();
+                    break;
 #ifdef USE_XRESRC
-            case HOSTIF_XREMgr:
-                pRet = XREClientReqHandler::getInstance();
-                break;
+                case HOSTIF_XREMgr:
+                    pRet = XREClientReqHandler::getInstance();
+                    break;
 #endif /*USE_XRESRC*/
-            case HOSTIF_DeviceMgr:
-                pRet = DeviceClientReqHandler::getInstance();
-                break;
+                case HOSTIF_DeviceMgr:
+                    pRet = DeviceClientReqHandler::getInstance();
+                    break;
 #ifdef USE_MoCA_PROFILE
-            case HOSTIF_MoCAMgr:
-                pRet = MoCAClientReqHandler::getInstance();
-                break;
+                case HOSTIF_MoCAMgr:
+                    pRet = MoCAClientReqHandler::getInstance();
+                    break;
 #endif /* USE_MoCA_PROFILE*/
-            case HOSTIF_EthernetMgr:
-                pRet = EthernetClientReqHandler::getInstance();
-                break;
-            case HOSTIF_TimeMgr:
-                pRet = TimeClientReqHandler::getInstance();
-                break;
-            case HOSTIF_IPMgr:
-                pRet = IPClientReqHandler::getInstance();
-                break;
+                case HOSTIF_EthernetMgr:
+                    pRet = EthernetClientReqHandler::getInstance();
+                    break;
+                case HOSTIF_TimeMgr:
+                    pRet = TimeClientReqHandler::getInstance();
+                    break;
+                case HOSTIF_IPMgr:
+                    pRet = IPClientReqHandler::getInstance();
+                    break;
 #ifdef USE_WIFI_PROFILE
-            case HOSTIF_WiFiMgr:
-                pRet = WiFiReqHandler::getInstance();
-                break;
+                case HOSTIF_WiFiMgr:
+                    pRet = WiFiReqHandler::getInstance();
+                    break;
 #endif /* USE_WIFI_PROFILE*/
 #ifdef USE_DHCPv4_PROFILE
-            case HOSTIF_DHCPv4:
-                pRet = DHCPv4ClientReqHandler::getInstance();
-                break;
+                case HOSTIF_DHCPv4:
+                    pRet = DHCPv4ClientReqHandler::getInstance();
+                    break;
 #endif /* USE_DHCPv4_PROFILE*/	
 #ifdef USE_INTFSTACK_PROFILE				
-            case HOSTIF_InterfaceStack:
-                pRet = InterfaceStackClientReqHandler::getInstance();
-                break;
+                case HOSTIF_InterfaceStack:
+                    pRet = InterfaceStackClientReqHandler::getInstance();
+                    break;
 #endif /* USE_INTFSTACK_PROFILE */	
 #ifdef USE_STORAGESERVICE_PROFILE					
-            case HOSTIF_StorageSrvcMgr:
-                pRet = StorageSrvcReqHandler::getInstance();
-                break;
+                case HOSTIF_StorageSrvcMgr:
+                    pRet = StorageSrvcReqHandler::getInstance();
+                    break;
 #endif /* USE_STORAGESERVICE_PROFILE */
 #ifdef SNMP_ADAPTER_ENABLED
-            case HOSTIF_SNMPAdapterMgr:
-                pRet = SNMPClientReqHandler::getInstance();
-                break;
+                case HOSTIF_SNMPAdapterMgr:
+                    pRet = SNMPClientReqHandler::getInstance();
+                    break;
 #endif
-            default:
-                ;
+                default:
+                    ;
+                }
             }
         }
         else {
             RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()]Not able to get Key  parameter :- %s \n", __FUNCTION__,stMsgHandlerData->paramName);
         }
-
+        if (list)
+            g_list_free(list);
     }
     else
     {

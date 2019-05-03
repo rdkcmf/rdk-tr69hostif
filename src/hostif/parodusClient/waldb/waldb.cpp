@@ -169,7 +169,9 @@ int getNumberofInstances(const char* paramName)
                 if((*parametervalArr)[0].name)
                     free((*parametervalArr)[0].name);
                 free(*parametervalArr);
-                free(parametervalArr);
+            }
+            if(NULL != parametervalArr) {
+                 free(parametervalArr);
             }
         }
     }

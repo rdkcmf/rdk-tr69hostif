@@ -85,6 +85,7 @@ class hostIf_STBServiceXSDCard
     ~hostIf_STBServiceXSDCard() {};
 
 private:
+    static hostIf_STBServiceXSDCard *instance;
     int getCapacity(HOSTIF_MsgData_t *);
     int getCardFailed(HOSTIF_MsgData_t *);
     int getLifeElapsed(HOSTIF_MsgData_t *);
@@ -95,7 +96,6 @@ private:
     int getSerialNumber(HOSTIF_MsgData_t *);
     int getTSBQualified(HOSTIF_MsgData_t *);
     int getStatus(HOSTIF_MsgData_t *);
-
 public:
     static hostIf_STBServiceXSDCard *getInstance();
     static void closeInstance(hostIf_STBServiceXSDCard *);

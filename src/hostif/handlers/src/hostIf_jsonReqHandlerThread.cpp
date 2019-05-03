@@ -77,12 +77,11 @@ static int process_number(void * ctx, const char * numberVal, unsigned int numbe
 static int process_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen)
 {
     parser_state_t  *context = (parser_state_t *) ctx;
-    char        *string = NULL;
 
     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Process string: %d\n", context->state);
-    if ((context->state == STATE_PROCESSING) && (context->grabString))
+    if ((context->state == STATE_PROCESSING) && (context->grabString) && (stringLen<TR69HOSTIFMGR_MAX_PARAM_LEN-1))
     {
-        string = strndup((const char *)stringVal, stringLen);
+        char *string = strndup((const char *)stringVal, stringLen);
         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Adding string %s\n", string);
         context->list = g_list_append(context->list, string);
         context->grabString = FALSE;
@@ -195,14 +194,16 @@ hostIf_HTTPJsonParse(const unsigned char *message, int length)
     if (stat != yajl_status_ok)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Failed to parse in yajl_parse()\n", __FUNCTION__, __FILE__);
+    } else {
+        stat = yajl_parse_complete(parser);
+        if (stat != yajl_status_ok)
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Failed to parse in yajl_parse_complete()\n", __FUNCTION__, __FILE__);
+        }
     }
-
-    stat = yajl_parse_complete(parser);
-    if (stat != yajl_status_ok)
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Failed to parse in yajl_parse_complete()\n", __FUNCTION__, __FILE__);
+    if (parser) {
+        yajl_free(parser);
     }
-
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
     return context.list;
 }
@@ -297,7 +298,7 @@ void hostIf_HTTPJsonMsgHandler(
         l = l->next;
     }
     // Free the list, but do NOT deallocate the strings.  They're now in the requestList
-    g_list_free(params);
+    g_list_free_full(params, g_free);
     params = NULL;
 
     // Close out the structures

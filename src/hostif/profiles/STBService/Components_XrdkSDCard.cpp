@@ -80,20 +80,22 @@ typedef struct _strMgrSDcardPropParam_t {
 
 static bool getSDCardProperties(strMgrSDcardPropParam_t *);
 
+hostIf_STBServiceXSDCard *hostIf_STBServiceXSDCard::instance = NULL;
+
 hostIf_STBServiceXSDCard* hostIf_STBServiceXSDCard::getInstance()
 {
-    hostIf_STBServiceXSDCard* pRet = NULL;
-
-    if(!pRet)
+    if (!instance)
     {
-        try {
-            pRet = new hostIf_STBServiceXSDCard();
-        } catch(const std::exception& e)
+        try
+        {
+            instance = new hostIf_STBServiceXSDCard();
+        }
+        catch(const std::exception& e)
         {
             RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Caught exception \" %s\"\n", __FUNCTION__, e.what());
         }
     }
-    return pRet;
+    return instance;
 }
 
 

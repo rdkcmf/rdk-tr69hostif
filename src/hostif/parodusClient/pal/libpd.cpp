@@ -137,7 +137,7 @@ static void parodus_receive_wait()
             continue;
         }
 
-        if (wrp_msg->msg_type == WRP_MSG_TYPE__REQ)
+        if (wrp_msg && wrp_msg->msg_type == WRP_MSG_TYPE__REQ)
         {
             res_wrp_msg = (wrp_msg_t *)malloc(sizeof(wrp_msg_t));
             memset(res_wrp_msg, 0, sizeof(wrp_msg_t));
@@ -151,9 +151,13 @@ static void parodus_receive_wait()
                 res_wrp_msg->u.req.payload_size = strlen((const char *)res_wrp_msg->u.req.payload);
             }
             res_wrp_msg->msg_type = wrp_msg->msg_type;
-            res_wrp_msg->u.req.source = wrp_msg->u.req.dest;
-            res_wrp_msg->u.req.dest = wrp_msg->u.req.source;
-            res_wrp_msg->u.req.transaction_uuid = wrp_msg->u.req.transaction_uuid;
+            if(wrp_msg->u.req.dest != NULL)
+                res_wrp_msg->u.req.source = strdup(wrp_msg->u.req.dest);
+            if(wrp_msg->u.req.source != NULL) 
+                res_wrp_msg->u.req.dest = strdup(wrp_msg->u.req.source);
+            if(wrp_msg->u.req.transaction_uuid != NULL) 
+                res_wrp_msg->u.req.transaction_uuid = strdup(wrp_msg->u.req.transaction_uuid);
+            
             contentType = (char *)malloc(sizeof(char)*(strlen(CONTENT_TYPE_JSON)+1));
             strncpy(contentType,CONTENT_TYPE_JSON,strlen(CONTENT_TYPE_JSON)+1);
             res_wrp_msg->u.req.content_type = contentType;
@@ -170,8 +174,8 @@ static void parodus_receive_wait()
             getCurrentTime(endPtr);
             RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Elapsed time : %ld ms\n", timeValDiff(startPtr, endPtr));
             wrp_free_struct (res_wrp_msg);
+            wrp_free_struct(wrp_msg);
         }
-        free(wrp_msg);
     }
 
     libparodus_shutdown(&libparodus_instance);

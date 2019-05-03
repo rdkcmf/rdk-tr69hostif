@@ -492,7 +492,6 @@ void DSClientReqHandler::checkForUpdates()
 			pIfaceAudio->doUpdates(mUpdateCallback);
         }
     }
-
     g_list_free(devList);
     
     devList = hostIf_STBServiceSPDIF::getAllInstances();
@@ -505,7 +504,9 @@ void DSClientReqHandler::checkForUpdates()
             pIfaceSPDIF->doUpdates(mUpdateCallback);
         }
     }
-        
+    if(devList)
+        g_list_free(devList); 
+
     hostIf_STBServiceHDMI::releaseLock();
 }
 

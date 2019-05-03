@@ -63,18 +63,35 @@ X_RDKCENTRAL_COM_MeshTable::X_RDKCENTRAL_COM_MeshTable(int _dev_id):
     dev_id = _dev_id;
 }
 
-X_RDKCENTRAL_COM_MeshTable* X_RDKCENTRAL_COM_MeshTable::getInstance(int dev_id) {
-    X_RDKCENTRAL_COM_MeshTable* pRet = NULL;
+GHashTable *X_RDKCENTRAL_COM_MeshTable::ifHash = NULL;
 
-    if(!pRet) {
-        try {
-            pRet = new X_RDKCENTRAL_COM_MeshTable(dev_id);
-        } catch(int e)
+X_RDKCENTRAL_COM_MeshTable* X_RDKCENTRAL_COM_MeshTable::getInstance(int dev_id) {
+
+    X_RDKCENTRAL_COM_MeshTable* instance = NULL;
+
+    if (ifHash)
+    {
+        instance = (X_RDKCENTRAL_COM_MeshTable*) g_hash_table_lookup(ifHash, (gpointer) dev_id);
+    }
+    else
+    {
+        ifHash = g_hash_table_new(NULL, NULL);
+    }
+
+    if (!instance)
+    {
+        try
         {
-            RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"Caught exception, not able create MoCA Interface QoS instance..\n");
+            instance = new X_RDKCENTRAL_COM_MeshTable(dev_id);
+            g_hash_table_insert(ifHash, (gpointer)dev_id, instance);
+        }
+        catch(int e)
+        {
+            RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"Caught exception, not able create X_RDKCENTRAL_COM_MeshTable instance..\n");
         }
     }
-    return pRet;
+
+    return instance;
 }
 
 void X_RDKCENTRAL_COM_MeshTable::closeInstance(X_RDKCENTRAL_COM_MeshTable *pDev) {
