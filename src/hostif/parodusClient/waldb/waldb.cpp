@@ -459,7 +459,7 @@ static TiXmlNode* getList(TiXmlNode *pParent,char *paramName,char* currentParam,
             // Find all parameters
             for(bChild = pChild ; pChild ; pChild=pChild->NextSibling() )
             {
-                if(*paramCount <= MAX_NUM_PARAMETERS)
+                if(*paramCount < MAX_NUM_PARAMETERS)
                 {
                     if(strlen(currentParam) > 0)
                     {
