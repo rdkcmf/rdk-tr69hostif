@@ -54,6 +54,7 @@ PAROUDS_ENABLE_FLAG=" "
 NEW_HTTP_SERVER_DISABLE_FLAG=" "
 YOCTO_FLAG=" "
 IS_YOCTO_ENABLED=" "
+BLE_TILE_PROFILE=" "
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
 [AM_DEFAULT_VERBOSITY=1
@@ -329,7 +330,18 @@ AC_ARG_ENABLE([yocto],
 AM_CONDITIONAL([IS_YOCTO_ENABLED], [test x$IS_YOCTO_ENABLED = xtrue])
 AC_SUBST(YOCTO_FLAG)
 
-
+AC_ARG_ENABLE([ble-tile-profile],
+	[ AS_HELP_STRING([--enable-ble-tile-profile], [enable Bluetooth LE Tile Feature profile (default is no)])],
+        [
+        case "${enableval}" in
+	yes) ENABLE_BLE_TILE_PROFILE=true
+         BLE_TILE_PROFILE=" -DBLE_TILE_PROFILE"
+	     echo " Bluetooth LE Tile Profile is enabled";;
+	no)  ENABLE_BLE_TILE_PROFILE=false ;;
+	*) AC_MSG_ERROR([bad value ${enableval} for --enable-ble-tile-profile])
+	esac
+	],
+    [echo "Bluetooth LE Tile Profile is disabled"])
 
 AM_CONDITIONAL([WITH_MOCA_PROFILE], [test "x$enable_moca" = "xyes"])
 AM_CONDITIONAL([WITH_MOCA20], [test "x$enable_moca2" = "xyes"])
@@ -345,6 +357,7 @@ AM_CONDITIONAL([WITH_IPV6_SUPPORT], [test x$IPV6_SUPPORT_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_NOTIFICATION_SUPPORT], [test x$HAVE_VALUE_CHANGE_EVENT_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_WEBPA_RFC], [test x$WEBPA_RFC_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_SNMP_ADAPTER], [test x$SNMP_ADAPTER_ENABLE = xtrue])
+AM_CONDITIONAL([ENABLE_BLE_TILE_PROFILE], [test x$ENABLE_BLE_TILE_PROFILE = xtrue])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -397,6 +410,7 @@ AC_SUBST(HWSELFTEST_PROFILE_FLAG)
 AC_SUBST(SNMP_ADAPTER_FLAG)
 AC_SUBST(WIFI_CLIENT_ROAMING)
 AC_SUBST(NEW_HTTP_SERVER_DISABLE_FLAG)
+AC_SUBST(BLE_TILE_PROFILE)
 
 # files to generate via autotools (.am or .in source files)
 AC_CONFIG_FILES([Makefile])
