@@ -55,6 +55,7 @@
 #include <mutex>
 extern "C" {
 #include "btmgr.h"
+#include "lemgr_iarm_interface.h"
 }
 
 #define X_BT_ROOT_OBJ 			"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth."
@@ -68,6 +69,14 @@ extern "C" {
 #define X_BT_PAIRED_DEV_OBJ 	"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.PairedDevice"
 #define X_BT_CONNECTED_DEV_OBJ	"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.ConnectedDevice"
 #define X_BT_DEVICEINFO_OBJ		"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.DeviceInfo"
+
+//#define X_BT_BLE_TILE_OBJ		"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.BLE.Tile"
+#define BT_TILE_ID_STRING 				"BLE.Tile.Ring.Id"
+#define BT_TILE_SESSION_ID_STRING 		"BLE.Tile.Ring.SessionId"
+#define BT_TILE_TRIGGER_STRING			"BLE.Tile.Ring.Trigger"
+
+#define BT_TILE_CMD_REQUEST_STRING 		"BLE.Tile.Cmd.Request"
+
 #define BT_DEV_NAME_STRING 				"Name"
 #define BT_DEV_DEVICE_ID_STRING 		"DeviceID"
 #define BT_DEV_LOWENERGYENABLED_STRING	"LowEnergyEnabled"
@@ -106,6 +115,12 @@ private:
     static BTRMGR_ConnectedDevicesList_t connectedDevList;
 
     static updateCallback mUpdateCallback;
+
+    string tile_Id;
+    string sessionId;
+    bool   triggerFlag;
+    int do_Ring_A_Tile(bool );
+    int process_TileCmdRequest(HOSTIF_MsgData_t *stMsgData);
 
     int isEnabled(HOSTIF_MsgData_t *);
     int isDiscoveryEnabled(HOSTIF_MsgData_t *);
