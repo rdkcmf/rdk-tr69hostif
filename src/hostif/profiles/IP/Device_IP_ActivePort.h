@@ -150,9 +150,9 @@ class hostIf_IPActivePort {
     bool bCalledRemotePort;
     bool bCalledStatus;
 
-    char backupLocalIPAddress[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupRemoteIPAddress[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupStatus[TR69HOSTIFMGR_MAX_PARAM_LEN];
+    char backupLocalIPAddress[_LENGTH_IPADDR];
+    char backupRemoteIPAddress[_LENGTH_IPADDR];
+    char backupStatus[_LENGTH_IPADDR];
     unsigned int backupLocalPort;
     unsigned int backupRemotePort;
 

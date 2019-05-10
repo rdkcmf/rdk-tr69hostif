@@ -92,11 +92,11 @@ class  hostIf_STBServiceDisplayDevice
     int dev_id;
     device::VideoOutputPort& vPort;
 
-    char backupDisplayDeviceStatus[PARAM_LEN];
-    char backupEDID[PARAM_LEN];
-    char backupEDIDBytes[PARAM_LEN];
-    char backupSupportedResolution[PARAM_LEN];
-    char backupPreferredResolution[PARAM_LEN];
+    char backupDisplayDeviceStatus[_BUF_LEN_16];
+    char backupEDID[_BUF_LEN_256];
+    char backupEDIDBytes[_BUF_LEN_256];
+    char backupSupportedResolution[_BUF_LEN_16];
+    char backupPreferredResolution[_BUF_LEN_16];
 
     bool bCalledDisplayDeviceStatus;
     bool bCalledEDID;

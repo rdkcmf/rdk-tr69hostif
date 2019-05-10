@@ -150,8 +150,6 @@ hostIf_STBServiceSPDIF::hostIf_STBServiceSPDIF(int devid, device::AudioOutputPor
 {
     backupEnable = false;
     strcpy(backupStatus, " ");
-    strcpy(backupAlias, " ");
-    strcpy(backupName, " ");
     backupForcePCM = false;
     backupPassthrough = false;
     backupAudioDelay = 0;
@@ -453,8 +451,8 @@ int hostIf_STBServiceSPDIF::getStatus(HOSTIF_MsgData_t *stMsgData, bool *pChange
         *pChanged = true;
     }
     bCalledStatus = true;
-    strncpy(backupStatus, stMsgData->paramValue, PARAM_LEN);
-    backupStatus[PARAM_LEN-1] = '\0';
+    strncpy(backupStatus, stMsgData->paramValue, _BUF_LEN_16-1);
+    backupStatus[_BUF_LEN_16-1] = '\0';
     return ret;
 }
 

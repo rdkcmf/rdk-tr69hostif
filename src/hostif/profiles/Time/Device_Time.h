@@ -145,8 +145,8 @@ class hostIf_Time {
 
     bool bCalledLocalTimeZone;
     bool bCalledCurrentLocalTime;
-    char backupLocalTimeZone[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupCurrentLocalTime[TR69HOSTIFMGR_MAX_PARAM_LEN];
+    char backupLocalTimeZone[_BUF_LEN_64];
+    char backupCurrentLocalTime[_BUF_LEN_64];
     hostIf_Time(int dev_id);
 
     ~hostIf_Time();

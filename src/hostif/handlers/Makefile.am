@@ -99,11 +99,18 @@ libMsgHandlers_la_SOURCES =	src/hostIf_IARM_ReqHandler.cpp \
 				src/hostIf_DeviceClient_ReqHandler.cpp \
 				src/hostIf_XREClient_ReqHandler.cpp \
 				src/hostIf_updateHandler.cpp \
-				src/hostIf_MoCAClient_ReqHandler.cpp \
 				src/hostIf_TimeClient_ReqHandler.cpp \
 				src/hostIf_IPClient_ReqHandler.cpp \
-				src/hostIf_EthernetClient_ReqHandler.cpp \
-				src/hostIf_WiFi_ReqHandler.cpp 
+				src/hostIf_EthernetClient_ReqHandler.cpp
+
+if WITH_MOCA_PROFILE
+libMsgHandlers_la_SOURCES +=    src/hostIf_MoCAClient_ReqHandler.cpp
+endif
+
+if WITH_WIFI_PROFILE
+libMsgHandlers_la_SOURCES +=    src/hostIf_WiFi_ReqHandler.cpp
+endif
+
 if WITH_DHCP_PROFILE
 libMsgHandlers_la_SOURCES +=	src/hostIf_DHCPv4Client_ReqHandler.cpp
 endif

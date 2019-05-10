@@ -97,14 +97,15 @@ void hostIf_StorageSrvc::closeAllInstances()
 {
     if(storageSrvHash)
     {
-        GList* tmp_list = g_hash_table_get_values (storageSrvHash);
-
+        GList* val_list = g_hash_table_get_values (storageSrvHash);
+        GList* tmp_list = val_list;
         while(tmp_list)
         {
            hostIf_StorageSrvc* pDev = (hostIf_StorageSrvc *)tmp_list->data;
            tmp_list = tmp_list->next;
            closeInstance(pDev);
         }
+        g_list_free(val_list);
     }
 }
 

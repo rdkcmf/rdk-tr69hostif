@@ -18,7 +18,7 @@
 ##########################################################################
 noinst_LTLIBRARIES=libwaldb.la
 libwaldb_la_SOURCES=waldb.cpp
-libwaldb_la_LDFLAGS=-ltinyxml -lIARMBus
+libwaldb_la_LDFLAGS=-ltinyxml2 -lIARMBus
 AM_CXXFLAGS = -I$(top_srcdir)/include \
               -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/wdmp-c \
               -I$(top_srcdir)/src/hostif/parodusClient/waldb \

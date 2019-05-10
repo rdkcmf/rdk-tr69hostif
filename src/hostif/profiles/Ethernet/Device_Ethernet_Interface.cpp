@@ -525,14 +525,14 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Status(HOSTIF_MsgDat
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eStatus);
 
-    if(bCalledStatus && pChanged && strncmp(stEthInterface.status,backupStatus,TR69HOSTIFMGR_MAX_PARAM_LEN))
+    if(bCalledStatus && pChanged && strncmp(stEthInterface.status,backupStatus,_BUF_LEN_16-1))
     {
         *pChanged = true;
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] Ethernet Interface Status Changed..", __FUNCTION__, __FILE__, __LINE__);
     }
     bCalledStatus = true;
     strcpy(backupStatus, stEthInterface.status);
-    strncpy(stMsgData->paramValue,stEthInterface.status,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(stMsgData->paramValue,stEthInterface.status,_BUF_LEN_16-1 );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stEthInterface.status);
     return OK;
@@ -554,13 +554,13 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Name(HOSTIF_MsgData_
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eName);
 
-    if(bCalledName && pChanged && strncmp(stEthInterface.name,backupName,TR69HOSTIFMGR_MAX_PARAM_LEN))
+    if(bCalledName && pChanged && strncmp(stEthInterface.name,backupName,_BUF_LEN_16-1))
     {
         *pChanged = true;
     }
     bCalledName = true;
     strcpy(backupName, stEthInterface.name);
-    strncpy(stMsgData->paramValue,stEthInterface.name,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(stMsgData->paramValue,stEthInterface.name,_BUF_LEN_16-1 );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stEthInterface.name);
 
@@ -664,13 +664,13 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_MACAddress(HOSTIF_Ms
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eMACAddress);
 
-    if(bCalledMACAddress && pChanged && strncmp(stEthInterface.mACAddress,backupMACAddress,TR69HOSTIFMGR_MAX_PARAM_LEN))
+    if(bCalledMACAddress && pChanged && strncmp(stEthInterface.mACAddress,backupMACAddress,S_LENGTH-1))
     {
         *pChanged = true;
     }
     bCalledMACAddress = true;
     strcpy(backupMACAddress, stEthInterface.mACAddress);
-    strncpy(stMsgData->paramValue,stEthInterface.mACAddress,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(stMsgData->paramValue,stEthInterface.mACAddress,S_LENGTH );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stEthInterface.mACAddress);
 
@@ -726,13 +726,13 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_DuplexMode(HOSTIF_Ms
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eDuplexMode);
 
-    if(bCalledDuplexMode && pChanged && strncmp(stEthInterface.duplexMode,backupDuplexMode,TR69HOSTIFMGR_MAX_PARAM_LEN))
+    if(bCalledDuplexMode && pChanged && strncmp(stEthInterface.duplexMode,backupDuplexMode,_BUF_LEN_16-1))
     {
         *pChanged = true;
     }
     bCalledDuplexMode = true;
     strcpy(backupDuplexMode, stEthInterface.duplexMode);
-    strncpy(stMsgData->paramValue,stEthInterface.duplexMode,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(stMsgData->paramValue,stEthInterface.duplexMode,_BUF_LEN_16-1 );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stEthInterface.duplexMode);
 

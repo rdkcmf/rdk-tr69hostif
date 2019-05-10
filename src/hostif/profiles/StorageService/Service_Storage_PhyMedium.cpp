@@ -200,14 +200,15 @@ void hostIf_PhysicalMedium::closeAllInstances()
 {
     if(phyMedHash)
     {
-        GList* tmp_list = g_hash_table_get_values (phyMedHash);
-
+        GList* values_list = g_hash_table_get_values (phyMedHash);
+        GList* tmp_list = values_list;
         while(tmp_list)
         {
            hostIf_PhysicalMedium* pDev = (hostIf_PhysicalMedium *)tmp_list->data;
            tmp_list = tmp_list->next;
            closeInstance(pDev);
         }
+        g_list_free(values_list);
     }
 }
 

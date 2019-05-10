@@ -118,18 +118,18 @@ class hostIf_STBServiceAudioInterface
     int dev_id;
     device::AudioOutputPort& aPort;
 
-    char backupStatus[PARAM_LEN];
+    char backupStatus[_BUF_LEN_16];
     bool backupCancelMute;
-    char backupAudioStereoMode[PARAM_LEN];
+    char backupAudioStereoMode[_BUF_LEN_16];
     unsigned int backupAudioLevel;
-    char backupAudioDB[PARAM_LEN];
-    char backupAudioLoopThru[PARAM_LEN];
-    char backupAudioCompression[PARAM_LEN];
-    char backupAudioEncoding[PARAM_LEN];
-    char backupAudioGain[PARAM_LEN];
-    char backupMinAudioDB[PARAM_LEN];
-    char backupMaxAudioDB[PARAM_LEN];
-    char backupAudioOptimalLevel[PARAM_LEN];
+    char backupAudioDB[_BUF_LEN_16];
+    char backupAudioLoopThru[_BUF_LEN_16];
+    char backupAudioCompression[_BUF_LEN_16];
+    char backupAudioEncoding[_BUF_LEN_16];
+    char backupAudioGain[_BUF_LEN_16];
+    char backupMinAudioDB[_BUF_LEN_16];
+    char backupMaxAudioDB[_BUF_LEN_16];
+    char backupAudioOptimalLevel[_BUF_LEN_16];
 
     bool bCalledStatus;
     bool bCalledCancelMute;

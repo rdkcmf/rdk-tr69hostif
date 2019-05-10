@@ -358,8 +358,8 @@ int hostIf_STBServiceVideoOutput::getStatus(HOSTIF_MsgData_t *stMsgData,bool *pC
             *pChanged = true;
         }
         bCalledVideoOutputStatus = true;
-        strncpy(backupVideoOutputStatus,stMsgData->paramValue,PARAM_LEN);
-        backupVideoOutputStatus[PARAM_LEN-1] = '\0';
+        strncpy(backupVideoOutputStatus,stMsgData->paramValue,_BUF_LEN_16-1);
+        backupVideoOutputStatus[_BUF_LEN_16-1] = '\0';
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
@@ -390,13 +390,13 @@ int hostIf_STBServiceVideoOutput::getAspectRatioBehaviour(HOSTIF_MsgData_t *stMs
         stMsgData->paramValue[PARAM_LEN-1] = '\0';
         stMsgData->paramtype = hostIf_StringType;
         stMsgData->paramLen = strlen(stMsgData->paramValue);
-        if(bCalledAspectRatioBehaviour && pChanged && strncmp(backupAspectRatioBehaviour,stMsgData->paramValue,PARAM_LEN))
+        if(bCalledAspectRatioBehaviour && pChanged && strncmp(backupAspectRatioBehaviour,stMsgData->paramValue,_BUF_LEN_16-1))
         {
             *pChanged = true;
         }
         bCalledAspectRatioBehaviour = true;
-        strncpy(backupAspectRatioBehaviour,stMsgData->paramValue,PARAM_LEN);
-        backupAspectRatioBehaviour[PARAM_LEN-1] = '\0';
+        strncpy(backupAspectRatioBehaviour,stMsgData->paramValue,_BUF_LEN_16-1);
+        backupAspectRatioBehaviour[_BUF_LEN_16-1] = '\0';
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
@@ -433,8 +433,8 @@ int hostIf_STBServiceVideoOutput::getVideoFormat(HOSTIF_MsgData_t *stMsgData,boo
             *pChanged = true;
         }
         bCalledVideoFormat = true;
-        strncpy(backupVideoFormat,stMsgData->paramValue,PARAM_LEN);
-        backupVideoFormat[PARAM_LEN-1] = '\0';
+        strncpy(backupVideoFormat,stMsgData->paramValue,_BUF_LEN_16-1);
+        backupVideoFormat[_BUF_LEN_16-1] = '\0';
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
@@ -469,8 +469,8 @@ int hostIf_STBServiceVideoOutput::getDisplayFormat(HOSTIF_MsgData_t *stMsgData,b
             *pChanged = true;
         }
         bCalledDisplayFormat = true;
-        strncpy(backupDisplayFormat,stMsgData->paramValue,PARAM_LEN);
-        backupDisplayFormat[PARAM_LEN-1] = '\0';
+        strncpy(backupDisplayFormat,stMsgData->paramValue,_BUF_LEN_16-1);
+        backupDisplayFormat[_BUF_LEN_16-1] = '\0';
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);

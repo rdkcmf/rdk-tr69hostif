@@ -84,9 +84,9 @@ class  hostIf_STBServiceVideoDecoder
     static GMutex *m_mutex;
     int dev_id;
 
-    char backupContentAspectRatio[PARAM_LEN];
+    char backupContentAspectRatio[_BUF_LEN_16];
     bool backupStandby;
-    char backupVideoDecoderStatus[PARAM_LEN];
+    char backupVideoDecoderStatus[_BUF_LEN_16];
 
     bool bCalledContentAspectRatio;
     bool bCalledStandby;

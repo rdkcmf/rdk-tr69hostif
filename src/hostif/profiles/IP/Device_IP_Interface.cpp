@@ -151,7 +151,7 @@ hostIf_IPInterface::hostIf_IPInterface(int dev_id):
 {
     strcpy(backupType,"");
     strcpy(backupName,"");
-    strcpy(backupName,"");
+    strcpy(backupStatus,"");
 }
 
 hostIf_IPInterface* hostIf_IPInterface::getInstance(int dev_id)
@@ -538,13 +538,13 @@ int hostIf_IPInterface::get_Interface_Status(HOSTIF_MsgData_t *stMsgData, bool *
 
     getInterfaceOperationalState (stIPInterfaceInstance.status);
 
-    if(bCalledStatus && pChanged && strncmp(stIPInterfaceInstance.status, backupStatus,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+    if(bCalledStatus && pChanged && strncmp(stIPInterfaceInstance.status, backupStatus,_BUF_LEN_16 ))
     {
         *pChanged = true;
     }
     bCalledStatus = true;
     strncpy(stMsgData->paramValue,stIPInterfaceInstance.status,TR69HOSTIFMGR_MAX_PARAM_LEN );
-    strncpy(backupStatus,stIPInterfaceInstance.status,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(backupStatus,stIPInterfaceInstance.status,_BUF_LEN_16 );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stIPInterfaceInstance.status);
 
@@ -601,13 +601,13 @@ int hostIf_IPInterface::get_Interface_Name(HOSTIF_MsgData_t *stMsgData, bool *pC
 
     RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s(): Interface name = %s \n", __FUNCTION__, stIPInterfaceInstance.name);
 
-    if(bCalledName && pChanged && strncmp(stIPInterfaceInstance.name, backupName,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+    if(bCalledName && pChanged && strncmp(stIPInterfaceInstance.name, backupName,_BUF_LEN_16 ))
     {
         *pChanged = true;
     }
     bCalledName = true;
     strncpy(stMsgData->paramValue,stIPInterfaceInstance.name,TR69HOSTIFMGR_MAX_PARAM_LEN );
-    strncpy(backupName,stIPInterfaceInstance.name,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(backupName,stIPInterfaceInstance.name,_BUF_LEN_16 );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stIPInterfaceInstance.name);
 
@@ -792,13 +792,13 @@ int hostIf_IPInterface::get_Interface_Type(HOSTIF_MsgData_t *stMsgData, bool *pC
 
     RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s(): Type: %s \n", __FUNCTION__, stIPInterfaceInstance.type);
 
-    if(bCalledType && pChanged && strncmp(stIPInterfaceInstance.type, backupType,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+    if(bCalledType && pChanged && strncmp(stIPInterfaceInstance.type, backupType,_BUF_LEN_16 ))
     {
         *pChanged = true;
     }
     bCalledType = true;
     strncpy(stMsgData->paramValue,stIPInterfaceInstance.type,TR69HOSTIFMGR_MAX_PARAM_LEN );
-    strncpy(backupType,stIPInterfaceInstance.type,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(backupType,stIPInterfaceInstance.type,_BUF_LEN_16 );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stIPInterfaceInstance.type);
 

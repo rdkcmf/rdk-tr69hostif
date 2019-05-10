@@ -98,11 +98,11 @@ class  hostIf_STBServiceVideoOutput
     int dev_id;
     device::VideoOutputPort& vPort;
 
-    char backupAspectRatioBehaviour[PARAM_LEN];
-    char backupDisplayFormat[PARAM_LEN];
-    char backupVideoFormat[PARAM_LEN];
+    char backupAspectRatioBehaviour[_BUF_LEN_16];
+    char backupDisplayFormat[_BUF_LEN_16];
+    char backupVideoFormat[_BUF_LEN_16];
     bool backupHDCP;
-    char backupVideoOutputStatus[PARAM_LEN];
+    char backupVideoOutputStatus[_BUF_LEN_16];
 
     bool bCalledAspectRatioBehaviour;
     bool bCalledDisplayFormat;

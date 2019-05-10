@@ -120,7 +120,7 @@ typedef enum EEthInterfaceMembers
 typedef struct Device_Ethernet_Interface
 {
     bool enable;
-    char status[S_LENGTH];
+    char status[_BUF_LEN_16];
     char alias[A_LENGTH];
     char name[A_LENGTH];
     unsigned int lastChange;
@@ -128,7 +128,7 @@ typedef struct Device_Ethernet_Interface
     bool upStream;
     char mACAddress[S_LENGTH];
     int maxBitRate;
-    char duplexMode[S_LENGTH];
+    char duplexMode[_BUF_LEN_16];
 } EthernetInterface;
 /** @} */ //End of the Doxygen tag TR69_HOSTIF_ETHERNET_INTERFACE_DEVICE_DSSTRUCT
 
@@ -208,10 +208,10 @@ class hostIf_EthernetInterface {
     bool backupEnable;
     bool backupUpstream;
     int backupMaxBitRate;
-    char backupStatus[TR69HOSTIFMGR_MAX_PARAM_LEN+1];
-    char backupName[TR69HOSTIFMGR_MAX_PARAM_LEN+1];
-    char backupMACAddress[TR69HOSTIFMGR_MAX_PARAM_LEN+1];
-    char backupDuplexMode[TR69HOSTIFMGR_MAX_PARAM_LEN+1];
+    char backupStatus[_BUF_LEN_16];
+    char backupName[_BUF_LEN_16];
+    char backupMACAddress[S_LENGTH];
+    char backupDuplexMode[_BUF_LEN_16];
 
     bool bCalledEnable;
     bool bCalledStatus;

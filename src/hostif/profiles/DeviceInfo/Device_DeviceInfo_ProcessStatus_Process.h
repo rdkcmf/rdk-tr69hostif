@@ -56,8 +56,7 @@
 #include "hostIf_utils.h"
 
 #define _COMMAND_LENGTH 256
-#define _STATE_LENGTH 64
-#define _LENGTH_PARAMETER 64
+#define _STATE_LENGTH 16
 #define PROCESS_STATE_RUNNING "Running"
 #define PROCESS_STATE_SLEEPING "Sleeping"
 #define PROCESS_STATE_STOPPED "Stopped"

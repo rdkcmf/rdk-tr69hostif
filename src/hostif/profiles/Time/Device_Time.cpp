@@ -164,7 +164,7 @@ int hostIf_Time::get_Device_Time_LocalTimeZone(HOSTIF_MsgData_t *stMsgData, bool
     struct timeval time_now;
     struct tm *newtime = NULL;
 
-    char tmp[TR69HOSTIFMGR_MAX_PARAM_LEN];
+    char tmp[_BUF_LEN_64];
 
     gettimeofday(&time_now, NULL);
 
@@ -175,14 +175,14 @@ int hostIf_Time::get_Device_Time_LocalTimeZone(HOSTIF_MsgData_t *stMsgData, bool
         return NOK;
     }
 
-    if(bCalledLocalTimeZone && pChanged && strncmp(tmp, backupLocalTimeZone,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+    if(bCalledLocalTimeZone && pChanged && strncmp(tmp, backupLocalTimeZone,_BUF_LEN_64))
     {
         *pChanged = true;
     }
 
     bCalledLocalTimeZone = true;
-    strcpy(stMsgData->paramValue,tmp);
-    strcpy(backupLocalTimeZone,tmp);
+    strncpy(stMsgData->paramValue,tmp,_BUF_LEN_64-1);
+    strncpy(backupLocalTimeZone,tmp,_BUF_LEN_64-1);
 
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stMsgData->paramValue);
@@ -221,7 +221,7 @@ int hostIf_Time::get_Device_Time_CurrentLocalTime(HOSTIF_MsgData_t *stMsgData, b
 {
     time_t rawtime;
     struct tm * timeinfo;
-    char buffer [36] = {'\0'};
+    char buffer [_BUF_LEN_64] = {'\0'};
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FILE__, __FUNCTION__);
     char timeZoneTmp[7];
     memset(timeZoneTmp, 0, sizeof(timeZoneTmp));
@@ -229,11 +229,11 @@ int hostIf_Time::get_Device_Time_CurrentLocalTime(HOSTIF_MsgData_t *stMsgData, b
     time (&rawtime);
     timeinfo = localtime (&rawtime);
 
-    strftime(buffer, 80,  "%Y-%m-%dT%H:%M:%S", timeinfo);
+    strftime(buffer,_BUF_LEN_64-1,  "%Y-%m-%dT%H:%M:%S", timeinfo);
     strftime(timeZoneTmp, sizeof(timeZoneTmp),  "%z", timeinfo);
     sprintf(buffer + strlen(buffer), ".%0.6d%s", timeinfo->tm_sec, timeZoneTmp);
 
-    if(bCalledCurrentLocalTime && pChanged && strncmp(buffer, backupCurrentLocalTime,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+    if(bCalledCurrentLocalTime && pChanged && strncmp(buffer, backupCurrentLocalTime, _BUF_LEN_64 ))
     {
         *pChanged = true;
     }

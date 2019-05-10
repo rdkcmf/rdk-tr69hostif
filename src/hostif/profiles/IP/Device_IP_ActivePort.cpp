@@ -171,7 +171,7 @@ hostIf_IPActivePort* hostIf_IPActivePort::getInstance(int dev_id)
 GList* hostIf_IPActivePort::getAllInstances()
 {
     if(ifHash)
-        return g_hash_table_get_keys(ifHash);
+       return g_hash_table_get_keys(ifHash);
     return NULL;
 }
 
@@ -188,7 +188,8 @@ void hostIf_IPActivePort::closeAllInstances()
 {
     if(ifHash)
     {
-        GList* tmp_list = g_hash_table_get_values (ifHash);
+        GList* tmp_list_original = g_hash_table_get_values (ifHash);
+        GList* tmp_list = tmp_list_original;
 
         while(tmp_list)
         {
@@ -196,6 +197,7 @@ void hostIf_IPActivePort::closeAllInstances()
             tmp_list = tmp_list->next;
             closeInstance(pDev);
         }
+        g_list_free(tmp_list_original);
     }
 }
 
@@ -266,13 +268,13 @@ int hostIf_IPActivePort::get_Device_IP_ActivePort_LocalIPAddress(HOSTIF_MsgData_
     /*Retrieving value */
     getActivePortsFields(dev_id);
 
-    if(bCalledLocalIPAddress && pChanged && strncmp(activePort.localIpAddress,backupLocalIPAddress,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+    if(bCalledLocalIPAddress && pChanged && strncmp(activePort.localIpAddress,backupLocalIPAddress,_LENGTH_IPADDR ))
     {
         *pChanged =  true;
     }
     bCalledLocalIPAddress = true;
-    strncpy(backupLocalIPAddress,activePort.localIpAddress,TR69HOSTIFMGR_MAX_PARAM_LEN );
-    strncpy(stMsgData->paramValue,activePort.localIpAddress,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(backupLocalIPAddress,activePort.localIpAddress,_LENGTH_IPADDR );
+    strncpy(stMsgData->paramValue,activePort.localIpAddress,_LENGTH_IPADDR );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen( activePort.localIpAddress);
 
@@ -329,13 +331,13 @@ int hostIf_IPActivePort::get_Device_IP_ActivePort_RemoteIPAddress(HOSTIF_MsgData
 {
     /*Retrieving value */
     getActivePortsFields(dev_id);
-    if(bCalledRemoteIPAddress && pChanged && strncmp(activePort.remoteIpAddress,backupRemoteIPAddress,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+    if(bCalledRemoteIPAddress && pChanged && strncmp(activePort.remoteIpAddress,backupRemoteIPAddress,_LENGTH_IPADDR ))
     {
         *pChanged =  true;
     }
     bCalledRemoteIPAddress = true;
-    strncpy(backupRemoteIPAddress,activePort.remoteIpAddress,TR69HOSTIFMGR_MAX_PARAM_LEN );
-    strncpy(stMsgData->paramValue,activePort.remoteIpAddress,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(backupRemoteIPAddress,activePort.remoteIpAddress,_LENGTH_IPADDR );
+    strncpy(stMsgData->paramValue,activePort.remoteIpAddress,_LENGTH_IPADDR );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen( activePort.remoteIpAddress);
     return OK;
@@ -390,13 +392,13 @@ int hostIf_IPActivePort::get_Device_IP_ActivePort_Status(HOSTIF_MsgData_t *stMsg
 {
     /*Retrieving value */
     getActivePortsFields(dev_id);
-    if(bCalledStatus && pChanged && strncmp(activePort.status,backupStatus,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+    if(bCalledStatus && pChanged && strncmp(activePort.status,backupStatus,_LENGTH_IPADDR ))
     {
         *pChanged =  true;
     }
     bCalledStatus = true;
-    strncpy(backupStatus,activePort.status,TR69HOSTIFMGR_MAX_PARAM_LEN );
-    strncpy(stMsgData->paramValue,activePort.status,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(backupStatus,activePort.status,_LENGTH_STATUS-1);
+    strncpy(stMsgData->paramValue,activePort.status,_LENGTH_STATUS-1 );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen( activePort.status);
     return OK;

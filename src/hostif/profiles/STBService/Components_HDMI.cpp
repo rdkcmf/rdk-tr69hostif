@@ -491,8 +491,8 @@ int hostIf_STBServiceHDMI::getResolutionValue(HOSTIF_MsgData_t *stMsgData,bool *
                 *pChanged = true;
             }
             bCalledResolutionValue = true;
-            strncpy(backupResolutionValue, stMsgData->paramValue, PARAM_LEN);
-            backupResolutionValue[PARAM_LEN-1] = '\0';
+            strncpy(backupResolutionValue, stMsgData->paramValue, _BUF_LEN_16-1);
+            backupResolutionValue[_BUF_LEN_16-1] = '\0';
         }
         stMsgData->paramtype = hostIf_StringType;
         stMsgData->paramLen = strlen(stMsgData->paramValue);
@@ -620,8 +620,8 @@ int hostIf_STBServiceHDMI::getStatus(HOSTIF_MsgData_t *stMsgData, bool *pChanged
             *pChanged = true;
         }
         bCalledStatus = true;
-        strncpy(backupStatus, stMsgData->paramValue, PARAM_LEN);
-        backupStatus[PARAM_LEN-1] = '\0';
+        strncpy(backupStatus, stMsgData->paramValue, _BUF_LEN_16-1);
+        backupStatus[_BUF_LEN_16-1] = '\0';
     }
     return ret;
 }
@@ -646,8 +646,8 @@ int hostIf_STBServiceHDMI::getName(HOSTIF_MsgData_t *stMsgData, bool *pChanged)
         *pChanged = true;
     }
     bCalledName = true;
-    strncpy(backupName, stMsgData->paramValue, PARAM_LEN);
-    backupName[PARAM_LEN-1] = '\0';
+    strncpy(backupName, stMsgData->paramValue, _BUF_LEN_256-1);
+    backupName[_BUF_LEN_256-1] = '\0';
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stMsgData->paramValue);
     return OK;
