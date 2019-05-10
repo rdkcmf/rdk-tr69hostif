@@ -24,6 +24,7 @@
 #include "libIBus.h"
 #include "webpa_parameter.h"
 #include "hostIf_main.h"
+#include "hostIf_utils.h"
 #include "hostIf_tr69ReqHandler.h"
 
 
@@ -31,6 +32,7 @@
 #define MAX_DATATYPE_LENGTH 48
 #define MAX_NUM_PARAMETERS 2048
 #define INSTANCE_NUMBER_INDICATOR "{i}."
+#define INSTANCE_CHAR_INDICATOR ".{i}."
 #define MAX_PARAM_LENGTH TR69HOSTIFMGR_MAX_PARAM_LEN
 #define BLUETOOTH_DISCOVERED_DEVICE_COUNT_PARAM  "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.DiscoveredDeviceCnt"
 #define BLUETOOTH_PAIRED_DEVICE_COUNT_PARAM  "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.PairedDeviceCnt"
@@ -660,97 +662,67 @@ int getParamInfoFromDataModel(void *dbhandle,const char *paramName, DataModelPar
     int first_i = 0;
     TiXmlDocument *doc = (TiXmlDocument *) dbhandle;
     char *newparamName = NULL;
+    char *frontPart = NULL;
+    char *rearPart = NULL;
+    std::string str_obj;
+    int inst = 0;
+    size_t pos = 0, found = 0, found_nonDigit = 0;
 
     /* Check if Parameter is one of {i} entriesi ex:Device.WiFi.Radio.1.Status should become Device.WiFi.Radio.{i}.Status */
-    std::string str(paramName);
-    std::size_t found = str.find_first_of("0123456789");
-    if(found != std::string::npos)
+    if(paramName != NULL)
     {
-        /* Check if match happens without a {i} */
         checkforParameterMatch(doc,paramName,&Match,dmParam);
         if(Match)
-            return true;
-        first_i = found+1;
-        newparamName =(char *) malloc(sizeof(char) * MAX_PARAMETER_LENGTH);
-        char splitParam[MAX_PARAMETER_LENGTH] = "{i}";
-        if(paramName[found+1] == '.')
+            return Match;
+
+        str_obj = (const char*)paramName;
+        newparamName = (char *) malloc(sizeof(char) * MAX_PARAMETER_LENGTH);
+        frontPart = (char *) malloc(sizeof(char) * MAX_PARAMETER_LENGTH);
+        memset(newparamName,0, MAX_PARAMETER_LENGTH);
+        memset(frontPart,0, MAX_PARAMETER_LENGTH);
+        found = str_obj.find_first_of("0123456789");
+        strncpy(newparamName,paramName,MAX_PARAMETER_LENGTH);
+        while(found != std::string::npos)
         {
-            strncpy(newparamName,paramName,found);
-            newparamName[found]='\0';
-            strncat(splitParam,str.substr(found+1).data(),MAX_PARAMETER_LENGTH-1);
-            splitParam[MAX_PARAMETER_LENGTH-1]='\0';
-            // Check for Parameter Match with first {i}
-            strncat(newparamName,splitParam,MAX_PARAMETER_LENGTH-1);
-            newparamName[MAX_PARAMETER_LENGTH-1]='\0';
-            checkforParameterMatch(doc,(const char*)newparamName,&Match,dmParam);
+            /* Check if match happens without a {i} */
+            checkforParameterMatch(doc,paramName,&Match,dmParam);
             if(Match)
-                goto freeResources;
-        }
-        else
-        {
-            strncpy(newparamName,paramName,found+1);
-            newparamName[found+1]='\0';
-            strncpy(splitParam,paramName+found+1,MAX_PARAMETER_LENGTH);
-            splitParam[MAX_PARAMETER_LENGTH-1]='\0';
-        }
-
-        // Check if splitParam has a digit
-        std::string str(splitParam);
-        std::size_t found = str.find_first_of("0123456789");
-        if(found != std::string::npos)
-        {
-            strncpy(newparamName,paramName,first_i);
-            newparamName[first_i] = '\0';
-
-            if(splitParam[found+1]=='.')
             {
-                splitParam[found]='\0';
-                strcat(splitParam,"{i}");
-                strncat(splitParam,str.substr(found+1).data(),MAX_PARAMETER_LENGTH-1);
-                splitParam[MAX_PARAMETER_LENGTH-1]='\0';
-
-                strncat(newparamName,splitParam+3,MAX_PARAMETER_LENGTH-1);
-                newparamName[MAX_PARAMETER_LENGTH-1]='\0';
-                checkforParameterMatch(doc,(const char*)newparamName,&Match,dmParam);
-                if(Match)
-                    goto freeResources;
+                break;
             }
-            else
+            found_nonDigit = str_obj.find_first_not_of("0123456789",found);
+            if(str_obj[found-1] == '.' && str_obj[found_nonDigit] == '.')
             {
-                /* Find if there are more {i} entries */
-                int first_num = found;
-                std::string str(splitParam+first_num+1);
-                std::size_t found = str.find_first_of("0123456789");
-                if(found != std::string::npos)
+                memset(frontPart,0,MAX_PARAMETER_LENGTH);
+                strncpy(frontPart,str_obj.substr(pos,found-1).data(),found-1);
+                if( matchComponent((const char*)newparamName,(const char*)frontPart,(const char**)&rearPart,inst) )
                 {
-                    splitParam[found+first_num]='\0';
-                    strcat(splitParam,".{i}");
-                    strncat(splitParam,str.substr(found+1).data(),MAX_PARAMETER_LENGTH-1);
-                    splitParam[MAX_PARAMETER_LENGTH-1]='\0';
-                    //Check for parameter match with second {i}
-                    strncat(newparamName,splitParam+3,MAX_PARAMETER_LENGTH-1);
-                    newparamName[MAX_PARAMETER_LENGTH-1]='\0';
+                    strncat(frontPart,INSTANCE_CHAR_INDICATOR,5);
+                    strncat(frontPart,rearPart,MAX_PARAMETER_LENGTH);
+                    strncpy(newparamName,frontPart,MAX_PARAMETER_LENGTH);
                     checkforParameterMatch(doc,(const char*)newparamName,&Match,dmParam);
-                    if(Match)
-                        goto freeResources;
+                    if(Match){ break;}
                 }
-            }
+                else
+                {
+                    Match = 0;
+                    break;
+                }
+            } // if non instance integer is found, continue to next digit search from that position.
+            str_obj = (const char*)newparamName;
+            found = str_obj.find_first_of("0123456789",found_nonDigit);
+        }// while loop ends
+        if(newparamName != NULL)
+        {
+            free(newparamName);
+            newparamName = NULL;
         }
-
-        if(first_i)
-            newparamName[first_i-1]='\0';
-        strncat(newparamName,splitParam,MAX_PARAMETER_LENGTH-1);
-        newparamName[MAX_PARAMETER_LENGTH-1]='\0';
-        checkforParameterMatch(doc,(const char *)newparamName,&Match,dmParam);
-    }
-    else
-    {
-        checkforParameterMatch(doc, paramName, &Match, dmParam);
-    }
-freeResources:
-    if (newparamName)
-    {
-        free(newparamName);
+        if(frontPart != NULL)
+        {
+            free(frontPart);
+            frontPart = NULL;
+        }
+        rearPart = NULL;
     }
     return Match;
 }
