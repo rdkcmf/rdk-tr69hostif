@@ -16,10 +16,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
 #include <iostream>
 #include <string>
 #include "waldb.h"
-#include "tinyxml.h"
+#include "tinyxml2.h"
 #include "stdlib.h"
 #include "libIBus.h"
 #include "webpa_parameter.h"
@@ -27,7 +28,7 @@
 #include "hostIf_utils.h"
 #include "hostIf_tr69ReqHandler.h"
 
-
+using namespace tinyxml2;
 #define MAX_PARAMETER_LENGTH 512
 #define MAX_DATATYPE_LENGTH 48
 #define MAX_NUM_PARAMETERS 2048
@@ -45,8 +46,9 @@ GHashTable  *instanceNumParamHash = NULL;
 
 
 //static void getList(TiXmlNode *pParent,char *paramName,char **ptrParamList,char **pParamDataTypeList,int *paramCount);
-static TiXmlNode* getList(TiXmlNode *pParent,char *paramName,char* currentParam,char **ptrParamList,char **pParamDataTypeList,int *paramCount);
-void checkforParameterMatch(TiXmlNode *pParent,char *paramName,int *pMatch,DataModelParam *dmParam);
+static XMLNode* getList(XMLNode *pParent,char *paramName,char* currentParam,char **ptrParamList,char **pParamDataTypeList,int *paramCount);
+static void removeUnnecessaryAttributes(XMLDocument *pParent);
+void checkforParameterMatch(XMLNode *pParent,char *paramName,int *pMatch,DataModelParam *dmParam);
 void appendNextObject(char* currentParam, const char* pAttparam);
 int isParamEndsWithInstance(const char* paramName);
 void replaceWithInstanceNumber(char *paramName, int instanceNumber);
@@ -67,29 +69,79 @@ static void *g_dbhandle = NULL;
 DB_STATUS loadDataModel(void)
 {
     DB_STATUS dbRet = DB_FAILURE;
-    TiXmlDocument *doc = NULL;
+    XMLDocument *doc = NULL;
 
     if(g_dbhandle)
     	return DB_SUCCESS;
 
     // Load Document model
-    doc = new TiXmlDocument(WEBPA_DATA_MODEL_FILE);
-	if(doc != NULL)
+    doc = new XMLDocument();
+    if(doc != NULL)
+    {
+        doc->LoadFile(WEBPA_DATA_MODEL_FILE);
+	if( doc->ErrorID() == 0 )
 	{
-		bool loadOK = doc->LoadFile();
-		if( loadOK )
-		{
-			g_dbhandle = (void *)doc;
-			// Initialize Number of entity param list
-			initNumEntityParamList();
-			return DB_SUCCESS;
-		}
-		else
-		{
-			return DB_FAILURE;
-		}
+            removeUnnecessaryAttributes(doc);
+            g_dbhandle = (void *)doc;
+	    // Initialize Number of entity param list
+	    initNumEntityParamList();
+	    return DB_SUCCESS;
 	}
-	return DB_FAILURE;
+	else
+	{
+	    return DB_FAILURE;
+	}
+    }
+    return DB_FAILURE;
+}
+static void removeUnnecessaryAttributes(XMLDocument *pParent)
+{
+    XMLNode* pChild;
+    if( pParent->ToElement() == NULL )
+    {
+        for ( pChild = pParent->FirstChild(); pChild != 0; )
+        {
+            if( pChild->ToElement() == NULL )
+            {
+                pChild = pChild->NextSibling();
+            }
+            else
+            {
+                if( !strcmp (pChild->Value(), "object") )
+                    break;
+                pChild = pChild->FirstChild();
+            }
+        }
+    }
+    else
+    {
+        pChild = pParent;
+    }
+    while(pChild)
+    {
+        XMLElement* pElement =  pChild->ToElement();
+        const XMLAttribute* pAttrib = pElement->FirstAttribute();
+        if(!strcmp(pChild->Value(),"object"))
+        {
+            pElement->DeleteAttribute("minEntries");
+            pElement->DeleteAttribute("addObjIdx");
+            pElement->DeleteAttribute("delObjIdx");
+            XMLNode* param = pChild->FirstChild();
+            if(param != NULL && !strcmp(param->Value(),"parameter"))
+            {
+                while( param )
+                {
+                    param->ToElement()->DeleteAttribute("notification");
+                    param->ToElement()->DeleteAttribute("maxNotification");
+                    param->ToElement()->DeleteAttribute("rebootIdx");
+                    param->ToElement()->DeleteAttribute("initIdx");
+                    param->ToElement()->DeleteAttribute("setIdx");
+                    param=param->NextSibling();
+                }
+            }
+        }
+        pChild = pChild->NextSibling();
+    }
 }
 
 void* getDataModelHandle()
@@ -318,9 +370,9 @@ void appendNextObject(char* currentParam, const char* pAttparam)
  * @param[in] paramName , Wildcard parameter name
  * @param[in] currentParam , current parameter name replaced {i} with instance num
  */
-static TiXmlNode* getList(TiXmlNode *pParent,char *paramName,char* currentParam,char **ptrParamList,char **pParamDataTypeList,int *paramCount)
+static XMLNode* getList(XMLNode *pParent,char *paramName,char* currentParam,char **ptrParamList,char **pParamDataTypeList,int *paramCount)
 {
-    TiXmlNode* pChild;
+    XMLNode* pChild;
     const char* maxEntries;
     int isReccursiveCall = 0;
     char zeroInstance[MAX_PARAMETER_LENGTH] = "\0";
@@ -340,11 +392,11 @@ static TiXmlNode* getList(TiXmlNode *pParent,char *paramName,char* currentParam,
     }
 
     // Goto actual Object node ie "Device."
-    if( pParent->Type() != TiXmlNode::TINYXML_ELEMENT )
+   if( pParent->ToElement() == NULL )
     {
         for ( pChild = pParent->FirstChild(); pChild != 0; )
         {
-            if( pChild->Type() != TiXmlNode::TINYXML_ELEMENT )
+            if( pChild->ToElement() == NULL )
             {
                 pChild = pChild->NextSibling();
             }
@@ -358,13 +410,13 @@ static TiXmlNode* getList(TiXmlNode *pParent,char *paramName,char* currentParam,
     }
     else
     {
-        pChild = pParent;
+       pChild = pParent;
     }
     // Traverse through the nodes and get matching parameters
     while(pChild)
     {
-        TiXmlElement* pElement =  pChild->ToElement();
-        TiXmlAttribute* pAttrib = pElement->FirstAttribute();
+        XMLElement* pElement =  pChild->ToElement();
+        const XMLAttribute* pAttrib = pElement->FirstAttribute();
         int inst = 0;
         int status = 0;
         char* endPtr = NULL;
@@ -389,7 +441,7 @@ static TiXmlNode* getList(TiXmlNode *pParent,char *paramName,char* currentParam,
                 if( status && !isReccursiveCall) strcpy(currentParam, paramName);
                 // Append if current attribute contains {i} to current param
                 appendNextObject(currentParam, pAttrib->Value());
-                TiXmlNode* bChild,*sChild;
+                XMLNode* bChild,*sChild;
                 bChild = pChild;
                 // Goto the parameters
                 pChild = pChild->FirstChild();
@@ -457,7 +509,7 @@ static TiXmlNode* getList(TiXmlNode *pParent,char *paramName,char* currentParam,
         // Found the Parameter
         else if(!strcmp(pChild->Value(),"parameter"))
         {
-            TiXmlNode* bChild;
+            XMLNode* bChild;
             // Find all parameters
             for(bChild = pChild ; pChild ; pChild=pChild->NextSibling() )
             {
@@ -504,7 +556,7 @@ DB_STATUS getChildParamNamesFromDataModel(void *dbhandle,char *paramName,char **
 
     if(isWildCardParam(parameterName))
     {
-        TiXmlDocument *doc = (TiXmlDocument *) dbhandle;
+        XMLDocument *doc = (XMLDocument *) dbhandle;
         getList(doc,parameterName,currentParam,ParamList,ParamDataTypeList,paramCount);
         if(*paramCount == 0)
         {
@@ -518,7 +570,7 @@ DB_STATUS getChildParamNamesFromDataModel(void *dbhandle,char *paramName,char **
     return DB_SUCCESS;
 }
 
-void checkforParameterNameMatch(TiXmlNode *pParent, const char *ObjectName, const char *paramName, int *pMatch, DataModelParam *dmParam)
+void checkforParameterNameMatch(XMLNode *pParent, const char *ObjectName, const char *paramName, int *pMatch, DataModelParam *dmParam)
 {
     if(!pParent)
     {
@@ -527,10 +579,10 @@ void checkforParameterNameMatch(TiXmlNode *pParent, const char *ObjectName, cons
     }
 
     RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"checkforAttributeMatch : pParent->Value() : %s\n", pParent->Value());
-    if(pParent->Type() == TiXmlNode::TINYXML_ELEMENT)
+    if(pParent->ToElement() != NULL)
     {
-        TiXmlElement* pElement = pParent->ToElement();
-        TiXmlAttribute* pAttrib = pElement->FirstAttribute();
+        XMLElement* pElement = pParent->ToElement();
+        const XMLAttribute* pAttrib = pElement->FirstAttribute();
         if(!strcmp(pParent->Value(),"parameter") && pAttrib)
         {
             char *ParameterName = (char *) malloc(sizeof(char) * MAX_PARAMETER_LENGTH);
@@ -541,8 +593,8 @@ void checkforParameterNameMatch(TiXmlNode *pParent, const char *ObjectName, cons
             free(ParameterName);
             if (match)
             {
-                TiXmlNode *pSyntaxNode = NULL;
-                TiXmlNode *pSyntaxChildNode = NULL;
+                XMLNode *pSyntaxNode = NULL;
+                XMLNode *pSyntaxChildNode = NULL;
                 RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"Match found : Extracting parameter attributes\n");
                 dmParam->objectName = strdup(paramName);
                 if(pElement->Attribute("base") != NULL)
@@ -552,12 +604,12 @@ void checkforParameterNameMatch(TiXmlNode *pParent, const char *ObjectName, cons
                 if(pElement->Attribute("access") != NULL)
                     dmParam->access = strdup(pElement->Attribute("access"));
 
-                pSyntaxNode = pElement->FirstChild("syntax");
+                pSyntaxNode = pElement->FirstChildElement("syntax");
                 for(pSyntaxChildNode = pSyntaxNode->FirstChild(); pSyntaxChildNode != NULL; pSyntaxChildNode = pSyntaxChildNode->NextSibling())
                 {
                     if(!strcmp("default", pSyntaxChildNode->Value()))
                     {
-                        TiXmlElement *pDefaultElement = pSyntaxChildNode->ToElement();
+                        XMLElement *pDefaultElement = pSyntaxChildNode->ToElement();
                         dmParam->defaultValue = strdup(pDefaultElement->Attribute("value"));
                         RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"Default Value : %s\n", dmParam->defaultValue);
                     }
@@ -573,7 +625,7 @@ void checkforParameterNameMatch(TiXmlNode *pParent, const char *ObjectName, cons
     }
 }
 
-void checkforObjectMatch(TiXmlNode *pParent,const char *objectName,int *pMatch,DataModelParam *dmParam)
+void checkforObjectMatch(XMLNode *pParent,const char *objectName,int *pMatch,DataModelParam *dmParam)
 {
     if(!pParent)
     {
@@ -582,10 +634,10 @@ void checkforObjectMatch(TiXmlNode *pParent,const char *objectName,int *pMatch,D
     }
 
     RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"checkforObjectMatch : pParent->Value() : %s\n", pParent->Value());
-    if(pParent->Type() == TiXmlNode::TINYXML_ELEMENT)
+    if(pParent->ToElement() != NULL)
     {
-        TiXmlElement* pElement = pParent->ToElement();
-        TiXmlAttribute* pAttrib = pElement->FirstAttribute();
+        XMLElement* pElement = pParent->ToElement();
+        const XMLAttribute* pAttrib = pElement->FirstAttribute();
         if(!strcmp(pParent->Value(),"object") && pAttrib)
         {
             RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"Comparing with object : %s\n", pAttrib->Value());
@@ -599,10 +651,10 @@ void checkforObjectMatch(TiXmlNode *pParent,const char *objectName,int *pMatch,D
     }
 }
 
-void checkforParameterMatch(TiXmlNode *pParent,const char *paramName,int *pMatch,DataModelParam *dmParam)
+void checkforParameterMatch(XMLNode *pParent,const char *paramName,int *pMatch,DataModelParam *dmParam)
 {
-    TiXmlNode *pChild = NULL;
-    TiXmlNode *pParam = NULL;
+    XMLNode *pChild = NULL;
+    XMLNode *pParam = NULL;
     if(!pParent)
     {
         RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"pParent is Null - returning\n");
@@ -627,9 +679,9 @@ void checkforParameterMatch(TiXmlNode *pParent,const char *paramName,int *pMatch
     }
 
     RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"Looking for object : %s\n", paramObject);
-    for(pChild = pParent->FirstChild("dm:document")->FirstChild("model")->FirstChild("object"); pChild != NULL; pChild = pChild->NextSibling())
+    for(pChild = pParent->FirstChildElement("dm:document")->FirstChildElement("model")->FirstChildElement("object"); pChild != NULL; pChild = pChild->NextSibling())
     {
-        if(pChild->Type() != TiXmlNode::TINYXML_ELEMENT)
+        if(pChild->ToElement() == NULL)
             continue;
         else
         {
@@ -678,7 +730,7 @@ int getParamInfoFromDataModel(void *dbhandle,const char *paramName, DataModelPar
 {
     int Match = 0;
     int first_i = 0;
-    TiXmlDocument *doc = (TiXmlDocument *) dbhandle;
+    XMLDocument *doc = (XMLDocument *) dbhandle;
     char *newparamName = NULL;
 
     /* Check if Parameter is one of {i} entriesi ex:Device.WiFi.Radio.1.Status should become Device.WiFi.Radio.{i}.Status */

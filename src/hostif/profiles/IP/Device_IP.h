@@ -187,7 +187,7 @@ class hostIf_IP {
     bool backupIPv4Enable;
     int backupInterfaceNumberOfEntries;
     int backupActivePortNumberOfEntries;
-    char backupIPv4Status[TR69HOSTIFMGR_MAX_PARAM_LEN];
+    char backupIPv4Status[_BUF_LEN_16];
 
     static unsigned int getInterfaceNumberOfEntries(void);
     static unsigned int getPhysicalInterfaceNumberOfEntries (struct if_nameindex* phy_if_list);

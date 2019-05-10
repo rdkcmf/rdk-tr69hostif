@@ -313,8 +313,8 @@ int hostIf_STBServiceVideoDecoder::getContentAspectRatio(HOSTIF_MsgData_t *stMsg
             *pChanged = true;
         }
         bCalledContentAspectRatio = true;
-        strncpy(backupContentAspectRatio,stMsgData->paramValue,PARAM_LEN);
-        backupContentAspectRatio[PARAM_LEN-1] = '\0';
+        strncpy(backupContentAspectRatio,stMsgData->paramValue,_BUF_LEN_16-1);
+        backupContentAspectRatio[_BUF_LEN_16-1] = '\0';
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] In getVideoDecoderContentAspectRatio(): Value: %s \n",__FUNCTION__, stMsgData->paramValue);
     }
     catch (const std::exception e) {
@@ -403,8 +403,8 @@ int hostIf_STBServiceVideoDecoder::getStatus(HOSTIF_MsgData_t *stMsgData,bool *p
             *pChanged = true;
         }
         bCalledVideoDecoderStatus = true;
-        strncpy(backupVideoDecoderStatus,stMsgData->paramValue,PARAM_LEN);
-        backupVideoDecoderStatus[PARAM_LEN-1] = '\0';
+        strncpy(backupVideoDecoderStatus,stMsgData->paramValue,_BUF_LEN_16-1);
+        backupVideoDecoderStatus[_BUF_LEN_16-1] = '\0';
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] PowerMode: [%d , %s] \n", __FUNCTION__, iPowerMode, stMsgData->paramValue);
     }
     catch (const std::exception e) {

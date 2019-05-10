@@ -86,9 +86,7 @@ class hostIf_STBServiceSPDIF
     device::AudioOutputPort& aPort;
 
     bool backupEnable;
-    char backupStatus[PARAM_LEN];
-    char backupAlias[PARAM_LEN];
-    char backupName[PARAM_LEN];
+    char backupStatus[_BUF_LEN_16];
     bool backupForcePCM;
     bool backupPassthrough;
     unsigned backupAudioDelay;

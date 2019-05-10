@@ -98,9 +98,9 @@ class  hostIf_STBServiceHDMI
 
     static char dsHDMIResolutionMode[10];
     bool backupEnable;
-    char backupStatus[PARAM_LEN];
-    char backupResolutionValue[PARAM_LEN];
-    char backupName[PARAM_LEN];
+    char backupStatus[_BUF_LEN_16];
+    char backupResolutionValue[_BUF_LEN_16];
+    char backupName[_BUF_LEN_256];
 
     bool bCalledEnable;
     bool bCalledStatus;

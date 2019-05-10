@@ -259,9 +259,9 @@ class hostIf_IPInterface {
     bool backupIPv6Enable;
     bool backupEnable;
 
-    char backupType[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupName[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupStatus[TR69HOSTIFMGR_MAX_PARAM_LEN];
+    char backupType[_BUF_LEN_16];
+    char backupName[_BUF_LEN_16];
+    char backupStatus[_BUF_LEN_16];
 
 
 public:

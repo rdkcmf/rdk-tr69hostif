@@ -195,17 +195,17 @@ class hostIf_DeviceInfo {
     bool bCalledProductClass;
     bool bCalledAdditionalSoftwareVersion;
 
-    char backupSoftwareVersion[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupX_COMCAST_COM_STB_IP[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupX_COMCAST_COM_FirmwareFilename[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupSerialNumber[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupProductClass[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupManufacturer[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupManufacturerOUI[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupModelName[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupHardwareVersion[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupDeviceMAC[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    char backupAdditionalSoftwareVersion[TR69HOSTIFMGR_MAX_PARAM_LEN];
+    char backupSoftwareVersion[_BUF_LEN_16];
+    char backupX_COMCAST_COM_STB_IP[_BUF_LEN_64];
+    char backupX_COMCAST_COM_FirmwareFilename[_BUF_LEN_64];
+    char backupSerialNumber[_BUF_LEN_16];
+    char backupProductClass[_BUF_LEN_16];
+    char backupManufacturer[_BUF_LEN_16];
+    char backupManufacturerOUI[_BUF_LEN_16];
+    char backupModelName[_BUF_LEN_16];
+    char backupHardwareVersion[_BUF_LEN_16];
+    char backupDeviceMAC[_BUF_LEN_32];
+    char backupAdditionalSoftwareVersion[_BUF_LEN_16];
 
     static string m_xFirmwareDownloadProtocol;
     static string m_xFirmwareDownloadURL;

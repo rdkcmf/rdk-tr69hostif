@@ -147,17 +147,17 @@ hostIf_DeviceInfo::hostIf_DeviceInfo(int dev_id):
     bCalledHardwareVersion(false),
     bCalledDeviceMAC(false)
 {
-    memset(backupSoftwareVersion, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupSerialNumber, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupProductClass , 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupManufacturer, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupManufacturerOUI, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupModelName, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupHardwareVersion, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupAdditionalSoftwareVersion, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupDeviceMAC, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupX_COMCAST_COM_STB_IP, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-    memset(backupX_COMCAST_COM_FirmwareFilename, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    memset(backupSoftwareVersion, 0, _BUF_LEN_16);
+    memset(backupSerialNumber, 0, _BUF_LEN_16);
+    memset(backupProductClass , 0, _BUF_LEN_16);
+    memset(backupManufacturer, 0, _BUF_LEN_16);
+    memset(backupManufacturerOUI, 0, _BUF_LEN_16);
+    memset(backupModelName, 0, _BUF_LEN_16);
+    memset(backupHardwareVersion, 0, _BUF_LEN_16);
+    memset(backupAdditionalSoftwareVersion, 0, _BUF_LEN_16);
+    memset(backupDeviceMAC, 0, _BUF_LEN_32);
+    memset(backupX_COMCAST_COM_STB_IP, 0, _BUF_LEN_64);
+    memset(backupX_COMCAST_COM_FirmwareFilename, 0, _BUF_LEN_64);
 #ifndef NEW_HTTP_SERVER_DISABLE
     if(!legacyRFCEnabled())
         m_rfcStore = XRFCStore::getInstance();
@@ -293,12 +293,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t * stM
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
-                if(bCalledSerialNumber && pChanged && strncmp(stMsgData->paramValue,backupSerialNumber,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledSerialNumber && pChanged && strncmp(stMsgData->paramValue,backupSerialNumber,_BUF_LEN_16 ))
                 {
                     *pChanged =  true;
                 }
                 bCalledSerialNumber = true;
-                strncpy(backupSerialNumber,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupSerialNumber,stMsgData->paramValue,_BUF_LEN_16 );
                 ret = OK;
             }
             else {
@@ -324,7 +324,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SerialNumber(HOSTIF_MsgData_t * stM
         {
             if (param.stb_serial_no.payload != NULL)
             {
-                snprintf(stMsgData->paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN, "%s", param.stb_serial_no.payload);
+                snprintf(stMsgData->paramValue, _BUF_LEN_16, "%s", param.stb_serial_no.payload);
                 RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] SerialNumber : \"%s\".\n",__FUNCTION__, param.stb_serial_no.payload );
                 ret = OK;
             }
@@ -421,12 +421,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SoftwareVersion(HOSTIF_MsgData_t * 
         }
 
 
-        if(bCalledSoftwareVersion && pChanged && strncmp(version,backupSoftwareVersion,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+        if(bCalledSoftwareVersion && pChanged && strncmp(version,backupSoftwareVersion,_BUF_LEN_16 ))
         {
             *pChanged =  true;
         }
         bCalledSoftwareVersion = true;
-        strncpy(backupSoftwareVersion,version,TR69HOSTIFMGR_MAX_PARAM_LEN );
+        strncpy(backupSoftwareVersion,version,_BUF_LEN_16 );
         stMsgData->paramLen = strlen(version);
         strncpy(stMsgData->paramValue,version, stMsgData->paramLen);
         stMsgData->paramtype = hostIf_StringType;
@@ -472,12 +472,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_Manufacturer(HOSTIF_MsgData_t * stM
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
-                if(bCalledManufacturer && pChanged && strncmp(stMsgData->paramValue,backupManufacturer,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledManufacturer && pChanged && strncmp(stMsgData->paramValue,backupManufacturer,_BUF_LEN_16 ))
                 {
                     *pChanged =  true;
                 }
                 bCalledManufacturer = true;
-                strncpy(backupManufacturer,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupManufacturer,stMsgData->paramValue,_BUF_LEN_16 );
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
             }
@@ -552,12 +552,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t * 
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
-                if(bCalledManufacturerOUI && pChanged && strncmp(stMsgData->paramValue,backupManufacturerOUI,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledManufacturerOUI && pChanged && strncmp(stMsgData->paramValue,backupManufacturerOUI,_BUF_LEN_16 ))
                 {
                     *pChanged =  true;
                 }
                 bCalledManufacturerOUI = true;
-                strncpy(backupManufacturerOUI,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupManufacturerOUI,stMsgData->paramValue,_BUF_LEN_16 );
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
             }
@@ -615,12 +615,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgD
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
-                if(bCalledModelName && pChanged && strncmp(stMsgData->paramValue,backupModelName,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledModelName && pChanged && strncmp(stMsgData->paramValue,backupModelName,_BUF_LEN_16 ))
                 {
                     *pChanged =  true;
                 }
                 bCalledModelName = true;
-                strncpy(backupModelName,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupModelName,stMsgData->paramValue,_BUF_LEN_16 );
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
             }
@@ -726,12 +726,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ProductClass(HOSTIF_MsgData_t * stM
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
-                if(bCalledProductClass && pChanged && strncmp(stMsgData->paramValue ,backupProductClass,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledProductClass && pChanged && strncmp(stMsgData->paramValue ,backupProductClass,_BUF_LEN_16 ))
                 {
                     *pChanged =  true;
                 }
                 bCalledProductClass = true;
-                strncpy(backupProductClass ,stMsgData->paramValue ,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupProductClass ,stMsgData->paramValue ,_BUF_LEN_16 );
                 stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
@@ -785,12 +785,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_HardwareVersion(HOSTIF_MsgData_t * 
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
-                if(bCalledHardwareVersion && pChanged && strncmp(stMsgData->paramValue,backupHardwareVersion,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledHardwareVersion && pChanged && strncmp(stMsgData->paramValue,backupHardwareVersion,_BUF_LEN_16 ))
                 {
                     *pChanged =  true;
                 }
                 bCalledHardwareVersion = true;
-                strncpy(backupHardwareVersion,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupHardwareVersion,stMsgData->paramValue,_BUF_LEN_16 );
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
                 ret = OK;
             }
@@ -869,12 +869,12 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_Ms
             if(param.buffer && param.bufLen) {
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
-                if(bCalledAdditionalSoftwareVersion && pChanged && strncmp(stMsgData->paramValue,backupAdditionalSoftwareVersion,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledAdditionalSoftwareVersion && pChanged && strncmp(stMsgData->paramValue,backupAdditionalSoftwareVersion,_BUF_LEN_16 ))
                 {
                     *pChanged =  true;
                 }
                 bCalledAdditionalSoftwareVersion = true;
-                strncpy(backupAdditionalSoftwareVersion,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupAdditionalSoftwareVersion,stMsgData->paramValue,_BUF_LEN_16 );
 
                 stMsgData->paramLen = param.bufLen;
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s param.pBuffer: %s \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue, param.buffer);
@@ -1042,45 +1042,44 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgDat
 
     try
     {
-        if((stbMacCache[0] == '\0') && (len == 0)) {
-            iarm_ret = IARM_Bus_Call(IARM_BUS_MFRLIB_NAME, IARM_BUS_MFRLIB_API_GetSerializedData, &param, sizeof(param));
-
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] IARM_BUS_MFRLIB_API_GetSerializedData returns params: %s with paramlen: %d.\r\n",__FUNCTION__, param.buffer, param.bufLen);
-            if(iarm_ret == IARM_RESULT_SUCCESS)
-            {
-                if(param.buffer && param.bufLen) {
-                    strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
-                    stMsgData->paramValue[param.bufLen+1] = '\0';
-                    stMsgData->paramLen = param.bufLen;
-                    if(bCalledDeviceMAC && pChanged && strncmp(stMsgData->paramValue,backupDeviceMAC,TR69HOSTIFMGR_MAX_PARAM_LEN ))
-                    {
-                        *pChanged =  true;
-                    }
-                    bCalledDeviceMAC = true;
-                    strncpy(backupDeviceMAC,stMsgData->paramValue,TR69HOSTIFMGR_MAX_PARAM_LEN );
-                    memset(stbMacCache, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
-                    strncpy(stbMacCache, param.buffer, param.bufLen);
-                    stMsgData->paramtype = hostIf_StringType;
-                    ret = OK;
-                }
-                else {
-                    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in \'IARM_BUS_MFRLIB_API_GetSerializedData\' for parameter : %s [ Value :%s with size :%d]\n",stMsgData->paramName, param.buffer, param.bufLen);
-                    ret = NOK;
-                }
+    	if((stbMacCache[0] == '\0') && (len == 0)) {
+    	iarm_ret = IARM_Bus_Call(IARM_BUS_MFRLIB_NAME, IARM_BUS_MFRLIB_API_GetSerializedData, &param, sizeof(param));
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] IARM_BUS_MFRLIB_API_GetSerializedData returns params: %s with paramlen: %d.\r\n",__FUNCTION__, param.buffer, param.bufLen);
+        if(iarm_ret == IARM_RESULT_SUCCESS)
+        {
+           if(param.buffer && param.bufLen) {
+              strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
+              stMsgData->paramValue[param.bufLen+1] = '\0';
+              stMsgData->paramLen = param.bufLen;
+              if(bCalledDeviceMAC && pChanged && strncmp(stMsgData->paramValue,backupDeviceMAC,_BUF_LEN_32 ))
+              {
+                 *pChanged =  true;
+              }
+              bCalledDeviceMAC = true;
+              strncpy(backupDeviceMAC,stMsgData->paramValue,_BUF_LEN_32 );
+              memset(stbMacCache, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
+              strncpy(stbMacCache, param.buffer, param.bufLen);
+              stMsgData->paramtype = hostIf_StringType;
+              ret = OK;
             }
             else {
-                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
-                ret = NOK;
-            }
-        }
-        else
-        {
-            memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
-            stMsgData->paramLen = len;
-            strncpy(stMsgData->paramValue, stbMacCache, stMsgData->paramLen);
-            stMsgData->paramtype = hostIf_StringType;
-            ret = OK;
-        }
+              RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in \'IARM_BUS_MFRLIB_API_GetSerializedData\' for parameter : %s [ Value :%s with size :%d]\n",stMsgData->paramName, param.buffer, param.bufLen);
+              ret = NOK;
+             }
+	      } 
+          else {
+             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
+             ret = NOK;
+	      }
+	}
+	else 
+	{
+          memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
+          stMsgData->paramLen = len;
+          strncpy(stMsgData->paramValue, stbMacCache, stMsgData->paramLen);
+          stMsgData->paramtype = hostIf_StringType;
+          ret = OK;
+	}	
     } catch (const std::exception& e)
     {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
@@ -1280,13 +1279,13 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(HOSTIF_MsgData
         return NOK;
     }
     else {
-        if(bCalledX_COMCAST_COM_STB_IP && pChanged && strncmp(ipaddr.c_str(),backupX_COMCAST_COM_STB_IP,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+        if(bCalledX_COMCAST_COM_STB_IP && pChanged && strncmp(ipaddr.c_str(),backupX_COMCAST_COM_STB_IP,_BUF_LEN_64 ))
         {
             *pChanged =  true;
         }
         bCalledX_COMCAST_COM_STB_IP = true;
-        strncpy(backupX_COMCAST_COM_STB_IP,ipaddr.c_str(),TR69HOSTIFMGR_MAX_PARAM_LEN );
-        memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
+        strncpy(backupX_COMCAST_COM_STB_IP,ipaddr.c_str(),_BUF_LEN_64 );
+        memset(stMsgData->paramValue, '\0', _BUF_LEN_64);
         stMsgData->paramLen = ipaddr.length();
         strncpy(stMsgData->paramValue, ipaddr.c_str(), stMsgData->paramLen);
         stMsgData->paramtype = hostIf_StringType;
@@ -1428,14 +1427,14 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(H
                 }
                 delete[] cstr;
 
-                if(bCalledX_COMCAST_COM_FirmwareFilename && pChanged && strncmp(pch,backupX_COMCAST_COM_FirmwareFilename,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+                if(bCalledX_COMCAST_COM_FirmwareFilename && pChanged && strncmp(pch,backupX_COMCAST_COM_FirmwareFilename,_BUF_LEN_64 ))
                 {
                     *pChanged =  true;
                 }
 
                 bCalledX_COMCAST_COM_FirmwareFilename = true;
-                strncpy(backupX_COMCAST_COM_FirmwareFilename,pch,TR69HOSTIFMGR_MAX_PARAM_LEN );
-                strncpy(stMsgData->paramValue,pch,TR69HOSTIFMGR_MAX_PARAM_LEN );
+                strncpy(backupX_COMCAST_COM_FirmwareFilename,pch,_BUF_LEN_64 );
+                strncpy(stMsgData->paramValue,pch,_BUF_LEN_64 );
                 strncpy((char *) stMsgData->paramValue, pch, stMsgData->paramLen +1 );
             }
         }

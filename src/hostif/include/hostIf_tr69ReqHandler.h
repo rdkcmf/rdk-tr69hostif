@@ -101,6 +101,20 @@ void hostIf_IARM_IF_Stop();
 
 #define TR69HOSTIFMGR_MAX_PARAM_LEN     (2*1024)
 
+#define _BUF_LEN_16 16
+
+#define _BUF_LEN_32 32
+
+#define _BUF_LEN_64 64
+
+#define _BUF_LEN_128 128
+
+#define _BUF_LEN_256 256
+
+#define _BUF_LEN_512 512
+
+#define _BUF_LEN_1024 1024
+
 /*! Parameter for Getpowerstate call*/
 /*! Host IF Message Parameter data-type*/
 typedef enum _HostIf_ParamType

@@ -584,13 +584,13 @@ int hostIf_IP::get_Device_IP_IPv4Status(HOSTIF_MsgData_t *stMsgData, bool *pChan
 {
 
     get_Device_IP_Fields(eIpIPv4Status);
-    if(bCalledIPv4Status && pChanged && strncmp(stIPInstance.iPv4Status, backupIPv4Status,TR69HOSTIFMGR_MAX_PARAM_LEN ))
+    if(bCalledIPv4Status && pChanged && strncmp(stIPInstance.iPv4Status, backupIPv4Status,_BUF_LEN_16 ))
     {
         *pChanged = true;
     }
     bCalledIPv4Status = true;
     strncpy(stMsgData->paramValue,stIPInstance.iPv4Status,TR69HOSTIFMGR_MAX_PARAM_LEN );
-    strncpy(backupIPv4Status,stIPInstance.iPv4Status,TR69HOSTIFMGR_MAX_PARAM_LEN );
+    strncpy(backupIPv4Status,stIPInstance.iPv4Status,_BUF_LEN_16 );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stIPInstance.iPv4Status);
 

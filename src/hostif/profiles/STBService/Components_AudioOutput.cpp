@@ -520,7 +520,7 @@ int hostIf_STBServiceAudioInterface::getStatus(HOSTIF_MsgData_t *stMsgData,bool 
             *pChanged = true;
         }
         bCalledStatus = true;
-        strncpy(backupStatus, stMsgData->paramValue, PARAM_LEN);
+        strncpy(backupStatus, stMsgData->paramValue, _BUF_LEN_16);
         backupStatus[PARAM_LEN-1] = '\0';
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] [Value: %s] \n", __FUNCTION__, stMsgData->paramValue);
     }
@@ -716,7 +716,7 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioStereoMode(HOSTIF_Msg
             *pChanged = true;
         }
         bCalledAudioStereoMode = true;
-        strncpy(backupAudioStereoMode, stMsgData->paramValue, PARAM_LEN);
+        strncpy(backupAudioStereoMode, stMsgData->paramValue, _BUF_LEN_16-1);
         backupAudioStereoMode[PARAM_LEN-1];
     }
     catch (const std::exception e) {
@@ -796,7 +796,7 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioEncoding(HOSTIF_MsgDa
         default:
             return NOK;
         }
-        stMsgData->paramValue[PARAM_LEN-1] = '\0';
+        stMsgData->paramValue[_BUF_LEN_16-1] = '\0';
         stMsgData->paramtype = hostIf_StringType;
         stMsgData->paramLen = strlen(stMsgData->paramValue);
         if(bCalledAudioEncoding && pChanged && strcmp(backupAudioEncoding, stMsgData->paramValue))
@@ -804,8 +804,8 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioEncoding(HOSTIF_MsgDa
             *pChanged = true;
         }
         bCalledAudioEncoding = true;
-        strncpy(backupAudioEncoding,stMsgData->paramValue, PARAM_LEN);
-        backupAudioEncoding[PARAM_LEN-1] = '\0';
+        strncpy(backupAudioEncoding,stMsgData->paramValue, _BUF_LEN_16-1);
+        backupAudioEncoding[_BUF_LEN_16-1] = '\0';
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] stMsgData->paramValue [%s]\n",__FUNCTION__, stMsgData->paramValue);
     }
     catch (const std::exception e) {
@@ -950,7 +950,7 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioCompression(HOSTIF_Ms
             *pChanged = true;
         }
         bCalledAudioCompression = true;
-        strncpy(backupAudioCompression, stMsgData->paramValue, PARAM_LEN);
+        strncpy(backupAudioCompression, stMsgData->paramValue, _BUF_LEN_16);
         backupAudioCompression[PARAM_LEN-1] = '\0';
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] \n",__FUNCTION__, stMsgData->paramValue);
     }
@@ -1078,7 +1078,7 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioDB(HOSTIF_MsgData_t *
             *pChanged = true;
         }
         bCalledAudioDB = true;
-        strncpy(backupAudioDB, stMsgData->paramValue, PARAM_LEN);
+        strncpy(backupAudioDB, stMsgData->paramValue, _BUF_LEN_16);
         backupAudioDB[PARAM_LEN-1] = '\0';
     }
     catch (const std::exception e) {
@@ -1115,8 +1115,8 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_MinAudioDB(HOSTIF_MsgData_
             *pChanged = true;
         }
         bCalledMinAudioDB = true;
-        strncpy(backupMinAudioDB, stMsgData->paramValue, PARAM_LEN);
-        backupMinAudioDB[PARAM_LEN-1] = '\0';
+        strncpy(backupMinAudioDB, stMsgData->paramValue, _BUF_LEN_16-1);
+        backupMinAudioDB[_BUF_LEN_16-1] = '\0';
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
@@ -1152,8 +1152,8 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_MaxAudioDB(HOSTIF_MsgData_
             *pChanged = true;
         }
         bCalledMaxAudioDB = true;
-        strncpy(backupMaxAudioDB, stMsgData->paramValue, PARAM_LEN);
-        backupMaxAudioDB[PARAM_LEN-1] = '\0';
+        strncpy(backupMaxAudioDB, stMsgData->paramValue, _BUF_LEN_16-1);
+        backupMaxAudioDB[_BUF_LEN_16-1] = '\0';
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
@@ -1189,8 +1189,8 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioGain(HOSTIF_MsgData_t
             *pChanged = true;
         }
         bCalledAudioGain = true;
-        strncpy(backupAudioGain,stMsgData->paramValue, PARAM_LEN);
-        backupAudioGain[PARAM_LEN] = '\0';
+        strncpy(backupAudioGain,stMsgData->paramValue, _BUF_LEN_16-1);
+        backupAudioGain[_BUF_LEN_16-1] = '\0';
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
@@ -1252,7 +1252,7 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioLoopThru(HOSTIF_MsgDa
             *pChanged = true;
         }
         bCalledAudioLoopThru = true;
-        strncpy(backupAudioLoopThru, stMsgData->paramValue, PARAM_LEN);
+        strncpy(backupAudioLoopThru, stMsgData->paramValue, _BUF_LEN_16-1);
         backupAudioLoopThru[PARAM_LEN-1] = '\0';
     }
     catch (const std::exception e) {
@@ -1288,8 +1288,8 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioOptimalLevel(HOSTIF_M
             *pChanged = true;
         }
         bCalledAudioOptimalLevel = true;
-        strncpy(backupAudioOptimalLevel, stMsgData->paramValue, PARAM_LEN);
-        backupAudioOptimalLevel[PARAM_LEN-1] = '\0';
+        strncpy(backupAudioOptimalLevel, stMsgData->paramValue, _BUF_LEN_16-1);
+        backupAudioOptimalLevel[_BUF_LEN_16-1] = '\0';
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);

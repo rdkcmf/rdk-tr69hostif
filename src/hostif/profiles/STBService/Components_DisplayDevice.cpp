@@ -288,8 +288,8 @@ int hostIf_STBServiceDisplayDevice::getStatus(HOSTIF_MsgData_t *stMsgData,bool *
             *pChanged = true;
         }
         bCalledDisplayDeviceStatus = true;
-        strncpy(backupDisplayDeviceStatus, stMsgData->paramValue, PARAM_LEN);
-        backupDisplayDeviceStatus[PARAM_LEN-1] = '\0';
+        strncpy(backupDisplayDeviceStatus, stMsgData->paramValue, _BUF_LEN_16-1);
+        backupDisplayDeviceStatus[_BUF_LEN_16-1] = '\0';
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] In getHDMIDisplayDeviceStatus(): Value: %s \n",__FUNCTION__, stMsgData->paramValue);
     }
     catch (const std::exception e) {
@@ -339,8 +339,8 @@ int hostIf_STBServiceDisplayDevice::getX_COMCAST_COM_EDID(HOSTIF_MsgData_t *stMs
             *pChanged = true;
         }
         bCalledEDID = true;
-        strncpy(backupEDID,stMsgData->paramValue,PARAM_LEN);
-        backupEDID[PARAM_LEN-1] = '\0';
+        strncpy(backupEDID,stMsgData->paramValue,_BUF_LEN_256-1);
+        backupEDID[_BUF_LEN_16-1] = '\0';
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] In getHDMIDisplayDeviceX_COMCAST_COM_EDID(): Value: %s \n",__FUNCTION__, stMsgData->paramValue);
     }
     catch (const std::exception e) {
@@ -391,7 +391,7 @@ int hostIf_STBServiceDisplayDevice::getEDID_BYTES(HOSTIF_MsgData_t *stMsgData,bo
             *pChanged = true;
         }
         bCalledEDIDBytes = true;
-        strncpy(backupEDIDBytes,stMsgData->paramValue,PARAM_LEN);
+        strncpy(backupEDIDBytes,stMsgData->paramValue,_BUF_LEN_256-1);
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] In getHDMIDisplayDeviceEDIDBytes(): Value: %s \n",__FUNCTION__, stMsgData->paramValue);
     }
     catch (const std::exception e) {
@@ -445,8 +445,8 @@ int hostIf_STBServiceDisplayDevice::getSupportedResolutions(HOSTIF_MsgData_t *st
             *pChanged = true;
         }
         bCalledSupportedResolution = true;
-        strncpy(backupSupportedResolution,stMsgData->paramValue,PARAM_LEN);
-        backupSupportedResolution[PARAM_LEN-1] = '\0';
+        strncpy(backupSupportedResolution,stMsgData->paramValue,_BUF_LEN_16-1);
+        backupSupportedResolution[_BUF_LEN_16-1] = '\0';
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s]  : Value: %s \n",__FUNCTION__, stMsgData->paramValue);
     }
     catch (const std::exception e) {
@@ -484,8 +484,8 @@ int hostIf_STBServiceDisplayDevice::getPreferredResolution(HOSTIF_MsgData_t *stM
             *pChanged = true;
         }
         bCalledPreferredResolution = true;
-        strncpy(backupPreferredResolution, stMsgData->paramValue, PARAM_LEN);
-        backupPreferredResolution[PARAM_LEN-1] = '\0';
+        strncpy(backupPreferredResolution, stMsgData->paramValue, _BUF_LEN_16-1);
+        backupPreferredResolution[_BUF_LEN_16-1] = '\0';
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\n",__FUNCTION__);
