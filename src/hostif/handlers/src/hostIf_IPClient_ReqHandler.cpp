@@ -36,6 +36,9 @@
 #include "Device_IP_ActivePort.h"
 #include "Device_IP_Interface.h"
 #include "Device_IP_Interface_IPv4Address.h"
+#ifdef SPEEDTEST_SUPPORT
+#include "Device_IP_Diagnostics_SpeedTest.h"
+#endif //SPEEDTEST_SUPPORT
 #ifdef IPV6_SUPPORT
 #include "Device_IP_Interface_IPv6Address.h"
 #endif // IPV6_SUPPORT
@@ -200,6 +203,13 @@ int IPClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         hostIf_IP_Diagnostics_IPPing& ipping = hostIf_IP_Diagnostics_IPPing::getInstance ();
         ret = ipping.handleGetMsg (stMsgData);
     }
+#ifdef SPEEDTEST_SUPPORT
+    else if (strncasecmp (stMsgData->paramName, hostIf_IP_Diagnostics_SpeedTest::SpeedTestProfile, strlen (hostIf_IP_Diagnostics_SpeedTest::SpeedTestProfile)) == 0)
+    {
+        hostIf_IP_Diagnostics_SpeedTest& spdtst = hostIf_IP_Diagnostics_SpeedTest::getInstance ();
+        ret = spdtst.handleGetMsg (stMsgData);
+    }
+#endif
     else if (matchComponent (stMsgData->paramName, "Device.IP.ActivePort", &positionAfterInstanceNumber, instanceNumber))
     {
         stMsgData->instanceNum = instanceNumber;
@@ -292,6 +302,13 @@ int IPClientReqHandler::handleSetMsg (HOSTIF_MsgData_t *stMsgData)
         hostIf_IP_Diagnostics_IPPing& ipping = hostIf_IP_Diagnostics_IPPing::getInstance ();
         ret = ipping.handleSetMsg (stMsgData);
     }
+#ifdef SPEEDTEST_SUPPORT
+    else if (strncasecmp (stMsgData->paramName, hostIf_IP_Diagnostics_SpeedTest::SpeedTestProfile, strlen (hostIf_IP_Diagnostics_SpeedTest::SpeedTestProfile)) == 0)
+    {
+	hostIf_IP_Diagnostics_SpeedTest& spdtst = hostIf_IP_Diagnostics_SpeedTest::getInstance ();
+	ret = spdtst.handleSetMsg (stMsgData);
+    }
+#endif
     else if (strncasecmp (stMsgData->paramName, "Device.IP", strlen ("Device.IP")))
     {
         stMsgData->instanceNum = instanceNumber;

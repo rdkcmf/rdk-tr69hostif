@@ -245,6 +245,18 @@ AC_ARG_ENABLE([IPv6],
            ],
          [echo "IPv6 support is disabled"])
 
+AC_ARG_ENABLE([SpeedTest],
+        AS_HELP_STRING([--enable-SpeedTest],[enable speed test diagnostics support in ip profile (default is no)]),
+        [
+          case "${enableval}" in
+           yes) SPEEDTEST_SUPPORT_ENABLE=true
+                SPEEDTEST_SUPPORT_FLAG="-DSPEEDTEST_SUPPORT" ;;
+           no) SPEEDTEST_SUPPORT_ENABLE=false AC_MSG_ERROR([Speedtest support is disabled]) ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-SpeedTest ]) ;;
+           esac
+           ],
+         [echo "SpeedTest support is disabled"])
+
 AC_ARG_ENABLE([systemd-notify],
         AS_HELP_STRING([--enable-systemd-notify],[enable systemd sd notify]),
         [
@@ -354,6 +366,7 @@ AM_CONDITIONAL([WITH_HWSELFTEST_PROFILE], [test x$HWSELFTEST_PROFILE_ENABLE = xt
 AM_CONDITIONAL([WITH_XRDK_RF4CE_PROFILE], [test x$XRDK_RF4CE_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_XRDK_BT_PROFILE], [test x$XRDK_BT_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_IPV6_SUPPORT], [test x$IPV6_SUPPORT_ENABLE = xtrue])
+AM_CONDITIONAL([WITH_SPEEDTEST_SUPPORT], [test x$SPEEDTEST_SUPPORT_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_NOTIFICATION_SUPPORT], [test x$HAVE_VALUE_CHANGE_EVENT_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_WEBPA_RFC], [test x$WEBPA_RFC_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_SNMP_ADAPTER], [test x$SNMP_ADAPTER_ENABLE = xtrue])
@@ -403,6 +416,7 @@ AC_SUBST(INTFSTACK_PROFILE_FLAG)
 AC_SUBST(XRDK_RF4CE_PROFILE_FLAG)
 AC_SUBST(XRDK_BT_PROFILE_FLAG)
 AC_SUBST(IPV6_SUPPORT_FLAG)
+AC_SUBST(SPEEDTEST_SUPPORT_FLAG)
 AC_SUBST(HAVE_VALUE_CHANGE_EVENT_FLAG)
 AC_SUBST(SYSTEMD_SDNOTIFY_CFLAGS)
 AC_SUBST(SYSTEMD_SDNOTIFY_LDFLAGS)
