@@ -7,7 +7,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "https://acswg.g.comcast.net:443/cwmpWeb/DigestCPEMgt?target=/CPEMgt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/comcast_acs_ca.crt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Comcast",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Xfinity"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Xfinity",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "CMCSTX"
    },
    "comcast" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -18,7 +19,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/comcast_acs_ca.crt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69Key" : "/etc/tr69/lallvzbkw.ens",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Comcast",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Xfinity"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Xfinity",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "CMCSTX"
    },
    "cox" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -28,7 +30,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "https://dukercapp-acs-v6.east.cox.net",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/ca-certificates.crt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Cox",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Contour"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Contour",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMCOX"
    },
    "cox-dev" : {
         "Device.Time.NTPServer1" : "cpentp.services.coxlab.net",
@@ -38,7 +41,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "https://chnm-acs-v6.qa1.coxlab.net",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/ca-certificates.crt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Cox",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Contour"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Contour",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMCOX"
    },
    "cox-qa" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -48,7 +52,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "https://dukercapp-acs-v6.east.cox.net",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/ca-certificates.crt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Cox",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Contour"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Contour",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMCOX"
    },
    "MIT" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -66,7 +71,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "https://acs-secure.shawcable.net/dps/TR069",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/usr/share/tr69/certs/shaw_acs_ca.pem",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Shaw",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Shaw)"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Shaw)",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMSHW"
    },
    "shaw-dev" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -76,7 +82,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "https://acs-secure-stg.shawcable.net/dps/TR069",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/usr/share/tr69/certs/shaw_acs_ca.pem",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Shaw",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Shaw)"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Shaw)",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMSHW"
    },
    "rogers" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -84,7 +91,8 @@
         "Device.Time.NTPServer3" : "time.google.com",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL_dev" : "https://ecoacs.acs.net.rogers.com",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "https://ecoacs.acs.net.rogers.com",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/rogers_acs_ca.cer"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/rogers_acs_ca.cer",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMRGR"
    },
    "rogers-dev" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -92,7 +100,8 @@
         "Device.Time.NTPServer3" : "time.google.com",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL_dev" : "http://ecoacs.vf.rogers.com",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "http://ecoacs.vf.rogers.com",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/rogers_acs_ca.cer"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/rogers_acs_ca.cer",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMRGR"
    },
    "videotron" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -102,6 +111,7 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "https://acswg.g.comcast.net:443/cwmpWeb/DigestCPEMgt?target=/CPEMgt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/comcast_acs_ca.crt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Videotron",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Videotron"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Videotron",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMVTN"
    }
 }
