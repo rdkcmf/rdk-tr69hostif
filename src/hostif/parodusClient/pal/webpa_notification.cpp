@@ -177,11 +177,12 @@ char * getNotifySource()
         getParamList[0]= (char*) calloc(1,MAX_PARAMETER_LENGTH);
         strncpy(getParamList[0],DEVICE_ESTB_MAC_PARAM,MAX_PARAMETER_LENGTH);
         param_t **parametervalArr = (param_t **) malloc(sizeof(param_t **));
+        *parametervalArr = NULL;
         ret = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS *)*1);
         retCount = (size_t *) malloc(sizeof(size_t) * 1);
         getValues(const_cast<const char**>(getParamList), 1, &parametervalArr, &retCount, &ret);
         notificationSource = (char*) malloc(WEBPA_NOTIFY_SRC_LEN);
-        if( (NULL != parametervalArr) && NULL != (*parametervalArr)[0].value)
+        if((NULL != parametervalArr) && (NULL != *parametervalArr) && (NULL != (*parametervalArr)[0].value))
         {
             strncpy(deviceMac,const_cast<const char*>((*parametervalArr)[0].value),WEBPA_NOTIFY_SRC_LEN);
             RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s] Calling MacToLower for MAC:  %s ", __FUNCTION__,deviceMac);
@@ -202,8 +203,10 @@ char * getNotifySource()
 
         if(NULL != parametervalArr)
         {
-            WAL_FREE((*parametervalArr)[0].value)
-            WAL_FREE((*parametervalArr)[0].name);
+            if(NULL != *parametervalArr) {
+                WAL_FREE((*parametervalArr)[0].value);
+                WAL_FREE((*parametervalArr)[0].name);
+            }
             WAL_FREE(parametervalArr);
         }
     }
