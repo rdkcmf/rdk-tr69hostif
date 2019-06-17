@@ -43,6 +43,10 @@
 #include "Device_MoCA_Interface.h"
 #endif
 
+#ifdef YOCTO_BUILD
+#include "secure_wrapper.h"
+#endif
+
 #define MAX_BUF_LEN 128
 #define MAX_CMD_LEN 256
 #define MAX_IFNAME_LEN 64
@@ -388,14 +392,22 @@ int hostif_InterfaceStack::populateBridgeTable()
             {
                 // Get the list of interfaces present inside brif director in comma separated format
                 snprintf(cmd, sizeof(cmd), "ls %s%s/brif|awk 'BEGIN{ORS=\",\";}{print $1}'", SYS_CLASS_NET_PATH, nameList[i]->d_name);
+#ifdef YOCTO_BUILD
+                fp = v_secure_popen("r", "ls %s%s/brif|awk 'BEGIN{ORS=\",\";}{print $1}'", SYS_CLASS_NET_PATH, nameList[i]->d_name);
+#else
                 fp = popen(cmd, "r");
+#endif
                 if(fp)
                 {
                     memset(result_buff, '\0', sizeof(result_buff));
                     fgets(result_buff, sizeof(result_buff), fp);
                     // Insert a row in bridge table with bridge as key and comma separated interface as value
                     ret = insertRowIntoBridgeTable(nameList[i]->d_name, result_buff);
+#ifdef YOCTO_BUILD
+                    v_secure_pclose(fp);
+#else
                     pclose(fp);
+#endif
                     fp = NULL;
                 }
             }

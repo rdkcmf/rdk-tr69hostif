@@ -41,6 +41,10 @@
 
 #include "Device_Ethernet_Interface.h"
 
+#ifdef YOCTO_BUILD
+#include "secure_wrapper.h"
+#endif
+
 EthernetInterface hostIf_EthernetInterface::stEthInterface = {0,};
 
 GMutex* hostIf_EthernetInterface::m_mutex = NULL;
@@ -240,7 +244,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
 
         sprintf(cmd,"cat /sys/class/net/%s/carrier", ethernetInterfaceName);
 
+#ifdef YOCTO_BUILD
+        fp = v_secure_popen("r", "cat /sys/class/net/%s/carrier", ethernetInterfaceName);
+#else
         fp = popen(cmd,"r");
+#endif
 
         if(fp == NULL)
         {
@@ -253,7 +261,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
         {
             sscanf(resultBuff,"%d",&hostIf_EthernetInterface::stEthInterface.enable);
         }
+#ifdef YOCTO_BUILD
+        v_secure_pclose(fp);
+#else
         pclose(fp);
+#endif
 
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u Enable: %d \n",
                 __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.enable);
@@ -268,7 +280,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
 
         sprintf(cmd,"cat /sys/class/net/%s/carrier", ethernetInterfaceName);
 
+#ifdef YOCTO_BUILD
+        fp = v_secure_popen("r", "cat /sys/class/net/%s/carrier", ethernetInterfaceName);
+#else
         fp = popen(cmd,"r");
+#endif
 
         if(fp == NULL)
         {
@@ -287,7 +303,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u Status: %s \n",
                 __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.status);
 
+#ifdef YOCTO_BUILD
+        v_secure_pclose(fp);
+#else
         pclose(fp);
+#endif
         break;
     case eName:
     {
@@ -307,8 +327,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
             return 0;
 
         sprintf(cmd,"cat /sys/class/net/%s/carrier", ethernetInterfaceName);
-
+#ifdef YOCTO_BUILD
+        fp = v_secure_popen("r", "cat /sys/class/net/%s/carrier", ethernetInterfaceName);
+#else
         fp = popen(cmd,"r");
+#endif
 
         if(fp == NULL)
         {
@@ -319,7 +342,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
         {
             sscanf(resultBuff,"%d",&hostIf_EthernetInterface::stEthInterface.upStream );
         }
+#ifdef YOCTO_BUILD
+        v_secure_pclose(fp);
+#else
         pclose(fp);
+#endif
 
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u UpStream: %d \n",
                 __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.upStream);
@@ -333,8 +360,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
             return 0;
 
         sprintf(cmd,"cat /sys/class/net/%s/address", ethernetInterfaceName);
-
+#ifdef YOCTO_BUILD
+        fp = v_secure_popen("r", "cat /sys/class/net/%s/address", ethernetInterfaceName);
+#else
         fp = popen(cmd,"r");
+#endif
 
         if(fp == NULL)
         {
@@ -347,8 +377,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
         {
             sscanf(resultBuff,"%s",hostIf_EthernetInterface::stEthInterface.mACAddress);
         }
-
+#ifdef YOCTO_BUILD
+        v_secure_pclose(fp);
+#else
         pclose(fp);
+#endif
 
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u MACAddress: %s \n",
                 __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.mACAddress);
@@ -361,9 +394,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
             return 0;
 
         sprintf(cmd,"cat /sys/class/net/%s/speed", ethernetInterfaceName);
-
+#ifdef YOCTO_BUILD
+        fp = v_secure_popen("r", "cat /sys/class/net/%s/speed", ethernetInterfaceName);
+#else
         fp = popen(cmd,"r");
-
+#endif
         if(fp == NULL)
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Error in popen eMaxBitRate\n", __FUNCTION__);
@@ -375,8 +410,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
         {
             sscanf(resultBuff,"%d",&hostIf_EthernetInterface::stEthInterface.maxBitRate);
         }
-
+#ifdef YOCTO_BUILD
+        v_secure_pclose(fp);
+#else
         pclose(fp);
+#endif
 
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u MaxBitRate: %d\n",
                 __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.maxBitRate);
@@ -388,8 +426,11 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
             return 0;
 
         sprintf(cmd,"cat /sys/class/net/%s/duplex", ethernetInterfaceName);
-
+#ifdef YOCTO_BUILD
+        fp = v_secure_popen("r", "cat /sys/class/net/%s/duplex", ethernetInterfaceName);
+#else
         fp = popen(cmd,"r");
+#endif
 
         if(fp == NULL)
         {
@@ -402,8 +443,12 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
         {
             sscanf(resultBuff,"%s",hostIf_EthernetInterface::stEthInterface.duplexMode);
         }
-
+#ifdef YOCTO_BUILD
+        v_secure_pclose(fp);
+#else
         pclose(fp);
+#endif
+
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u DuplexMode: %s\n",
                 __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.duplexMode);
 

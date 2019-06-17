@@ -16,11 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##########################################################################
->>>>>>> 2e7994b... RDK-17766:Update files in tr69hostif component with Apache header
 
 SUBDIRS = 
 
 AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include -I$(top_srcdir)/src/hostif/handlers/include  $(GLIB_CFLAGS) $(G_THREAD_CFLAGS)
+
+if IS_YOCTO_ENABLED
+AM_LDFLAGS = -lsecure_wrapper
+endif
 
 noinst_LTLIBRARIES = libhostIfEthernet.la
 libhostIfEthernet_la_SOURCES = 	Device_Ethernet_Interface_Stats.cpp \

@@ -25,13 +25,17 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
 -I$(top_srcdir)/src/hostif/profiles/moca \
 -I$(top_srcdir)/src/hostif/profiles/X_COMCAST-COM/X_COMCAST-COM_Xcalibur/include \
 -I$(top_srcdir)/src/hostif/profiles/moca \
-$(GLIB_CFLAGS) $(G_THREAD_CFLAGS) $(XREMGR_FLAGS) $(MOCAMGR_FLAGS) $(PROCPS_CFLAGS) \
+$(GLIB_CFLAGS) $(G_THREAD_CFLAGS) $(XREMGR_FLAGS) $(MOCAMGR_FLAGS) $(PROCPS_CFLAGS) $(YOCTO_FLAG) \
 -I=/usr/include/rdk/iarmbus/ \
 -I=/usr/include/rdk/iarmmgrs/mfr/ \
 -I=/usr/include/rdk/iarmmgrs-hal/ \
 -I=/usr/include/wdmp-c
 
 AM_LDFLAGS = $(PROCPS_LIBS) -lIARMBus -lyajl -lds -ldshalcli -ldbus-1 -lcurl -lrfcapi
+
+if IS_YOCTO_ENABLED
+AM_LDFLAGS += -lsecure_wrapper
+endif
 
 if WITH_XRDK_BT_PROFILE
 AM_CXXFLAGS += $(XRDK_BT_PROFILE_FLAG)

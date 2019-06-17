@@ -50,6 +50,10 @@
 #include "snmpAdapter.h"
 #include <fstream>
 
+#ifdef YOCTO_BUILD
+#include "secure_wrapper.h"
+#endif
+
 #define TR181_SNMPOID_FILE              "/etc/tr181_snmpOID.conf"
 #define SNMP_AGENT_IP_ADDRESS           "192.168.100.1" //"127.0.0.1"
 #define SNMP_COMMUNITY                  "hDaFHJG7"
@@ -276,6 +280,13 @@ int hostIf_snmpAdapter::set_ValueToSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
     char resultBuff[BUFF_LENGTH_256] = { 0 };
     map<string,string>::iterator it;
 
+#ifdef YOCTO_BUILD
+    FILE *fp;
+#define CMD(cmd, length, args...) ({ snprintf(cmd, length, args); fp = (v_secure_popen("r", args); )})
+#else
+#define CMD(cmd, length, args...) ({ snprintf(cmd, length, args); })
+#endif
+
     if(stMsgData)
     {
         it = tr181SNMPMap.find(stMsgData->paramName);
@@ -284,21 +295,21 @@ int hostIf_snmpAdapter::set_ValueToSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
             switch(stMsgData->paramtype)
             {
                 case hostIf_StringType:
-                    snprintf (cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s s %s", 
+                    CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s s %s", 
                         SNMP_COMMUNITY, SNMP_AGENT_IP_ADDRESS, 
                         it->second.c_str(),
                         stMsgData->paramValue);
                     break;
 
                 case hostIf_IntegerType:
-                    snprintf (cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s i %d",
+                    CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s i %d",
                         SNMP_COMMUNITY, SNMP_AGENT_IP_ADDRESS,
                         it->second.c_str(),
                         stMsgData->paramValue);
                     break;
 
                 case hostIf_UnsignedIntType:
-                    snprintf (cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s u %d",
+                    CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s u %d",
                         SNMP_COMMUNITY,
                         SNMP_AGENT_IP_ADDRESS,
                         it->second.c_str(),
@@ -314,7 +325,22 @@ int hostIf_snmpAdapter::set_ValueToSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
             }
 
             RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] %s\n", __FUNCTION__, cmd);
+#ifdef YOCTO_BUILD
+	if (fp == NULL) {
+		RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]: cannot run command [%s]\n", __FUNCTION__, cmd);
+		ret = NOK;
+	} else if (fgets (resultBuff, BUFF_LENGTH_256, fp) == NULL) {
+		RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]: cannot read output from command [%s]\n", __FUNCTION__, cmd);
+		v_secure_pclose (fp);
+		ret = NOK;
+	} else {
+		ret = v_secure_pclose(fp);
+	}
+
+	RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s]: command [%s] returned [%s]\n", __FUNCTION__, cmd, resultBuff);
+#else
             ret = read_command_output (cmd, resultBuff, BUFF_LENGTH_256);
+#endif
             stMsgData->faultCode = (OK == ret)?fcNoFault:fcRequestDenied;
         }
         else
@@ -323,6 +349,7 @@ int hostIf_snmpAdapter::set_ValueToSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] %s NOT found in the map.\n", __FUNCTION__,__LINE__, stMsgData->paramName );
         }
     }
+#undef CMD
     return ret;
 }
 

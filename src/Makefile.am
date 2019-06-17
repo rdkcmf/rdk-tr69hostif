@@ -113,8 +113,12 @@ AM_CPPFLAGS =  $(GLIB_CFLAGS) $(GTHREAD_CFLAGS)
 #        WITH_DS_CLIENT=TRUE
 #endif
 # Enabled SD_NOTIFY
-AM_CXXFLAGS += $(SYSTEMD_SDNOTIFY_CFLAGS)
+AM_CXXFLAGS += $(SYSTEMD_SDNOTIFY_CFLAGS) $(YOCTO_FLAG)
+if IS_YOCTO_ENABLED
+AM_LDFLAGS += $(SYSTEMD_SDNOTIFY_LDFLAGS) -lsecure_wrapper
+else
 AM_LDFLAGS += $(SYSTEMD_SDNOTIFY_LDFLAGS)
+endif
 
 bin_PROGRAMS = tr69hostif
 tr69hostif_SOURCES = $(top_srcdir)/src/hostif/src/hostIf_main.cpp $(top_srcdir)/src/hostif/src/hostIf_utils.cpp

@@ -23,6 +23,10 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include -I$(top_srcdir)/src/hostif/hand
 				-I$(top_srcdir)/src/hostif/profiles/Ethernet -I$(top_srcdir)/src/hostif/profiles/moca \
                -I$(top_srcdir)/src/hostif/profiles/Ghn $(GLIB_CFLAGS) $(G_THREAD_CFLAGS) $(MOCAMGR_FLAGS) $(INTFSTACK_PROFILE_FLAG)
 
+if IS_YOCTO_ENABLED
+AM_LDFLAGS = -lsecure_wrapper
+endif
+
 noinst_LTLIBRARIES = libhostIfInterfaceStack.la
 libhostIfInterfaceStack_la_SOURCES = 	Device_InterfaceStack.cpp
 				

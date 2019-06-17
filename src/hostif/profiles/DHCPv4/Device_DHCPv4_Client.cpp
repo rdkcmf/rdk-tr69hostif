@@ -26,7 +26,9 @@
 #include "Device_DHCPv4_Client.h"
 #include "Device_IP_Interface.h"
 #include "Device_IP.h"
-
+#ifdef YOCTO_BUILD
+#include "secure_wrapper.h"
+#endif
 #define MAX_CMD_LEN 128
 #define MAX_BUF_LEN 256
 #define MAX_IP_LEN 16
@@ -279,11 +281,19 @@ bool hostIf_DHCPv4Client::isIfnameInroutetoDNSServer(char* dnsServer, char* ifNa
     FILE* cmdOP;
 
     snprintf(cmd,MAX_CMD_LEN -1, "ip route get %s | grep %s | awk 'BEGIN {FR=\" \"} {printf $5}'", dnsServer, dnsServer);
+#ifdef YOCTO_BUILD
+    cmdOP=v_secure_popen("r", "ip route get %s | grep %s | awk 'BEGIN {FR=\" \"} {printf $5}'", dnsServer, dnsServer);
+#else
     cmdOP=popen(cmd, "r");
+#endif
     if (cmdOP)
     {
         fgets(opIfName, 8, cmdOP);
-        pclose(cmdOP);
+#ifdef YOCTO_BUILD
+        v_secure_pclose(cmdOP);
+#else
+	pclose(cmdOP);
+#endif
     }
     if(strncmp(opIfName, ifName, sizeof(opIfName))==0)
     {
@@ -379,7 +389,11 @@ int hostIf_DHCPv4Client::get_Device_DHCPv4_Client_Fields(DHCPv4ClientMembers dhc
             memset(cmd, 0, sizeof cmd);
             /*Get the default interface name and its gateway. If the interface name matches with the class interface, then fill iprouters */
             snprintf(cmd, MAX_CMD_LEN - 1 ,"ip r|grep default| grep %s |awk '{printf $3}'",ifname);
+#ifdef YOCTO_BUILD
+            cmdOP=v_secure_popen("r", "ip r|grep default| grep %s |awk '{printf $3}'",ifname);
+#else
             cmdOP=popen(cmd, "r");
+#endif
             if (cmdOP)
             {
                 fgets(buffer, MAX_BUF_LEN, cmdOP);
@@ -388,7 +402,11 @@ int hostIf_DHCPv4Client::get_Device_DHCPv4_Client_Fields(DHCPv4ClientMembers dhc
                     snprintf(dhcpClient.ipRouters, sizeof(dhcpClient.ipRouters), "%s",  buffer);
                 }
                 ret=OK;
+#ifdef YOCTO_BUILD
+                v_secure_pclose(cmdOP);
+#else
                 pclose(cmdOP);
+#endif
             }
             break;
         default:

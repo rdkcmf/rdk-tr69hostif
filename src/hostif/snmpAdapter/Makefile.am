@@ -26,6 +26,10 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
 
 AM_LDFLAGS = $(GLIB_LIBS) $(G_THREAD_LIBS) $(SOUP_LIBS)
 
+if IS_YOCTO_ENABLED
+AM_LDFLAGS = -lsecure_wrapper
+endif
+
 noinst_LTLIBRARIES = libSNMPAdapter.la
 libSNMPAdapter_la_SOURCES = snmpAdapter.cpp
 
