@@ -26,6 +26,10 @@
 #include "Service_Storage_PhyMedium.h"
 #include "Service_Storage.h"
 
+#ifdef YOCTO_BUILD
+#include "secure_wrapper.h"
+#endif
+
 #define MAX_CMD_LEN 256
 #define MAX_BUF_LEN 256
 #define MAX_IP_LEN 16
@@ -662,7 +666,11 @@ int hostIf_PhysicalMedium :: isMediumHealthOK()
         {
             snprintf(cmd,MAX_CMD_LEN, CMD_TO_CHECK_SMART_HEALTH ,mediumName, STORAGE_PHYMED_SMARTPARAMS);
             RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Executing command:%s\n",cmd);
+#ifdef YOCTO_BUILD
+            cmdOp = v_secure_popen("r",CMD_TO_CHECK_SMART_HEALTH,mediumName,STORAGE_PHYMED_SMARTPARAMS);
+#else
             cmdOp = popen(cmd,"r");
+#endif
             if(NULL != cmdOp)
             {
                 fgets(buffer,MAX_BUF_LEN,cmdOp);
@@ -690,7 +698,11 @@ int hostIf_PhysicalMedium :: isMediumHealthOK()
                     health=PHYMED_INVALID_PARAM;
                     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Error in parsing output\n");
                 }
-                pclose(cmdOp);
+#ifdef YOCTO_BUILD
+                v_secure_pclose(cmdOp);
+#else
+                pclose(cmdOp);	
+#endif
             }
             else
             {

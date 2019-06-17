@@ -21,5 +21,9 @@ SUBDIRS =
 
 AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include -I$(top_srcdir)/src/hostif/handlers/include  -I$(top_srcdir)/src/hostif/profiles/IP $(GLIB_CFLAGS) $(G_THREAD_CFLAGS)
 
+if IS_YOCTO_ENABLED
+AM_LDFLAGS = -lsecure_wrapper
+endif
+
 noinst_LTLIBRARIES = libhostIfDHCPv4Client.la
 libhostIfDHCPv4Client_la_SOURCES =  Device_DHCPv4_Client.cpp 

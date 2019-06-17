@@ -50,9 +50,7 @@
 #include "Device_IP.h"
 
 #ifdef YOCTO_BUILD
-extern "C" {
 #include "secure_wrapper.h"
-}
 #endif
 GMutex* hostIf_IPv4Address::m_mutex = NULL;
 GHashTable *hostIf_IPv4Address::ifHash = NULL;
@@ -94,11 +92,11 @@ int hostIf_IPv4Address::setIpOrMask(int interfaceNo, char *value, const char* ip
     {
         if (0 == strcasecmp (backupAddressingType, "static"))
         {
-            char cmd[BUFF_LENGTH] = { 0 };
-            sprintf (cmd, "ifconfig %s %s %s", nameOfInterface, ipOrMask, value);
 #ifdef YOCTO_BUILD
-       v_secure_system(cmd);
+       v_secure_system("ifconfig %s %s %s", nameOfInterface, ipOrMask, value);
 #else
+       char cmd[BUFF_LENGTH] = { 0 };
+       sprintf (cmd, "ifconfig %s %s %s", nameOfInterface, ipOrMask, value);
        system(cmd);
 #endif
             RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s(),%d] IPv4Address: IPAddress/SubnetMask is set \n", __FUNCTION__, __LINE__);
@@ -625,10 +623,10 @@ int hostIf_IPv4Address::set_IPv4Address_Enable(HOSTIF_MsgData_t *stMsgData, int 
     char cmd[BUFF_LENGTH] = { 0 };
     if(FALSE == get_boolean(stMsgData->paramValue))
     {
-        sprintf(cmd,"ifconfig %s 0.0.0.0",nameOfInterface);
 #ifdef YOCTO_BUILD
-       v_secure_system(cmd);
+       v_secure_system("ifconfig %s 0.0.0.0", nameOfInterface);
 #else
+       sprintf(cmd,"ifconfig %s 0.0.0.0", nameOfInterface);
        system(cmd);
 #endif
         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s(),%d] IPv4Address Disabled   \n",__FUNCTION__,__LINE__);
@@ -636,10 +634,10 @@ int hostIf_IPv4Address::set_IPv4Address_Enable(HOSTIF_MsgData_t *stMsgData, int 
     }
     if(TRUE == get_boolean(stMsgData->paramValue))
     {
-        sprintf(cmd,"ifdown %s && ifup %s",nameOfInterface,nameOfInterface);
 #ifdef YOCTO_BUILD
-       v_secure_system(cmd);
+       v_secure_system("ifdown %s && ifup %s", nameOfInterface, nameOfInterface);
 #else
+       sprintf(cmd,"ifdown %s && ifup %s", nameOfInterface, nameOfInterface);
        system(cmd);
 #endif
         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s(),%d] IPv4Address Enabled \n",__FUNCTION__,__LINE__);

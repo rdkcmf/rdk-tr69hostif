@@ -21,6 +21,10 @@ SUBDIRS =
 
 AM_CXXFLAGS = -std=c++0x -I$(top_srcdir)/src/hostif/include -I$(top_srcdir)/src/hostif/handlers/include  $(GLIB_CFLAGS) $(G_THREAD_CFLAGS) 
 
+if IS_YOCTO_ENABLED
+AM_LDFLAGS = -lsecure_wrapper
+endif
+
 noinst_LTLIBRARIES = libstorageservice.la
 libstorageservice_la_SOURCES =  Service_Storage_PhyMedium.cpp \
 				Service_Storage.cpp

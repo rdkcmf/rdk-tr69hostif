@@ -72,6 +72,10 @@
 #include <fstream>
 #include <algorithm>
 
+#ifdef YOCTO_BUILD
+#include "secure_wrapper.h"
+#endif
+
 #ifdef USE_MoCA_PROFILE
 #include "Device_MoCA_Interface.h"
 #endif
@@ -2945,7 +2949,11 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *stMsgD
     {
         char execBuf[100] = {'\0'};
         sprintf(execBuf, "wl roam_trigger %s &", stMsgData->paramValue);
+#ifdef YOCTO_BUILD
+        v_secure_system("wl roam_trigger %s &", stMsgData->paramValue);
+#else
         system(execBuf);
+#endif
         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully executed \"%s\" with \"%s\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, execBuf);
         ret = OK;
     }
@@ -3062,7 +3070,11 @@ int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] CMD : [ %s ] \n",__FUNCTION__, cmd);
 
+#ifdef YOCTO_BUILD
+    fp = v_secure_popen("r", "/usr/local/tr69agent/host-if -H 127.0.0.1 -p 56981 -g %s | grep -i Value | cut -d \":\" -f2", stMsgData->paramName);
+#else
     fp = popen(cmd,"r");
+#endif
 
     if(fp == NULL)
     {
@@ -3077,7 +3089,11 @@ int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] result %s buf %s Reset. \n",__FUNCTION__, result, buf);
 
+#ifdef YOCTO_BUILD
+    v_secure_pclose(fp);
+#else
     pclose(fp);
+#endif
     memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
     strncpy(stMsgData->paramValue, result, TR69HOSTIFMGR_MAX_PARAM_LEN );
     stMsgData->paramtype = hostIf_StringType;
@@ -3227,7 +3243,11 @@ int hostIf_DeviceInfo::set_xFirmwareDownloadNow(HOSTIF_MsgData_t *stMsgData)
                 char cmd[200] = {'\0'};
                 sprintf(cmd, "%s %s %s %s %d &",userTriggerDwScr, m_xFirmwareDownloadProtocol.c_str(), m_xFirmwareDownloadURL.c_str(), m_xFirmwareToDownload.c_str(), m_xFirmwareDownloadUseCodebig);
 
+#ifdef YOCTO_BUILD
+                ret = v_secure_system("%s %s %s %s &",userTriggerDwScr, m_xFirmwareDownloadProtocol.c_str(), m_xFirmwareDownloadURL.c_str(), m_xFirmwareToDownload.c_str());
+#else
                 ret = system (cmd);
+#endif
 
                 if (ret != 0) {
                     RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Failed to trigger Download, \'system (\"%s\")\' returned error code '%d'\n", __FUNCTION__, cmd, ret);
