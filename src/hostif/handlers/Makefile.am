@@ -38,7 +38,7 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
 	-I$(top_srcdir)/src/hostif/profiles/wifi \
 	-I./include $(GLIB_CFLAGS) $(G_THREAD_CFLAGS) \
 	$(XREMGR_FLAGS) $(MOCAMGR_FLAGS) $(SOUP_CFLAGS) $(MOCA2_FLAG) \
-	$(WIFI_PROFILE_FLAG) $(XRDK_SDCARD_PROFILE_FLAG)\
+	$(WIFI_PROFILE_FLAG) $(XRDK_SDCARD_PROFILE_FLAG) $(XRDK_EMMC_PROFILE_FLAG) \
         -I=/usr/include/rdk/iarmbus/ \
         -I=/usr/include/rdk/iarmmgrs/sysmgr/ \
         -I$(PKG_CONFIG_SYSROOT_DIR)/usr/include/rdk/tr69agent/ \
@@ -50,6 +50,10 @@ AM_CXXFLAGS += "-std=c++11" $(PROCPS_CFLAGS)
 
 if WITH_XRDK_SDCARD_PROFILE
 AM_CXXFLAGS += $(XRDK_SDCARD_PROFILE_FLAG)
+endif
+
+if WITH_XRDK_EMMC_PROFILE
+AM_CXXFLAGS += $(XRDK_EMMC_PROFILE_FLAG)
 endif
 
 if WITH_INTFSTACK_PROFILE
