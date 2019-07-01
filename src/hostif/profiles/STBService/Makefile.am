@@ -29,6 +29,10 @@ if WITH_XRDK_SDCARD_PROFILE
 AM_CXXFLAGS += $(XRDK_SDCARD_PROFILE_FLAG)
 endif
 
+if WITH_XRDK_EMMC_PROFILE
+AM_CXXFLAGS += $(XRDK_EMMC_PROFILE_FLAG)
+endif
+
 if WITH_XRDK_RF4CE_PROFILE
 AM_CXXFLAGS += $(XRDK_RF4CE_PROFILE_FLAG)
 endif
@@ -43,6 +47,10 @@ libstbservice_la_SOURCES =	Components_AudioOutput.cpp \
 				Capabilities.cpp
 if WITH_XRDK_SDCARD_PROFILE
 libstbservice_la_SOURCES += Components_XrdkSDCard.cpp
+endif
+
+if WITH_XRDK_EMMC_PROFILE
+libstbservice_la_SOURCES += Components_XrdkEMMC.cpp
 endif
 
 if ENABLE_RDK_STMGR_V2

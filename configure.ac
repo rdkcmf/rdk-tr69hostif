@@ -37,6 +37,7 @@ SUBDIRS_WIFI=" "
 MOCA2_FLAG=" "
 WIFI_PROFILE_FLAGS=" "
 XRDK_SDCARD_PROFILE_FLAG=" "
+XRDK_EMMC_PROFILE_FLAG=" "
 SUBDIRS_STORAGESERVICE=" "
 SUBDIRS_INTFSTACK=" "
 SUBDIRS_DHCPv4=" "
@@ -137,6 +138,19 @@ AC_ARG_ENABLE([sdcard],
            esac
            ],
          [echo "X_RDKCENTRAL_COM SDcard  profile is disabled"])
+
+AC_ARG_ENABLE([emmc],
+        AS_HELP_STRING([--enable-emmc],[enable X_RDKCENTRAL_COM EMMC profile (default is no)]),
+        [
+          case "${enableval}" in
+           yes) XRDK_EMMC_PROFILE_ENABLE=true
+                XRDK_EMMC_PROFILE_FLAG="-DUSE_XRDK_EMMC_PROFILE" ;;
+           no)  XRDK_EMMC_PROFILE_ENABLE=false
+                [echo "X_RDKCENTRAL_COM EMMC profile is disabled"] ;;
+          *) AC_MSG_ERROR([bad value ${enableval} for --enable-emmc ]) ;;
+           esac
+           ],
+         [echo "X_RDKCENTRAL_COM EMMC profile is disabled"])
 
 AC_ARG_ENABLE([DHCPv4],
         AS_HELP_STRING([--enable-DHCPv4],[enable DHCPv4 profile (default is no)]),
@@ -359,6 +373,7 @@ AM_CONDITIONAL([WITH_MOCA_PROFILE], [test "x$enable_moca" = "xyes"])
 AM_CONDITIONAL([WITH_MOCA20], [test "x$enable_moca2" = "xyes"])
 AM_CONDITIONAL([WITH_WIFI_PROFILE], [test x$WIFI_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_XRDK_SDCARD_PROFILE], [test x$XRDK_SDCARD_PROFILE_ENABLE = xtrue])
+AM_CONDITIONAL([WITH_XRDK_EMMC_PROFILE], [test x$XRDK_EMMC_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_DHCP_PROFILE], [test x$DHCPv4_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_INTFSTACK_PROFILE], [test x$INTFSTACK_PROFILE_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_STORAGESERVICE_PROFILE], [test x$STORAGESERVICE_PROFILE_ENABLE = xtrue])
@@ -393,7 +408,7 @@ AC_TYPE_SIZE_T
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([rdkStorageMgr.h], [HAVE_RDK_STMGR_V2_H=yes], [HAVE_RDK_STMGR_V2_H=no], [])
 AC_LANG_POP
-AM_CONDITIONAL([ENABLE_RDK_STMGR_V2], [test "x$HAVE_RDK_STMGR_V2_H" = "xyes" -a "x$XRDK_SDCARD_PROFILE_ENABLE" = "xtrue"])
+AM_CONDITIONAL([ENABLE_RDK_STMGR_V2], [test "x$HAVE_RDK_STMGR_V2_H" = "xyes" -a '(' "x$XRDK_SDCARD_PROFILE_ENABLE" = "xtrue" -o "x$XRDK_EMMC_PROFILE_ENABLE" = "xtrue" ')'])
 
 # Checks for library functions.
 AC_FUNC_MALLOC
@@ -410,6 +425,7 @@ AC_SUBST(MOCA2_FLAG)
 AC_SUBST(WIFI_PROFILE_ENABLE)
 AC_SUBST(WIFI_PROFILE_FLAG)
 AC_SUBST(XRDK_SDCARD_PROFILE_FLAG)
+AC_SUBST(XRDK_EMMC_PROFILE_FLAG)
 AC_SUBST(DHCPv4_PROFILE_FLAG)
 AC_SUBST(STORAGESERVICE_PROFILE_FLAG)
 AC_SUBST(INTFSTACK_PROFILE_FLAG)

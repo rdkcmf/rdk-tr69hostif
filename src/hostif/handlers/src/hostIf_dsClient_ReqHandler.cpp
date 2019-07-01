@@ -36,6 +36,9 @@
 #ifdef USE_XRDK_SDCARD_PROFILE
 #include "Components_XrdkSDCard.h"
 #endif
+#ifdef USE_XRDK_EMMC_PROFILE
+#include "Components_XrdkEMMC.h"
+#endif
 
 #include "Capabilities.h"
 #include "Components_AudioOutput.h"
@@ -360,6 +363,21 @@ int DSClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     	}
     	stMsgData->instanceNum = 0;
     	ret = pIfaceSdcardif->handleGetMsg(stMsgData);
+    }
+#endif
+#ifdef USE_XRDK_EMMC_PROFILE
+    else if(strncasecmp(stMsgData->paramName, X_EMMC_OBJ, strlen(X_EMMC_OBJ)) == 0)
+    {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] Parameter Name : [\'%s\'] \n", __FILE__, __FUNCTION__, __LINE__, stMsgData->paramName);
+        hostIf_STBServiceXeMMC *pIfaceEMMCif = hostIf_STBServiceXeMMC::getInstance();
+        if(!pIfaceEMMCif)
+        {
+            // TODO: why do we need to release some random HDMI lock here?
+            hostIf_STBServiceHDMI::releaseLock();
+            return NOK;
+        }
+        stMsgData->instanceNum = 0;
+        ret = pIfaceEMMCif->handleGetMsg(stMsgData);
     }
 #endif
 

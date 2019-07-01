@@ -602,11 +602,11 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
             {
                 sdCardParam->sdCardProp.iVal = -1;
                 /* FIXME: Update string from "used" to a proper proposed value */
-                for (int i = 0; i < healthInfo.m_diagnosticsList.m_numOfAttributes; i++)
+                for (int i = 0; i < healthInfo.m_diagnostics.m_list.m_numOfAttributes; i++)
                 {
-                    if (0 == strcmp (healthInfo.m_diagnosticsList.m_diagnostics[i].m_name, "used"))
+                    if (0 == strcmp (healthInfo.m_diagnostics.m_list.m_diagnostics[i].m_name, "used"))
                     {
-                        sdCardParam->sdCardProp.iVal = atoi (healthInfo.m_diagnosticsList.m_diagnostics[i].m_value);
+                        sdCardParam->sdCardProp.iVal = atoi (healthInfo.m_diagnostics.m_list.m_diagnostics[i].m_value);
                         break;
                     }
                 }
