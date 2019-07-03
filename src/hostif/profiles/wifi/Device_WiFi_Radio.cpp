@@ -179,7 +179,7 @@ int hostIf_WiFi_Radio::get_Device_WiFi_Radio_Props_Fields(int radioIndex)
         snprintf(OperatingFrequencyBand,BUFF_LENGTH_64,param.data.radio.params.operatingFrequencyBand);
         snprintf(SupportedStandards,BUFF_LENGTH_64,param.data.radio.params.supportedStandards);
         snprintf(OperatingStandards,BUFF_LENGTH_64,param.data.radio.params.operatingStandards);
-        snprintf(PossibleChannels,BUFF_LENGTH_64,param.data.radio.params.possibleChannels);
+        snprintf(PossibleChannels,BUFF_LENGTH_256,param.data.radio.params.possibleChannels);
         snprintf(ChannelsInUse,BUFF_LENGTH_1024,param.data.radio.params.channelsInUse);
         Channel                     =   param.data.radio.params.channel;
         AutoChannelSupported        =   param.data.radio.params.autoChannelSupported;

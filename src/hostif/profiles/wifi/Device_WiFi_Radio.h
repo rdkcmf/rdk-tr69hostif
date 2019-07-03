@@ -133,7 +133,7 @@ public:
     char OperatingFrequencyBand[BUFF_LENGTH_64];
     char SupportedStandards[BUFF_LENGTH_64];
     char OperatingStandards[BUFF_LENGTH_64];
-    char PossibleChannels[BUFF_LENGTH_64];
+    char PossibleChannels[BUFF_LENGTH_256];
     char ChannelsInUse[BUFF_LENGTH_1024];
     unsigned int Channel;
     bool AutoChannelSupported;
