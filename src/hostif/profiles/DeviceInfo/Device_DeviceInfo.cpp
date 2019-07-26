@@ -90,6 +90,7 @@
 #define GATEWAY_NAME_SIZE 4
 #define IPREMOTE_SUPPORT_STATUS_FILE    "/opt/.ipremote_status"
 #define IPREMOTE_INTERFACE_INFO         "/tmp/ipremote_interface_info"
+#define MODEL_NAME_FILE                 "/tmp/.model"
 
 #define TR069DOSLIMIT_THRESHOLD "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Tr069DoSLimit.Threshold"
 #define MIN_TR69_DOS_THRESHOLD 0
@@ -639,21 +640,28 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgD
         ret = NOK;
     }
 #else 
-    // Try to get MODEL NUM from Device Properties file
-    char* modelName = NULL;
-    modelName = getenvOrDefault("MODEL_NUM","");
-    if(modelName !=  NULL) {
+    // Try to get MODEL NAME from Device Properties
+    FILE *fp = NULL;
+    char modelName[64] = {'\0'};
+
+    fp = fopen(MODEL_NAME_FILE,"r");
+    if(fp == NULL) {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Failed to open MODEL Name file\n.!",__FUNCTION__, __FILE__, __LINE__);
+        return NOK;
+    }
+    if(fgets(modelName, 64,fp)!=NULL) {
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] modelName = %s.\n",__FUNCTION__, __FILE__, __LINE__,modelName);
         int len = strlen(modelName);
         strncpy((char *)stMsgData->paramValue, modelName, len);
-        stMsgData->paramValue[len+1] = '\0';
+        stMsgData->paramValue[len] = '\0';
         stMsgData->paramLen = len;
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s stMsgData->paramLen: %d \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue,stMsgData->paramLen);
         ret = OK;
     } else {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Failed to get model name from device properties..!!\n",__FUNCTION__, __FILE__, __LINE__);
-        ret = NOK;
-    } 
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Failed to read model name.\n", __FUNCTION__);
+    }
+    fclose(fp);
+
 #endif //#if !defined (USE_DEV_PROPERTIES_CONF)
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()]\n", __FUNCTION__);
     return ret;
