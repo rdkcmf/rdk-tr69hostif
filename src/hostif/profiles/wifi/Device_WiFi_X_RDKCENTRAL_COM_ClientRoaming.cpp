@@ -336,7 +336,7 @@ int hostIf_WiFi_Xrdk_ClientRoaming::get_Device_WiFi_X_Rdkcentral_clientRoaming_P
     else {
         put_int(stMsgData->paramValue, this->preassnBestDelta);
     }
-    stMsgData->paramtype = hostIf_IntegerType;
+    stMsgData->paramtype = hostIf_UnsignedIntType;
     stMsgData->paramLen=4;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
     return retStatus;
@@ -417,7 +417,7 @@ int hostIf_WiFi_Xrdk_ClientRoaming::get_Device_WiFi_X_Rdkcentral_clientRoaming_P
     else {
         put_int(stMsgData->paramValue, this->postAssnLevelDeltaConnected);
     }
-    stMsgData->paramtype = hostIf_IntegerType;
+    stMsgData->paramtype = hostIf_UnsignedIntType;
     stMsgData->paramLen=4;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting...\n", __FUNCTION__, __FILE__);
     return retStatus;
@@ -456,7 +456,7 @@ int hostIf_WiFi_Xrdk_ClientRoaming::get_Device_WiFi_X_Rdkcentral_clientRoaming_P
     else {
         put_int(stMsgData->paramValue, this->postAssnLevelDeltaDisconnected);
     }
-    stMsgData->paramtype = hostIf_IntegerType;
+    stMsgData->paramtype = hostIf_UnsignedIntType;
     stMsgData->paramLen=4;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting...\n", __FUNCTION__, __FILE__);
     return retStatus;
@@ -534,7 +534,7 @@ int hostIf_WiFi_Xrdk_ClientRoaming::get_Device_WiFi_X_Rdkcentral_clientRoaming_P
     else {
         put_int(stMsgData->paramValue, this->postAssnSelfSteerTimeframe);
     }
-    stMsgData->paramtype = hostIf_IntegerType;
+    stMsgData->paramtype = hostIf_UnsignedIntType;
     stMsgData->paramLen=4;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting...\n", __FUNCTION__, __FILE__);
     return retStatus;
@@ -656,7 +656,7 @@ int hostIf_WiFi_Xrdk_ClientRoaming::get_Device_WiFi_X_Rdkcentral_clientRoaming_P
     else {
         put_int(stMsgData->paramValue, this->postAssnAPcontrolTimeframe);
     }
-    stMsgData->paramtype = hostIf_IntegerType;
+    stMsgData->paramtype = hostIf_UnsignedIntType;
     stMsgData->paramLen=4;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting...\n", __FUNCTION__, __FILE__);
     return retStatus;
@@ -697,7 +697,7 @@ int hostIf_WiFi_Xrdk_ClientRoaming::get_Device_WiFi_X_Rdkcentral_clientRoaming_p
     else {
         put_int(stMsgData->paramValue, this->postAssnBackOffTime);
     }
-    stMsgData->paramtype = hostIf_IntegerType;;
+    stMsgData->paramtype = hostIf_UnsignedIntType;
     stMsgData->paramLen=4;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting...\n", __FUNCTION__, __FILE__);
     return retStatus;
