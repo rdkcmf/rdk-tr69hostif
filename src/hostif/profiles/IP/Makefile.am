@@ -25,6 +25,10 @@ if WITH_IPV6_SUPPORT
 AM_CXXFLAGS += $(IPV6_SUPPORT_FLAG)
 endif
 
+if WITH_SPEEDTEST_SUPPORT
+AM_CXXFLAGS += $(SPEEDTEST_SUPPORT_FLAG)
+endif
+
 noinst_LTLIBRARIES = libhostIfIP.la
 libhostIfIP_la_SOURCES =  Device_IP_ActivePort.cpp \
 				Device_IP.cpp \
@@ -38,4 +42,9 @@ libhostIfIP_la_LDFLAGS = -lsecure_wrapper
 endif
 if WITH_IPV6_SUPPORT
 libhostIfIP_la_SOURCES += Device_IP_Interface_IPv6Address.cpp
-endif				
+endif
+
+if WITH_SPEEDTEST_SUPPORT
+libhostIfIP_la_SOURCES += Device_IP_Diagnostics_SpeedTest.cpp
+endif
+
