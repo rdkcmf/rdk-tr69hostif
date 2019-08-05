@@ -501,7 +501,7 @@ void exit_gracefully (int sig_received)
 #endif
 
         // Kill Parodus Thread
-        pthread_kill(parodus_init_tid, sig_received);
+        pthread_cancel(parodus_init_tid);
        /*Stop libSoup server and exit Json Thread */
        hostIf_HttpServerStop();
 
