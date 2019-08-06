@@ -33,18 +33,26 @@
 #include "hostIf_tr69ReqHandler.h"
 
 typedef void (*parodusNotificationCallback)();
+
 class NotificationHandler
 {
-    NotificationHandler();
-    ~NotificationHandler();
+private:
     static NotificationHandler *pInstance;
     static parodusNotificationCallback notifyUpdateCallback;
     static GAsyncQueue *notificationQueue;
+
+    NotificationHandler();
+    ~NotificationHandler();
+
+    void pushNotification(const char* destination, const char* payload);
+
 public:
     static NotificationHandler* getInstance();
     static GAsyncQueue* GetNotificationQueue();
-    void addNotificationToQueue(const char *owner, IARM_Bus_tr69HostIfMgr_EventId_t eventId, void *data, size_t len);
     static void registerUpdateCallback(parodusNotificationCallback cb);
+
+    void pushValueChangeNotification(IARM_Bus_tr69HostIfMgr_EventData_t& event);
+    void pushKeyValueNotification(const char* destination, const char* key, const char* value);
 };
 
 #endif //_HOSTIF_NOTIFICATION_HANDLER_H_
