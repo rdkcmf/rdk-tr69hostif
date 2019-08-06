@@ -27,10 +27,9 @@
 #include "rdk_debug.h"
 
 
-#define WEBPA_NOTIFY_TYPE		   "VALUE_CHANGE_NOTIFICATION"
-#define DEVICE_ESTB_MAC_PARAM 		"Device.DeviceInfo.X_COMCAST-COM_STB_MAC"
-#define WEBPA_UNKNOWN_PARAM_VALUE 	"Unknown"
-#define WEBPA_NOTIFY_SRC_LEN		32
+#define DEVICE_ESTB_MAC_PARAM       "Device.DeviceInfo.X_COMCAST-COM_STB_MAC"
+#define WEBPA_UNKNOWN_PARAM_VALUE   "Unknown"
+#define WEBPA_NOTIFY_SRC_LEN        32
 
 
 char **g_notifyParamList = NULL;
@@ -59,104 +58,6 @@ void setNotifyConfigurationFile(const char* nofityConfigFile)
     }
 }
 
-/**
- * @brief Process Notification and generate payload
- *
- * @return void.
- */
-char* processNotification(NotifyData *notifyMsg, char* payload)
-{
-    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Entering processNotification...-\n");
-    char* stringifiedNotifyPayload = NULL;
-
-    if(notifyMsg)
-    {
-
-        cJSON * notifyPayload = NULL;
-        ParamNotify *param = NULL;
-        char *device_id = NULL;
-
-        switch (notifyMsg->type)
-        {
-        case PARAM_NOTIFY:
-        case TRANS_STATUS:
-        case CONNECTED_CLIENT_NOTIFY:
-        case UPSTREAM_MSG:
-        case PARAM_VALUE_CHANGE_NOTIFY:
-        {
-            if(notifyMsg->data)
-            {
-                param = notifyMsg->data->notify;
-                if(param)
-                {
-                    notifyPayload = cJSON_CreateObject();
-                    device_id = getNotifySource(); // Device ID and Notification source are same
-                    cJSON_AddStringToObject(notifyPayload, "device_id",device_id);
-                    cJSON_AddNumberToObject(notifyPayload, "datatype",param->type);
-                    cJSON_AddStringToObject(notifyPayload, "paramName",param->paramName);
-                    cJSON_AddStringToObject(notifyPayload, "notificationType",WEBPA_NOTIFY_TYPE);
-                    switch(param->type)
-                    {
-                    case WAL_STRING:
-                    {
-                        cJSON_AddStringToObject(notifyPayload,"paramValue",param->newValue );
-                        break;
-                    }
-                    case WAL_INT:
-                    {
-                        const int *paramNewValue = (const int *)param->newValue;
-                        cJSON_AddNumberToObject(notifyPayload,"paramValue",*paramNewValue );
-                        break;
-                    }
-                    case WAL_UINT:
-                    {
-                        const unsigned int *paramNewValue = (const unsigned int *)param->newValue;
-                        cJSON_AddNumberToObject(notifyPayload,"paramValue",*paramNewValue );
-                        break;
-                    }
-                    case WAL_BOOLEAN:
-                    {
-                        const bool  *paramNewValue = (const bool *)param->newValue;
-                        cJSON_AddBoolToObject(notifyPayload,"paramValue",*paramNewValue);
-                        break;
-                    }
-                    case WAL_ULONG:
-                    {
-                        const unsigned long *paramNewValue = (const unsigned long *)param->newValue;
-                        cJSON_AddNumberToObject(notifyPayload,"paramValue",*paramNewValue);
-                        break;
-                    }
-                    default:
-                    {
-                        cJSON_AddStringToObject(notifyPayload,"paramValue",param->newValue );
-                        break;
-                    }
-                    }
-                    stringifiedNotifyPayload = cJSON_PrintUnformatted(notifyPayload);
-                    payload = strdup(stringifiedNotifyPayload);
-                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Notification Processed , Payload = %s\n",payload);
-                    cJSON_Delete(notifyPayload);
-                }
-                else
-                {
-                    RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"ParamNotify is NULL.. !!\n");
-                }
-            }
-            else
-            {
-                RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Notify data is NULL!!\n");
-            }
-        }
-        break;
-        }
-    }
-    else
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF," Invalid Notification Message..!!\n");
-    }
-    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Exiting processNotification...\n");
-    return payload;
-}
 /**
  * @brief Get the Notification source
  *
@@ -244,23 +145,6 @@ static void macToLower(char macValue[],char macConverted[])
         macConverted[j] = tolower(macConverted[j]);
     }
 }
-/**
- * @brief Get the Notification Destination
- *
- * @return void.
- */
-char* getNotifyDestination(char *notifyDest)
-{
-    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Entering .... %s \n", __FUNCTION__);
-    notifyDest = (char*) malloc(WEBPA_NOTIFY_SRC_LEN);
-    if(notifyDest)
-    {
-        strcpy(notifyDest,"event:VALUE_CHANGE_NOTIFICATION");
-        RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Dest = %s... %s \n",notifyDest, __FUNCTION__);
-    }
-    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Exiting .... %s \n", __FUNCTION__);
-    return notifyDest;
-}
 
 /**
  * @brief Read Notify configuration file from config file
@@ -328,8 +212,3 @@ int getnotifyparamList(char ***notifyParamList,int *ptrnotifyListSize)
         RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Unable to parse Configuration file");
     }
 }
-
-
-
-
-

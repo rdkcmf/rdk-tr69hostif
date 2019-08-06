@@ -199,10 +199,12 @@ void updateHandler::notifyCallback(IARM_Bus_tr69HostIfMgr_EventId_t event_type, 
     eventData.paramtype = paramtype;
     IARM_Bus_BroadcastEvent(IARM_BUS_TR69HOSTIFMGR_NAME, (IARM_EventId_t) event_type, (void *)&eventData, sizeof(eventData));
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] Inside Parodus :- %s..\n", __FILE__, __FUNCTION__,paramName);
-    NotificationHandler* pInstance =  NULL;
-    pInstance = NotificationHandler::getInstance();
-    if(pInstance)
-    pInstance->addNotificationToQueue(IARM_BUS_TR69HOSTIFMGR_NAME,event_type, (void *)&eventData, sizeof(eventData));
+
+    if (IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED == event_type &&
+            paramName && strcmp(paramName+strlen(paramName)-1,".")) // parameter name should not end with .
+    {
+        NotificationHandler::getInstance()->pushValueChangeNotification(eventData);
+    }
 }
 
 void sendAddRemoveEvents (updateCallback callbackFn, int newValue, int& savedValue, char* objectPath)

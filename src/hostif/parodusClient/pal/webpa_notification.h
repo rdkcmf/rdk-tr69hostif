@@ -57,21 +57,7 @@ void setNotifyConfigurationFile(const char* nofityConfigFile);
 int getnotifyparamList(char ***notifyParamList,int *ptrnotifyListSize);
 
 /**
- * @brief Initializes WebPA configuration file parameters
- *
- * @return void.
- */
-char* processNotification(NotifyData *notifyMsg,char* payload);
-
-/**
- * @brief Initializes WebPA notification source
- *
- * @return void.
- */
-char* getNotifyDestination(char *notifyDest);
-
-/**
- * @brief Initializes WebPA notification Destination
+ * @brief Gets WebPA notification source
  *
  * @return void.
  */

@@ -172,7 +172,8 @@ typedef enum
     UPSTREAM_MSG,
     TRANS_STATUS,
     CONNECTED_CLIENT_NOTIFY,
-    PARAM_VALUE_CHANGE_NOTIFY
+    PARAM_VALUE_CHANGE_NOTIFY,
+    NOTIFY_TYPE_MAX
 } NOTIFY_TYPE;
 
 
@@ -181,10 +182,8 @@ typedef enum
  */
 typedef struct
 {
-    char *paramName;
-    char *oldValue;
-    char *newValue;
-    WAL_DATA_TYPE type;
+    char* notifyDest;
+    char* notifyPayload;
 } ParamNotify;
 
 

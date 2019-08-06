@@ -61,7 +61,6 @@ char* webPANotifySource = NULL;
 /*----------------------------------------------------------------------------*/
 static WDMP_STATUS validate_parameter(param_t *param, int paramCount);
 static void setRebootReason(param_t param, WEBPA_SET_TYPE setType);
-static void freeNotificationData(NotifyData *notifyMsg);
 void notificationCallBack();
 
 /*----------------------------------------------------------------------------*/
@@ -357,64 +356,56 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
 void notificationCallBack()
 {
     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"************** notificationCallBack *****************\n");
-    char *notifyPayload = NULL;
-    char *notifySource = NULL;
-    char *notifyDest = NULL;
-    GAsyncQueue *notificationQueue = NULL;
-    NotificationHandler* pIface = NULL;
 
-    // Get the notification Handler
-    pIface = NotificationHandler::getInstance();
+    GAsyncQueue* notificationQueue;
+    NotifyData* notifyMsg;
 
-    if(pIface)
+    ParamNotify* param = NULL;
+
+    bool sentNotification = false;
+
+    if (NULL == (notificationQueue = NotificationHandler::getInstance()->GetNotificationQueue()))
     {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Got notification Instance \n");
-        notificationQueue = pIface->GetNotificationQueue();
-        if(NULL != notificationQueue)
-        {
-            // Get the Param Notify
-            NotifyData *notifyMsg = (NotifyData*) g_async_queue_timeout_pop (notificationQueue,1000);
-            if(NULL != notifyMsg)
-            {
-                notifySource = webPANotifySource; 
-                notifyDest = getNotifyDestination(notifyDest);
-                RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Calling Process request \n");
-                notifyPayload = processNotification(notifyMsg,notifyPayload);
-
-                RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Notification Source = %s \n",notifySource);
-                RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Notification Dest = %s \n",notifyDest);
-                if(NULL != notifyPayload)
-                {
-                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Notification notifyPayload = %s \n",notifyPayload);
-                }
-                else
-                {
-                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Notification Payload is NULL\n");
-                }
-                if(notifyPayload && notifySource && notifyDest)
-                {
-                    sendNotification(notifyPayload,notifySource,notifyDest);
-                }
-                else
-                {
-                    RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Error in generating notification payload\n");
-                }
-
-                // Lets free all allocated memory
-                if(notifyDest)
-                    free(notifyDest);
-                freeNotificationData(notifyMsg);
-            }
-            else
-            {
-                RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Notification Queue is Empty\n");
-            }
-        }
-        else
-        {
-            RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Notification Queue is Not Initialized\n");
-        }
+        RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Notification Queue is Not Initialized\n");
+        return;
     }
+    else if (NULL == (notifyMsg = (NotifyData*) g_async_queue_timeout_pop (notificationQueue, 1000)))
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Notification Queue is Empty\n");
+        return;
+    }
+    else if (NULL == notifyMsg->data)
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Notify data is NULL!!\n");
+        goto freeNotifyMsg;
+    }
+    else if (NULL == (param = notifyMsg->data->notify))
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "ParamNotify is NULL.. !!\n");
+        goto freeNotifyMsgData;
+    }
+    else if (notifyMsg->type < 0 || notifyMsg->type >= NOTIFY_TYPE_MAX)
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Invalid Notify type %d \n", notifyMsg->type);
+    }
+    else if (NULL == param->notifyDest || NULL == param->notifyPayload)
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Source is NULL or Dest is NULL or Payload is NULL \n");
+    }
+    else
+    {
+        sendNotification(param->notifyPayload, getNotifySource(), param->notifyDest);
+        sentNotification = true;
+    }
+    if (sentNotification == false)
+        WAL_FREE(param->notifyPayload); // sendNotification frees notifyPayload. if sendNotification was not called, free notifyPayload
+
+    WAL_FREE(param->notifyDest);
+    WAL_FREE(param);
+freeNotifyMsgData:
+    WAL_FREE(notifyMsg->data);
+freeNotifyMsg:
+    WAL_FREE(notifyMsg);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -497,21 +488,3 @@ void getCurrentTime(struct timespec *timer)
 {
     clock_gettime(CLOCK_REALTIME, timer);
 }
-
-/**
- * @brief Frees the Notification data
- *
- * @param[in] Notification Data pointer
- */
-static void freeNotificationData(NotifyData *notifyMsg)
-{
-    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Entering... %s \n",__FUNCTION__);
-    if(notifyMsg)
-    {
-        WAL_FREE(notifyMsg->data->notify);
-        WAL_FREE(notifyMsg->data);
-        WAL_FREE(notifyMsg);
-    }
-    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Exiting... %s \n",__FUNCTION__);
-}
-

@@ -75,6 +75,7 @@ extern "C" {
 #define BT_TILE_SESSION_ID_STRING       "BLE.Tile.Ring.SessionId"
 #define BT_TILE_TRIGGER_STRING          "BLE.Tile.Ring.Trigger"
 #define BT_TILE_CMD_REQUEST_STRING      "BLE.Tile.Cmd.Request"
+#define BT_TILE_CMD_NOTIFY_STRING       "BLE.Tile.Cmd.Notify"
 #endif 
 
 #define BT_DEV_NAME_STRING 				"Name"

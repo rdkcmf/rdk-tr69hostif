@@ -55,6 +55,7 @@ extern "C" {
 #include "btmgr.h"
 #ifdef BLE_TILE_PROFILE
 #include "lemgr_iarm_interface.h"
+#include "hostIf_NotificationHandler.h"
 #endif
 }
 
@@ -198,6 +199,13 @@ int hostIf_DeviceInfoRdk_xBT::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         else if (strncasecmp(paramName, BT_TILE_CMD_REQUEST_STRING, strlen(BT_TILE_CMD_REQUEST_STRING))== 0)
         {
            ret = process_TileCmdRequest(stMsgData);    
+        }
+        else if (strncasecmp(paramName, BT_TILE_CMD_NOTIFY_STRING, strlen(BT_TILE_CMD_NOTIFY_STRING))== 0)
+        {
+            // NOTE: this parameter is for internal use only and meant to be set only using an IARM call from BT LE mgr.
+            // It has not been added to the data model.
+            // If parameter validation is performed for IARM set calls, control will never reach here
+            NotificationHandler::getInstance()->pushKeyValueNotification("event:BLE_TILE_RING_NOTIFICATION", "cmd_notify", stMsgData->paramValue);
         }
 #endif
         else
