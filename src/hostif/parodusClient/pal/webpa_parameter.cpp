@@ -177,7 +177,6 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                     (*parametervalPtrPtr)[index][wc_cnt].value = NULL;
 
                     // Convert Param.paramtype to ParamVal.type
-                    converttoWalType (Param.paramtype, (WAL_DATA_TYPE *) &(*parametervalPtrPtr)[index][wc_cnt].type);
                     getRet = get_ParamValues_tr69hostIf (&Param);
 
                     // Fill Only if we can able to get Proper value
@@ -193,7 +192,8 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                         }
                         // Copy Param Name
                         strncat((*parametervalPtrPtr)[index][successWcCnt].name, Param.paramName, MAX_PARAM_LENGTH - 1);
-
+                        // Copy Type 
+                        converttoWalType (Param.paramtype, (WAL_DATA_TYPE *) &(*parametervalPtrPtr)[index][successWcCnt].type);
                         // Copy param value
                         switch (Param.paramtype)
                         {
