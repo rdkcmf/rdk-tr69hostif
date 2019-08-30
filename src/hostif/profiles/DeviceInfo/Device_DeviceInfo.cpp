@@ -2526,8 +2526,9 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
         } else {
             string localIP = getEstbIp();
 
-            // for arguments for script in the form " ip_version_number localIP + remoteIP + remotePort"
-            stunnelSSHArgs = parsedMap.at("type") + " " + localIP + " " + parsedMap.at("host") + " " + parsedMap.at("callbackport");
+            // for arguments for script in the form " ip_version_number localIP + remoteIP + remotePort + remoteTerminalRows
+            //                                        + remoteTerminalColumns"
+            stunnelSSHArgs = parsedMap.at("type") + " " + localIP + " " + parsedMap.at("host") + " " + parsedMap.at("callbackport") + " " +  parsedMap.at("rows") + " " + parsedMap.at("columns");
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] StunnelSSH Args = %s \n",__FUNCTION__,stunnelSSHArgs.c_str());
 
             string runCommand = stunnelCommand + " " + stunnelSSHArgs + " &";
