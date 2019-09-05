@@ -208,6 +208,10 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_xOpsDeviceMgmtRPCRebootNow (stMsgData);
         }
+	else if (strncasecmp(stMsgData->paramName,xOpsForwardSshEnable_STR,strlen(xOpsForwardSshEnable_STR)) == 0)
+	{
+	    ret = pIface->set_xOpsDeviceMgmtForwardSSHEnable(stMsgData);
+	}
         else if (strcasecmp(stMsgData->paramName,IPREMOTE_SUPPORT) == 0)
         {
             ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(stMsgData);
@@ -385,6 +389,11 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
              stMsgData->faultCode = fcInvalidParameterName;
              ret = NOK;   
         }
+    }
+    else if(strncasecmp(stMsgData->paramName,xOpsForwardSshEnable_STR,strlen(xOpsForwardSshEnable_STR)) == 0)
+    {
+        hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
+        ret = pIface->get_xOpsDeviceMgmtForwardSSHEnable(stMsgData);
     }
     else if(strncasecmp(stMsgData->paramName,xOpsReverseSshStatus_STR,strlen(xOpsReverseSshStatus_STR)) == 0)
     {

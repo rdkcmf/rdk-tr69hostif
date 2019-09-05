@@ -86,6 +86,7 @@
 
 #define SOC_ID_FILE			"/var/log/socprov.log"
 #define PREFERRED_GATEWAY_FILE		"/opt/prefered-gateway"
+#define FORWARD_SSH_FILE                "/opt/secure/.RFC_ForwardSSH"
 #define GATEWAY_NAME_SIZE 4
 #define IPREMOTE_SUPPORT_STATUS_FILE    "/opt/.ipremote_status"
 #define IPREMOTE_INTERFACE_INFO         "/tmp/ipremote_interface_info"
@@ -2590,6 +2591,71 @@ int hostIf_DeviceInfo::set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t * stMsgD
 
     return OK;
 }
+
+int hostIf_DeviceInfo::get_xOpsDeviceMgmtForwardSSHEnable(HOSTIF_MsgData_t * stMsgData)
+{
+    LOG_ENTRY_EXIT;
+    char ForwardSSH[10]="true";
+    char *p = NULL;
+    char dataToBeRead[50];
+    FILE *fp;
+
+    if((fp=fopen(FORWARD_SSH_FILE,"r"))==NULL)
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s]Unable to open file\n", __FUNCTION__);
+	put_boolean(stMsgData->paramValue, true);  //Default value
+	return NOK;
+    }
+    else
+    {
+        while( fgets ( dataToBeRead, 50, fp ) != NULL )
+        {
+            p = strchr(dataToBeRead ,'=');
+            sprintf( ForwardSSH ,"%s" , ++p ) ;
+            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Enable value:%s --> Parameter[%s]\n", __FUNCTION__, ForwardSSH, stMsgData->paramName);
+	    if( strcmp( ForwardSSH,"true"))
+	    {
+		put_boolean(stMsgData->paramValue, false);
+	    }
+            else
+	    {
+		put_boolean(stMsgData->paramValue, true);
+	    }
+        }
+    }
+
+    fclose(fp);
+    return OK;
+}
+
+int hostIf_DeviceInfo::set_xOpsDeviceMgmtForwardSSHEnable(HOSTIF_MsgData_t * stMsgData)
+{
+    LOG_ENTRY_EXIT;
+    char ForwardSSH[10]="true";   //Default value
+    FILE *fp;
+
+    if((fp=fopen(FORWARD_SSH_FILE,"w"))==NULL)
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s]Unable to open file\n", __FUNCTION__);
+        return NOK;
+    }
+    else
+    {
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Default Enable value:%s --> Parameter[%s]\n", __FUNCTION__, ForwardSSH, stMsgData->paramName);
+	if (get_boolean(stMsgData->paramValue))
+	{
+	    strcpy(ForwardSSH,"true");
+        }
+	else
+	{
+	    strcpy(ForwardSSH,"false");	
+	}
+        fprintf(fp ,"ForwardSSH=%s", ForwardSSH);
+    }
+    fclose(fp);
+    return OK;
+}
+
 
 #ifdef USE_HWSELFTEST_PROFILE
 int hostIf_DeviceInfo::set_xOpsDeviceMgmt_hwHealthTest_Enable(HOSTIF_MsgData_t *stMsgData)

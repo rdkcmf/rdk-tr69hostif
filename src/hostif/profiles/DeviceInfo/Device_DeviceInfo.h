@@ -138,6 +138,7 @@
 #define xOpsReverseSshArgs_STR "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.ReverseSSH.xOpsReverseSshArgs"
 #define xOpsReverseSshStatus_STR "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.ReverseSSH.xOpsReverseSshStatus"
 
+#define xOpsForwardSshEnable_STR "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.ForwardSSH.Enable"
 
 #define XRDK_BOOT_TIME "Device.DeviceInfo.X_RDKCENTRAL-COM_BootTime"
 
@@ -1025,6 +1026,10 @@ public:
     * @retval NOK if operation fails.
     */
     int set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t *);
+
+    int get_xOpsDeviceMgmtForwardSSHEnable (HOSTIF_MsgData_t *);
+
+    int set_xOpsDeviceMgmtForwardSSHEnable (HOSTIF_MsgData_t *);
 
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *, bool *pChanged = NULL);
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *);
