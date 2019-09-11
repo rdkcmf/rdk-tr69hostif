@@ -57,42 +57,44 @@ extern "C" {
 #include "btmgr.h"
 }
 
-#define X_BT_ROOT_OBJ 			"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth."
-#define BT_ENABLE_STRING 							"enable"
-#define BT_DISCOVERY_ENABLED_STRING 				"DiscoveryEnabled"
-#define BT_DISCOVERY_DEVICE_CNT_STRING 				"DiscoveredDeviceCnt"
-#define BT_PAIRED_DEVICE_CNT_STRING 				"PairedDeviceCnt"
-#define BT_CONNECTED_DEVICE_CNT_STRING				"ConnectedDeviceCnt"
+#define X_BT_ROOT_OBJ                       "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth."
+#define BT_ENABLE_STRING                    "enable"
+#define BT_DISCOVERY_ENABLED_STRING         "DiscoveryEnabled"
+#define BT_DISCOVERY_DEVICE_CNT_STRING      "DiscoveredDeviceCnt"
+#define BT_PAIRED_DEVICE_CNT_STRING         "PairedDeviceCnt"
+#define BT_CONNECTED_DEVICE_CNT_STRING      "ConnectedDeviceCnt"
+#define BT_LIMIT_BEACON_DETECTION_STRING    "LimitBeaconDetection"
 
-#define X_BT_DISCOVERED_DEV_OBJ "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.DiscoveredDevice"
-#define X_BT_PAIRED_DEV_OBJ 	"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.PairedDevice"
-#define X_BT_CONNECTED_DEV_OBJ	"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.ConnectedDevice"
-#define X_BT_DEVICEINFO_OBJ		"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.DeviceInfo"
+#define X_BT_DISCOVERED_DEV_OBJ             "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.DiscoveredDevice"
+#define X_BT_PAIRED_DEV_OBJ                 "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.PairedDevice"
+#define X_BT_CONNECTED_DEV_OBJ              "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.ConnectedDevice"
+#define X_BT_DEVICEINFO_OBJ                 "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.DeviceInfo"
+#define X_BT_LIMITBEACONDETECTION_OBJ       "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.LimitBeaconDetection"
 
 #ifdef BLE_TILE_PROFILE
-//#define X_BT_BLE_TILE_OBJ		"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.BLE.Tile"
-#define BT_TILE_ID_STRING               "BLE.Tile.Ring.Id"
-#define BT_TILE_SESSION_ID_STRING       "BLE.Tile.Ring.SessionId"
-#define BT_TILE_TRIGGER_STRING          "BLE.Tile.Ring.Trigger"
-#define BT_TILE_CMD_REQUEST_STRING      "BLE.Tile.Cmd.Request"
-#define BT_TILE_CMD_NOTIFY_STRING       "BLE.Tile.Cmd.Notify"
-#endif 
+//#define X_BT_BLE_TILE_OBJ        "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.BLE.Tile"
+#define BT_TILE_ID_STRING                   "BLE.Tile.Ring.Id"
+#define BT_TILE_SESSION_ID_STRING           "BLE.Tile.Ring.SessionId"
+#define BT_TILE_TRIGGER_STRING              "BLE.Tile.Ring.Trigger"
+#define BT_TILE_CMD_REQUEST_STRING          "BLE.Tile.Cmd.Request"
+#define BT_TILE_CMD_NOTIFY_STRING           "BLE.Tile.Cmd.Notify"
+#endif
 
-#define BT_DEV_NAME_STRING 				"Name"
-#define BT_DEV_DEVICE_ID_STRING 		"DeviceID"
-#define BT_DEV_LOWENERGYENABLED_STRING	"LowEnergyEnabled"
-#define BT_DEV_ACTIVE_STRING			"Active"
-#define BT_DEV_CONNECTED_STRING         "Connected"
-#define BT_DEV_DEVICE_TYPE_STRING       "DeviceType"
-#define BT_DEV_PAIRED_STRING            "Paired"
+#define BT_DEV_NAME_STRING                  "Name"
+#define BT_DEV_DEVICE_ID_STRING             "DeviceID"
+#define BT_DEV_LOWENERGYENABLED_STRING      "LowEnergyEnabled"
+#define BT_DEV_ACTIVE_STRING                "Active"
+#define BT_DEV_CONNECTED_STRING             "Connected"
+#define BT_DEV_DEVICE_TYPE_STRING           "DeviceType"
+#define BT_DEV_PAIRED_STRING                "Paired"
 
-#define	BT_DEV_GETDEVICEINFO_STRING		"GetDeviceInfo"
-#define BT_DEV_INFO_DEVICE_ID_STRING 		"DeviceInfo.DeviceID"
-#define BT_DEV_INFO_PROFILE_STRING 			"DeviceInfo.Profile"
-#define BT_DEV_INFO_MAC_STRING 				"DeviceInfo.MAC"
-#define BT_DEV_INFO_MANUFACTURER_STRING 	"DeviceInfo.Manufacturer"
+#define BT_DEV_GETDEVICEINFO_STRING         "GetDeviceInfo"
+#define BT_DEV_INFO_DEVICE_ID_STRING        "DeviceInfo.DeviceID"
+#define BT_DEV_INFO_PROFILE_STRING          "DeviceInfo.Profile"
+#define BT_DEV_INFO_MAC_STRING              "DeviceInfo.MAC"
+#define BT_DEV_INFO_MANUFACTURER_STRING     "DeviceInfo.Manufacturer"
 #define BT_DEV_INFO_RSSI_STRING             "DeviceInfo.RSSI"
-#define BT_DEV_INFO_SIGNALLEVEL_STRING		"DeviceInfo.SignalStrength"
+#define BT_DEV_INFO_SIGNALLEVEL_STRING      "DeviceInfo.SignalStrength"
 
 /**
  * @brief This class provides the TR-069 components Bluetooth devices information.
@@ -165,6 +167,9 @@ private:
 
     int getDeviceInfo(HOSTIF_MsgData_t *);
     int setDeviceInfo(HOSTIF_MsgData_t *);
+
+    int getLimitBeaconDetection(HOSTIF_MsgData_t *);
+    int setLimitBeaconDetection(HOSTIF_MsgData_t *);
 
     static void fetch_Bluetooth_DiscoveredDevicesList();
     static void fetch_Bluetooth_PairedDevicesList();
