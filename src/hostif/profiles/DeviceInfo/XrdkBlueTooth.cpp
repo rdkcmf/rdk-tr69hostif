@@ -51,13 +51,14 @@
 
 #include "XrdkBlueTooth.h"
 #include <mutex>
-extern "C" {
+
 #include "btmgr.h"
-#ifdef BLE_TILE_PROFILE
 #include "lemgr_iarm_interface.h"
+
+#ifdef BLE_TILE_PROFILE
 #include "hostIf_NotificationHandler.h"
 #endif
-}
+
 
 BTRMGR_DiscoveredDevicesList_t hostIf_DeviceInfoRdk_xBT::disDevList;
 BTRMGR_PairedDevicesList_t hostIf_DeviceInfoRdk_xBT::pairedDevList;
@@ -167,6 +168,10 @@ int hostIf_DeviceInfoRdk_xBT::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = setDeviceInfo(stMsgData);
         }
+        else if (strncasecmp(paramName, BT_LIMIT_BEACON_DETECTION_STRING, strlen(BT_LIMIT_BEACON_DETECTION_STRING)) == 0)
+        {
+            ret = setLimitBeaconDetection(stMsgData);
+        }
 #ifdef BLE_TILE_PROFILE
         else if (strncasecmp(paramName, BT_TILE_ID_STRING, strlen(BT_TILE_ID_STRING)) == 0)
         {
@@ -270,6 +275,10 @@ int hostIf_DeviceInfoRdk_xBT::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         if (strncasecmp(paramName, BT_ENABLE_STRING, strlen(BT_ENABLE_STRING)) == 0)
         {
             ret = isEnabled(stMsgData);
+        }
+        else if (strncasecmp(paramName, BT_LIMIT_BEACON_DETECTION_STRING, strlen(BT_LIMIT_BEACON_DETECTION_STRING)) == 0)
+        {
+            ret = getLimitBeaconDetection(stMsgData);
         }
         else if (strncasecmp(paramName, BT_DISCOVERY_ENABLED_STRING, strlen(BT_DISCOVERY_ENABLED_STRING)) == 0)
         {
@@ -1632,6 +1641,106 @@ int hostIf_DeviceInfoRdk_xBT::setDeviceInfo (HOSTIF_MsgData_t *stMsgData)
         return NOK;
     }
     stMsgData->paramtype=hostIf_UnsignedLongType;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exiting..\n", __FUNCTION__, __LINE__);
+    return OK;
+}
+
+/************************************************************
+ * Description  : Set api for
+ *                               'Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.setLimitBeaconDetection' parameter.
+ *
+ * Precondition : Bluetooth stack should be present.
+ * Input        : stMsgData, params & value to set, true or false
+
+ * Return       : OK -> Success
+                  NOK -> Failure
+                  value -> OK on successful set or NOK
+************************************************************/
+
+int hostIf_DeviceInfoRdk_xBT::setLimitBeaconDetection (HOSTIF_MsgData_t *stMsgData)
+{
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering..\n", __FUNCTION__, __LINE__);
+
+    try {
+
+        if(stMsgData->paramValue != NULL) {
+            unsigned char isLimited = 0;
+
+            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Received Set value : %s for LimitBeaconDetection\r\n",
+                    __FUNCTION__,__LINE__, stMsgData->paramValue);
+
+            isLimited = get_int(stMsgData->paramValue);
+            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: isLimited value : %d for LimitBeaconDetection\r\n", __FUNCTION__,__LINE__, isLimited);
+
+            leLimitBeaconDetection_t param;
+            memset(&param, 0, sizeof(param));
+            param.adapterIndex = 0;
+            param.limitBeaconDetection = isLimited;
+
+            IARM_Result_t retVal = IARM_RESULT_SUCCESS;
+
+            retVal = IARM_Bus_Call(IARM_BUS_BTRLEMGR_NAME, IARM_BUS_LEMGR_API_leSetLimitBeaconDetection, (void *)&param, sizeof(leLimitBeaconDetection_t));
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n***********************************\n");
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n \"%s\",  \"%s\"", IARM_BUS_LEMGR_API_leSetLimitBeaconDetection , param.limitBeaconDetection ? "true" : "false");
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n***********************************\n");
+
+            if(retVal == IARM_RESULT_SUCCESS) { // && param.status) {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Successfully Set the limit beacon detection.\n", __FUNCTION__, __LINE__);
+            }
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed due to empty LimitBeaconDetection value \r\n",__FUNCTION__, __LINE__);
+            return NOK;
+        }
+    } catch (const std::exception& e) {
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exception : %s\r\n",__FUNCTION__,__LINE__, e.what());
+        return NOK;
+    }
+    stMsgData->paramtype=hostIf_BooleanType;
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exiting..\n", __FUNCTION__, __LINE__);
+    return OK;
+}
+
+/************************************************************
+ * Description  : Get api for
+ *                               'Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.LimitBeaconDetection' parameter.
+ *
+ * Precondition : Bluetooth stack should be present.
+ * Input        :
+
+ * Return       : OK -> Success
+                  NOK -> Failure
+                  value -> OK on successful set or NOK
+************************************************************/
+int hostIf_DeviceInfoRdk_xBT::getLimitBeaconDetection (HOSTIF_MsgData_t *stMsgData)
+{
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering..\n", __FUNCTION__, __LINE__);
+    //bool limitBeaconDis = false;
+    unsigned char isLimited = 0;
+
+    try {
+        IARM_Result_t retVal = IARM_RESULT_SUCCESS;
+        leLimitBeaconDetection_t param;
+        memset(&param, 0, sizeof(param));
+
+        retVal = IARM_Bus_Call(IARM_BUS_BTRLEMGR_NAME, IARM_BUS_LEMGR_API_leGetLimitBeaconDetection, (void *)&param, sizeof(leLimitBeaconDetection_t));
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n***********************************\n");
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n \"%s\",  \"%s\"", IARM_BUS_LEMGR_API_leGetLimitBeaconDetection , param.limitBeaconDetection ? "true" : "false");
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n***********************************\n");
+
+        if(retVal == IARM_RESULT_SUCCESS) { // && param.status) {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Successfully get the limit beacon detection.\n", __FUNCTION__, __LINE__);
+        }
+        
+        isLimited = (param.limitBeaconDetection) ? 1 : 0 ;
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s][AMIT_DEBUG_DD]xBlueTooth: Is beacon detection limited : %d \n", __FUNCTION__, isLimited);
+    } catch (const std::exception& e) {
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exception : %s\r\n",__FUNCTION__, __LINE__, e.what());
+        return NOK;
+    }
+    put_boolean(stMsgData->paramValue, isLimited);
+    stMsgData->paramtype=hostIf_BooleanType;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exiting..\n", __FUNCTION__, __LINE__);
     return OK;
 }
