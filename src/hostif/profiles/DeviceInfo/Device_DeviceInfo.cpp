@@ -380,7 +380,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SoftwareVersion(HOSTIF_MsgData_t * 
                 {
                     isTrunkbuild = true;
                 }
-                if (line.find("VERSION") !=string::npos)
+                if ((line.find("_VERSION") == string::npos) && (line.find("VERSION") != string::npos))
                 {
                     char *tmpStr = strstr((char *)line.c_str(), "=");
                     tmpStr++;
