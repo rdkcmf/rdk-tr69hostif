@@ -17,11 +17,11 @@
 # limitations under the License.
 ##########################################################################
 [Unit]
-Description=Webpa parodus 
+Description=Webpa parodus V6 
 DefaultDependencies=false
 
 [Path]
-PathExists=/tmp/route_available
+PathExists=/tmp/addressaquired_ipv6
 Unit=parodus.service
 
 [Install]
