@@ -8,7 +8,10 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/comcast_acs_ca.crt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Comcast",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Xfinity",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "CMCSTX"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "CMCSTX",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    },
    "comcast" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -20,7 +23,10 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69Key" : "/etc/tr69/lallvzbkw.ens",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Comcast",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Xfinity",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "CMCSTX"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "CMCSTX",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "2001:558:feed:dc::200",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    },
    "cox" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -31,7 +37,10 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/ca-certificates.crt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Cox",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Contour",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMCOX"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMCOX",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    },
    "cox-dev" : {
         "Device.Time.NTPServer1" : "cpentp.services.coxlab.net",
@@ -42,7 +51,10 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/ca-certificates.crt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Cox",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Contour",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMCOX"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMCOX",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    },
    "cox-qa" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -53,7 +65,10 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/ca-certificates.crt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Cox",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Contour",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMCOX"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMCOX",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    },
    "MIT" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -61,7 +76,10 @@
         "Device.Time.NTPServer3" : "time.google.com",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL_dev" : "https://acswg-dt-ai-vip.comcast.net:443/cwmpWeb/DigestCPEMgt?target=/CPEMgt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "https://acswg.g.comcast.net:443/cwmpWeb/DigestCPEMgt?target=/CPEMgt",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/usr/share/tr69/certs/comcast_acs_ca.crt"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/usr/share/tr69/certs/comcast_acs_ca.crt",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    },
    "shaw" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -72,7 +90,10 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/usr/share/tr69/certs/shaw_acs_ca.pem",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Shaw",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Shaw)",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMSHW"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMSHW",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    },
    "shaw-dev" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -83,7 +104,10 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/usr/share/tr69/certs/shaw_acs_ca.pem",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Shaw",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Shaw)",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMSHW"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMSHW",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    },
    "rogers" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -92,7 +116,10 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL_dev" : "https://ecoacs.acs.net.rogers.com",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "https://ecoacs.acs.net.rogers.com",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/rogers_acs_ca.cer",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMRGR"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMRGR",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    },
    "rogers-dev" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -101,7 +128,10 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL_dev" : "http://ecoacs.vf.rogers.com",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "http://ecoacs.vf.rogers.com",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/rogers_acs_ca.cer",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMRGR"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMRGR",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    },
    "videotron" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -112,6 +142,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/comcast_acs_ca.crt",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Videotron",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Videotron",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMVTN"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMVTN",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    }
 }

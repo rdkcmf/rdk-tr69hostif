@@ -18,7 +18,7 @@
 ##########################################################################
 [Unit]
 Description=TR69 Host Interface Daemon
-After=lighttpd.service dsmgr.service
+After=lighttpd.service dsmgr.service securemount.service
 
 [Service]
 Type=notify
