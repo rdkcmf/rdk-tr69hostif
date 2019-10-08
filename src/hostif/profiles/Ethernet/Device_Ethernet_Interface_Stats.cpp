@@ -44,6 +44,7 @@
 #include <arpa/inet.h>
 
 #include "Device_Ethernet_Interface_Stats.h"
+#include "Device_Ethernet_Interface.h"
 
 EthernetInterfaceStats hostIf_EthernetInterfaceStats::stEthInterfaceStats = {0,};
 
@@ -60,11 +61,18 @@ static int read_Device_Ethernet_Interface_Stats_Fields(unsigned int ethInterface
     char resultBuff[BUFF_LENGTH] = {'\0'};
     char cmd[BUFF_LENGTH] = {'\0'};
     int temp;
+    char ethName[BUFF_LENGTH] = {'\0'};
+
+    // Get Interface name from devId to read statistics
+    HOSTIF_MsgData_t stMsgData;
+    hostIf_EthernetInterface *pIface = hostIf_EthernetInterface::getInstance(ethInterfaceNum);
+    pIface->get_Device_Ethernet_Interface_Name(&stMsgData);
+    strncpy(ethName,stMsgData.paramValue,BUFF_LENGTH -1);
 
     switch(ethInterfaceStatMem)
     {
     case eBytesSent:
-        sprintf(cmd,"cat /sys/class/net/eth%d/statistics/tx_bytes",ethInterfaceNum-1);
+        sprintf(cmd,"cat /sys/class/net/%s/statistics/tx_bytes",ethName);
 
         fp = popen(cmd,"r");
 
@@ -84,7 +92,7 @@ static int read_Device_Ethernet_Interface_Stats_Fields(unsigned int ethInterface
         break;
 
     case eBytesReceived:
-        sprintf(cmd,"cat /sys/class/net/eth%d/statistics/rx_bytes",ethInterfaceNum-1);
+        sprintf(cmd,"cat /sys/class/net/%s/statistics/rx_bytes",ethName);
 
         fp = popen(cmd,"r");
 
@@ -106,7 +114,7 @@ static int read_Device_Ethernet_Interface_Stats_Fields(unsigned int ethInterface
     case eUnicastPacketsSent:
     case eMulticastPacketsSent:
     case eBroadcastPacketsSent:
-        sprintf(cmd,"cat /sys/class/net/eth%d/statistics/tx_packets",ethInterfaceNum-1);
+        sprintf(cmd,"cat /sys/class/net/%s/statistics/tx_packets",ethName);
 
         fp = popen(cmd,"r");
 
@@ -132,7 +140,7 @@ static int read_Device_Ethernet_Interface_Stats_Fields(unsigned int ethInterface
     case eUnicastPacketsReceived:
     case eMulticastPacketsReceived:
     case eBroadcastPacketsReceived:
-        sprintf(cmd,"cat /sys/class/net/eth%d/statistics/rx_packets",ethInterfaceNum-1);
+        sprintf(cmd,"cat /sys/class/net/%s/statistics/rx_packets",ethName);
 
         fp = popen(cmd,"r");
 
@@ -155,7 +163,7 @@ static int read_Device_Ethernet_Interface_Stats_Fields(unsigned int ethInterface
         break;
 
     case eErrorsSent:
-        sprintf(cmd,"cat /sys/class/net/eth%d/statistics/tx_errors",ethInterfaceNum-1);
+        sprintf(cmd,"cat /sys/class/net/%s/statistics/tx_errors",ethName);
 
         fp = popen(cmd,"r");
 
@@ -175,7 +183,7 @@ static int read_Device_Ethernet_Interface_Stats_Fields(unsigned int ethInterface
         break;
 
     case eErrorsReceived:
-        sprintf(cmd,"cat /sys/class/net/eth%d/statistics/rx_errors",ethInterfaceNum-1);
+        sprintf(cmd,"cat /sys/class/net/%s/statistics/rx_errors",ethName);
 
         fp = popen(cmd,"r");
 
@@ -195,7 +203,7 @@ static int read_Device_Ethernet_Interface_Stats_Fields(unsigned int ethInterface
         break;
 
     case eDiscardPacketsSent:
-        sprintf(cmd,"cat /sys/class/net/eth%d/statistics/tx_dropped",ethInterfaceNum-1);
+        sprintf(cmd,"cat /sys/class/net/%s/statistics/tx_dropped",ethName);
 
         fp = popen(cmd,"r");
 
@@ -216,7 +224,7 @@ static int read_Device_Ethernet_Interface_Stats_Fields(unsigned int ethInterface
 
     case eDiscardPacketsReceived:
     case eUnknownProtoPacketsReceived:
-        sprintf(cmd,"cat /sys/class/net/eth%d/statistics/rx_dropped",ethInterfaceNum-1);
+        sprintf(cmd,"cat /sys/class/net/%s/statistics/rx_dropped",ethName);
 
         fp = popen(cmd,"r");
 
