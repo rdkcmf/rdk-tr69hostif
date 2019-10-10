@@ -318,18 +318,17 @@ int hostIf_STBServiceXeMMC::getTSBQualified(HOSTIF_MsgData_t *stMsgData)
 
     stMsgData->paramtype = hostIf_BooleanType;
 
-    bool tsb_qualified = false;
-    if (0 == *emmcPartitionID)
+    eSTMGRDeviceInfo deviceInfo;
+    if (RDK_STMGR_RETURN_SUCCESS == rdkStorage_getDeviceInfo (emmcDeviceID, &deviceInfo))
     {
-        eSTMGRPartitionInfo partitionInfo;
-        if (RDK_STMGR_RETURN_SUCCESS == rdkStorage_getPartitionInfo (emmcDeviceID, emmcPartitionID, &partitionInfo)) {
-            tsb_qualified = partitionInfo.m_isTSBSupported;
-        }
+        put_boolean(stMsgData->paramValue, (deviceInfo.m_status != RDK_STMGR_DEVICE_STATUS_NOT_QUALIFIED));
+        return OK;
     }
-    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] tsb_qualified: %d\n", __FUNCTION__, __FILE__, tsb_qualified);
-
-    put_boolean(stMsgData->paramValue, tsb_qualified);
-    return OK;
+    else
+    {
+        put_boolean(stMsgData->paramValue, true); // assume eMMC (a non-user-removable part) is Comcast-approved and thus TSB-qualified
+        return OK;
+    }
 }
 
 int hostIf_STBServiceXeMMC::getPreEOLStateSystem(HOSTIF_MsgData_t *stMsgData)

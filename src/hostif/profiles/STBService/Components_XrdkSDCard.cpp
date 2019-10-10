@@ -618,20 +618,6 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
                 sdCardParam->sdCardProp.iVal = -1;
             }
         }
-        else if (sdCardParam->eSDPropType == SD_TSBQualified)
-        {
-            if ('\0' == sdCardPartitionID[0]) {
-                eSTMGRPartitionInfo partitionInfo;
-                if (RDK_STMGR_RETURN_SUCCESS != rdkStorage_getPartitionInfo (sdCardDeviceID, sdCardPartitionID, &partitionInfo)) {
-                    sdCardParam->sdCardProp.bVal = false;
-                }
-                else {
-                    sdCardParam->sdCardProp.bVal = partitionInfo.m_isTSBSupported;
-                }
-            }
-            else
-                sdCardParam->sdCardProp.bVal = false;
-        }
         else
         {
             eSTMGRDeviceInfo deviceInfo;
@@ -700,7 +686,11 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
                                 break;
                         }
                         break;
-                   }
+                    }
+                    case SD_TSBQualified:
+                        sdCardParam->sdCardProp.bVal = (deviceInfo.m_status != RDK_STMGR_DEVICE_STATUS_NOT_QUALIFIED &&
+                                deviceInfo.m_status != RDK_STMGR_DEVICE_STATUS_UNKNOWN);
+                        break;
                 }
             }
             else
