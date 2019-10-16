@@ -65,6 +65,12 @@ void* MoCADevice::getRmhContext()
     /* Initialized the RMH Context */
     static RMH_Handle rmhContext = NULL;
     uint32_t waitedSeconds = 0;
+    bool alwayRecreate = true; /* XITHREE-7905 */
+
+    if (alwayRecreate && rmhContext) {
+        RMH_Destroy(rmhContext);
+        rmhContext=NULL;
+    }
 
     /* If we have an RMH handle, ensure it's still valid */
     if (rmhContext) {
