@@ -168,8 +168,10 @@ private:
     int getDeviceInfo(HOSTIF_MsgData_t *);
     int setDeviceInfo(HOSTIF_MsgData_t *);
 
+#ifdef BLE_TILE_PROFILE
     int getLimitBeaconDetection(HOSTIF_MsgData_t *);
     int setLimitBeaconDetection(HOSTIF_MsgData_t *);
+#endif
 
     static void fetch_Bluetooth_DiscoveredDevicesList();
     static void fetch_Bluetooth_PairedDevicesList();
