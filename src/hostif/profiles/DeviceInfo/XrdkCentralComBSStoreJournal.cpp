@@ -220,7 +220,7 @@ HostIf_Source_Type_t XBSStoreJournal::getJournalSource(const string &key)
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
     unordered_map<string,BS_JournalData_t>::const_iterator it = m_dict.find(key);
     if (it == m_dict.end()) {
-        return HOSTIF_SRC_DEFAULT;
+        return HOSTIF_NONE;
     }
     BS_JournalData_t journalData = it->second;
     RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "getJournalSource UpdatedSource = %s \n", getUpdatedSourceString(journalData.updatedSource).c_str());
@@ -287,8 +287,13 @@ bool XBSStoreJournal::setJournalValue(const string &key, const string &value, Ho
        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "key %s not found\n", key.c_str());
        if (bsSource != HOSTIF_SRC_DEFAULT)
        {
-          RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "New param is not from firmware. Ignoring..\n");//Override through RFC/WebPA is allowed only for the params that exist in firmware json file.
-          return false;
+          journalData.fwValue = "-";
+          journalData.buildTime = m_buildTime;
+          journalData.updatedValue = value;
+          journalData.updatedTime = getTime();
+          journalData.updatedSource = bsSource;
+          journalData.clearRfc = false;
+          RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Ths should not happen...Param is missing in journal file..Adding it..\n");
        }
        else
        {
