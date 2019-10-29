@@ -33,7 +33,10 @@ void libpd_set_notifyConfigFile(const char* configFile);
  */
 void *libpd_client_mgr(void *args);
 
-
+/**
+ * @brief Stops parodus receive wait thread
+ */
+void stop_parodus_recv_wait();
 
 /**
  * Send Notification Message

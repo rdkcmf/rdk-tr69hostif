@@ -62,7 +62,7 @@ static long timeValDiff(struct timespec *starttime, struct timespec *finishtime)
 libpd_instance_t libparodus_instance;
 char parodus_url[URL_SIZE] = {'\0'};
 char client_url[URL_SIZE] = {'\0'};
-
+bool exit_parodus_recv = false;
 /*----------------------------------------------------------------------------*/
 /*                             External functions                             */
 /*----------------------------------------------------------------------------*/
@@ -76,6 +76,10 @@ void libpd_set_notifyConfigFile(const char* configFile)
     setInitialNotifyConfigFile(configFile);
 }
 
+void stop_parodus_recv_wait()
+{
+   exit_parodus_recv = true;
+}
 /**
  * Initialize libpd and Load Data model, Invoke connection to parodus
  */
@@ -84,6 +88,7 @@ void *libpd_client_mgr(void *)
     // Load Data model
     int status =-1;
     RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Loading DB \n");
+
     status = loadDataModel();
     if(status != 0)
     {
@@ -123,7 +128,7 @@ static void parodus_receive_wait()
 
     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Entering parodus_receive_wait.. \n");
 
-    while (1)
+    while (!exit_parodus_recv)
     {
         rtn = libparodus_receive (libparodus_instance, &wrp_msg, 2000);
         if (rtn == 1)
