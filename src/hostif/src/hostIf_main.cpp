@@ -491,6 +491,7 @@ void quit_handler (int sig_received)
 
 void exit_gracefully (int sig_received)
 {
+
     if((pthread_mutex_trylock(&graceful_exit_mutex) == 0) && (isShutdownTriggered == 0)) {
         RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
         isShutdownTriggered = 1;
@@ -499,9 +500,12 @@ void exit_gracefully (int sig_received)
         /* Perform the necessary operations to shut down the WiFi device */
         WiFiDevice::shutdown();
 #endif
-
+        
         // Kill Parodus Thread
-        pthread_cancel(parodus_init_tid);
+        stop_parodus_recv_wait();
+        // Wait for the thread to exit
+        pthread_join(parodus_init_tid, NULL);
+
        /*Stop libSoup server and exit Json Thread */
        hostIf_HttpServerStop();
 
