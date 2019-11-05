@@ -53,9 +53,9 @@
 #include <mutex>
 
 #include "btmgr.h"
-#include "lemgr_iarm_interface.h"
 
 #ifdef BLE_TILE_PROFILE
+#include "lemgr_iarm_interface.h"
 #include "hostIf_NotificationHandler.h"
 #endif
 
@@ -168,11 +168,11 @@ int hostIf_DeviceInfoRdk_xBT::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = setDeviceInfo(stMsgData);
         }
+#ifdef BLE_TILE_PROFILE
         else if (strncasecmp(paramName, BT_LIMIT_BEACON_DETECTION_STRING, strlen(BT_LIMIT_BEACON_DETECTION_STRING)) == 0)
         {
             ret = setLimitBeaconDetection(stMsgData);
         }
-#ifdef BLE_TILE_PROFILE
         else if (strncasecmp(paramName, BT_TILE_ID_STRING, strlen(BT_TILE_ID_STRING)) == 0)
         {
             this->tile_Id = stMsgData->paramValue;
@@ -276,10 +276,6 @@ int hostIf_DeviceInfoRdk_xBT::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = isEnabled(stMsgData);
         }
-        else if (strncasecmp(paramName, BT_LIMIT_BEACON_DETECTION_STRING, strlen(BT_LIMIT_BEACON_DETECTION_STRING)) == 0)
-        {
-            ret = getLimitBeaconDetection(stMsgData);
-        }
         else if (strncasecmp(paramName, BT_DISCOVERY_ENABLED_STRING, strlen(BT_DISCOVERY_ENABLED_STRING)) == 0)
         {
             ret = isDiscoveryEnabled(stMsgData);
@@ -326,6 +322,10 @@ int hostIf_DeviceInfoRdk_xBT::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             ret = getDeviceInfo_RSSI(stMsgData);
         }
 #ifdef BLE_TILE_PROFILE
+        else if (strncasecmp(paramName, BT_LIMIT_BEACON_DETECTION_STRING, strlen(BT_LIMIT_BEACON_DETECTION_STRING)) == 0)
+        {
+            ret = getLimitBeaconDetection(stMsgData);
+        }
         else if (strncasecmp(paramName, BT_TILE_ID_STRING, strlen(BT_TILE_ID_STRING)) == 0)
         {
             snprintf(stMsgData->paramValue, (TR69HOSTIFMGR_MAX_PARAM_LEN -1), "%s", this->tile_Id.c_str());
@@ -1645,6 +1645,7 @@ int hostIf_DeviceInfoRdk_xBT::setDeviceInfo (HOSTIF_MsgData_t *stMsgData)
     return OK;
 }
 
+#ifdef BLE_TILE_PROFILE
 /************************************************************
  * Description  : Set api for
  *                               'Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.setLimitBeaconDetection' parameter.
@@ -1744,7 +1745,7 @@ int hostIf_DeviceInfoRdk_xBT::getLimitBeaconDetection (HOSTIF_MsgData_t *stMsgDa
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Exiting..\n", __FUNCTION__, __LINE__);
     return OK;
 }
-
+#endif
 /************************************************************
  * Description  : This method is to fetch Bluetooth Discovered Devices details.
  *
