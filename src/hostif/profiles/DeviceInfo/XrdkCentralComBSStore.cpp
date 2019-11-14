@@ -275,8 +275,10 @@ bool XBSStore::setRawValue(const string &key, const string &value, HostIf_Source
         }
 
         //Keep an updated firmware value in the journal even though it is not active configuration.
-        if(sourceType == HOSTIF_SRC_DEFAULT && xbsJournalInstance->getJournalSource(key) != HOSTIF_SRC_DEFAULT)
+        if(sourceType == HOSTIF_SRC_DEFAULT &&
+           (xbsJournalInstance->getJournalSource(key) == HOSTIF_SRC_RFC || xbsJournalInstance->getJournalSource(key) == HOSTIF_SRC_WEBPA) )
         {
+           RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Update firmware value in journal even though it is not active..\n");
            xbsJournalInstance->setJournalValue(key, value, sourceType);
            return true;
         }
