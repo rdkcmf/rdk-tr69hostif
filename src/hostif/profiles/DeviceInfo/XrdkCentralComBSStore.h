@@ -43,8 +43,7 @@ private:
     bool m_initialUpdate;
     bool m_rfcUpdateInProgress;
     thread partnerIdThread;
-    static string m_partnerId;
-    static mutex mtx;
+    static recursive_mutex mtx;
     static bool m_stopped;
     std::unordered_map<std::string, std::string> m_dict;
 

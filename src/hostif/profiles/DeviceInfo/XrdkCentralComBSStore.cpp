@@ -27,6 +27,7 @@
 
 #include "XrdkCentralComBSStore.h"
 #include "hostIf_utils.h"
+#include "rfcapi.h"
 
 #define BS_STORE_KEY "BS_STORE_FILENAME"
 #define BS_JOURNAL_KEY "BS_JOURNAL_FILENAME"
@@ -35,11 +36,11 @@
 #define TR181_PARTNER_ID_KEY "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId"
 #define BS_CLEAR_DB_START "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.Control.ClearDB"
 #define BS_CLEAR_DB_END "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.Control.ClearDBEnd"
+#define RFC_SERVICE_LOCK "/tmp/.rfcServiceLock"
 
 XBSStore* XBSStore::xbsInstance = NULL;
 XBSStoreJournal* XBSStore::xbsJournalInstance = NULL;
-string XBSStore::m_partnerId = "";
-mutex XBSStore::mtx;
+recursive_mutex XBSStore::mtx;
 bool XBSStore::m_stopped = false;
 
 size_t static writeCurlResponse(void *ptr, size_t size, size_t nmemb, string stream)
@@ -51,8 +52,31 @@ size_t static writeCurlResponse(void *ptr, size_t size, size_t nmemb, string str
 }
 void XBSStore::getAuthServicePartnerID()
 {
+    bool partnerIdChanged = false;
     while(!m_stopped)
     {
+        if ( partnerIdChanged )
+        {
+            ifstream f(RFC_SERVICE_LOCK);
+            if (f.good())
+            {
+                RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: RFC service in progress. Retry after 30 sec\n", __FUNCTION__);
+                sleep(30);
+                continue;
+            }
+            else
+            {
+                //Invalidate RFC hash and retrigger so we can apply RFC overrides to the new partner configuration
+                WDMP_STATUS status = setRFCParameter("tr69hostif", "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.ConfigSetHash", "INVALIDATE", WDMP_STRING);
+                RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: RFC SET to Invalidate Hash status = %d \n", __FUNCTION__, status);
+
+                status = setRFCParameter("tr69hostif", "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.RetrieveNow", "1", WDMP_UINT);
+                RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: RFC SET to retrieveNow status = %d \n", __FUNCTION__, status);
+                break;
+            }
+        }
+        
+        string newPartnerId = "";
         string response;
         CURL *curl = curl_easy_init();
         if(curl)
@@ -77,9 +101,7 @@ void XBSStore::getAuthServicePartnerID()
                     if(partnerID->type == cJSON_String && partnerID->valuestring && strlen(partnerID->valuestring) > 0)
                     {
                         RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Found partnerID value = %s\n", partnerID->valuestring);
-                        mtx.lock();
-                        m_partnerId = partnerID->valuestring;
-                        mtx.unlock();
+                        newPartnerId = partnerID->valuestring;
                     }
                     cJSON_Delete(root);
                 }
@@ -93,12 +115,27 @@ void XBSStore::getAuthServicePartnerID()
         {
             RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: curl init failed\n", __FUNCTION__);
         }
-        if(m_partnerId.length() > 0)
-            break;
+        if(newPartnerId.length() > 0)
+        {
+            string storedPartnerId = xbsInstance->getRawValue(TR181_PARTNER_ID_KEY);
+            if (newPartnerId.compare(storedPartnerId) != 0)
+            {
+                RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"partnerId has changed\n");
+                partnerIdChanged = true;
+                mtx.lock();
+                xbsInstance->resetCacheAndStore();
+                xbsInstance->setRawValue(TR181_PARTNER_ID_KEY, newPartnerId.c_str(), HOSTIF_SRC_DEFAULT);
+                xbsInstance->m_initDone = false;
+                xbsInstance->init();
+                mtx.unlock();
+            }
+            else
+                break;
+        }
         else
         {
-            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: partnerId not found. Retry after 10 sec\n", __FUNCTION__);
-            sleep(10);
+            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: partnerId not found. Retry after 30 sec\n", __FUNCTION__);
+            sleep(30);
         }
     }
 }
@@ -115,9 +152,7 @@ bool XBSStore::loadFromJson()
 {
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
 
-    mtx.lock();
-    string partnerId = m_partnerId;
-    mtx.unlock();
+    string partnerId = getRawValue(TR181_PARTNER_ID_KEY);
 
     if (partnerId.length() == 0)
     {
@@ -140,14 +175,6 @@ bool XBSStore::loadFromJson()
         return false;
     }
 
-    string prevPartnerId = getRawValue(TR181_PARTNER_ID_KEY);
-    bool partnerIdChanged = false;
-    if (partnerId.compare(prevPartnerId) != 0)
-    {
-        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"partnerId has changed\n");
-        partnerIdChanged = true;
-    }
-
     cJSON* partnerConfig = cJSON_GetObjectItem(json, partnerId.c_str());
     if (!partnerConfig)
     {
@@ -155,10 +182,6 @@ bool XBSStore::loadFromJson()
         return false;
     }
     if(partnerConfig->type == cJSON_Object) {
-        if (partnerIdChanged)
-        {
-            resetCacheAndStore();
-        }
         ifstream ifs_bsini(m_filename);
         if (ifs_bsini.is_open()) {
             RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s: File [%s] exist. Look for any default parameter changes.\n", __FUNCTION__, m_filename.c_str());
@@ -215,8 +238,6 @@ bool XBSStore::loadFromJson()
             setRawValue(configKey, configValue, HOSTIF_SRC_DEFAULT);
             configObject = configObject->next;
         }
-        if (partnerIdChanged)
-            setRawValue(TR181_PARTNER_ID_KEY, partnerId.c_str(), HOSTIF_SRC_DEFAULT);
         m_initialUpdate = false;
         xbsJournalInstance->setInitialUpdate(false);
     }
@@ -230,10 +251,13 @@ string XBSStore::getRawValue(const string &key)
 {
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
 
+    mtx.lock();
     unordered_map<string,string>::const_iterator it = m_dict.find(key);
     if (it == m_dict.end()) {
+        mtx.unlock();
         return "";
     }
+    mtx.unlock();
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s : Value = %s \n", __FUNCTION__, it->second.c_str());
 
     return it->second;
@@ -381,9 +405,11 @@ faultCode_t  XBSStore::overrideValue(HOSTIF_MsgData_t *stMsgData)
        return stMsgData->faultCode;
     }
 
+    mtx.lock();
     if (m_dict.find(stMsgData->paramName) == m_dict.end())
     {
         RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Param does not exist in bootstrap store. Cannot override.\n");
+        mtx.unlock();
         return fcInternalError;
     }
 
@@ -401,6 +427,7 @@ faultCode_t  XBSStore::overrideValue(HOSTIF_MsgData_t *stMsgData)
     else
     {
         RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "Bootstrap override rules not met: [requestor=%d]\n");
+        mtx.unlock();
         return fcInternalError;
     }
 
@@ -416,6 +443,7 @@ faultCode_t  XBSStore::overrideValue(HOSTIF_MsgData_t *stMsgData)
         RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "Unable to Set Value for given Param\n");
         stMsgData->faultCode = fcInternalError;
     }
+    mtx.unlock();
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s \n", __FUNCTION__);
     return stMsgData->faultCode;
 }
@@ -469,7 +497,7 @@ bool XBSStore::loadBSPropertiesIntoCache()
     // get rid of quotes, it is quite common with properties files
     m_filename.erase(remove(m_filename.begin(), m_filename.end(), '\"'), m_filename.end());
     m_dict.clear();
-    RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "Bootstrap Properties File :  %s \n", m_filename.c_str());
+    RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Bootstrap Properties File :  %s \n", m_filename.c_str());
 
     ifstream ifs_bsini(m_filename);
     if (ifs_bsini.is_open())
@@ -503,14 +531,18 @@ bool XBSStore::loadBSPropertiesIntoCache()
 bool XBSStore::init()
 {
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
+    mtx.lock();
     if(m_initDone)
+    {
+        mtx.unlock();
         return m_initDone;
-
+    }
     initBSPropertiesFileName();
 
     m_initDone = loadBSPropertiesIntoCache();
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s \n", __FUNCTION__);
+    mtx.unlock();
     return m_initDone;
 }
 
