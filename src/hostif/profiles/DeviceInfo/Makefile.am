@@ -28,9 +28,10 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
 $(GLIB_CFLAGS) $(G_THREAD_CFLAGS) $(XREMGR_FLAGS) $(MOCAMGR_FLAGS) $(PROCPS_CFLAGS) \
 -I=/usr/include/rdk/iarmbus/ \
 -I=/usr/include/rdk/iarmmgrs/mfr/ \
--I=/usr/include/rdk/iarmmgrs-hal/
+-I=/usr/include/rdk/iarmmgrs-hal/ \
+-I=/usr/include/wdmp-c
 
-AM_LDFLAGS = $(PROCPS_LIBS) -lIARMBus -lyajl -lds -ldshalcli -ldbus-1 -lcurl
+AM_LDFLAGS = $(PROCPS_LIBS) -lIARMBus -lyajl -lds -ldshalcli -ldbus-1 -lcurl -lrfcapi
 
 if WITH_XRDK_BT_PROFILE
 AM_CXXFLAGS += $(XRDK_BT_PROFILE_FLAG)
