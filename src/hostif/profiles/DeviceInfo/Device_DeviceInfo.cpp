@@ -650,11 +650,13 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ModelName(HOSTIF_MsgData_t * stMsgD
         return NOK;
     }
     if(fgets(modelName, 64,fp)!=NULL) {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] modelName = %s.\n",__FUNCTION__, __FILE__, __LINE__,modelName);
+        // Remove new line char if any in model name
         int len = strlen(modelName);
-        strncpy((char *)stMsgData->paramValue, modelName, len);
-        stMsgData->paramValue[len] = '\0';
-        stMsgData->paramLen = len;
+        if(modelName[len-1] == '\n') modelName[len-1] = '\0';
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] modelName = %s.\n",__FUNCTION__, __FILE__, __LINE__,modelName);
+        strncpy((char *)stMsgData->paramValue, modelName,sizeof(stMsgData->paramValue)-1);
+        stMsgData->paramValue[sizeof(stMsgData->paramValue)-1] = '\0';
+        stMsgData->paramLen = strlen(modelName);
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s stMsgData->paramLen: %d \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue,stMsgData->paramLen);
         ret = OK;
     } else {
