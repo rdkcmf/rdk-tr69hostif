@@ -42,6 +42,20 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
    },
+   "cox-hospitality" : {
+        "Device.Time.NTPServer1" : "cpentp.services.cox.net",
+        "Device.Time.NTPServer2" : "cpentp.services.cox.net",
+        "Device.Time.NTPServer3" : "time.google.com",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL_dev" : "https://dukercapp-acs-v6.east.cox.net",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "https://dukercapp-acs-v6.east.cox.net",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "/etc/ssl/certs/ca-certificates.crt",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Cox",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Contour",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "COMCOX",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server1" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+   },
    "cox-dev" : {
         "Device.Time.NTPServer1" : "cpentp.services.coxlab.net",
         "Device.Time.NTPServer2" : "cpentp.services.coxlab.net",
