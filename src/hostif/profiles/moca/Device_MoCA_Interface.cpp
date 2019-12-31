@@ -94,8 +94,9 @@ void* MoCADevice::getRmhContext()
         }
 
         if (waitedSeconds >= MAX_WAIT_FOR_RMH_SECONDS) {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"(%s) Maximum wait for MoCA reached. Aborting!\n", __FUNCTION__);
-            throw 1;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"(%s) Maximum wait for MoCA reached. Skipping RMH Initialization.!\n", __FUNCTION__);
+            //throw 1; Leading to program termination. Better to return failure rather than terminating process to allow access to other profiles.
+            break;
         }
 
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"(%s)Failed in RMH_Initialize. Assuming MoCA isn't ready. Waiting...\n", __FUNCTION__);
