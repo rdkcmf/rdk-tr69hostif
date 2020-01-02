@@ -41,6 +41,7 @@
 XBSStore* XBSStore::xbsInstance = NULL;
 XBSStoreJournal* XBSStore::xbsJournalInstance = NULL;
 recursive_mutex XBSStore::mtx;
+thread XBSStore::partnerIdThread;
 bool XBSStore::m_stopped = false;
 
 size_t static writeCurlResponse(void *ptr, size_t size, size_t nmemb, string stream)
@@ -554,8 +555,6 @@ XBSStore::XBSStore()
     m_initialUpdate = false;
     m_rfcUpdateInProgress = false;
 
-    partnerIdThread = thread(getAuthServicePartnerID);
-
     init();
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s \n", __FUNCTION__);
@@ -566,7 +565,11 @@ XBSStore* XBSStore::getInstance()
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
 
     if(!xbsInstance)
+    {
         xbsInstance = new XBSStore;
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: Start thread getAuthServicePartnerID \n", __FUNCTION__);
+        partnerIdThread = thread(getAuthServicePartnerID);
+    }
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s \n", __FUNCTION__);
     return xbsInstance;
