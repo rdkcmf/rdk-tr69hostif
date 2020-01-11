@@ -427,7 +427,7 @@ int hostIf_STBServiceHDMI::setResolution(const HOSTIF_MsgData_t *stMsgData)
 
         static int pixelResolArrSize = sizeof( dsVideoPixelResolutionMapper ) / sizeof( EnumStringMapper );
         int pixelId = getEnumFromString(dsVideoPixelResolutionMapper, pixelResolArrSize, pixelName);
-        if ((pixelId<dsVIDEO_PIXELRES_720x480) || (pixelId>dsVIDEO_PIXELRES_1920x1080))
+        if ((pixelId<dsVIDEO_PIXELRES_720x480) || (pixelId>dsVIDEO_PIXELRES_3840x2160))
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Error in PixelResolution value: %s\n",__FUNCTION__, pixelName);
             return NOK;
