@@ -24,6 +24,7 @@
 #include <string>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <XrdkCentralComBSStoreJournal.h>
 using namespace std;
 
@@ -45,6 +46,8 @@ private:
     static thread partnerIdThread;
     static recursive_mutex mtx;
     static bool m_stopped;
+    static mutex mtx_stopped;
+    static condition_variable cv;
     std::unordered_map<std::string, std::string> m_dict;
 
     XBSStore();

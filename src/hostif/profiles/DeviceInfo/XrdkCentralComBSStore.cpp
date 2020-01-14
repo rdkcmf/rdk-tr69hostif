@@ -43,6 +43,8 @@ XBSStoreJournal* XBSStore::xbsJournalInstance = NULL;
 recursive_mutex XBSStore::mtx;
 thread XBSStore::partnerIdThread;
 bool XBSStore::m_stopped = false;
+mutex XBSStore::mtx_stopped;
+condition_variable XBSStore::cv;
 
 size_t static writeCurlResponse(void *ptr, size_t size, size_t nmemb, string stream)
 {
@@ -54,6 +56,8 @@ size_t static writeCurlResponse(void *ptr, size_t size, size_t nmemb, string str
 void XBSStore::getAuthServicePartnerID()
 {
     bool partnerIdChanged = false;
+    auto sec = chrono::seconds(1);
+
     while(!m_stopped)
     {
         if ( partnerIdChanged )
@@ -62,7 +66,8 @@ void XBSStore::getAuthServicePartnerID()
             if (f.good())
             {
                 RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: RFC service in progress. Retry after 30 sec\n", __FUNCTION__);
-                sleep(30);
+                unique_lock<mutex> lck(mtx_stopped);
+                cv.wait_for(lck, 30*sec, []{return m_stopped;});
                 continue;
             }
             else
@@ -136,7 +141,8 @@ void XBSStore::getAuthServicePartnerID()
         else
         {
             RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: partnerId not found. Retry after 30 sec\n", __FUNCTION__);
-            sleep(30);
+            unique_lock<mutex> lck(mtx_stopped);
+            cv.wait_for(lck, 30*sec, []{return m_stopped;});
         }
     }
 }
@@ -578,4 +584,6 @@ XBSStore* XBSStore::getInstance()
 void XBSStore::stop()
 {
     m_stopped = true;
+    cv.notify_one();
+    partnerIdThread.join();
 }
