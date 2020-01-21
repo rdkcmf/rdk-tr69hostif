@@ -63,6 +63,8 @@ libpd_instance_t libparodus_instance;
 char parodus_url[URL_SIZE] = {'\0'};
 char client_url[URL_SIZE] = {'\0'};
 bool exit_parodus_recv = false;
+pthread_cond_t parodus_cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t parodus_lock = PTHREAD_MUTEX_INITIALIZER;
 /*----------------------------------------------------------------------------*/
 /*                             External functions                             */
 /*----------------------------------------------------------------------------*/
@@ -78,7 +80,21 @@ void libpd_set_notifyConfigFile(const char* configFile)
 
 void stop_parodus_recv_wait()
 {
+   int ret = 0;
    exit_parodus_recv = true;
+
+   // Close libparodus receiver 
+   ret = libparodus_close_receiver (libparodus_instance);
+   if(ret == 0)
+   {
+       RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Successfully closed libparodus receiver. \n");
+   }
+   else
+   {
+       RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failure in closing libparodus receiver, Ret = %d\n",ret);
+   }
+   // Unblock parodus thread from conditional wait.
+   pthread_cond_signal(&parodus_cond);
 }
 /**
  * Initialize libpd and Load Data model, Invoke connection to parodus
@@ -121,7 +137,8 @@ static void parodus_receive_wait()
     wrp_msg_t *wrp_msg;
     wrp_msg_t *res_wrp_msg ;
 
-    struct timespec start,end,*startPtr,*endPtr;
+    struct timespec start,end,*startPtr,*endPtr,currTime;
+    
     startPtr = &start;
     endPtr = &end;
     char *contentType = NULL;
@@ -135,10 +152,13 @@ static void parodus_receive_wait()
         {
             continue;
         }
-
         if (rtn != 0)
         {
-            sleep(5);
+            clock_gettime(CLOCK_MONOTONIC, &currTime);
+            currTime.tv_sec += 5;
+            pthread_mutex_lock(&parodus_lock);
+            pthread_cond_timedwait(&parodus_cond, &parodus_lock,&currTime );
+            pthread_mutex_unlock(&parodus_lock);
             continue;
         }
 
@@ -182,9 +202,7 @@ static void parodus_receive_wait()
             wrp_free_struct(wrp_msg);
         }
     }
-
     libparodus_shutdown(&libparodus_instance);
-
     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"End of parodus_upstream\n");
 }
 
