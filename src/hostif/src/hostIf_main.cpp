@@ -184,18 +184,6 @@ int main(int argc, char *argv[])
     struct sigaction sigact;
     sigset_t sigset;
 
-    if (sem_init(&shutdown_thread_sem, 0, 0) == -1)
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] sem_init() failed\n", __FUNCTION__, __FILE__);
-        return 1;
-    }
-
-    if (pthread_create(&shutdown_thread, NULL, shutdown_thread_entry, NULL) != 0)
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] pthread_create() failed\n", __FUNCTION__, __FILE__);
-        return 1;
-    }
-
     while (1)
     {
         static struct option long_options[] =
@@ -473,11 +461,12 @@ int main(int argc, char *argv[])
 #endif
 
     main_loop = g_main_loop_new (NULL, FALSE);
-
     g_main_loop_run(main_loop);
     g_main_loop_unref (main_loop);
+    pthread_join(parodus_init_tid,NULL);
 
-    return ch;
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"\n\n----------------------EXITING MAIN PROGRAM----------------------\n");
+    return 0 ;
 }
 
 //------------------------------------------------------------------------------
@@ -523,8 +512,6 @@ void exit_gracefully (int sig_received)
         
         // Kill Parodus Thread
         stop_parodus_recv_wait();
-        // Wait for the thread to exit
-        pthread_join(parodus_init_tid, NULL);
 
        /*Stop libSoup server and exit Json Thread */
        hostIf_HttpServerStop();
@@ -546,8 +533,10 @@ void exit_gracefully (int sig_received)
        hostIf_IARM_IF_Stop();
 
        RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"[%s:%s] Exiting program gracefully..\n", __FUNCTION__, __FILE__);
+       if (g_main_loop_is_running(main_loop)) {
+           g_main_loop_quit(main_loop);
+       }
        pthread_mutex_unlock(&graceful_exit_mutex);
-       exit (0);
     }
 }
 
