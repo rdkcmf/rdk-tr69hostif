@@ -175,6 +175,11 @@ int XREClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     {
         ret = setXreReceiverRestart(stMsgData);
     }
+    else if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.DevApp.devAppRestartRequest") == 0)
+    {
+        // xreReceiverRestart uses /lib/rdk/restartReceiver.sh, which sometimes doesn't start receiver back 
+        ret = setDevAppRestartRequest(stMsgData);
+    }
     else
     {
         stMsgData->faultCode = fcInvalidParameterName;
@@ -366,7 +371,14 @@ int XREClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     {
         ret = get_XreLastVideoUrl(stMsgData);
     }
-
+    else if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.DevApp.devAppNumAps") == 0)
+    {
+        ret = get_DevAppNumAps(stMsgData);
+    }
+    else if(matchComponent(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.DevApp.devAppTable",&pSetting,instanceNumber))
+    {
+        ret = get_DevAppTable(stMsgData, pSetting, instanceNumber);
+    }
 #if 0
     else if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.Client.XRE.numberOfConnections") == 0)
     {
