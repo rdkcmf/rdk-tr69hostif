@@ -60,6 +60,10 @@
 #include <systemd/sd-daemon.h>
 #endif
 
+#ifdef WEBCONFIG_LITE_ENABLE
+#include<webconfig_lite.h>
+#endif
+
 //static void killAllThreads();
 
 //------------------------------------------------------------------------------
@@ -84,6 +88,9 @@ static int isShutdownTriggered = 0;
 // Parodus Init Thread
 pthread_t parodus_init_tid;
 
+#ifdef WEBCONFIG_LITE_ENABLE
+pthread_t webconfig_threadId;
+#endif
 char *hostIf_JsonIfMsg = (char *)"hostIf_JsonIfThread";
 #ifndef NEW_HTTP_SERVER_DISABLE
 char *HTTPServerName = (char *)"HTTPServerThread";
@@ -452,6 +459,19 @@ int main(int argc, char *argv[])
     {
 	RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Parodus init thread create failed\n");
     }
+    
+#ifdef WEBCONFIG_LITE_ENABLE
+
+    if(0 == pthread_create(&webconfig_threadId, NULL, initWebConfigTask, NULL))
+    {
+          RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"webconfig thread created success.. \n");
+    }
+    else
+    {
+           RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"webconfig thread created failed.. \n");
+    }
+#endif
+
     main_loop = g_main_loop_new (NULL, FALSE);
 
     g_main_loop_run(main_loop);

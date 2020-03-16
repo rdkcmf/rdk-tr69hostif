@@ -31,6 +31,11 @@ SUBDIRS += hostif/httpserver
 DIST_SUBDIRS += hostif/httpserver
 endif
 
+if WITH_WEBCONFIG_LITE_SUPPORT
+SUBDIRS +=hostif/webconfig_lite
+DIST_SUBDIRS += hostif/webconfig_lite
+endif
+
 AM_CXXFLAGS = $(GLIB_CFLAGS) $(GTHREAD_CFLAGS) \
 	$(SOUP_CFLAGS) \
 	-I$(top_srcdir)/src/hostif/include \
@@ -68,6 +73,10 @@ endif
 if WITH_INTFSTACK_PROFILE
 AM_CXXFLAGS += -DUSE_INTFSTACK_PROFILE
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/profiles/InterfaceStack
+endif
+
+if WITH_WEBCONFIG_LITE_SUPPORT
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/webconfig_lite
 endif
 
 if WITH_WEBPA_RFC
@@ -148,6 +157,10 @@ endif
 
 if WITH_SNMP_ADAPTER
 tr69hostif_LDADD += $(top_builddir)/src/hostif/snmpAdapter/libSNMPAdapter.la
+endif
+
+if WITH_WEBCONFIG_LITE_SUPPORT
+tr69hostif_LDADD += $(top_builddir)/src/hostif/webconfig_lite/libwebconfiglite.la
 endif
 
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/parodusClient/pal 
