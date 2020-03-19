@@ -185,8 +185,14 @@ bool XBSStore::loadFromJson()
     cJSON* partnerConfig = cJSON_GetObjectItem(json, partnerId.c_str());
     if (!partnerConfig)
     {
-        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"Error for partner:%s, error = [%s]\n", partnerId.c_str(), cJSON_GetErrorPtr());
-        return false;
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"Unknown partner:%s, using default.\n", partnerId.c_str() );
+        partnerConfig = cJSON_GetObjectItem(json, "default" );
+
+        if (!partnerConfig)
+        {
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"Error for partner:%s, error = [%s]\n", partnerId.c_str(), cJSON_GetErrorPtr());
+            return false;
+        }
     }
     if(partnerConfig->type == cJSON_Object) {
         ifstream ifs_bsini(m_filename);
