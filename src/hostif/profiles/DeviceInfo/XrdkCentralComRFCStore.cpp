@@ -27,6 +27,7 @@
 
 #define TR181_RFC_STORE_KEY "TR181_STORE_FILENAME"
 #define RFC_PROPERTIES_FILE "/etc/rfc.properties"
+#define RFCDEFAULTS_FILE "/tmp/rfcdefaults.ini"
 
 XRFCStore* XRFCStore::xrfcInstance = NULL;
 
@@ -136,8 +137,28 @@ faultCode_t XRFCStore::getValue(HOSTIF_MsgData_t *stMsgData)
     }
     else
     {
-        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s : Parameter Not Found in %s\n", stMsgData->paramName, m_filename.c_str());
-        stMsgData->faultCode = fcInternalError;
+        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s : Parameter Not Found in %s\n", stMsgData->paramName, m_filename.c_str());
+        unordered_map<string,string>::const_iterator it = m_dict_rfcdefaults.find(stMsgData->paramName);
+        if (it != m_dict_rfcdefaults.end())
+        {
+           RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s : Param found in rfcdefaults\n", stMsgData->paramName);
+           rawValue = it->second;
+           if(rawValue.length() > 0)
+           {
+              putValue(stMsgData, rawValue.c_str());
+              stMsgData->faultCode = fcNoFault;
+           }
+           else
+           {
+              RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s : Parameter Found in rfcdefaults is empty\n", stMsgData->paramName);
+              stMsgData->faultCode = fcInternalError;
+           }
+        }
+        else
+        {
+           RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s : Parameter Not Found in rfcdefaults\n", stMsgData->paramName);
+           stMsgData->faultCode = fcInternalError;
+        }
     }
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s\n", __FUNCTION__);
     return stMsgData->faultCode;
@@ -245,6 +266,28 @@ bool XRFCStore::loadTR181PropertiesIntoCache()
         }
         ifs_tr181.close();
     }
+
+
+    ifstream ifs_rfcdef(RFCDEFAULTS_FILE);
+    if (!ifs_rfcdef.is_open()) {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Trying to open a non-existent file [%s] \n", __FUNCTION__, RFCDEFAULTS_FILE);
+        return false;
+    }
+    else
+    {
+        string line;
+        while (getline(ifs_rfcdef, line)) {
+            size_t splitterPos = line.find('=');
+            if (splitterPos < line.length()) {
+                string key = line.substr(0, splitterPos);
+                string value = line.substr(splitterPos+1, line.length());
+                m_dict_rfcdefaults[key] = value;
+                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "Key = %s : Value = %s\n", key.c_str(), value.c_str());
+            }
+        }
+        ifs_rfcdef.close();
+    }
+
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s \n", __FUNCTION__);
     return true;
 }

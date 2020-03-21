@@ -165,5 +165,48 @@
         </syntax>
       </parameter>
     </object>
+    <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.CommonProperties." access="readOnly" minEntries="1" maxEntries="1"/>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.CommonProperties.WarehouseHost." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+        <parameter base="CName1" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+          <syntax>
+            <string/>
+            <default type="factory" value="xcal.tv"/>
+           </syntax>
+        </parameter>
+        <parameter base="CName2" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+          <syntax>
+            <string/>
+            <default type="factory" value="cable.comcast.com"/>
+           </syntax>
+        </parameter>
+        <parameter base="CNameTail" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+          <syntax>
+            <string/>
+            <default type="factory" value=".warehouse.ccp.xcal.tv"/>
+           </syntax>
+        </parameter>
+      </object>
+      <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.CommonProperties.FKPS." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+        <parameter base="URL1" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+          <syntax>
+            <string/>
+            <default type="factory" value="fkpsbroker-stage.ccp.xcal.tv"/>
+          </syntax>
+        </parameter>
+        <parameter base="URL2" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+          <syntax>
+            <string/>
+            <default type="factory" value="https://fkps-stage.ccp.xcal.tv:443/"/>
+          </syntax>
+        </parameter>
+      </object>
+      <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.CommonProperties.AuthService." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+        <parameter base="Host" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+          <syntax>
+            <string/>
+            <default type="factory" value="xacs.ccp.xcal.tv"/>
+          </syntax>
+        </parameter>
+     </object>
   </model>
 </dm:document>
