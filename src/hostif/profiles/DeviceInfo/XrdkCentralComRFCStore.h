@@ -45,6 +45,7 @@ private:
     bool m_updateInProgress;
 
     std::unordered_map<std::string, std::string> m_dict;
+    std::unordered_map<std::string, std::string> m_dict_rfcdefaults;
 
     XRFCStore();
     XRFCStore(XRFCStore const&){};
