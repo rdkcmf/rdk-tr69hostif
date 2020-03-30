@@ -782,16 +782,16 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioEncoding(HOSTIF_MsgDa
         switch(aPort.getEncoding().getId())
         {
         case dsAUDIO_ENC_NONE:
-            strncpy(stMsgData->paramValue, "None", PARAM_LEN);
+            strncpy(stMsgData->paramValue, "None", _BUF_LEN_16);
             break;
         case dsAUDIO_ENC_DISPLAY:
-            strncpy(stMsgData->paramValue, "Display", PARAM_LEN);
+            strncpy(stMsgData->paramValue, "Display", _BUF_LEN_16);
             break;
         case dsAUDIO_ENC_PCM:
-            strncpy(stMsgData->paramValue, "PCM", PARAM_LEN);
+            strncpy(stMsgData->paramValue, "PCM", _BUF_LEN_16);
             break;
         case dsAUDIO_ENC_AC3:
-            strncpy(stMsgData->paramValue, "AC3", PARAM_LEN);
+            strncpy(stMsgData->paramValue, "AC3", _BUF_LEN_16);
             break;
         default:
             return NOK;
@@ -804,7 +804,7 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioEncoding(HOSTIF_MsgDa
             *pChanged = true;
         }
         bCalledAudioEncoding = true;
-        strncpy(backupAudioEncoding,stMsgData->paramValue, _BUF_LEN_16-1);
+        strncpy(backupAudioEncoding,stMsgData->paramValue, _BUF_LEN_16);
         backupAudioEncoding[_BUF_LEN_16-1] = '\0';
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] stMsgData->paramValue [%s]\n",__FUNCTION__, stMsgData->paramValue);
     }

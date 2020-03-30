@@ -189,11 +189,13 @@ void updateHandler::notifyCallback(IARM_Bus_tr69HostIfMgr_EventId_t event_type, 
 {
     IARM_Bus_tr69HostIfMgr_EventData_t eventData;
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] updateHandler::notifyCallback for Parameter :- %s..\n", __FILE__, __FUNCTION__,paramName);
-    strncpy(eventData.paramName,paramName, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    strncpy(eventData.paramName,paramName, TR69HOSTIFMGR_MAX_PARAM_LEN-1);
+    eventData.paramName[TR69HOSTIFMGR_MAX_PARAM_LEN-1] = '\0';
 
     if(paramValue)
     {
-        strncpy(eventData.paramValue, paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN);
+        strncpy(eventData.paramValue, paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN-1);
+        eventData.paramValue[TR69HOSTIFMGR_MAX_PARAM_LEN-1] = '\0';
     }
 
     eventData.paramtype = paramtype;

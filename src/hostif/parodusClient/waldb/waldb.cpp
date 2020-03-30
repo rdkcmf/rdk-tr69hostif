@@ -588,7 +588,7 @@ void checkforParameterNameMatch(XMLNode *pParent, const char *ObjectName, const 
             char *ParameterName = (char *) malloc(sizeof(char) * MAX_PARAMETER_LENGTH);
             strncpy(ParameterName,ObjectName,MAX_PARAMETER_LENGTH-1);
             strncat(ParameterName,pAttrib->Value(),MAX_PARAMETER_LENGTH-1);
-            ParameterName[MAX_PARAMETER_LENGTH] = '\0';
+            ParameterName[MAX_PARAMETER_LENGTH-1] = '\0';
             bool match = !strcmp(ParameterName,paramName);
             free(ParameterName);
             if (match)
@@ -675,7 +675,7 @@ void checkforParameterMatch(XMLNode *pParent,const char *paramName,int *pMatch,D
     else
     {
         strncpy(paramObject,paramName,MAX_PARAMETER_LENGTH-1);
-        paramObject[MAX_PARAMETER_LENGTH] = '\0';
+        paramObject[MAX_PARAMETER_LENGTH-1] = '\0';
     }
 
     RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"Looking for object : %s\n", paramObject);

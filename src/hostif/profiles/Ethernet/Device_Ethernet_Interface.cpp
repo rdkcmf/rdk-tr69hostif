@@ -578,6 +578,7 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Status(HOSTIF_MsgDat
     bCalledStatus = true;
     strcpy(backupStatus, stEthInterface.status);
     strncpy(stMsgData->paramValue,stEthInterface.status,_BUF_LEN_16-1 );
+    stMsgData->paramValue[_BUF_LEN_16-1] = '\0';
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stEthInterface.status);
     return OK;
@@ -606,6 +607,7 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Name(HOSTIF_MsgData_
     bCalledName = true;
     strcpy(backupName, stEthInterface.name);
     strncpy(stMsgData->paramValue,stEthInterface.name,_BUF_LEN_16-1 );
+    stMsgData->paramValue[_BUF_LEN_16-1] = '\0';
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stEthInterface.name);
 

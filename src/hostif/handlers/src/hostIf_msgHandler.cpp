@@ -200,7 +200,7 @@ void hostIf_Print_msgData(HOSTIF_MsgData_t *stMsgData)
 bool hostIf_initalize_ConfigManger()
 {
     bool bVal = true;
-    HostIf_ParamMgr_t mgrName;
+    HostIf_ParamMgr_t mgrName = HOSTIF_INVALID_Mgr;
     char param[100] = {'\0'};
     char mgr[16] = {'\0'};
 
@@ -220,7 +220,6 @@ bool hostIf_initalize_ConfigManger()
     {
         while (fscanf( fp, "%s %s", param, mgr) != EOF)
         {
-            mgrName = HOSTIF_INVALID_Mgr;
             if(strcasecmp(mgr, "deviceMgr") == 0)
             {
                 mgrName = HOSTIF_DeviceMgr;
