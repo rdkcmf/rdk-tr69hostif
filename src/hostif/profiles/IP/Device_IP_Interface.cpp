@@ -606,8 +606,10 @@ int hostIf_IPInterface::get_Interface_Name(HOSTIF_MsgData_t *stMsgData, bool *pC
         *pChanged = true;
     }
     bCalledName = true;
-    strncpy(stMsgData->paramValue,stIPInterfaceInstance.name,TR69HOSTIFMGR_MAX_PARAM_LEN );
-    strncpy(backupName,stIPInterfaceInstance.name,_BUF_LEN_16 );
+    strncpy(stMsgData->paramValue,stIPInterfaceInstance.name,TR69HOSTIFMGR_MAX_PARAM_LEN-1 );
+    stMsgData->paramValue[TR69HOSTIFMGR_MAX_PARAM_LEN-1] = '\0';
+    strncpy(backupName,stIPInterfaceInstance.name,_BUF_LEN_16-1 );
+    backupName[_BUF_LEN_16-1] = '\0';
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stIPInterfaceInstance.name);
 
