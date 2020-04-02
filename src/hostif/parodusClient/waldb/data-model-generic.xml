@@ -95,6 +95,16 @@
           <string/>
         </syntax>
       </parameter>
+      <parameter base="Server3" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="Server4" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
       <parameter base="Enable" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>
           <boolean/>
