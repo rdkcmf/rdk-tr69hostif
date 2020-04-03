@@ -226,5 +226,131 @@
           </syntax>
         </parameter>
      </object>
+      <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.openrdk.DisplaySettings." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object> 
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.openrdk.StoragemanagerService." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object> 
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.com.comcast.stateObserver." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object> 
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.rdk.DeviceDiagnostics_1." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object> 
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.rdk.activityMonitor." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object> 
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.rdk.proxies." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object> 
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.rdk.LoggingPreferences." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object> 
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.rdk.userpreferences." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object> 
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.com.comcast.XreFrameRateService." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.openrdk.videoApplicationEvents_1." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+      <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.rdk.ContinueWatchingService_1." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>     
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.WebSocketService." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>     
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.Warehouse." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>     
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.com.comcast.application_1." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>     
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.com.comcast.hdmiCec_1." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>     
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.com.comcast.HDCPProfile." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.com.comcast.hdmiInput_1." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>   
   </model>
 </dm:document>
