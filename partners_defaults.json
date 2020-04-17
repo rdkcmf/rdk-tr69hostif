@@ -13,7 +13,13 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
      	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    },
    "comcast" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -30,7 +36,13 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "2001:558:feed:dc::201",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "True",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "True",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "True",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    },
    "cox" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -46,7 +58,13 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
      	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    },
    "cox-hospitality" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -62,7 +80,13 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
      	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    },
    "cox-dev" : {
         "Device.Time.NTPServer1" : "cpentp.services.coxlab.net",
@@ -78,7 +102,13 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
      	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    },
    "cox-qa" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -94,7 +124,13 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
      	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    },
    "MIT" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -107,7 +143,13 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
      	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    },
    "shaw" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -123,7 +165,13 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
      	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    },
    "shaw-dev" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -139,7 +187,13 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
      	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    },
    "rogers" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -153,7 +207,13 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
      	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    },
    "rogers-dev" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -167,7 +227,13 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
      	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    },
    "videotron" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -183,6 +249,12 @@
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server2" : "",
      	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server3" : "",
 	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Server4" : "",
-	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False"
+	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DNS64Proxy.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.Enable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
    }
 }
