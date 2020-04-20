@@ -1937,7 +1937,7 @@ int hostIf_DeviceInfoRdk_xBT::do_Ring_A_Tile(bool enable)
 
         IARM_Result_t retVal = IARM_RESULT_SUCCESS;
 
-        retVal = IARM_Bus_Call(IARM_BUS_BTRLEMGR_NAME, IARM_BUS_LEMGR_API_leRingATile, (void *)&param, sizeof(leRingATileHandleParam_t ));
+        retVal = IARM_Bus_Call_with_IPCTimeout(IARM_BUS_BTRLEMGR_NAME, IARM_BUS_LEMGR_API_leRingATile, (void *)&param, sizeof(leRingATileHandleParam_t ), 15000);
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n***********************************\n");
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n \"%s\",  \"%s\"", IARM_BUS_LEMGR_API_leRingATile , ((param.triggerCmd)?"true":"false"));
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n***********************************\n");
@@ -1962,7 +1962,7 @@ int hostIf_DeviceInfoRdk_xBT::process_TileCmdRequest(HOSTIF_MsgData_t *stMsgData
     IARM_Result_t retVal = IARM_RESULT_SUCCESS;
     snprintf(param.request, TILE_REQUEST_MAX_SIZE -1, stMsgData->paramValue);
 
-    retVal = IARM_Bus_Call_with_IPCTimeout(IARM_BUS_BTRLEMGR_NAME, IARM_BUS_LEMGR_API_leTileRequest, (void *)&param, sizeof(leTileRequestHandleParam_t ), 10000);
+    retVal = IARM_Bus_Call_with_IPCTimeout(IARM_BUS_BTRLEMGR_NAME, IARM_BUS_LEMGR_API_leTileRequest, (void *)&param, sizeof(leTileRequestHandleParam_t ), 15000);
     
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n***********************************\n");
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"\n \"%s\",  \"%s\"\n", IARM_BUS_LEMGR_API_leTileRequest, ((retVal == IARM_RESULT_SUCCESS) ?"Successfully set.":"Failed."));
