@@ -21,6 +21,7 @@
 #include <fstream>
 #include <string>
 #include <ctype.h>
+#include <sstream>
 
 #include "XrdkCentralComRFCStore.h"
 #include "hostIf_utils.h"
@@ -28,6 +29,7 @@
 #define TR181_RFC_STORE_KEY "TR181_STORE_FILENAME"
 #define RFC_PROPERTIES_FILE "/etc/rfc.properties"
 #define RFCDEFAULTS_FILE "/tmp/rfcdefaults.ini"
+#define RFCDEFAULTS_ETC_DIR "/etc/rfcdefaults/"
 
 XRFCStore* XRFCStore::xrfcInstance = NULL;
 
@@ -234,6 +236,33 @@ void XRFCStore::initTR181PropertiesFileName()
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s \n", __FUNCTION__);
 }
 
+bool init_rfcdefaults()
+{
+   DIR *dir;
+   struct dirent *ent;
+   if ((dir = opendir ( RFCDEFAULTS_ETC_DIR )) != NULL)
+   {
+      std::ofstream combined_file( RFCDEFAULTS_FILE, ios::out | ios::app ) ;
+      while ((ent = readdir (dir)) != NULL )
+      {
+         if (strstr(ent->d_name, ".ini"))
+         {
+            RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF,"rfcdefaults file: %s\n", ent->d_name);
+            string filepath = RFCDEFAULTS_ETC_DIR;
+            std::ifstream file1( filepath.append(ent->d_name) ) ;
+            combined_file << file1.rdbuf();
+         }
+      }
+      closedir (dir);
+   }
+   else
+   {
+      RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF,"Could not open dir %s \n", RFCDEFAULTS_ETC_DIR) ;
+      return false;
+   }
+   return true;
+}
+
 bool XRFCStore::loadTR181PropertiesIntoCache()
 {
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
@@ -250,7 +279,6 @@ bool XRFCStore::loadTR181PropertiesIntoCache()
     ifstream ifs_tr181(m_filename);
     if (!ifs_tr181.is_open()) {
         RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Trying to open a non-existent file [%s] \n", __FUNCTION__, m_filename.c_str());
-        return false;
     }
     else
     {
@@ -267,26 +295,32 @@ bool XRFCStore::loadTR181PropertiesIntoCache()
         ifs_tr181.close();
     }
 
-
     ifstream ifs_rfcdef(RFCDEFAULTS_FILE);
     if (!ifs_rfcdef.is_open()) {
         RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Trying to open a non-existent file [%s] \n", __FUNCTION__, RFCDEFAULTS_FILE);
-        return false;
-    }
-    else
-    {
-        string line;
-        while (getline(ifs_rfcdef, line)) {
-            size_t splitterPos = line.find('=');
-            if (splitterPos < line.length()) {
-                string key = line.substr(0, splitterPos);
-                string value = line.substr(splitterPos+1, line.length());
-                m_dict_rfcdefaults[key] = value;
-                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "Key = %s : Value = %s\n", key.c_str(), value.c_str());
-            }
+
+        if ( init_rfcdefaults())
+        {
+            RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "Trying to open %s after newly creating\n", RFCDEFAULTS_FILE);
+            ifs_rfcdef.open(RFCDEFAULTS_FILE, ifstream::in);
+            if (!ifs_rfcdef.is_open())
+                return false;
         }
-        ifs_rfcdef.close();
+        else
+            return false;
     }
+    
+    string line;
+    while (getline(ifs_rfcdef, line)) {
+        size_t splitterPos = line.find('=');
+        if (splitterPos < line.length()) {
+            string key = line.substr(0, splitterPos);
+            string value = line.substr(splitterPos+1, line.length());
+            m_dict_rfcdefaults[key] = value;
+            RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "Key = %s : Value = %s\n", key.c_str(), value.c_str());
+        }
+    }
+    ifs_rfcdef.close();
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s \n", __FUNCTION__);
     return true;
