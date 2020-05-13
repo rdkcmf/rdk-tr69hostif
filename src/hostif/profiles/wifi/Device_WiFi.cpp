@@ -321,60 +321,36 @@ int hostIf_WiFi::set_Device_WiFi_EnableWiFi(HOSTIF_MsgData_t *stMsgData)
 {
     LOG_ENTRY_EXIT;
 
-    int ret = NOK;
-    if (stMsgData->paramtype == hostIf_BooleanType)
+    if (stMsgData->paramtype != hostIf_BooleanType)
     {
-        bool enabled = get_boolean(stMsgData->paramValue);
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Failed due to wrong data type for %s, please use boolean(0/1) to set.\n", __FUNCTION__, stMsgData->paramName);
+        stMsgData->faultCode = fcInvalidParameterType;
+        return NOK;
+    }
 
-        IARM_BUS_NetSrvMgr_Iface_EventData_t iarmData = { 0 };
+    IARM_BUS_NetSrvMgr_Iface_EventData_t iarmData = { 0 };
+    snprintf (iarmData.setInterface, INTERFACE_SIZE, "WIFI");
+    iarmData.isInterfaceEnabled = get_boolean(stMsgData->paramValue);
+    iarmData.persist = true; // set interface control persistence = true, whether WiFi is asked to be enabled or not
 
-        snprintf (iarmData.setInterface, INTERFACE_SIZE, "WIFI");
-        iarmData.isInterfaceEnabled = true; // set interface control persistence = true, whether WiFi is asked to be enabled or not
-
-        if (IARM_RESULT_SUCCESS == IARM_Bus_BroadcastEvent (IARM_BUS_NM_SRV_MGR_NAME,
-                (IARM_EventId_t) IARM_BUS_NETWORK_MANAGER_EVENT_SET_INTERFACE_CONTROL_PERSISTENCE,
-                (void *)&iarmData, sizeof(iarmData)))
-        {
-            RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF,
-                    "[%s] Broadcasted IARM_BUS_NETWORK_MANAGER_EVENT_SET_INTERFACE_CONTROL_PERSISTENCE = %d for interface '%s'\n",
-                    __FUNCTION__, iarmData.isInterfaceEnabled, iarmData.setInterface);
-        }
-        else
-        {
-            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF,
-                    "[%s] Failed to broadcast IARM_BUS_NETWORK_MANAGER_EVENT_SET_INTERFACE_CONTROL_PERSISTENCE = %d for interface '%s'\n",
-                    __FUNCTION__, iarmData.isInterfaceEnabled, iarmData.setInterface);
-        }
-
-        memset(&iarmData, 0, sizeof(IARM_BUS_NetSrvMgr_Iface_EventData_t));
-
-        snprintf (iarmData.setInterface, INTERFACE_SIZE, "WIFI");
-        iarmData.isInterfaceEnabled = enabled;
-
-        if (IARM_RESULT_SUCCESS == IARM_Bus_BroadcastEvent (IARM_BUS_NM_SRV_MGR_NAME,
-                (IARM_EventId_t) IARM_BUS_NETWORK_MANAGER_EVENT_SET_INTERFACE_ENABLED,
-                (void *)&iarmData, sizeof(iarmData)))
-        {
-            RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF,
-                    "[%s] Broadcasted IARM_BUS_NETWORK_MANAGER_EVENT_SET_INTERFACE_ENABLED = %d for interface '%s'\n",
-                    __FUNCTION__, iarmData.isInterfaceEnabled, iarmData.setInterface);
-        }
-        else
-        {
-            RDK_LOG (RDK_LOG_ERROR ,LOG_TR69HOSTIF,
-                    "[%s] Failed to broadcast IARM_BUS_NETWORK_MANAGER_EVENT_SET_INTERFACE_ENABLED = %d for interface '%s'\n",
-                    __FUNCTION__, iarmData.isInterfaceEnabled, iarmData.setInterface);
-        }
-
-        ret = OK;
+    if (IARM_RESULT_SUCCESS == IARM_Bus_Call (IARM_BUS_NM_SRV_MGR_NAME,
+            IARM_BUS_NETSRVMGR_API_setInterfaceEnabled,
+            (void*)&iarmData, sizeof(iarmData)))
+    {
+        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF,
+                "[%s] IARM call succeeded %s %s (interface = %s enabled = %d persist = %d)\n",
+                __FUNCTION__, IARM_BUS_NM_SRV_MGR_NAME, IARM_BUS_NETSRVMGR_API_setInterfaceEnabled,
+                iarmData.setInterface, iarmData.isInterfaceEnabled, iarmData.persist);
+        return OK;
     }
     else
     {
-        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Failed due to wrong data type for %s, please use boolean(0/1) to set.\n",
-                __FUNCTION__, stMsgData->paramName);
-        stMsgData->faultCode = fcInvalidParameterType;
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF,
+                "[%s] IARM call failed %s %s (interface = %s enabled = %d persist = %d)\n",
+                __FUNCTION__, IARM_BUS_NM_SRV_MGR_NAME, IARM_BUS_NETSRVMGR_API_setInterfaceEnabled,
+                iarmData.setInterface, iarmData.isInterfaceEnabled, iarmData.persist);
+        return NOK;
     }
-    return ret;
 }
 
 #endif
