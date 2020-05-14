@@ -258,6 +258,13 @@
           </syntax>
         </parameter>
      </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.JSPPCache." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+       <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <boolean/>
+         </syntax>
+       </parameter>
+      </object>
       <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
       <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>                                                                                                                          
