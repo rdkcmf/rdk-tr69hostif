@@ -217,11 +217,11 @@ void hostIf_IP_Diagnostics_SpeedTest::processMsg(HOSTIF_MsgData_t* stMsgData)
 #endif
 
             // check and launch
-            launch_script.open(application);
+            launch_script.open(application.c_str());
             if (launch_script.fail())
             {
                 application = application_prod;
-                launch_script.open(application);
+                launch_script.open(application.c_str());
                 if (launch_script.fail())
                 {
                     RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Speedtest launch script is not found anywhere\n", __FUNCTION__);
