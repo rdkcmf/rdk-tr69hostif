@@ -99,8 +99,8 @@ AC_ARG_ENABLE([moca2],
 	[
 	AC_MSG_NOTICE([moca20 profile is disabled])])
 
-AC_ARG_ENABLE([morty],
-        [AS_HELP_STRING([--enable-morty],[enable morty (default is yes)])],
+AC_ARG_ENABLE([latest-procps],
+        [AS_HELP_STRING([--enable-latest-procps],[enable latest version of procps (default is yes)])],
         [
         PKG_CHECK_MODULES([PROCPS], [libprocps >= 3.2.8])
         ],
