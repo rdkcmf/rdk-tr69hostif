@@ -35,6 +35,8 @@ public:
     void stop();
     faultCode_t  getValue(HOSTIF_MsgData_t *stMsgData);
     faultCode_t  overrideValue(HOSTIF_MsgData_t *stMsgData);
+    // adding a member function to call loadjson
+    bool call_loadJson() { return loadFromJson(); }
 
 private:
     static XBSStore* xbsInstance;

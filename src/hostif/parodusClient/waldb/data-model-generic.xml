@@ -59,7 +59,7 @@
           <string/>
         </syntax>
       </parameter>
-      <parameter base="PartnerId" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+      <parameter base="PartnerId" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>
           <string/>
         </syntax>
