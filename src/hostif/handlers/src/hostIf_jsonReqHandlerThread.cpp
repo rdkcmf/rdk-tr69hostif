@@ -188,15 +188,22 @@ hostIf_HTTPJsonParse(const unsigned char *message, int length)
     yajl_status stat;
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
-
+#ifndef YAJL_V2
     yajl_handle parser = yajl_alloc(&callbacks, NULL, /* &allocFuncs */ NULL, (void *) (&context));
+#else
+    yajl_handle parser = yajl_alloc(&callbacks, /* &allocFuncs */ NULL, (void *) (&context));
+#endif
     //yajl_handle parser = yajl_alloc(&callbacks, NULL, NULL);
     stat = yajl_parse(parser, message, length);
     if (stat != yajl_status_ok)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Failed to parse in yajl_parse()\n", __FUNCTION__, __FILE__);
     } else {
+#ifndef YAJL_V2
         stat = yajl_parse_complete(parser);
+#else
+        stat = yajl_complete_parse(parser);
+#endif
         if (stat != yajl_status_ok)
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] Failed to parse in yajl_parse_complete()\n", __FUNCTION__, __FILE__);
@@ -242,7 +249,11 @@ void hostIf_HTTPJsonMsgHandler(
     }
 
     yajl_gen        json;
+#ifndef YAJL_V2
     json = yajl_gen_alloc(/* &allocFuncs */ NULL, NULL);
+#else
+    json = yajl_gen_alloc(NULL);
+#endif
     if (!json)
     {
         soup_message_set_status_full (msg, SOUP_STATUS_INTERNAL_SERVER_ERROR, "Cannot create return object");
