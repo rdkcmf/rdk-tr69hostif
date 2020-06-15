@@ -660,12 +660,22 @@ void checkforParameterMatch(XMLNode *pParent,const char *paramName,int *pMatch,D
         RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"pParent is Null - returning\n");
         return;
     }
+    if(!paramName)
+    {
+        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"paramName is Null - returning\n");
+        return;
+    }
     // Construct Object without parameter from input ParamName
     std::string *str1 = new std::string(paramName);
     std::size_t found = str1->find_last_of(".");
     delete str1;
     
     char *paramObject = (char *) malloc(sizeof(char) * MAX_PARAMETER_LENGTH);
+    if(!paramObject)
+    {
+        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"paramObject Malloc is Null - returning\n");
+        return;
+    }
     if(found != std::string::npos)
     {
         strncpy(paramObject,paramName,found);
