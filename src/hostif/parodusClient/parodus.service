@@ -26,6 +26,6 @@ ConditionPathExists=/tmp/route_available
 SyslogIdentifier="parodus"
 ExecStartPre=/bin/sh -c 'source /lib/rdk/startParodus.sh'
 ExecStart=/bin/sh -c '/usr/bin/parodus $PARODUS_CMD'
-ExecStop=/bin/kill -15 $MAINPID
+ExecStop=/bin/kill -2 $MAINPID
 RestartSec=10s
 Restart=always
