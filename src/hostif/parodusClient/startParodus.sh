@@ -29,6 +29,9 @@ JWT_KEY="/etc/ssl/certs/webpa-rs256.pem"
 DNS_TEXT_URL="fabric.xmidt.comcast.net"
 TOKEN_SERVER_URL="https://issuer.xmidt.comcast.net:8080/issue"
 
+REBOOT_REASON_SECURE_FILE="/opt/secure/reboot/previousreboot.info"
+REBOOT_REASON_REGULAR_FILE="/opt/persistent/previousreboot.info"
+
 Serial=""
 BootTime=""
 
@@ -42,6 +45,12 @@ if [ -f /usr/bin/GetConfigFile ];then
     GetConfigFile $CONFIG_RES_FILE
 else
     echo "Error: GetConfigFile Not Found"
+fi
+
+if [ -f "$REBOOT_REASON_SECURE_FILE" ]; then
+    REBOOT_INFO=$REBOOT_REASON_SECURE_FILE
+else
+    REBOOT_INFO=$REBOOT_REASON_REGULAR_FILE
 fi
 
 get_webpa_string_parameter()
@@ -151,9 +160,10 @@ parodus_start_up()
         PartnerId="*,$PartnerId"
     fi
 
-    local reboot_reason=$(grep PreviousRebootReason /opt/logs/rebootInfo.log | cut -d: -f2)
+    local reboot_reason=$(cat $REBOOT_INFO | grep "reason" | cut -d: -f2 | cut -d, -f1)
     if [ -z "$reboot_reason" ] || [ ' ' = "$reboot_reason" ]; then
         echo "Last Reboot reason is not Known."
+        reboot_reason="Unknown"
     fi
 
     Image=$(get_ImageName)
