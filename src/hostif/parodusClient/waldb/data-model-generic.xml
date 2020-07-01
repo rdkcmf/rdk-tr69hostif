@@ -402,6 +402,83 @@
           <boolean/>
         </syntax>
       </parameter>
+     </object>     
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.openrdk.ControlService." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.rdk.ping_1." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.rdk.linearSegmentedAdvertising_1." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.screenCaptureService." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.systemService." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.openrdk.RemoteActionMappingService." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.AVInput." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.openrdk.vrexmanagerservice." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.com.comcast.xcast_1." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.FrontPanelService." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
+     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.com.comcast.deviceProvisioning_1." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>                                                                                                                          
+           <boolean/>
+        </syntax>  
+      </parameter>
      </object>
   </model>
 </dm:document>
