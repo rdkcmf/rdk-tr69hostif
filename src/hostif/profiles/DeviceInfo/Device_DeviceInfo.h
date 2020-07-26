@@ -1106,6 +1106,44 @@ public:
     int get_xOpsDeviceMgmt_hwHealthTest_Results(HOSTIF_MsgData_t *);
 
     /**
+    * @brief set_xOpsDeviceMgmt_hwHealthTest_SetTuneType
+    *
+    * This method is used to start tune tests by using a particular tune type.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.SetTuneType
+    *   Data type: integer - Type of tune data to set.
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xOpsDeviceMgmt_hwHealthTest_SetTuneType(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xOpsDeviceMgmt_hwHealthTest_ExecuteTuneTest
+    *
+    * This method is used to perform the tune testing based on the tune type.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.ExecuteTuneTest
+    *   Data type: string - json format of string with tune related data.
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */    
+    int set_xOpsDeviceMgmt_hwHealthTest_ExecuteTuneTest(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xOpsDeviceMgmt_hwHealthTest_TuneResults
+    *
+    * This method is used to retrieve the most recent hardware health Tune test results.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTestTune.TuneResults
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int get_xOpsDeviceMgmt_hwHealthTestTune_TuneResults(HOSTIF_MsgData_t *);
+
+    /**
     * @brief set_xOpsDeviceMgmt_hwHealthTest_EnablePeriodicRun
     *
     * This method is used to enable/disable the hardware health test periodic run functionality.
