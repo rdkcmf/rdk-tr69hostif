@@ -245,6 +245,14 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_xOpsDeviceMgmt_hwHealthTest_ExecuteTest(stMsgData);
         }
+        else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.SetTuneType"))
+        {
+            ret = pIface->set_xOpsDeviceMgmt_hwHealthTest_SetTuneType(stMsgData);
+        }
+        else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.ExecuteTuneTest"))
+        {
+            ret = pIface->set_xOpsDeviceMgmt_hwHealthTest_ExecuteTuneTest(stMsgData);
+        }
 #endif /* USE_HWSELFTEST_PROFILE */
         else if (!strcasecmp(stMsgData->paramName, xFirmwareDownloadNow_STR))
         {
@@ -611,6 +619,10 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTest.Results"))
         {
             ret = pIface->get_xOpsDeviceMgmt_hwHealthTest_Results(stMsgData);
+        }
+        else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTestTune.TuneResults"))
+        {
+            ret = pIface->get_xOpsDeviceMgmt_hwHealthTestTune_TuneResults(stMsgData);
         }
 #endif /* USE_HWSELFTEST_PROFILE */
         else
