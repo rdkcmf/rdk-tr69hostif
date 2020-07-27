@@ -86,7 +86,7 @@ class  hostIf_STBServiceVideoDecoder
 
     char backupContentAspectRatio[_BUF_LEN_16];
     bool backupStandby;
-    char backupVideoDecoderStatus[_BUF_LEN_16];
+    char backupVideoDecoderStatus[_BUF_LEN_32];
 
     bool bCalledContentAspectRatio;
     bool bCalledStandby;
