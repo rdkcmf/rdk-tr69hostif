@@ -403,8 +403,8 @@ int hostIf_STBServiceVideoDecoder::getStatus(HOSTIF_MsgData_t *stMsgData,bool *p
             *pChanged = true;
         }
         bCalledVideoDecoderStatus = true;
-        strncpy(backupVideoDecoderStatus,stMsgData->paramValue,_BUF_LEN_16-1);
-        backupVideoDecoderStatus[_BUF_LEN_16-1] = '\0';
+        strncpy(backupVideoDecoderStatus,stMsgData->paramValue,_BUF_LEN_32-1);
+        backupVideoDecoderStatus[_BUF_LEN_32-1] = '\0';
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] PowerMode: [%d , %s] \n", __FUNCTION__, iPowerMode, stMsgData->paramValue);
     }
     catch (const std::exception e) {
