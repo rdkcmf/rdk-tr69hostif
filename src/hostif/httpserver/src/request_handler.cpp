@@ -305,13 +305,16 @@ static WDMP_STATUS handleRFCRequest(REQ_TYPE reqType, param_t *param)
    return wdmpStatus;
 }
 
-static WDMP_STATUS invokeHostIfAPI(REQ_TYPE reqType, param_t *param, HostIf_Source_Type_t bsUpdate)
+static WDMP_STATUS invokeHostIfAPI(REQ_TYPE reqType, param_t *param, HostIf_Source_Type_t bsUpdate, const char *pcCallerID)
 {
    WDMP_STATUS wdmpStatus = WDMP_SUCCESS;
    int result = NOK;
    HOSTIF_MsgData_t hostIfParam;
    memset(&hostIfParam,0,sizeof(HOSTIF_MsgData_t));
-   hostIfParam.requestor = HOSTIF_SRC_RFC;
+   if (strcmp(pcCallerID, "rfc") == 0)
+      hostIfParam.requestor = HOSTIF_SRC_RFC;
+   else
+      hostIfParam.requestor = HOSTIF_SRC_WEBPA;
    hostIfParam.bsUpdate = bsUpdate;
    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"Entering %s\n", __FUNCTION__);
 
@@ -604,7 +607,7 @@ res_struct* handleRequest(const char* pcCallerID, req_struct *reqSt)
                                 childParams[childParamIndex].value = NULL;
 
                                 //retStatus represents the first error while trying to retrieve the values of a wild card parameter name.
-                                if(WDMP_SUCCESS != invokeHostIfAPI(reqSt->reqType, childParams+childParamIndex, HOSTIF_NONE) && respSt->retStatus[paramIndex] == WDMP_SUCCESS)
+                                if(WDMP_SUCCESS != invokeHostIfAPI(reqSt->reqType, childParams+childParamIndex, HOSTIF_NONE, pcCallerID) && respSt->retStatus[paramIndex] == WDMP_SUCCESS)
                                 {
                                    respSt->retStatus[paramIndex] = WDMP_ERR_VALUE_IS_EMPTY;
                                 }
@@ -654,7 +657,7 @@ res_struct* handleRequest(const char* pcCallerID, req_struct *reqSt)
                         if(WDMP_SUCCESS == respSt->retStatus[paramIndex])
                         {
                            if(!rfcParam)
-                              respSt->retStatus[paramIndex] = invokeHostIfAPI(reqSt->reqType, respSt->u.getRes->params[paramIndex], bsUpdate);
+                              respSt->retStatus[paramIndex] = invokeHostIfAPI(reqSt->reqType, respSt->u.getRes->params[paramIndex], bsUpdate, pcCallerID);
                            else // Temporary handling for RFC Variables - handled using RFC API.
                               respSt->retStatus[paramIndex] = handleRFCRequest(reqSt->reqType, respSt->u.getRes->params[paramIndex]);
 
@@ -728,7 +731,7 @@ res_struct* handleRequest(const char* pcCallerID, req_struct *reqSt)
                             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Operation not permitted : %d\n", respSt->retStatus[paramIndex]);
                             continue;
                         }
-                        respSt->retStatus[paramIndex] = invokeHostIfAPI(reqSt->reqType, reqSt->u.setReq->param + paramIndex, bsUpdate);
+                        respSt->retStatus[paramIndex] = invokeHostIfAPI(reqSt->reqType, reqSt->u.setReq->param + paramIndex, bsUpdate, pcCallerID);
                     }
                 }
                 break;
