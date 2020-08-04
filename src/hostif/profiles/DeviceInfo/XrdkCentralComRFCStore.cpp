@@ -30,7 +30,8 @@
 #define RFC_PROPERTIES_FILE "/etc/rfc.properties"
 #define RFCDEFAULTS_FILE "/tmp/rfcdefaults.ini"
 #define RFCDEFAULTS_ETC_DIR "/etc/rfcdefaults/"
-
+#define TR181_LOCAL_STORE_KEY "TR181_LOCAL_STORE_FILENAME"
+#define TR181_CLEAR_PARAM "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.ClearParam"
 XRFCStore* XRFCStore::xrfcInstance = NULL;
 
 void XRFCStore::clearAll()
@@ -67,6 +68,25 @@ void XRFCStore::reloadCache()
 
     m_updateInProgress = false;
 
+    //copy the local settings from tr181localstore.ini to main DB tr181store.ini
+    for (unordered_map<string, string>::iterator it=m_local_dict.begin(); it!=m_local_dict.end(); ++it)
+    {
+        m_dict[it->first] = it->second;
+    }
+    ofstream ofs(m_filename, ios::trunc | ios::out);
+    if(!ofs.is_open())
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "Failed to open : %s \n", m_filename.c_str());
+        return;
+    }
+
+    for (unordered_map<string, string>::iterator it=m_dict.begin(); it!=m_dict.end(); ++it)
+    {
+        ofs << it->first << '=' << it->second << endl;
+    }
+    ofs.flush();
+    ofs.close();
+    
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s \n", __FUNCTION__);
 }
 
@@ -102,25 +122,65 @@ bool XRFCStore::setRawValue(const string &key, const string &value)
     }
     else
     {
-        ofstream ofs(m_filename, ios::trunc | ios::out);
-
-        if(!ofs.is_open())
-        {
-            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "Failed to open : %s \n", m_filename.c_str());
-            return false;
-        }
-        m_dict[key] = value;
-
-        for (unordered_map<string, string>::iterator it=m_dict.begin(); it!=m_dict.end(); ++it)
-        {
-            ofs << it->first << '=' << it->second << endl;
-        }
-        ofs.flush();
-        ofs.close();
+        return writeHashToFile(key, value, m_dict, m_filename);
     }
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s \n", __FUNCTION__);
     return true;
+}
+
+bool XRFCStore::writeHashToFile(const string &key, const string &value, unordered_map<string, string> &dict, string &filename)
+{
+    ofstream ofs(filename, ios::trunc | ios::out);
+
+    if(!ofs.is_open())
+    {   
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "Failed to open : %s \n", filename.c_str());
+        return false;
+    }
+
+    if (key.compare(TR181_CLEAR_PARAM))
+    {
+        dict[key] = value;
+    }
+
+    for (unordered_map<string, string>::iterator it=dict.begin(); it!=dict.end(); ++it)
+    {   
+        ofs << it->first << '=' << it->second << endl;
+    }
+    ofs.flush();
+    ofs.close();
+
+    return true;
+}
+
+faultCode_t XRFCStore::clearValue(const string &key, const string &value)
+{
+    bool foundInLocalStore = false;
+    unordered_map<string, string> temp_local_dict(m_local_dict);
+
+    for (unordered_map<string, string>::iterator it=temp_local_dict.begin(); it!=temp_local_dict.end(); ++it)
+    {
+        //Check if the param to be cleared is present in tr181localstore.ini
+        //(Or) if the param to be cleared is a wild card, clear all the params from local store that match with the wild card.
+        if(!it->first.compare(value) ||  (value.back() == '.' && it->first.find(value) != string::npos) )
+        {
+            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "Clearing param: %s\n", it->first.c_str());
+            m_local_dict.erase(it->first);
+            m_dict.erase(it->first);
+            foundInLocalStore = true;
+        }
+    }
+
+    if (foundInLocalStore)
+    {
+        writeHashToFile(key, value, m_local_dict, m_local_filename);
+        writeHashToFile(key, value, m_dict, m_filename);
+    }
+    else
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Parameter to be cleared is not present in tr181localstore.ini\n");
+
+    return fcNoFault;
 }
 
 faultCode_t XRFCStore::getValue(HOSTIF_MsgData_t *stMsgData)
@@ -175,6 +235,25 @@ faultCode_t  XRFCStore::setValue(HOSTIF_MsgData_t *stMsgData)
         return fcInternalError;
     }
     const string &givenValue = getStringValue(stMsgData);
+
+    if (!strcmp(stMsgData->paramName,TR181_CLEAR_PARAM))
+    {
+        return clearValue(stMsgData->paramName, givenValue);
+    }
+
+    if (stMsgData->requestor == HOSTIF_SRC_WEBPA) {
+        if(!writeHashToFile(stMsgData->paramName, givenValue, m_local_dict, m_local_filename))
+        {
+            return fcInternalError;
+        }
+        //if the RFC processing is going on, do not perform local/webpa set on tr181store.ini
+        if(m_updateInProgress)
+        {
+            RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "Local tr181 set during RFC processing for %s\n", stMsgData->paramName);
+            return fcNoFault;
+        }
+    }
+    
     if(!m_updateInProgress)
     {
         const string &currentValue = getRawValue(stMsgData->paramName);
@@ -223,6 +302,11 @@ void XRFCStore::initTR181PropertiesFileName()
                 {
                     m_filename = value;
                     RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "TR181 Properties FileName = %s\n", m_filename.c_str());
+                }
+                else if(!strcmp(key.c_str(), TR181_LOCAL_STORE_KEY))
+                {   
+                    m_local_filename = value;
+                    RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "TR181 Local FileName = %s\n", m_local_filename.c_str());
                 }
             }
         }
@@ -294,6 +378,37 @@ bool XRFCStore::loadTR181PropertiesIntoCache()
         }
         ifs_tr181.close();
     }
+
+
+    if(m_local_filename.empty())
+    {
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Invalid TR181 local filename, Unable to load properties\n");
+        return false;
+    }
+    // get rid of quotes, it is quite common with properties files
+    m_local_filename.erase(remove(m_local_filename.begin(), m_local_filename.end(), '\"'), m_local_filename.end());
+    m_local_dict.clear();
+
+    RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "TR181 Local File :  %s \n", m_local_filename.c_str());
+    ifstream ifs_local_tr181(m_local_filename);
+    if (!ifs_local_tr181.is_open()) {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Trying to open a non-existent file [%s] \n", __FUNCTION__, m_local_filename.c_str());
+    }
+    else
+    {   
+        string line;
+        while (getline(ifs_local_tr181, line)) {
+            size_t splitterPos = line.find('=');
+            if (splitterPos < line.length()) {
+                string key = line.substr(0, splitterPos);
+                string value = line.substr(splitterPos+1, line.length());
+                m_local_dict[key] = value;
+                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "Key = %s : Value = %s\n", key.c_str(), value.c_str());
+            }
+        }
+        ifs_local_tr181.close();
+    }
+
 
     ifstream ifs_rfcdef(RFCDEFAULTS_FILE);
     if (!ifs_rfcdef.is_open()) {

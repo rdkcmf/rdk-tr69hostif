@@ -41,10 +41,12 @@ private:
 
     static XRFCStore* xrfcInstance;
     string	m_filename;
+    string m_local_filename;
     bool m_initDone;
     bool m_updateInProgress;
 
     std::unordered_map<std::string, std::string> m_dict;
+    std::unordered_map<std::string, std::string> m_local_dict;
     std::unordered_map<std::string, std::string> m_dict_rfcdefaults;
 
     XRFCStore();
@@ -54,7 +56,8 @@ private:
     bool init();
     string getRawValue(const string &key);
     bool setRawValue(const string &key, const string &value);
-
+    faultCode_t clearValue(const string &key, const string &value);
+    bool writeHashToFile(const string &key, const string &value, unordered_map<string, string> &dict, string &filename);
     void initTR181PropertiesFileName();
     bool loadTR181PropertiesIntoCache();
 };
