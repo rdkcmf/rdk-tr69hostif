@@ -31,7 +31,6 @@ CURL_RESPONSE="/tmp/.cURLresponse"
 #CLICMD="/tmp/cliCMD"
 SERVER_URL="https://issuer.xmidt.comcast.net:8080/issue"
 
-CERT_PATH="/etc/ssl/certs/ca-certificates.crt"
 HTTP_CODE="/tmp/cfg_http_code"
 CURL_FILE="/tmp/adzvfchig-res.mch"
 CURL_FILE_RESPONSE="/tmp/adzvfchig-conf.mch"
@@ -56,7 +55,7 @@ runcURL()
 					retry_count=1
 					while [ true ]
 					do
-						CURL_TOKEN="curl -w '%{http_code}\n'  --output $CURL_RESPONSE --cacert $CERT_PATH  -E $CURL_FILE --header X-Midt-Mac-Address:\"$MAC\" --header X-Midt-Serial-Number:\"$SER_NUM\" --header X-Midt-Uuid:\"$UUID\" --header X-Midt-Transaction-Id:\"$UUID\" $SERVER_URL"
+						CURL_TOKEN="curl -w '%{http_code}\n'  --output $CURL_RESPONSE -E $CURL_FILE --header X-Midt-Mac-Address:\"$MAC\" --header X-Midt-Serial-Number:\"$SER_NUM\" --header X-Midt-Uuid:\"$UUID\" --header X-Midt-Transaction-Id:\"$UUID\" $SERVER_URL"
 						result= eval $CURL_TOKEN > $HTTP_CODE
 						ret=$?
 						sleep 1

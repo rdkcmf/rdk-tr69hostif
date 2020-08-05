@@ -52,7 +52,7 @@ extern "C"
 /*----------------------------------------------------------------------------*/
 /* Macros */
 #define CURL_TIMEOUT_SEC	   25L
-#define CA_CERT_PATH 		   "/etc/ssl/certs/ca-certificates.crt"
+#define CA_CERT_PATH 		   "/etc/ssl/certs"
 #define MAX_BUF_SIZE	           256
 #define MAX_HEADER_LEN			4096
 #define MAX_PARAMETERNAME_LENGTH       512
@@ -425,7 +425,7 @@ static int requestWebConfigData(char **configData, long *code, char **transactio
         //If any failure, retry with v4 first and then v6 mode. 
         RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:curl Ip resolve option set as default mode\n");
         curl_easy_setopt(curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_WHATEVER);
-        curl_easy_setopt(curl, CURLOPT_CAINFO, CA_CERT_PATH);
+        curl_easy_setopt(curl, CURLOPT_CAPATH, CA_CERT_PATH);
         // disconnect if it is failed to validate server's cert 
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
         // Verify the certificate's name against host 
