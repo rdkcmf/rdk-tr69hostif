@@ -925,25 +925,23 @@ int hostIf_STBServiceAudioInterface::setX_COMCAST_COM_AudioCompression(const HOS
 int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioCompression(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     try {
-        int compression = aPort.getCompression();
-
-        if(compression == 0)
+        switch(aPort.getCompression().getId())
         {
+        case dsAUDIO_CMP_NONE:
             strncpy(stMsgData->paramValue,"None", PARAM_LEN);
-        }
-        else if ((compression > 0 )&&(compression < 5)) 
-        {
+            break;
+        case dsAUDIO_CMP_LIGHT:
             strncpy(stMsgData->paramValue,"Light", PARAM_LEN);
-        }
-        else if ((compression > 5 )&&(compression < 12)) 
-        {
+            break;
+        case dsAUDIO_CMP_MEDIUM:
             strncpy(stMsgData->paramValue,"Medium", PARAM_LEN);
-        }
-        else if ((compression > 12 )&&(compression < 16)) 
-        {
+            break;
+        case dsAUDIO_CMP_HEAVY:
             strncpy(stMsgData->paramValue,"Heavy", PARAM_LEN);
+            break;
+        default:
+            return NOK;
         }
-
         stMsgData->paramValue[PARAM_LEN-1] = '\0';
         stMsgData->paramtype = hostIf_StringType;
         stMsgData->paramLen = strlen(stMsgData->paramValue);
