@@ -232,7 +232,6 @@ class hostIf_DeviceInfo {
     int set_xRDKCentralComTelemetryRFCEnable(HOSTIF_MsgData_t *);
     int set_xRDKCentralComHdrRFCEnable(HOSTIF_MsgData_t *);
     int set_xRDKCentralComUhdRFCEnable(HOSTIF_MsgData_t *);
-    int set_xRDKCentralComHdrDVRFCEnable(HOSTIF_MsgData_t *);
     int set_xRDKCentralComXREContainerRFCEnable(HOSTIF_MsgData_t *);
 
     // This is to set wl roam_trigger
