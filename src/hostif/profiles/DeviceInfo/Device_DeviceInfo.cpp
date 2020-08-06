@@ -866,7 +866,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_Ms
 {
     int ret = NOT_HANDLED;
     stMsgData->paramtype = hostIf_StringType;
-#if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
     IARM_Result_t iarm_ret = IARM_RESULT_IPCCORE_FAIL;
     memset(&param, 0, sizeof(param));
@@ -909,7 +908,6 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_AdditionalSoftwareVersion(HOSTIF_Ms
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "Failed in IARM_Bus_Call() for parameter : %s [param.type:%d with error code:%d]\n",stMsgData->paramName,param.type, ret);
         ret = NOK;
     }
-#endif
     return ret;
 }
 
