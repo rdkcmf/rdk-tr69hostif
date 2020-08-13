@@ -79,6 +79,13 @@ if WITH_WEBCONFIG_LITE_SUPPORT
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/webconfig_lite
 endif
 
+if WITH_WEB_CONFIG
+AM_CXXFLAGS += -DWEB_CONFIG_ENABLED
+AM_CXXFLAGS += -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/wdmp-c
+AM_CXXFLAGS += -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/webcfg
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/webcfg/
+endif
+
 if WITH_WEBPA_RFC
 AM_CXXFLAGS += -DWEBPA_RFC_ENABLED
 endif
@@ -123,6 +130,9 @@ endif
 bin_PROGRAMS = tr69hostif
 tr69hostif_SOURCES = $(top_srcdir)/src/hostif/src/hostIf_main.cpp $(top_srcdir)/src/hostif/src/hostIf_utils.cpp
 tr69hostif_SOURCES += $(top_srcdir)/src/hostif/src/IniFile.cpp
+if WITH_WEB_CONFIG
+tr69hostif_SOURCES += $(top_srcdir)/src/hostif/webcfg/webcfg_utils.cpp
+endif
 
 tr69hostif_LDADD = $(top_builddir)/src/hostif/handlers/libMsgHandlers.la
 tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/STBService/libstbservice.la
@@ -165,6 +175,11 @@ endif
 
 if WITH_WEBCONFIG_LITE_SUPPORT
 tr69hostif_LDADD += $(top_builddir)/src/hostif/webconfig_lite/libwebconfiglite.la
+endif
+
+if WITH_WEB_CONFIG
+AM_LDFLAGS += -lwebcfg -lcurl -luuid
+tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/webConfig/libxRdkWebConfig.la
 endif
 
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/parodusClient/pal 

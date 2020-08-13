@@ -92,6 +92,10 @@ if WIFI_CLIENT_ROAMING
 AM_CXXFLAGS += -DWIFI_CLIENT_ROAMING
 endif
 
+if WITH_WEB_CONFIG
+AM_CXXFLAGS += -DWEB_CONFIG_ENABLED -I$(top_srcdir)/src/hostif/profiles/webConfig
+endif
+
 noinst_LTLIBRARIES = libMsgHandlers.la
 libMsgHandlers_la_SOURCES =	src/hostIf_IARM_ReqHandler.cpp \
 				src/hostIf_msgHandler.cpp \
@@ -128,6 +132,10 @@ endif
 
 if WITH_SNMP_ADAPTER
 libMsgHandlers_la_SOURCES +=     src/hostIf_SNMPClient_ReqHandler.cpp
+endif
+
+if WITH_WEB_CONFIG
+libMsgHandlers_la_SOURCES +=     src/x_rdk_webconfig_dml_req_handler.cpp
 endif
 
 if WITH_IPV6_SUPPORT

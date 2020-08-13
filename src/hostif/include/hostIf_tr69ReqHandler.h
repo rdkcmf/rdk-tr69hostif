@@ -168,6 +168,7 @@ typedef enum _HostIf_Source_Type_t
 typedef struct _HostIf_MsgData_t {
     char paramName[TR69HOSTIFMGR_MAX_PARAM_LEN];   			/*!< Parameter name with complete request path */
     char paramValue[TR69HOSTIFMGR_MAX_PARAM_LEN];   			/*!< Parameter Value */
+    char transactionID[_BUF_LEN_256];   			/*!< transaction identifier Value */
     short paramLen;             	/*!< Size of Response parameter data*/
     short instanceNum;              /*!< Instances number of Response parameter data*/
     HostIf_ParamType_t paramtype;	/*!< Parameter type */

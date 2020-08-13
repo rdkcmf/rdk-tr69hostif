@@ -57,6 +57,7 @@ YOCTO_FLAG=" "
 IS_YOCTO_ENABLED=" "
 BLE_TILE_PROFILE=" "
 WEBCONFIG_LITE_FLAG=" "
+WEB_CONFIG_ENABLE=" "
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
 [AM_DEFAULT_VERBOSITY=1
@@ -308,6 +309,19 @@ AC_ARG_ENABLE([webconfig-lite],
            ],
          [echo "webconfig lite is disabled"])
 
+AC_ARG_ENABLE([web-config],
+        [ AS_HELP_STRING([--enable-web-config], [enable Web Config Feature profile (default is no)])],
+          [
+            case "${enableval}" in
+              yes) WITH_WEB_CONFIG=true
+                   WEB_CONFIG_ENABLE=" -DWEB_CONFIG_ENABLE"
+                   echo " Web Config Feature Profile is enabled";;
+              no)  WITH_WEB_CONFIG=false ;;
+            *) AC_MSG_ERROR([bad value ${enableval} for --enable-web-config])
+            esac
+          ],
+        [echo "Web Config Feature Profile is disabled"])
+
 AC_ARG_ENABLE([snmpAdapter],
         AS_HELP_STRING([--enable-snmpAdapter],[enable SNMP_ADAPTER (default is no)]),
         [
@@ -400,6 +414,7 @@ AM_CONDITIONAL([WITH_WEBPA_RFC], [test x$WEBPA_RFC_ENABLE = xtrue])
 AM_CONDITIONAL([WITH_SNMP_ADAPTER], [test x$SNMP_ADAPTER_ENABLE = xtrue])
 AM_CONDITIONAL([ENABLE_BLE_TILE_PROFILE], [test x$ENABLE_BLE_TILE_PROFILE = xtrue])
 AM_CONDITIONAL([WITH_WEBCONFIG_LITE_SUPPORT], [test x$WEBCONFIG_LITE_SUPPORT = xtrue])
+AM_CONDITIONAL([WITH_WEB_CONFIG], [test x$WITH_WEB_CONFIG = xtrue])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -456,6 +471,7 @@ AC_SUBST(WIFI_CLIENT_ROAMING)
 AC_SUBST(NEW_HTTP_SERVER_DISABLE_FLAG)
 AC_SUBST(BLE_TILE_PROFILE)
 AC_SUBST(WEBCONFIG_LITE_FLAG)
+AC_SUBST(WEB_CONFIG_ENABLE)
 
 # files to generate via autotools (.am or .in source files)
 AC_CONFIG_FILES([Makefile])
@@ -467,6 +483,7 @@ AC_CONFIG_FILES([src/hostif/profiles/DeviceInfo/Makefile])
 AC_CONFIG_FILES([src/hostif/profiles/Ethernet/Makefile])
 AC_CONFIG_FILES([src/hostif/profiles/IP/Makefile])
 AC_CONFIG_FILES([src/hostif/profiles/Time/Makefile])
+AC_CONFIG_FILES([src/hostif/profiles/webConfig/Makefile])
 AC_CONFIG_FILES([src/hostif/httpserver/Makefile])
 AC_CONFIG_FILES([src/tr69BusAgent/Makefile])
 

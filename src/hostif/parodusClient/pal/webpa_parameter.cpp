@@ -42,7 +42,7 @@ static WDMP_STATUS get_ParamValues_tr69hostIf(HOSTIF_MsgData_t *ptrParam);
 int isWildCardParam(const char *paramName);
 static void converttohostIfType(char *ParamDataType,HostIf_ParamType_t* pParamType);
 static void converttoWalType(HostIf_ParamType_t paramType,WAL_DATA_TYPE* pwalType);
-static WAL_STATUS SetParamInfo(ParamVal paramVal);
+static WAL_STATUS SetParamInfo(ParamVal paramVal , char * transaction_id);
 static WAL_STATUS set_ParamValues_tr69hostIf (HOSTIF_MsgData_t param);
 static WAL_STATUS convertFaultCodeToWalStatus(faultCode_t faultCode);
 
@@ -97,7 +97,7 @@ void setValues(const ParamVal paramVal[], const unsigned int paramCount, const W
     int cnt=0;
     for(cnt = 0; cnt < paramCount; cnt++)
     {
-        (*retStatus)[cnt] = (WDMP_STATUS) SetParamInfo(paramVal[cnt]);
+        (*retStatus)[cnt] = (WDMP_STATUS) SetParamInfo(paramVal[cnt], transaction_id);
     }
 }
 
@@ -302,7 +302,7 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
     return ret;
 }
 
-static WAL_STATUS SetParamInfo(ParamVal paramVal)
+static WAL_STATUS SetParamInfo(ParamVal paramVal, char * transactionID)
 {
     WAL_STATUS ret = WAL_SUCCESS;
     void *dataBaseHandle = NULL;
@@ -372,6 +372,13 @@ static WAL_STATUS SetParamInfo(ParamVal paramVal)
         {
             strncpy(Param.paramValue, paramVal.value,MAX_PARAM_LENGTH-1);
             Param.paramValue[MAX_PARAM_LENGTH-1]='\0';
+        }
+
+        /* transactionID */
+        if ((NULL != strstr (Param.paramName, "Device.X_RDK_WebConfig.")) && (transactionID))
+        {
+            strncpy(Param.transactionID, transactionID, _BUF_LEN_256-1);
+            Param.transactionID[_BUF_LEN_256-1]='\0';
         }
 
         ret = set_ParamValues_tr69hostIf(Param);
