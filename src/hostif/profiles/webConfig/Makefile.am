@@ -17,37 +17,9 @@
 # limitations under the License.
 ##########################################################################
 
-SUBDIRS =   STBService DeviceInfo Ethernet IP Time
-if WITH_DHCP_PROFILE
-SUBDIRS += DHCPv4
-endif
-if WITH_STORAGESERVICE_PROFILE
-SUBDIRS += StorageService 
-endif
-if WITH_INTFSTACK_PROFILE
-SUBDIRS += InterfaceStack 
-endif
-if WITH_WIFI_PROFILE
-SUBDIRS += wifi
-endif
-if WITH_WEB_CONFIG
-SUBDIRS += webConfig
-endif
+SUBDIRS =
 
+AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include -I$(top_srcdir)/src/hostif/handlers/include  $(GLIB_CFLAGS) $(G_THREAD_CFLAGS)
 
-DIST_SUBDIRS =  STBService DeviceInfo Ethernet IP Time
-if WITH_DHCP_PROFILE
-DIST_SUBDIRS += DHCPv4
-endif
-if WITH_STORAGESERVICE_PROFILE
-DIST_SUBDIRS += StorageService 
-endif
-if WITH_INTFSTACK_PROFILE
-DIST_SUBDIRS += InterfaceStack 
-endif
-if WITH_WIFI_PROFILE
-DIST_SUBDIRS += wifi
-endif
-if WITH_WEB_CONFIG
-DIST_SUBDIRS += webConfig
-endif
+noinst_LTLIBRARIES = libxRdkWebConfig.la
+libxRdkWebConfig_la_SOURCES =  x_rdk_webconfig_dml.cpp

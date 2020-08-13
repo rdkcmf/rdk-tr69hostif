@@ -72,6 +72,9 @@ typedef enum _HostIf_ParamMgr
     HOSTIF_WiFiMgr,
     HOSTIF_DHCPv4,
     HOSTIF_InterfaceStack,
+#ifdef WEB_CONFIG_ENABLED
+    HOSTIF_WebConfigMgr,
+#endif
     HOSTIF_StorageSrvcMgr
 #ifdef SNMP_ADAPTER_ENABLED
     , HOSTIF_SNMPAdapterMgr

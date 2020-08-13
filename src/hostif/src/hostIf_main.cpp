@@ -60,6 +60,16 @@
 #include <systemd/sd-daemon.h>
 #endif
 
+#ifdef WEB_CONFIG_ENABLED
+#ifdef __cplusplus
+extern "C"{
+#include <webcfg.h>
+}
+#endif
+#include "cJSON.h"
+#include <sys/file.h>
+#endif
+
 #ifdef WEBCONFIG_LITE_ENABLE
 #include<webconfig_lite.h>
 #endif
@@ -450,8 +460,9 @@ int main(int argc, char *argv[])
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Parodus init thread create failed\n");
     }
     
-#ifdef WEBCONFIG_LITE_ENABLE
-
+#if defined(WEB_CONFIG_ENABLED)
+    initWebConfigMultipartTask(0);
+#elif defined(WEBCONFIG_LITE_ENABLE)
     if(0 == pthread_create(&webconfig_threadId, NULL, initWebConfigTask, NULL))
     {
         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"webconfig thread created success.. \n");

@@ -59,6 +59,9 @@
 #ifdef SNMP_ADAPTER_ENABLED
 #include "hostIf_SNMPClient_ReqHandler.h"
 #endif
+#ifdef WEB_CONFIG_ENABLED
+#include "x_rdk_webconfig_dml_req_handler.h"
+#endif
 
 
 extern GHashTable* paramMgrhash;
@@ -91,7 +94,7 @@ int hostIf_GetMsgHandler(HOSTIF_MsgData_t *stMsgData)
 int hostIf_SetMsgHandler(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOK;
-    
+
     std::lock_guard<std::mutex> lock(set_handler_mutex);
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
 
@@ -263,14 +266,14 @@ bool hostIf_initalize_ConfigManger()
             {
                 mgrName = HOSTIF_DHCPv4;
             }
-#endif /* USE_DHCPv4_PROFILE */		
-#ifdef USE_INTFSTACK_PROFILE	
+#endif /* USE_DHCPv4_PROFILE */
+#ifdef USE_INTFSTACK_PROFILE
             else if(strcasecmp(mgr, "ifStackMgr") == 0)
             {
                 mgrName = HOSTIF_InterfaceStack;
             }
-#endif /* USE_INTFSTACK_PROFILE */			
-#ifdef USE_STORAGESERVICE_PROFILE			
+#endif /* USE_INTFSTACK_PROFILE */
+#ifdef USE_STORAGESERVICE_PROFILE
             else if(strcasecmp(mgr, "storageSrvcMgr") == 0)
             {
                 mgrName = HOSTIF_StorageSrvcMgr;
@@ -280,6 +283,12 @@ bool hostIf_initalize_ConfigManger()
             else if(strcasecmp(mgr, "snmpAdapterMgr") == 0)
             {
                 mgrName = HOSTIF_SNMPAdapterMgr;
+            }
+#endif
+#ifdef WEB_CONFIG_ENABLED
+            else if(strcasecmp(mgr, "webConfigMgr") == 0)
+            {
+                mgrName = HOSTIF_WebConfigMgr;
             }
 #endif
             if(mgrName != HOSTIF_INVALID_Mgr) {
@@ -366,13 +375,13 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
                 case HOSTIF_DHCPv4:
                     pRet = DHCPv4ClientReqHandler::getInstance();
                     break;
-#endif /* USE_DHCPv4_PROFILE*/	
-#ifdef USE_INTFSTACK_PROFILE				
+#endif /* USE_DHCPv4_PROFILE*/
+#ifdef USE_INTFSTACK_PROFILE
                 case HOSTIF_InterfaceStack:
                     pRet = InterfaceStackClientReqHandler::getInstance();
                     break;
-#endif /* USE_INTFSTACK_PROFILE */	
-#ifdef USE_STORAGESERVICE_PROFILE					
+#endif /* USE_INTFSTACK_PROFILE */
+#ifdef USE_STORAGESERVICE_PROFILE
                 case HOSTIF_StorageSrvcMgr:
                     pRet = StorageSrvcReqHandler::getInstance();
                     break;
@@ -380,6 +389,11 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
 #ifdef SNMP_ADAPTER_ENABLED
                 case HOSTIF_SNMPAdapterMgr:
                     pRet = SNMPClientReqHandler::getInstance();
+                    break;
+#endif
+#ifdef WEB_CONFIG_ENABLED
+                case HOSTIF_WebConfigMgr:
+                    pRet = X_RDK_WebConfig_Dml_ReqHandler::getInstance();
                     break;
 #endif
                 default:
@@ -486,8 +500,8 @@ bool hostIf_ConfigProperties_Init()
                         {
                             mgrName = HOSTIF_DHCPv4;
                         }
-#endif /* USE_DHCPv4_PROFILE*/	
-#ifdef USE_STORAGESERVICE_PROFILE							
+#endif /* USE_DHCPv4_PROFILE*/
+#ifdef USE_STORAGESERVICE_PROFILE
                         else if(strcasecmp(value, "storageSrvcMgr") == 0)
                         {
                             mgrName = HOSTIF_StorageSrvcMgr;
