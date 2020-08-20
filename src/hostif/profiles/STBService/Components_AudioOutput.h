@@ -124,12 +124,13 @@ class hostIf_STBServiceAudioInterface
     unsigned int backupAudioLevel;
     char backupAudioDB[_BUF_LEN_16];
     char backupAudioLoopThru[_BUF_LEN_16];
-    char backupAudioCompression[_BUF_LEN_16];
+    unsigned int backupAudioCompression;
     char backupAudioEncoding[_BUF_LEN_16];
     char backupAudioGain[_BUF_LEN_16];
     char backupMinAudioDB[_BUF_LEN_16];
     char backupMaxAudioDB[_BUF_LEN_16];
     char backupAudioOptimalLevel[_BUF_LEN_16];
+    unsigned int backupDialogEnhancement;
 
     bool bCalledStatus;
     bool bCalledCancelMute;
@@ -143,6 +144,7 @@ class hostIf_STBServiceAudioInterface
     bool bCalledMinAudioDB;
     bool bCalledMaxAudioDB;
     bool bCalledAudioOptimalLevel;
+    bool bCalledDialogEnhancement;
 
 private:
     int getStatus(HOSTIF_MsgData_t *,bool *pChanged = NULL);
@@ -183,6 +185,10 @@ private:
     int getX_COMCAST_COM_MinAudioDB(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     int getX_COMCAST_COM_MaxAudioDB(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     int getX_COMCAST_COM_AudioOptimalLevel(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
+
+    /* X_COMCAST_COM_DialogEnhancement */
+    int setX_COMCAST_COM_DialogEnhancement(const HOSTIF_MsgData_t *);
+    int getX_COMCAST_COM_DialogEnhancement(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
 
 
 public:
