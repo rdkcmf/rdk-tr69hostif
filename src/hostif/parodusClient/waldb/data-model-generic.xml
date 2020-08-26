@@ -462,6 +462,28 @@
     </object>
     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.fog." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
       <parameter base="ZeroDrmHost" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+      <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+    </object>
+    <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.aamp." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+      <parameter base="SchemeIdUriDaiStream" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="SchemeIdUriVssStream" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="LRHAcceptValue" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="LRHContentType" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>
           <string/>
         </syntax>
@@ -907,7 +929,7 @@
       <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>
           <boolean/>
-	  <default type="factory" value="true"/>
+            <default type="factory" value="true"/>
         </syntax>
       </parameter>
      </object>
