@@ -228,6 +228,11 @@
       <parameter base="AudioDuckingLevel" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax> <string/> </syntax>
       </parameter>
+      <parameter base="VSDKConfiguration" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+       <syntax>
+        <string/>
+       </syntax>
+      </parameter>
     </object>
     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.FWUpdate." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1"/>
     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.FWUpdate.AutoExcluded." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
