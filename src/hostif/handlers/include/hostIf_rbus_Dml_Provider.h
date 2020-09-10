@@ -50,6 +50,9 @@
 
 void init_rbus_dml_provider();
 
+int setRbusStringParam(char *paramName, char* paramValue);
+int getRbusStringParam(char *paramName, char** paramValue);
+
 #endif /* HOSTIF_RBUS_DML_PROVIDER_H_ */
 
 /* End of HOSTIF_RBUS_DML_PROVIDER_H_ API doxygen group */

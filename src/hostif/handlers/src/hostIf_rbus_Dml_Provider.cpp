@@ -54,9 +54,27 @@ extern "C"
 
 
 #define MAX_NUM_PARAMETERS 2048
+#define MAX_PARAMETER_LENGTH 512
+
+static const char *EXCLUDE_PARAMLIST[] = { "Device.X_RDKCENTRAL-COM_T2.ReportProfiles", \
+                                        "Device.X_RDKCENTRAL-COM_T2.ReportProfilesMsgPack" };
+
+#define EXCLUDE_LIST_SIZE (sizeof((EXCLUDE_PARAMLIST))/sizeof((EXCLUDE_PARAMLIST)[0]))
 
 rbusError_t TR_Dml_GetHandler(rbusHandle_t handle, rbusProperty_t property, rbusGetHandlerOptions_t* opts);
+static rbusHandle_t rbusHandle = NULL;
 
+static bool isInExclusionList(const char* param){
+    int i = 0 ;
+    bool isMatch = false ;
+    for (i = 0; i < EXCLUDE_LIST_SIZE ; i++) {
+        if (strncmp(EXCLUDE_PARAMLIST[i], param, MAX_PARAMETER_LENGTH) == 0){
+            isMatch = true ;
+            break ;
+        }
+     }
+    return isMatch ;
+}
 
 static void convert2hostIfDataType(char *ParamDataType, HostIf_ParamType_t* pParamType)
 {
@@ -204,7 +222,6 @@ void init_rbus_dml_provider()
     }
 
     rbusError_t rc = RBUS_ERROR_SUCCESS;
-    rbusHandle_t rbusHandle = NULL;
     rbusDataElement_t* dataElements = NULL;
     int i = 0;
 
@@ -212,6 +229,8 @@ void init_rbus_dml_provider()
 
     char **pParamNameList = (char**) calloc (MAX_NUM_PARAMETERS, sizeof(char*));
     int num_of_params = 0;
+    int num_of_rbus_params = 0;
+    int rbus_param_counter = 0;
 
     try {
 
@@ -224,28 +243,35 @@ void init_rbus_dml_provider()
         {
             RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d][rbusdml]Successfully get the complete parameter list, the Parameter counts is = %d\n", __FUNCTION__, __LINE__, num_of_params);
 
-            dataElements = (rbusDataElement_t*)calloc(num_of_params, sizeof(rbusDataElement_t));
+            num_of_rbus_params = num_of_params - EXCLUDE_LIST_SIZE ;
+            dataElements = (rbusDataElement_t*)calloc(num_of_rbus_params, sizeof(rbusDataElement_t));
 
             if(dataElements != NULL)
             {
                 for(i=0; i< num_of_params; i++)
                 {
-                    dataElements[i].name = strdup(pParamNameList[i]);
-
-                    if (strcmp(pParamNameList[i] + strlen(pParamNameList[i])-5,".{i}.") == 0 )
-                    {
-                        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, "[%s] [rbusdml] Parameter [%d] : [ %s ] registered as [RBUS_ELEMENT_TYPE_TABLE]\n", __FUNCTION__, i +1, pParamNameList[i]);
-                        dataElements[i].type = RBUS_ELEMENT_TYPE_TABLE;
-                    }
-                    else
-                    {
-                        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF, "[%s] [rbusdml]Parameter [%d] : [ %s ] registered as [RBUS_ELEMENT_TYPE_PROPERTY]\n", __FUNCTION__, i +1, pParamNameList[i]);
-                        dataElements[i].type = RBUS_ELEMENT_TYPE_PROPERTY;
-                        dataElements[i].cbTable.getHandler = TR_Dml_GetHandler;
+                    if(pParamNameList[i] != NULL) {
+                        if(isInExclusionList(pParamNameList[i])) {
+                            // Temporary solution to ignore externally managed TR181 parameters from rBus registration.
+                            // This is to avoid recursive call of handlers.
+                            RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s] [rbusdml] Parameter %s is externally rbus registered, ignoring from datamodel list.\n", __FUNCTION__,pParamNameList[i]);
+                            continue;
+                        }else {
+                            dataElements[rbus_param_counter].name = strdup(pParamNameList[i]);
+                            if(strcmp(pParamNameList[i] + strlen(pParamNameList[i]) - 5, ".{i}.") == 0) {
+                                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s] [rbusdml] Parameter [%d] : [ %s ] registered as [RBUS_ELEMENT_TYPE_TABLE]\n", __FUNCTION__, i + 1,pParamNameList[i]);
+                                dataElements[rbus_param_counter].type = RBUS_ELEMENT_TYPE_TABLE;
+                            }else {
+                                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s] [rbusdml]Parameter [%d] : [ %s ] registered as [RBUS_ELEMENT_TYPE_PROPERTY]\n", __FUNCTION__, i + 1,pParamNameList[i]);
+                                dataElements[rbus_param_counter].type = RBUS_ELEMENT_TYPE_PROPERTY;
+                                dataElements[rbus_param_counter].cbTable.getHandler = TR_Dml_GetHandler;
+                            }
+                            rbus_param_counter++ ;
+                        }
                     }
                 }
 
-                rc = rbus_regDataElements(rbusHandle, num_of_params, dataElements);
+                rc = rbus_regDataElements(rbusHandle, rbus_param_counter, dataElements);
 
                 if(rc != RBUS_ERROR_SUCCESS)
                 {
@@ -272,4 +298,58 @@ void init_rbus_dml_provider()
     {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s][rbusdml] Exception: %s\r\n",__FUNCTION__, e.what());
     }
+}
+
+
+int setRbusStringParam(char *rbusParamName, char* rbusParamValue){
+
+    rbusValue_t value;
+    rbusSetOptions_t opts;
+    opts.commit = true;
+    int ret = RBUS_ERROR_SUCCESS;
+    if(!rbusHandle) {
+     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s][rbusdml] rbusHandle is NULL.\n", __FUNCTION__);
+     return NOK;
+    }
+
+    rbusValue_Init(&value);
+    rbusValue_SetString(value, rbusParamValue);
+    //ret = rbus_set(rbusHandle, "Device.X_RDKCENTRAL-COM_T2.ReportProfiles", value, &opts);
+    ret = rbus_set(rbusHandle, rbusParamName, value, &opts);
+    if (ret != RBUS_ERROR_SUCCESS){
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s][rbusdml] rbus_set Failed for [%s] with error [%d].\n", __FUNCTION__, rbusParamName, ret);
+        return NOT_HANDLED;
+    }
+    rbusValue_Release(value);
+
+    return OK ;
+
+}
+
+int getRbusStringParam(char *rbusParamName, char **rbusParamValue){
+
+    rbusValue_t paramValue_t;
+    rbusValueType_t rbusValueType ;
+    int ret = RBUS_ERROR_SUCCESS ;
+    char *stringValue = NULL;
+    rbusSetOptions_t opts;
+    opts.commit = true;
+
+    if(!rbusHandle) {
+         printf("rbusHandle is NULL\n");
+         return NOK;
+     }
+
+     ret = rbus_get(rbusHandle, rbusParamName, &paramValue_t);
+     if(ret != RBUS_ERROR_SUCCESS) {
+         printf("Unable to get %s\n", rbusParamName);
+         return NOK;
+     }
+     stringValue = rbusValue_ToString(paramValue_t, NULL, 0);
+     if (stringValue != NULL)
+         *rbusParamValue = strdup(stringValue);
+
+     rbusValue_Release(paramValue_t);
+     return OK ;
+
 }

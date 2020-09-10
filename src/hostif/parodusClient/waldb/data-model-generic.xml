@@ -37,6 +37,18 @@
         </syntax>
       </parameter>
     </object>
+    <object base="Device.X_RDKCENTRAL-COM_T2." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+        <parameter base="ReportProfiles" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="ReportProfilesMsgPack" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+    </object>
     <object base="Device.DeviceInfo." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1"/>
     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
       <parameter base="TR69ACSConnectURL_dev" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
@@ -645,14 +657,14 @@
       <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>                                                                                                                          
            <boolean/>
-        </syntax>  
+        </syntax>
       </parameter>
      </object>
      <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderProxy.org.rdk.dataCapture_1." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
       <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
-        <syntax>                                                                                                                          
+        <syntax>                         
            <boolean/>
-        </syntax>  
+        </syntax>
       </parameter>
      </object>
     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Power.UserInactivityNotification." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
@@ -672,6 +684,23 @@
       <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>
           <boolean/>
+        </syntax>
+      </parameter>
+    </object>
+    <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Telemetry." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="ConfigURL" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="Version" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
         </syntax>
       </parameter>
     </object>
