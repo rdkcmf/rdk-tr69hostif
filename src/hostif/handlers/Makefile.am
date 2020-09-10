@@ -107,6 +107,7 @@ libMsgHandlers_la_SOURCES =	src/hostIf_IARM_ReqHandler.cpp \
 				src/hostIf_TimeClient_ReqHandler.cpp \
 				src/hostIf_IPClient_ReqHandler.cpp \
 				src/hostIf_EthernetClient_ReqHandler.cpp \
+				src/hostIf_XrdkCentralT2_ReqHandler.cpp \
 				src/hostIf_rbus_Dml_Provider.cpp
 
 if WITH_MOCA_PROFILE

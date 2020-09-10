@@ -35,6 +35,8 @@
 #include "hostIf_utils.h"
 #include "hostIf_dsClient_ReqHandler.h"
 #include "hostIf_DeviceClient_ReqHandler.h"
+#include "hostIf_XrdkCentralT2_ReqHandler.h"
+
 #ifdef USE_XRESRC
 #include "hostIf_XREClient_ReqHandler.h"
 #endif /* USE_XRESRC */
@@ -231,6 +233,10 @@ bool hostIf_initalize_ConfigManger()
             {
                 mgrName = HOSTIF_DSMgr;
             }
+            else if(strcasecmp(mgr, "telemetryMgr") == 0)
+            {
+                mgrName = HOSTIF_TelemetryMgr;
+            }
 #ifdef USE_MoCA_PROFILE
             else if(strcasecmp(mgr, "mocaMgr") == 0)
             {
@@ -396,6 +402,8 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
                     pRet = X_RDK_WebConfig_Dml_ReqHandler::getInstance();
                     break;
 #endif
+                case HOSTIF_TelemetryMgr:
+                    pRet = XRdkCentralT2::getInstance();
                 default:
                     ;
                 }
