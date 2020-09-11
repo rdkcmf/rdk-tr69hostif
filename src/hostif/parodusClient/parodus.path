@@ -19,6 +19,7 @@
 [Unit]
 Description=Webpa parodus 
 DefaultDependencies=false
+OnFailure=path-fail-notifier@%n.service
 
 [Path]
 PathExists=/tmp/route_available

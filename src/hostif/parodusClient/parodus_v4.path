@@ -19,6 +19,7 @@
 [Unit]
 Description=Webpa parodus V4
 DefaultDependencies=false
+OnFailure=path-fail-notifier@%n.service
 
 [Path]
 PathExists=/tmp/addressaquired_ipv4
