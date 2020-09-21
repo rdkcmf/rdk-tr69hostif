@@ -41,8 +41,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.AdCacheEnable" : "True",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ProgrammerEnable" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "True",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "https://5df09-linear.v.fwmrm.net/scte/request?nw=384777&csid=linear_endpoint_x1&resp=scte-130&prof=linear_mvpd",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "https://5df09-linear.v.fwmrm.net/scte/request?nw=384777&csid=linear_endpoint_x1&resp=scte-130&prof=linear_mvpd"
    },
    "cox" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
