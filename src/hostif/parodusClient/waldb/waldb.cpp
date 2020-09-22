@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <string>
+#include <mutex>
 #include "waldb.h"
 #include "tinyxml2.h"
 #include "stdlib.h"
@@ -59,6 +60,7 @@ int getNumberofInstances(const char* paramName);
 
 #define WEBPA_DATA_MODEL_FILE "/etc/data-model.xml"
 static void *g_dbhandle = NULL;
+std::mutex g_db_mutex;
 
 /* @brief Loads the data-model xml data
  *
@@ -72,25 +74,27 @@ DB_STATUS loadDataModel(void)
     XMLDocument *doc = NULL;
 
     if(g_dbhandle)
-    	return DB_SUCCESS;
+        return DB_SUCCESS;
+
+    const std::lock_guard<std::mutex> lock(g_db_mutex);
 
     // Load Document model
     doc = new XMLDocument();
     if(doc != NULL)
     {
         doc->LoadFile(WEBPA_DATA_MODEL_FILE);
-	if( doc->ErrorID() == 0 )
-	{
+        if( doc->ErrorID() == 0 )
+        {
             removeUnnecessaryAttributes(doc);
             g_dbhandle = (void *)doc;
-	    // Initialize Number of entity param list
-	    initNumEntityParamList();
-	    return DB_SUCCESS;
-	}
-	else
-	{
-	    return DB_FAILURE;
-	}
+            // Initialize Number of entity param list
+            initNumEntityParamList();
+            return DB_SUCCESS;
+        }
+        else
+        {
+            return DB_FAILURE;
+        }
     }
     return DB_FAILURE;
 }
@@ -146,7 +150,12 @@ static void removeUnnecessaryAttributes(XMLDocument *pParent)
 
 void* getDataModelHandle()
 {
-	return g_dbhandle;
+    return g_dbhandle;
+}
+
+DB_STATUS checkDataModelStatus()
+{
+    return (g_dbhandle != NULL)?DB_SUCCESS:DB_FAILURE;
 }
 
 /* @brief Loads the Parameter count query string to memory
@@ -223,7 +232,7 @@ int getNumberofInstances(const char* paramName)
                 free(*parametervalArr);
             }
             if(NULL != parametervalArr) {
-                 free(parametervalArr);
+                free(parametervalArr);
             }
         }
     }
@@ -392,7 +401,7 @@ static XMLNode* getList(XMLNode *pParent,char *paramName,char* currentParam,char
     }
 
     // Goto actual Object node ie "Device."
-   if( pParent->ToElement() == NULL )
+    if( pParent->ToElement() == NULL )
     {
         for ( pChild = pParent->FirstChild(); pChild != 0; )
         {
@@ -410,7 +419,7 @@ static XMLNode* getList(XMLNode *pParent,char *paramName,char* currentParam,char
     }
     else
     {
-       pChild = pParent;
+        pChild = pParent;
     }
     // Traverse through the nodes and get matching parameters
     while(pChild)
@@ -552,7 +561,9 @@ DB_STATUS getChildParamNamesFromDataModel(void *dbhandle,char *paramName,char **
     strncpy(parameterName,paramName,MAX_PARAMETER_LENGTH-1);
 
     if(dbhandle == NULL)
-    	return DB_FAILURE;
+        return DB_FAILURE;
+
+    const std::lock_guard<std::mutex> lock(g_db_mutex);
 
     if(isWildCardParam(parameterName))
     {
@@ -629,7 +640,7 @@ void checkforObjectMatch(XMLNode *pParent,const char *objectName,int *pMatch,Dat
 {
     if(!pParent)
     {
-    	RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"pParent Node is NULL.. returning form checkforParameterMatch\n");
+        RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"pParent Node is NULL.. returning form checkforParameterMatch\n");
         return;
     }
 
@@ -669,7 +680,7 @@ void checkforParameterMatch(XMLNode *pParent,const char *paramName,int *pMatch,D
     std::string *str1 = new std::string(paramName);
     std::size_t found = str1->find_last_of(".");
     delete str1;
-    
+
     char *paramObject = (char *) malloc(sizeof(char) * MAX_PARAMETER_LENGTH);
     if(!paramObject)
     {
@@ -740,8 +751,13 @@ int getParamInfoFromDataModel(void *dbhandle,const char *paramName, DataModelPar
 {
     int Match = 0;
     int first_i = 0;
-    XMLDocument *doc = (XMLDocument *) dbhandle;
     char *newparamName = NULL;
+    XMLDocument *doc = NULL;
+
+    const std::lock_guard<std::mutex> lock(g_db_mutex);
+
+    doc = (XMLDocument *) dbhandle;
+
 
     /* Check if Parameter is one of {i} entriesi ex:Device.WiFi.Radio.1.Status should become Device.WiFi.Radio.{i}.Status */
     std::string str(paramName);
@@ -837,4 +853,208 @@ freeResources:
         free(newparamName);
     }
     return Match;
+}
+
+/**
+ * @brief Get complete list of parameters from data model xml.
+ * @param[in] pParent , The current node in tinyxml node
+ * @param[out] param_list , Complete list of Parameter Name and type
+ * @return DB_STATUS
+ */
+static DB_STATUS get_complete_parameter_list_from_dml_xml (
+    XMLNode *pInParentXmlNode,
+    char **pOutParamNameList,
+    int *num_of_params)
+{
+    int params_count = 0;
+    XMLNode* pChild = NULL;
+
+    char currentParam[MAX_PARAMETER_LENGTH] = "\0";
+    const char *top_node_name = "Device.";
+
+    // If parent is Null Return
+    if(!pInParentXmlNode) {
+        return DB_FAILURE;
+    }
+
+
+    if( pInParentXmlNode->ToElement() == NULL )
+    {
+        for ( pChild = pInParentXmlNode->FirstChild(); pChild != 0; )
+        {
+            if( pChild->ToElement() == NULL )
+            {
+                pChild = pChild->NextSibling();
+            }
+            else
+            {
+                if( !strcmp (pChild->Value(), "object") )
+                    break;
+                pChild = pChild->FirstChild();
+            }
+        }
+    }
+    else
+    {
+        pChild = pInParentXmlNode;
+    }
+
+    // Traverse through the nodes and get matching parameters
+    while(pChild)
+    {
+        XMLElement* pElement =  pChild->ToElement();
+        const XMLAttribute* pAttrib = pElement->FirstAttribute();
+
+        // Check if node is an Object
+        if(!strcmp(pChild->Value(),"object"))
+        {
+            // Check if the Object is matching with given input wild card
+            if(strstr(pAttrib->Value(),top_node_name))
+            {
+                appendNextObject(currentParam, pAttrib->Value());
+                std::string str = pAttrib->Value();
+
+                if (str.compare(str.size()-5,5,".{i}.") == 0) {
+                    if(params_count < MAX_NUM_PARAMETERS)
+                    {
+                        pOutParamNameList[params_count] = (char *) calloc(MAX_PARAMETER_LENGTH, sizeof(char));
+                        snprintf(pOutParamNameList[params_count], MAX_PARAMETER_LENGTH,"%s",pAttrib->Value());
+                        params_count++;
+                    }
+                }
+                XMLNode* bChild;
+                bChild = pChild;
+                // Goto the parameters
+                pChild = pChild->FirstChild();
+
+                // Object not having any parameter thus go to next Sibling
+                if(NULL == pChild)
+                {
+                    pChild = bChild->NextSibling();
+                }
+            }
+            else // Tree not found yet goto next sibling and get it
+            {
+                pChild = pChild->NextSibling();
+            }
+        }
+        // Found the Parameter
+        else if(!strcmp(pChild->Value(),"parameter"))
+        {
+            XMLNode* bChild;
+            // Find all parameters
+            for(bChild = pChild ; pChild ; pChild=pChild->NextSibling() )
+            {
+                if(params_count < MAX_NUM_PARAMETERS)
+                {
+                    if(strlen(currentParam) > 0)
+                    {
+                        if(pChild->ToElement()->Attribute("getIdx") && strtol(pChild->ToElement()->Attribute("getIdx"),NULL,10) >= 1)
+                        {
+                            pOutParamNameList[params_count] = (char *) calloc(MAX_PARAMETER_LENGTH, sizeof(char));
+                            snprintf(pOutParamNameList[params_count],MAX_PARAMETER_LENGTH,"%s%s",currentParam,pChild->ToElement()->FirstAttribute()->Value());
+                            params_count++;
+                        }
+                    }
+                }
+            }
+            // Go to next object
+            pChild = bChild->Parent();
+            pChild = pChild->NextSibling();
+        }
+    }
+    *num_of_params = params_count;
+    return DB_SUCCESS;
+
+}
+
+/* @brief Get the complete list of parameter name and data type.
+ *
+ * @out_param_list[out] Complete list of Parameter Name and type
+ * @return DB_STATUS
+ */
+DB_STATUS get_complete_param_list (char **out_param_list, int *out_param_count)
+{
+    DB_STATUS status = DB_SUCCESS;
+
+    XMLDocument *in_xml_doc = (XMLDocument *)getDataModelHandle();
+
+    if(in_xml_doc == NULL)
+        return DB_FAILURE;
+    else
+    {
+        get_complete_parameter_list_from_dml_xml(in_xml_doc, out_param_list, out_param_count);
+
+        if(out_param_count == 0)
+        {
+            return status = DB_FAILURE;
+        }
+    }
+    return status;
+}
+
+void freeDataModelParam(DataModelParam dmParam)
+{
+    if(dmParam.objectName)
+        free(dmParam.objectName);
+    if(dmParam.paramName)
+        free(dmParam.paramName);
+    if(dmParam.access)
+        free(dmParam.access);
+    if(dmParam.dataType)
+        free(dmParam.dataType);
+    if(dmParam.defaultValue)
+        free(dmParam.defaultValue);
+    if(dmParam.bsUpdate)
+        free(dmParam.bsUpdate);
+}
+
+/* @brief to test get_complete_param_list.
+ *
+ */
+void test_get_complete_param_list()
+{
+
+    char **pParam_name_list;
+
+    pParam_name_list =  (char**) calloc (MAX_NUM_PARAMETERS, sizeof(char*));
+    int num_of_params = 0;
+
+    if(DB_SUCCESS != loadDataModel())
+    {
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"Failed to load data-model.xml file\n" );
+    }
+
+    if(DB_SUCCESS != get_complete_param_list (pParam_name_list, &num_of_params))
+    {
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"Failed to get complete parameter list.\n");
+    }
+
+    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"Count = %d \n", num_of_params);
+    int i = 0;
+    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"======================================================================\n");
+    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"Iteration:1 => Starts\n ");
+    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"======================================================================\n");
+    for(i=0; i< num_of_params; i++)
+    {
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF," [%d] Parameter : [ %s (%s)]\n", i +1, pParam_name_list[i]);
+        free(pParam_name_list[i]);
+    }
+    free(pParam_name_list);
+    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"======================================================================\n");
+    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"Iteration:1 => Ends\n ");
+    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"======================================================================\n");
+    DataModelParam dmParam = {0};
+
+    const char *pParameterName = "Device.WiFi.EndPoint.1.Profile.1.Status";
+
+    if (getParamInfoFromDataModel(g_dbhandle, pParameterName, &dmParam))
+    {
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "Found Parameter...!!!  [%s (%s)]\n ", pParameterName, dmParam.dataType);
+    }
+    else {
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "Invalid Parameter : [%s] \n ", pParameterName);
+    }
+
+    ((XMLDocument *)g_dbhandle)->Clear();
 }

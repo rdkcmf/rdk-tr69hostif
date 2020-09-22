@@ -105,7 +105,7 @@ void *libpd_client_mgr(void *)
     int status =-1;
     RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Loading DB \n");
 
-    status = loadDataModel();
+    status = checkDataModelStatus();
     if(status != 0)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Error in Database loading,Webpa Cannot be initialized..!! \n");

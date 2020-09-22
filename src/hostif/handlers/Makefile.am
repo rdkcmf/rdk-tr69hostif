@@ -44,7 +44,8 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
         -I$(PKG_CONFIG_SYSROOT_DIR)/usr/include/rdk/tr69agent/ \
         -I=/usr/include/rdk/ds/ \
         -I=/usr/include/rdk/ds-hal/ \
-	$(XRDK_RF4CE_PROFILE_FLAG)
+	$(XRDK_RF4CE_PROFILE_FLAG) \
+        -I$(PKG_CONFIG_SYSROOT_DIR)/usr/include/rbus/
 
 AM_CXXFLAGS += "-std=c++11" $(PROCPS_CFLAGS)
 
@@ -101,7 +102,8 @@ libMsgHandlers_la_SOURCES =	src/hostIf_IARM_ReqHandler.cpp \
 				src/hostIf_updateHandler.cpp \
 				src/hostIf_TimeClient_ReqHandler.cpp \
 				src/hostIf_IPClient_ReqHandler.cpp \
-				src/hostIf_EthernetClient_ReqHandler.cpp
+				src/hostIf_EthernetClient_ReqHandler.cpp \
+				src/hostIf_rbus_Dml_Provider.cpp
 
 if WITH_MOCA_PROFILE
 libMsgHandlers_la_SOURCES +=    src/hostIf_MoCAClient_ReqHandler.cpp

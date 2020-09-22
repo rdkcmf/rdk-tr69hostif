@@ -38,13 +38,14 @@ DB_STATUS;
 
 typedef struct __DataModelParam
 {
-	char *objectName;
-	char *paramName;
-	char *dataType;
-	char *access;
-	char *defaultValue;
-	char *bsUpdate;
-}DataModelParam;
+    char *objectName;
+    char *paramName;
+    char *dataType;
+    char *access;
+    char *defaultValue;
+    char *bsUpdate;
+} DataModelParam;
+
 
 /* @brief Loads the Parameter count query string to memory
  *
@@ -59,6 +60,9 @@ int isWildCardParam(char *paramName);
 
 void* getDataModelHandle();
 
+DB_STATUS checkDataModelStatus();
+
+void freeDataModelParam(DataModelParam dmParam);
 /* @brief Returns a parameter list and count given an input paramName with wildcard characters
  *
  * @dbhandle[in] database handle to query in to
@@ -74,10 +78,12 @@ DB_STATUS getChildParamNamesFromDataModel(void *dbhandle,char *paramName,char **
  *
  * @dbhandle[in] database handle
  * @paramName[in] parameter name to search for in xml and retrieeve node details
- * @dmParam[out] XML node details of paramName if found 
+ * @dmParam[out] XML node details of paramName if found
  * @return int returned 0 or 1 based on availability in XML
  */
 int getParamInfoFromDataModel(void *handle,const char *paramName,DataModelParam *dmParam);
+
+DB_STATUS get_complete_param_list (char **out_param_list, int *out_param_count);
 #ifdef __cplusplus
 }
 #endif
