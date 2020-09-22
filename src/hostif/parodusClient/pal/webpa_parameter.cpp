@@ -81,7 +81,7 @@ void getValues (const char *paramName[], const unsigned int paramCount, param_t 
             RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "Parameter Name: %s return: %d\n", paramName[cnt], (*retStatus)[cnt]);
         } else {
             (*retStatus)[cnt] = WDMP_ERR_INVALID_PARAMETER_NAME;
-            (*retValCount)[cnt] = 0; 
+            (*retValCount)[cnt] = 0;
         }
     }
 }
@@ -99,22 +99,6 @@ void setValues(const ParamVal paramVal[], const unsigned int paramCount, const W
     {
         (*retStatus)[cnt] = (WDMP_STATUS) SetParamInfo(paramVal[cnt]);
     }
-}
-
-void freeDataModelParam(DataModelParam dmParam)
-{
-	if(dmParam.objectName)
-		free(dmParam.objectName);
-	if(dmParam.paramName)
-		free(dmParam.paramName);
-	if(dmParam.access)
-		free(dmParam.access);
-	if(dmParam.dataType)
-		free(dmParam.dataType);
-	if(dmParam.defaultValue)
-		free(dmParam.defaultValue);
-	if(dmParam.bsUpdate)
-                free(dmParam.bsUpdate);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -192,7 +176,7 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                         }
                         // Copy Param Name
                         strncat((*parametervalPtrPtr)[index][successWcCnt].name, Param.paramName, MAX_PARAM_LENGTH - 1);
-                        // Copy Type 
+                        // Copy Type
                         converttoWalType (Param.paramtype, (WAL_DATA_TYPE *) &(*parametervalPtrPtr)[index][successWcCnt].type);
                         // Copy param value
                         switch (Param.paramtype)
@@ -301,7 +285,7 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                 }
                 else
                 {
-                    RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Failed get_ParamValues_tr69hostIf() Param Name :-  %s \n",pParameterName);                   
+                    RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Failed get_ParamValues_tr69hostIf() Param Name :-  %s \n",pParameterName);
                 }
             }
             else
@@ -408,13 +392,13 @@ static WDMP_STATUS get_ParamValues_tr69hostIf(HOSTIF_MsgData_t *ptrParam)
 {
     int status = -1;
     ptrParam->reqType = HOSTIF_GET;
-    WDMP_STATUS retStatus = WDMP_FAILURE;    
+    WDMP_STATUS retStatus = WDMP_FAILURE;
     status = hostIf_GetMsgHandler(ptrParam);
 
     if(status != 0) {
         RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"[%s:%s:%d] Error in Get Message Handler : %d\n", __FILE__, __FUNCTION__, __LINE__, status);
         retStatus =(WDMP_STATUS) convertFaultCodeToWalStatus(ptrParam->faultCode); // returning appropriate fault code for get
-        RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s:%d] return status of fault code: %d\n", __FUNCTION__, __LINE__, retStatus);            
+        RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s:%d] return status of fault code: %d\n", __FUNCTION__, __LINE__, retStatus);
     }
     else
     {

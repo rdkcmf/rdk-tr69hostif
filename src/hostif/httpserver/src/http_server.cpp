@@ -213,7 +213,7 @@ void *HTTPServerStartThread(void *msg)
     g_type_init ();
 #endif
 
-    status = loadDataModel();
+    status = checkDataModelStatus();
     if(status != 0)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Error in Data Model Initialization\n");

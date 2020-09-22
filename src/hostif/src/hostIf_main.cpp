@@ -64,6 +64,8 @@
 #include<webconfig_lite.h>
 #endif
 
+#include "hostIf_rbus_Dml_Provider.h"
+
 //static void killAllThreads();
 
 //------------------------------------------------------------------------------
@@ -122,25 +124,25 @@ static void *shutdown_thread_entry(void *arg)
         continue;   /* Restart if interrupted by handler */
     }
 
-     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] TR69 Host-If received signal handler with sigNum : %d \n",__FILE__, __FUNCTION__, shutdown_sig_received);
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] TR69 Host-If received signal handler with sigNum : %d \n",__FILE__, __FUNCTION__, shutdown_sig_received);
 
     switch (shutdown_sig_received)
     {
-        case SIGINT:
-             RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"SIGINT received (CTRL+C was pressed) \n");
-            break;
-        case SIGTERM:
-             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"SIGTERM received\n");
-            break;
-        case SIGQUIT:
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"SIGQUIT received\n");
-            break;
-        case SIGSEGV:
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"SIGSEGV received (Segmentation fault was detected)\n");
-            break;
-        default:
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Signal %d received\n", shutdown_sig_received);
-            break;
+    case SIGINT:
+        RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"SIGINT received (CTRL+C was pressed) \n");
+        break;
+    case SIGTERM:
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"SIGTERM received\n");
+        break;
+    case SIGQUIT:
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"SIGQUIT received\n");
+        break;
+    case SIGSEGV:
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"SIGSEGV received (Segmentation fault was detected)\n");
+        break;
+    default:
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Signal %d received\n", shutdown_sig_received);
+        break;
     }
 
     exit_gracefully(shutdown_sig_received);
@@ -200,7 +202,7 @@ int main(int argc, char *argv[])
             {"httpserverport",		required_argument, 0, 's'},
 #endif
             {"debugconfig",     required_argument, 0, 'd'},
-	    {"notifyconfig",    required_argument, 0, 'w'},
+            {"notifyconfig",    required_argument, 0, 'w'},
             {0, 0, 0, 0}
         };
 
@@ -231,15 +233,15 @@ int main(int argc, char *argv[])
         case 'd':
             if(optarg)
             {
-		debugConfigFile = optarg;
+                debugConfigFile = optarg;
             }
             break;
         case 'w':
-	    if(optarg)
-	    {
-		webpaNotifyConfigFile = optarg;
+            if(optarg)
+            {
+                webpaNotifyConfigFile = optarg;
             }
-	    break;
+            break;
 
         case 'p':
             if(optarg)
@@ -249,11 +251,11 @@ int main(int argc, char *argv[])
             break;
 #ifndef NEW_HTTP_SERVER_DISABLE
         case 's':
-        	if(optarg)
-        	{
-        		argList.httpServerPort = atoi(optarg);
-        	}
-        	break;
+            if(optarg)
+            {
+                argList.httpServerPort = atoi(optarg);
+            }
+            break;
 #endif
         case 'h':
         case 'H':
@@ -309,16 +311,16 @@ int main(int argc, char *argv[])
     sigaction (SIGHUP, &sigact, NULL);
 #ifndef RDK_DEVICE_CISCO_XI4
 #if 0
-		sigaction (SIGSEGV, &sigact, NULL);
-		sigaction (SIGILL, &sigact, NULL);
-		sigaction (SIGFPE, &sigact, NULL);
-		sigaction (SIGABRT, &sigact, NULL);
-		sigaction (SIGQUIT, &sigact, NULL);
+    sigaction (SIGSEGV, &sigact, NULL);
+    sigaction (SIGILL, &sigact, NULL);
+    sigaction (SIGFPE, &sigact, NULL);
+    sigaction (SIGABRT, &sigact, NULL);
+    sigaction (SIGQUIT, &sigact, NULL);
 #endif
 #endif
-		signal (SIGPIPE, SIG_IGN);
+    signal (SIGPIPE, SIG_IGN);
 
-		setvbuf(stdout, NULL, _IOLBF, 0);
+    setvbuf(stdout, NULL, _IOLBF, 0);
 
     //------------------------------------------------------------------------------
     // Initialize the glib, g_time and logger
@@ -386,6 +388,18 @@ int main(int argc, char *argv[])
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed to start hostIf_IARM_IF_Start()\n");
     }
 
+    /* Load the data model xml file*/
+    DB_STATUS status = loadDataModel();
+    if(status != DB_SUCCESS)
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Error in Data Model Initialization\n");
+        return DB_FAILURE;
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Successfully initialize Data Model.\n");
+    }
+
     //------------------------------------------------------------------------------
     // hostIf_HttpServerStart: Soup HTTP Server
     //------------------------------------------------------------------------------
@@ -401,12 +415,12 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    #ifdef ENABLE_SD_NOTIFY
-        sd_notifyf(0, "READY=1\n"
-           "STATUS=tr69hostif is Successfully Initialized\n"
-              "MAINPID=%lu", (unsigned long) getpid());
-        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"tr69hostif sd notify envent  is sent  Successfully\n");
-    #endif
+#ifdef ENABLE_SD_NOTIFY
+    sd_notifyf(0, "READY=1\n"
+               "STATUS=tr69hostif is Successfully Initialized\n"
+               "MAINPID=%lu", (unsigned long) getpid());
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"tr69hostif sd notify envent  is sent  Successfully\n");
+#endif
 
 #ifdef PID_FILE_PATH
 #define xstr(s) str(s)
@@ -422,31 +436,34 @@ int main(int argc, char *argv[])
     updateHandler_runThread = g_thread_new("updateHandler_runThread", (GThreadFunc)updateHandler::run, NULL);
 
     //------------------------------------------------------------------------------
-    // Initialize WebPA Module 
+    // Initialize WebPA Module
     //------------------------------------------------------------------------------
 
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Starting WEBPA Parodus Connections\n");
     libpd_set_notifyConfigFile(webpaNotifyConfigFile);
     if(0 == pthread_create(&parodus_init_tid, NULL, libpd_client_mgr, NULL))
     {
-	RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Initiating Connection with PARODUS success.. \n");
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Initiating Connection with PARODUS success.. \n");
     }
     else
     {
-	RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Parodus init thread create failed\n");
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Parodus init thread create failed\n");
     }
     
 #ifdef WEBCONFIG_LITE_ENABLE
 
     if(0 == pthread_create(&webconfig_threadId, NULL, initWebConfigTask, NULL))
     {
-          RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"webconfig thread created success.. \n");
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"webconfig thread created success.. \n");
     }
     else
     {
-           RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"webconfig thread created failed.. \n");
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"webconfig thread created failed.. \n");
     }
 #endif
+
+    /* Initialized Rbus interface for TR181 Data*/
+    init_rbus_dml_provider();
 
     main_loop = g_main_loop_new (NULL, FALSE);
     g_main_loop_run(main_loop);
@@ -501,34 +518,34 @@ void exit_gracefully (int sig_received)
         /* Perform the necessary operations to shut down the WiFi device */
         WiFiDevice::shutdown();
 #endif
-        
+
         // Kill Parodus Thread
         stop_parodus_recv_wait();
 
-       /*Stop libSoup server and exit Json Thread */
-       hostIf_HttpServerStop();
+        /*Stop libSoup server and exit Json Thread */
+        hostIf_HttpServerStop();
 
 #ifndef NEW_HTTP_SERVER_DISABLE
-       /*Stop HTTP Server Thread*/
-       HttpServerStop();
+        /*Stop HTTP Server Thread*/
+        HttpServerStop();
 #endif
 
-       updateHandler::stop();
-       XBSStore::getInstance()->stop();
+        updateHandler::stop();
+        XBSStore::getInstance()->stop();
 
-       if(logfile) fclose (logfile);
+        if(logfile) fclose (logfile);
 
-       if(paramMgrhash) {
+        if(paramMgrhash) {
             g_hash_table_destroy(paramMgrhash);
             paramMgrhash = NULL;
-       }
-       hostIf_IARM_IF_Stop();
+        }
+        hostIf_IARM_IF_Stop();
 
-       RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"[%s:%s] Exiting program gracefully..\n", __FUNCTION__, __FILE__);
-       if (g_main_loop_is_running(main_loop)) {
-           g_main_loop_quit(main_loop);
-       }
-       pthread_mutex_unlock(&graceful_exit_mutex);
+        RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"[%s:%s] Exiting program gracefully..\n", __FUNCTION__, __FILE__);
+        if (g_main_loop_is_running(main_loop)) {
+            g_main_loop_quit(main_loop);
+        }
+        pthread_mutex_unlock(&graceful_exit_mutex);
     }
 }
 
