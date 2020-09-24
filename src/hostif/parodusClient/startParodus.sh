@@ -32,6 +32,14 @@ TOKEN_SERVER_URL="https://issuer.xmidt.comcast.net:8080/issue"
 REBOOT_REASON_SECURE_FILE="/opt/secure/reboot/previousreboot.info"
 REBOOT_REASON_REGULAR_FILE="/opt/persistent/previousreboot.info"
 
+CONFIG_FILE=/usr/bin/GetConfigFile
+RDKSSACLI=/usr/bin/rdkssacli
+DEVICE_CERT="devicecert_1.pk12"
+STATIC_CERT="/etc/ssl/certs/staticXpkiCrt.pk12"
+DEVICE_CERT_PATH="/opt/certs"
+CFG_IN="/tmp/.cfgStaticxpki"
+XPKIEXTRACT="/tmp/.adzvfchigc1ssa"
+
 Serial=""
 BootTime=""
 
@@ -41,11 +49,46 @@ else
     WEBPA_CFG_FILE="/etc/webpa_cfg.json"
 fi
 
-if [ -f /usr/bin/GetConfigFile ];then
-    GetConfigFile $CONFIG_RES_FILE
-else
-    echo "Error: GetConfigFile Not Found"
-fi
+#cpu intensive routine hence reduce the usage
+getDeviceConfigFile()
+{
+    if [ ! -f $CONFIG_RES_FILE ]; then
+        if [ ! -f $DEVICE_CERT_PATH/$DEVICE_CERT ]; then 
+            if [ -x /usr/bin/rdkssacertcheck.sh ]; then
+            echo "Procure xPki Cert"
+            sh /usr/bin/rdkssacertcheck.sh nonotify
+            fi
+        fi
+
+        if [ -f $DEVICE_CERT_PATH/$DEVICE_CERT ]; then
+            if [ -f $RDKSSACLI ]; then
+                openssl pkcs12 -nodes -password pass:$($RDKSSACLI "{STOR=GET,SRC=kquhqtoczcbx,DST=/dev/stdout}") -in $DEVICE_CERT_PATH/$DEVICE_CERT -out $XPKIEXTRACT
+                sed -n '/--BEGIN PRIVATE KEY--/,/--END PRIVATE KEY--/p; /--END PRIVATE KEY--/q' $XPKIEXTRACT  > $CONFIG_RES_FILE
+                sed -n '/--BEGIN CERTIFICATE--/,/--END CERTIFICATE--/p; /--END CERTIFICATE--/q' $XPKIEXTRACT  >> $CONFIG_RES_FILE
+                rm -f $XPKIEXTRACT
+            else
+                echo "No $RDKSSACLI support "
+            fi
+        else
+            echo "No $DEVICE_CERT_PATH/$DEVICE_CERT using static cert"
+            if [ -f $CONFIG_FILE ]; then
+                $CONFIG_FILE $CFG_IN
+                if [ -f $CFG_IN ]; then
+                    openssl pkcs12 -nodes -password pass:$(cat $CFG_IN) -in $STATIC_CERT -out $XPKIEXTRACT
+                    sed -n '/--BEGIN PRIVATE KEY--/,/--END PRIVATE KEY--/p; /--END PRIVATE KEY--/q' $XPKIEXTRACT  > $CONFIG_RES_FILE
+                    sed -n '/--BEGIN CERTIFICATE--/,/--END CERTIFICATE--/p; /--END CERTIFICATE--/q' $XPKIEXTRACT  >> $CONFIG_RES_FILE
+                    rm -f $XPKIEXTRACT $CFG_IN
+                else
+                    echo "$CFG_IN not available"
+                fi
+            else
+                echo "No $CONFIG_FILE to fetch $CFG_IN"
+            fi
+        fi
+    fi
+}
+
+getDeviceConfigFile
 
 if [ -f "$REBOOT_REASON_SECURE_FILE" ]; then
     REBOOT_INFO=$REBOOT_REASON_SECURE_FILE
