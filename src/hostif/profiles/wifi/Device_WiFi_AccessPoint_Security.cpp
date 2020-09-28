@@ -121,43 +121,52 @@ hostIf_WiFi_AccessPoint_Security::hostIf_WiFi_AccessPoint_Security(int dev_id):
  */
 int hostIf_WiFi_AccessPoint_Security::get_hostIf_WiFi_AccessPoint_Security_ModesSupported(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 
 int hostIf_WiFi_AccessPoint_Security::get_hostIf_WiFi_AccessPoint_Security_ModeEnabled(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 
 int hostIf_WiFi_AccessPoint_Security::get_hostIf_WiFi_AccessPoint_Security_WEPKey(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 
 int hostIf_WiFi_AccessPoint_Security::get_hostIf_WiFi_AccessPoint_Security_PreSharedKey(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 int hostIf_WiFi_AccessPoint_Security::get_hostIf_WiFi_AccessPoint_Security_KeyPassphrase(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 int hostIf_WiFi_AccessPoint_Security::get_hostIf_WiFi_AccessPoint_Security_RekeyingInterval(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 int hostIf_WiFi_AccessPoint_Security::get_hostIf_WiFi_AccessPoint_Security_RadiusServerIPAddr(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 
 int hostIf_WiFi_AccessPoint_Security::get_hostIf_WiFi_AccessPoint_Security_RadiusServerPort(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 
 int hostIf_WiFi_AccessPoint_Security::get_hostIf_WiFi_AccessPoint_Security_RadiusSecret(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 

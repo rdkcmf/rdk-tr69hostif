@@ -2080,6 +2080,7 @@ void *ResetFunc( void *)
 {
     sleep(2);
     triggerResetScript();
+    return NULL;
 
 }
 

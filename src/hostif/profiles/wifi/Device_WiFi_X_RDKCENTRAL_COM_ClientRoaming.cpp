@@ -239,6 +239,7 @@ int update_from_local_config(WiFi_RoamingCtrl_t* param, hostIf_WiFi_Xrdk_ClientR
     param->postAssnAPcontrolTimeframe = roamInst->postAssnAPcontrolTimeframe;
     param->roaming80211kvrEnable = roamInst->roaming80211kvrEnable;
     param->postAssnBackOffTime = roamInst->postAssnBackOffTime;
+    return 0;
 
 }
 int hostIf_WiFi_Xrdk_ClientRoaming::get_Device_WiFi_X_Rdkcentral_clientRoaming_Enable(HOSTIF_MsgData_t *stMsgData )

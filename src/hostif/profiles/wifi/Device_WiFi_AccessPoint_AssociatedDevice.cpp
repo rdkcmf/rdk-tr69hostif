@@ -124,32 +124,38 @@ hostIf_WiFi_AccessPoint_AssociatedDevice::hostIf_WiFi_AccessPoint_AssociatedDevi
  */
 int hostIf_WiFi_AccessPoint_AssociatedDevice::get_hostIf_WiFi_AccessPoint_AssociatedDevice_MACAddress(HOSTIF_MsgData_t *stMsgData )
 {
-
+ return 0;
 }
 
 int hostIf_WiFi_AccessPoint_AssociatedDevice::get_hostIf_WiFi_AccessPoint_AssociatedDevice_AuthenticationState(HOSTIF_MsgData_t *stMsgData )
 {
+ return 0;
 
 }
 
 int hostIf_WiFi_AccessPoint_AssociatedDevice::get_hostIf_WiFi_AccessPoint_AssociatedDevice_LastDataDownlinkRate(HOSTIF_MsgData_t *stMsgData )
 {
+ return 0;
 
 }
 int hostIf_WiFi_AccessPoint_AssociatedDevice::get_hostIf_WiFi_AccessPoint_AssociatedDevice_LastDataUplinkRate(HOSTIF_MsgData_t *stMsgData )
 {
+ return 0;
 
 }
 int hostIf_WiFi_AccessPoint_AssociatedDevice::get_hostIf_WiFi_AccessPoint_AssociatedDevice_SignalStrength(HOSTIF_MsgData_t *stMsgData )
 {
+ return 0;
 
 }
 int hostIf_WiFi_AccessPoint_AssociatedDevice::get_hostIf_WiFi_AccessPoint_AssociatedDevice_Retransmissions(HOSTIF_MsgData_t *stMsgData )
 {
+ return 0;
 
 }
 int hostIf_WiFi_AccessPoint_AssociatedDevice::get_hostIf_WiFi_AccessPoint_AssociatedDevice_Active(HOSTIF_MsgData_t *stMsgData )
 {
+ return 0;
 
 }
 

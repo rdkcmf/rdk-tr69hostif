@@ -62,10 +62,11 @@
 #include "XrdkBlueTooth.h"
 #endif
 
-GThread * updateHandler::thread = NULL;
-bool updateHandler::stopped = false;
 
-int updateHandler::Init()
+bool updateHandler::stopped = false;
+std::mutex updateHandler::mtx;
+std::condition_variable updateHandler::ctv;
+void updateHandler::Init()
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FILE__, __FUNCTION__);
 
@@ -99,13 +100,13 @@ int updateHandler::Init()
     hostIf_DeviceInfoRdk_xBT::registerUpdateCallback(notifyCallback);
 #endif // USE_XRDK_BT_PROFILE
 
-    thread=g_thread_create(run,NULL,TRUE,NULL);
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FILE__, __FUNCTION__);
 }
 
 void updateHandler::stop()
 {
     stopped = true;
+    ctv.notify_one();
 }
 
 void updateHandler::reset()
@@ -178,7 +179,9 @@ gpointer updateHandler::run(gpointer ptr)
         hostIf_DeviceInfoRdk_xBT::checkForUpdates();
 #endif
 
-        sleep(60);
+        //sleep(60);
+	std::unique_lock<std::mutex> lck(mtx);
+	ctv.wait_for(lck,  chrono::seconds(60), []{return stopped;});
         RDK_LOG(RDK_LOG_TRACE2,LOG_TR69HOSTIF,"[%s:%s:%d] Exiting..\n", __FILE__, __FUNCTION__, __LINE__);
     }
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FILE__, __FUNCTION__);
