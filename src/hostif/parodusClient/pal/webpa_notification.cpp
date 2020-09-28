@@ -211,4 +211,5 @@ int getnotifyparamList(char ***notifyParamList,int *ptrnotifyListSize)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Unable to parse Configuration file");
     }
+    return 0;
 }

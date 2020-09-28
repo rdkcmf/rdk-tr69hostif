@@ -110,18 +110,22 @@ hostIf_WiFi_EndPoint_Profile_Security::hostIf_WiFi_EndPoint_Profile_Security(int
 
 int hostIf_WiFi_EndPoint_Profile_Security::get_hostIf_WiFi_EndPoint_Profile_Security_ModeEnabled(HOSTIF_MsgData_t *stMsgData )
 {
-
+    return 0;
 }
+
 int hostIf_WiFi_EndPoint_Profile_Security::get_hostIf_WiFi_EndPoint_Profile_Security_WEPKey(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 int hostIf_WiFi_EndPoint_Profile_Security::get_hostIf_WiFi_EndPoint_Profile_Security_PreSharedKey(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 int hostIf_WiFi_EndPoint_Profile_Security::get_hostIf_WiFi_EndPoint_Profile_Security_KeyPassphrase(HOSTIF_MsgData_t *stMsgData )
 {
+    return 0;
 
 }
 #endif /* #ifdef USE_WIFI_PROFILE */

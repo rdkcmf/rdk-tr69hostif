@@ -125,6 +125,7 @@ void *libpd_client_mgr(void *)
         // Call Parodus receive wait function
         parodus_receive_wait();
     }
+    return NULL;
 }
 
 

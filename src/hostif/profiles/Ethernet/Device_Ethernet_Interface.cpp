@@ -420,7 +420,7 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
                 __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.maxBitRate);
         break;
     case eDuplexMode:
-        memset(hostIf_EthernetInterface::stEthInterface.duplexMode, '\0',S_LENGTH);
+        memset(hostIf_EthernetInterface::stEthInterface.duplexMode, '\0',_BUF_LEN_16);
 
         if (OK != getEthernetInterfaceName (ethInterfaceNum, ethernetInterfaceName))
             return 0;

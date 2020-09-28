@@ -34,15 +34,19 @@
 #include "hostIf_main.h"
 //#include <unistd.h>
 #include "libIBus.h"
+#include <condition_variable>
+#include <mutex>
 
 typedef void (*updateCallback)(IARM_Bus_tr69HostIfMgr_EventId_t, const char* paramName, const char* paramValue, HostIf_ParamType_t paramtype);
 
 class updateHandler {
 
     static bool stopped;
-    static GThread *thread;
+    static std::mutex mtx;
+    static std::condition_variable ctv;
+
 public:
-    static int Init();
+    static void Init();
     static void stop();
     static void reset();
     static gpointer run(gpointer);

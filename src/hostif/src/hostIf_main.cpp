@@ -70,6 +70,7 @@
 // Initialize global variables and functions.
 //------------------------------------------------------------------------------
 GThread *hostIf_JsonIfThread = NULL;
+GThread *updateHandler_runThread = NULL;
 #ifndef NEW_HTTP_SERVER_DISABLE
 GThread *HTTPServerThread = NULL;
 #define LEGACY_RFC_ENABLED_PATH "/opt/RFC/.RFC_LegacyRFCEnabled.ini"
@@ -143,6 +144,7 @@ static void *shutdown_thread_entry(void *arg)
     }
 
     exit_gracefully(shutdown_sig_received);
+    return NULL;
 }
 
 #ifdef WEBPA_RFC_ENABLED
@@ -387,26 +389,11 @@ int main(int argc, char *argv[])
     //------------------------------------------------------------------------------
     // hostIf_HttpServerStart: Soup HTTP Server
     //------------------------------------------------------------------------------
-    if( (hostIf_JsonIfThread = g_thread_create(    (GThreadFunc)jsonIfHandlerThread,
-                               (void *)hostIf_JsonIfMsg,
-                               FALSE,
-                               &err1)) == NULL)
-    {
-        g_critical("Thread create failed: %s!!\n", err1->message );
-        g_error_free (err1);
-    }
+    hostIf_JsonIfThread = g_thread_new("hostIf_JsonIfThread", (GThreadFunc)jsonIfHandlerThread, NULL);
 #ifndef NEW_HTTP_SERVER_DISABLE
     if(!legacyRFCEnabled())
     {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"legacyRFC Set to False, Starting New HTTP Server\n");
-        if((HTTPServerThread = g_thread_create((GThreadFunc)HTTPServerStartThread,
-                               (void *)HTTPServerName,
-                               FALSE,
-                               &httpError)) == NULL)
-        {
-            g_critical("New HTTP Server Thread Create failed: %s!!\n", httpError->message );
-            g_error_free (httpError);
-        }
+        HTTPServerThread = g_thread_new("HTTPServerThread", (GThreadFunc)HTTPServerStartThread, NULL);
     }
     else
     {
@@ -432,6 +419,7 @@ int main(int argc, char *argv[])
     // updateHandler::init :  Update handler thread for polling table profiles
     //------------------------------------------------------------------------------
     updateHandler::Init();
+    updateHandler_runThread = g_thread_new("updateHandler_runThread", (GThreadFunc)updateHandler::run, NULL);
 
     //------------------------------------------------------------------------------
     // Initialize WebPA Module 
@@ -462,7 +450,11 @@ int main(int argc, char *argv[])
 
     main_loop = g_main_loop_new (NULL, FALSE);
     g_main_loop_run(main_loop);
+
     g_main_loop_unref (main_loop);
+    g_thread_join(hostIf_JsonIfThread);
+    g_thread_join(HTTPServerThread);
+    g_thread_join(updateHandler_runThread);    
     pthread_join(parodus_init_tid,NULL);
 
     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"\n\n----------------------EXITING MAIN PROGRAM----------------------\n");

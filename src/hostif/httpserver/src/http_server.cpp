@@ -94,7 +94,6 @@ static void HTTPRequestHandler(
             }
             else
                 RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s:%s] GET with CallerID : %s..\n", __FUNCTION__, __FILE__, pcCallerID);
-
             parse_get_request(jsonRequest, &reqSt, WDMP_TR181);
             respSt = handleRequest(pcCallerID, reqSt);
             if(respSt)
@@ -103,15 +102,21 @@ static void HTTPRequestHandler(
                 wdmp_form_get_response(respSt, jsonResponse);
 
                 // WDMP Code sets a generic statusCode, the following lines replace it with an actual error code.
-                cJSON_DeleteItemFromObject(jsonResponse, "statusCode");
+		int new_st_code = 0;
+
                 for(int paramIndex = 0; paramIndex < respSt->paramCnt; paramIndex++)
                 {
                    if(respSt->retStatus[paramIndex] != 0 || paramIndex == respSt->paramCnt-1)
                    {
-                      cJSON_AddNumberToObject(jsonResponse, "statusCode", respSt->retStatus[paramIndex]);
+		      new_st_code =  respSt->retStatus[paramIndex];
                       break;
                    }
-               }
+                }
+		cJSON * stcode = cJSON_GetObjectItem(jsonResponse, "statusCode");
+		if( NULL != stcode)
+		{
+		     cJSON_SetIntValue(stcode, new_st_code);
+		}
             }
             else
             {
@@ -139,14 +144,20 @@ static void HTTPRequestHandler(
                 jsonResponse = cJSON_CreateObject();
                 wdmp_form_set_response(respSt, jsonResponse);
                 // WDMP Code sets a generic statusCode, the following lines replace it with an actual error code.
-                cJSON_DeleteItemFromObject(jsonResponse, "statusCode");
+                int new_st_code = 0;
+
                 for(int paramIndex = 0; paramIndex < respSt->paramCnt; paramIndex++)
                 {
                    if(respSt->retStatus[paramIndex] != 0 || paramIndex == respSt->paramCnt-1)
                    {
-                      cJSON_AddNumberToObject(jsonResponse, "statusCode", respSt->retStatus[paramIndex]);
+                      new_st_code =  respSt->retStatus[paramIndex];
                       break;
                    }
+                }
+		cJSON * stcode = cJSON_GetObjectItem(jsonResponse, "statusCode");
+                if( NULL != stcode)
+                {
+                     cJSON_SetIntValue(stcode, new_st_code);
                 }
              }
              else

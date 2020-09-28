@@ -177,6 +177,7 @@ void *jsonIfHandlerThread(void *msg)
     hostIf_HttpServerStart();
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
+    return NULL;
 }
 
 

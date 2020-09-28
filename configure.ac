@@ -22,7 +22,7 @@
 AC_INIT([hostIfMgr],[1.0],[rajnish_dey2@cable.comcast.com])
 AC_CONFIG_SRCDIR([src/hostif/src/hostIf_main.cpp])
 
-AC_CONFIG_MACRO_DIR([cfg])
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([cfg])
 AM_INIT_AUTOMAKE([foreign no-dist-gzip dist-bzip2 1.9])
 #AM_INIT_AUTOMAKE([foreign -Wall -Werror])

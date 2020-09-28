@@ -33,7 +33,7 @@ class Validator:
         result = self.xmlschema.validate(xml_doc)
         if not result:
             for error in self.xmlschema.error_log:
-                print error.message, error.line, error.column
+                print (error.message, error.line, error.column)
         return result
 
 

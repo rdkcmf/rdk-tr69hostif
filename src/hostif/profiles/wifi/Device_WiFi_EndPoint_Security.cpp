@@ -140,7 +140,7 @@ int hostIf_WiFi_EndPoint_Security::get_hostIf_WiFi_EndPoint_Security_ModesEnable
 }
 int hostIf_WiFi_EndPoint_Security::get_hostIf_WiFi_EndPoint_ModesSupported(HOSTIF_MsgData_t *stMsgData )
 {
-
+ return 0;
 }
 
 #endif /* #ifdef USE_WIFI_PROFILE */

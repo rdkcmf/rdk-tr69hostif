@@ -57,6 +57,7 @@ bool XBSStoreJournal::rfcUpdateStarted()
          m_dict[key] = journalData;
       }
    }
+   return true;
 }
 
 bool XBSStoreJournal::rfcUpdateEnd()
@@ -80,6 +81,7 @@ bool XBSStoreJournal::rfcUpdateEnd()
    }
    ofs.flush();
    ofs.close();
+   return true;
 }
 
 bool XBSStoreJournal::clearRfcAndGetDefaultValue(const string &key, string &defaultValue)
@@ -144,6 +146,7 @@ bool XBSStoreJournal::removeRecord(const string &key)
         return false;
    }
    m_dict.erase(key);
+   return true;
 }
 
 void XBSStoreJournal::resetCacheAndStore()
