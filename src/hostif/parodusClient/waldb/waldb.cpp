@@ -187,7 +187,8 @@ int getNumberofInstances(const char* paramName)
         char *position = NULL;
         char numberOfEntitiesParam[MAX_PARAMETER_LENGTH] = "\0";
         char parameter[MAX_PARAMETER_LENGTH] = "\0";
-        strcpy(numberOfEntitiesParam,paramName);
+        strncpy(numberOfEntitiesParam,paramName,sizeof(numberOfEntitiesParam) -1);
+        numberOfEntitiesParam[sizeof(numberOfEntitiesParam) -1] = '\0';
         if(NULL != (position = strstr(numberOfEntitiesParam, INSTANCE_NUMBER_INDICATOR)))
         {
             // Check if Parameter is present in numParam Hash List

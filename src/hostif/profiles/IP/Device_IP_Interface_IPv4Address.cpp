@@ -359,7 +359,7 @@ int hostIf_IPv4Address::get_IPv4Address_Status(HOSTIF_MsgData_t *stMsgData,int s
         *pChanged = true;
     }
     bCalledStatus = true;
-    strncpy (backupStatus, status, BUFF_LENGTH_16);
+    strncpy (backupStatus, status, BUFF_LENGTH_16 -1);  //CID:136516 - Buffer size warning
     strncpy (stMsgData->paramValue, status, BUFF_LENGTH_16);
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (status);

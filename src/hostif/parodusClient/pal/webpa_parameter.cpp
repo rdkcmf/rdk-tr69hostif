@@ -230,7 +230,10 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                 Param.requestor = HOSTIF_SRC_WEBPA;
                 Param.bsUpdate = getBSUpdateEnum(dmParam.bsUpdate);
 
-                converttohostIfType (dmParam.dataType, &(Param.paramtype));
+                if(dmParam.dataType != NULL)
+                {
+                    converttohostIfType (dmParam.dataType, &(Param.paramtype));  //CID:18170 - FORWARD NULL
+                }
                 freeDataModelParam(dmParam);
                 Param.instanceNum = 0;
                 ret = get_ParamValues_tr69hostIf (&Param);
@@ -320,7 +323,10 @@ static WAL_STATUS SetParamInfo(ParamVal paramVal, char * transactionID)
     if(getParamInfoFromDataModel((void *)dataBaseHandle,paramVal.name,&dmParam))
     {
         WAL_DATA_TYPE walType;
-        converttohostIfType(dmParam.dataType,&(Param.paramtype));
+        if(dmParam.dataType != NULL)
+        {
+            converttohostIfType(dmParam.dataType,&(Param.paramtype));   //CID:18545 - FORWARD NULL
+        }
         Param.bsUpdate = getBSUpdateEnum(dmParam.bsUpdate);
         Param.requestor = HOSTIF_SRC_WEBPA;
         freeDataModelParam(dmParam);

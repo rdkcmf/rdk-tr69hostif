@@ -131,7 +131,7 @@ int hostIf_DeviceProcessStatusInterface::getProcessStatusCPUUsage() {
     unsigned long work_jiffies_1 = 0, work_jiffies_2 = 0;
     long long unsigned int mUser = 0, mNice = 0, mSystem = 0, mIdle = 0, mIOwait = 0, mIrq = 0, mSoftirq = 0;
     unsigned int uiCpuUsage = 0;
-
+    unsigned int temp = 0;
     //CPUUsage
     memset(cmd,'\0', sizeof(cmd));
     strcpy(cmd,"grep '^cpu ' /proc/stat");
@@ -170,11 +170,16 @@ int hostIf_DeviceProcessStatusInterface::getProcessStatusCPUUsage() {
     total_jiffies_2 =  mUser + mNice + mSystem + mIdle + mIOwait + mIrq + mSoftirq;
     work_jiffies_2 =  mUser + mNice + mSystem;
 
-    uiCpuUsage = ((work_jiffies_2 - work_jiffies_1)*100)/(total_jiffies_2 - total_jiffies_1);
+    temp = total_jiffies_2 - total_jiffies_1;
 
-    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): CpuUsage = [%u]\n", __FUNCTION__, uiCpuUsage);
+    if(temp != 0)
+    {
+        uiCpuUsage = ((work_jiffies_2 - work_jiffies_1)*100)/(temp);
 
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): CpuUsage = [%u]\n", __FUNCTION__, uiCpuUsage);
+    }
     return uiCpuUsage;
+
 }
 
 

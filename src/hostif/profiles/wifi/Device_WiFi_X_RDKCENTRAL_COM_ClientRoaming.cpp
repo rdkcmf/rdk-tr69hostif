@@ -116,7 +116,10 @@ hostIf_WiFi_Xrdk_ClientRoaming::hostIf_WiFi_Xrdk_ClientRoaming(int dev_id):
     postAssnAPcontrolTimeframe(60),
     postAssnBackOffTime(2),
     postAssnSelfSteerOverrideEnable(false),
-    roaming80211kvrEnable(false)
+    roaming80211kvrEnable(false),
+    roamingConfigEnable(false),
+    preassnProbeRetryCnt(0),
+    postAssnSelfSteerBeaconsMissedTime(0)   //CID:103263 - UNINIT_CTOR
 {
 
 }

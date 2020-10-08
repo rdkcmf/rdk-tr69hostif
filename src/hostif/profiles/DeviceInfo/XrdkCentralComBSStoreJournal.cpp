@@ -180,6 +180,7 @@ bool XBSStoreJournal::loadJournalRecordsIntoCache()
         while (getline(ifs_bsj, line)) {
             stringstream ss(line);
             BS_JournalData_t journalData;
+            journalData.clearRfc = false;  //CID:88739 - UNINIT
             if( ss.good() )
             {
                string key;

@@ -423,7 +423,7 @@ bool hostIf_ConfigProperties_Init()
     gsize length = 0;
     gdouble double_value = 0;
     guint group = 0, key = 0;
-    HostIf_ParamMgr_t mgrName;
+    HostIf_ParamMgr_t mgrName = HOSTIF_INVALID_Mgr;  //CID:82970 - UNINIT
 
     if(argList.confFile[0] == '\0')
     {

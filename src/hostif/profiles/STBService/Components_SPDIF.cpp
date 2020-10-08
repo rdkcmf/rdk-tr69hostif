@@ -352,7 +352,7 @@ int hostIf_STBServiceSPDIF::getNumberOfInstances(HOSTIF_MsgData_t *stMsgData)
 {
     int portCount = 0;
     device::List<device::AudioOutputPort> aPorts = device::Host::getInstance().getAudioOutputPorts();
-    for (int i; i < aPorts.size() ; i++)
+    for (int i = 0; i < aPorts.size() ; i++)   //CID:18299 - UNINIT
     {
         if (strcasestr(aPorts.at(i).getName().c_str(), "spdif"))
             portCount++;

@@ -590,7 +590,8 @@ int hostIf_IP::get_Device_IP_IPv4Status(HOSTIF_MsgData_t *stMsgData, bool *pChan
     }
     bCalledIPv4Status = true;
     strncpy(stMsgData->paramValue,stIPInstance.iPv4Status,TR69HOSTIFMGR_MAX_PARAM_LEN );
-    strncpy(backupIPv4Status,stIPInstance.iPv4Status,_BUF_LEN_16 );
+    strncpy(backupIPv4Status,stIPInstance.iPv4Status,sizeof(backupIPv4Status) -1);  //CID:136557 - Buffer size warning
+    backupIPv4Status[sizeof(backupIPv4Status) -1] = '\0';
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stIPInstance.iPv4Status);
 

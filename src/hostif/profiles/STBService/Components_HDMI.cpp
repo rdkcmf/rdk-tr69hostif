@@ -265,7 +265,8 @@ int hostIf_STBServiceHDMI::handleGetMsg(const char *paramName, HOSTIF_MsgData_t 
     }
     else if(strcasecmp(paramName, RES_MODE_STRING) == 0)
     {
-        strncpy(stMsgData->paramValue,getHDMIResolutionMode(), PARAM_LEN);
+        strncpy(stMsgData->paramValue,getHDMIResolutionMode(), sizeof(stMsgData->paramValue) -1);  //CID:136490 - Buffer size warning
+        stMsgData->paramValue [sizeof(stMsgData->paramValue) -1] = '\0';
         stMsgData->paramtype=hostIf_StringType;
         stMsgData->paramLen = strlen(stMsgData->paramValue);
         ret = OK;
@@ -368,7 +369,7 @@ int hostIf_STBServiceHDMI::setResolution(const HOSTIF_MsgData_t *stMsgData)
         char *pixelName = NULL, *frameRateName = NULL;
         bool isInterlaced = true;
 
-        strncpy(inResolution, stMsgData->paramValue, strlen(stMsgData->paramValue));
+        strncpy(inResolution, stMsgData->paramValue, sizeof(inResolution)-1);
         inResolution[sizeof(inResolution)-1] = '\0';
         hzPtr = strcasestr(inResolution, (char*)"Hz");
 
@@ -379,7 +380,7 @@ int hostIf_STBServiceHDMI::setResolution(const HOSTIF_MsgData_t *stMsgData)
         }
         else
         {
-            strncpy(hzPtr, "Hz", 2);
+            strncpy(hzPtr, "Hz", 3);  //CID:136580 - Buffer size
         }
 
         interlacedPtr = strcasestr(inResolution, (char*)"p");

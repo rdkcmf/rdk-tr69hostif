@@ -545,8 +545,9 @@ int hostIf_STBServiceAudioInterface::getStatus(HOSTIF_MsgData_t *stMsgData,bool 
             *pChanged = true;
         }
         bCalledStatus = true;
-        strncpy(backupStatus, stMsgData->paramValue, _BUF_LEN_16);
-        backupStatus[PARAM_LEN-1] = '\0';
+        strncpy(backupStatus, stMsgData->paramValue, sizeof(backupStatus) -1);
+        backupStatus [sizeof(backupStatus) -1] = '\0';
+        //CID:44082 - OVERRUN
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] [Value: %s] \n", __FUNCTION__, stMsgData->paramValue);
     }
     catch (const std::exception e) {
@@ -741,8 +742,9 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioStereoMode(HOSTIF_Msg
             *pChanged = true;
         }
         bCalledAudioStereoMode = true;
-        strncpy(backupAudioStereoMode, stMsgData->paramValue, _BUF_LEN_16-1);
-        backupAudioStereoMode[PARAM_LEN-1];
+        strncpy(backupAudioStereoMode, stMsgData->paramValue, sizeof(backupAudioStereoMode) -1);
+        backupAudioStereoMode[sizeof(backupAudioStereoMode) -1] = '\0';
+        //CID:44081 - OVERRUN
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
@@ -1077,8 +1079,9 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioDB(HOSTIF_MsgData_t *
             *pChanged = true;
         }
         bCalledAudioDB = true;
-        strncpy(backupAudioDB, stMsgData->paramValue, _BUF_LEN_16);
-        backupAudioDB[PARAM_LEN-1] = '\0';
+        strncpy(backupAudioDB, stMsgData->paramValue, sizeof(backupAudioDB) -1);
+        backupAudioDB[sizeof(backupAudioDB) -1] = '\0';
+         //CID:44080 - OVERRUN
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
@@ -1251,8 +1254,9 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioLoopThru(HOSTIF_MsgDa
             *pChanged = true;
         }
         bCalledAudioLoopThru = true;
-        strncpy(backupAudioLoopThru, stMsgData->paramValue, _BUF_LEN_16-1);
-        backupAudioLoopThru[PARAM_LEN-1] = '\0';
+        strncpy(backupAudioLoopThru, stMsgData->paramValue, sizeof(backupAudioLoopThru) -1);
+        backupAudioLoopThru[sizeof(backupAudioLoopThru) -1] = '\0';
+         //CID:44083 - OVERRUN
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);

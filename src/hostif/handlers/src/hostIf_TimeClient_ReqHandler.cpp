@@ -93,7 +93,7 @@ int TimeClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
     const char *pSetting;
-    int instanceNumber;
+    int instanceNumber = 0;  //CID:83448 - UNINIT
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
     if(strncasecmp(stMsgData->paramName,"Device.Time",strlen("Device.Time"))==0)
     {
@@ -150,7 +150,7 @@ int TimeClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
     const char *pSetting;
-    int instanceNumber;
+    int instanceNumber = 0;  //CID:87240 - UNINIT
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
 
     if(strncasecmp(stMsgData->paramName,"Device.Time",strlen("Device.Time"))==0)

@@ -178,7 +178,8 @@ int hostIf_DeviceProcessorInterface::get_Device_DeviceInfo_Processor_Architectur
     }
 
     bCalledArchitecture = true;
-    strncpy(backupArchitecture,stMsgData->paramValue,strlen(stMsgData->paramValue));
+    strncpy(backupArchitecture,stMsgData->paramValue,sizeof(backupArchitecture) -1);  //CID:136590 - Buffer size
+    backupArchitecture[sizeof(backupArchitecture)-1] = '\0';
 
     return OK;
 }

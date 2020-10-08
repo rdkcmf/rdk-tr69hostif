@@ -290,25 +290,23 @@ static void get_parodus_url(char *parodus_url, char *client_url)
 
     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Reading Parodus URL...\n");
     fp = fopen(WEBPA_CONFIG_FILE, "r");
-    if (fp == NULL)
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failed to open Webpa cfg file %s\n", WEBPA_CONFIG_FILE);
-    }
-    else
+    if (fp != NULL)
     {
         fseek(fp, 0, SEEK_END);
         ch_count = ftell(fp);
-        fseek(fp, 0, SEEK_SET);
-        webpaCfgFile = (char *) malloc(sizeof(char) * (ch_count + 1));
-        fread(webpaCfgFile, 1, ch_count,fp);
-        webpaCfgFile[ch_count] ='\0';
-        fclose(fp);
         if(ch_count < 1)
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"WebPA config file is Empty %s\n", WEBPA_CONFIG_FILE);
+            fclose(fp);
         }
         else
         {
+            fseek(fp, 0, SEEK_SET);
+            webpaCfgFile = (char *) malloc(sizeof(char) * (ch_count + 1));
+            fread(webpaCfgFile, 1, ch_count,fp);
+            webpaCfgFile[ch_count] ='\0';
+            fclose(fp);
+            //CID:18143 - NEGATIVE RETURNS - since ch_count cannot be negative
             cJSON *webpa_cfg = cJSON_Parse(webpaCfgFile);
             if(webpa_cfg)
             {
@@ -325,6 +323,10 @@ static void get_parodus_url(char *parodus_url, char *client_url)
                 }
             }
         }
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failed to open Webpa cfg file %s\n", WEBPA_CONFIG_FILE);
     }
     // Set Default value if not configured
     if(!getStatus)

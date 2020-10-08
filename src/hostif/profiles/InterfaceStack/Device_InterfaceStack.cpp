@@ -106,7 +106,8 @@ hostif_InterfaceStack::hostif_InterfaceStack(int dev_id, char *_higherLayer, cha
 
     if(_lowerLayer)
     {
-        strncpy(lowerLayer, _lowerLayer, sizeof(lowerLayer));
+        strncpy(lowerLayer, _lowerLayer, sizeof(lowerLayer) -1);  //CID:136379 - Buffer size warning
+        lowerLayer[sizeof(lowerLayer) -1] = '\0';
     }
     else
     {
@@ -948,7 +949,8 @@ int hostif_InterfaceStack::get_Device_InterfaceStack_HigherLayer(HOSTIF_MsgData_
         *pChanged = true;
     }
     bCalledHigherLayer = true;
-    strncpy(backupHigherLayer, higherLayer, sizeof(backupHigherLayer));
+    strncpy(backupHigherLayer, higherLayer, sizeof(backupHigherLayer) -1);  //CID:136448 - Buffer size warnin
+    backupHigherLayer[sizeof(backupHigherLayer) -1] = '\0';
     strncpy(stMsgData->paramValue, higherLayer, TR69HOSTIFMGR_MAX_PARAM_LEN );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stMsgData->paramValue);
@@ -977,7 +979,8 @@ int hostif_InterfaceStack::get_Device_InterfaceStack_LowerLayer(HOSTIF_MsgData_t
         *pChanged = true;
     }
     bCalledLowerLayer = true;
-    strncpy(backupLowerLayer, lowerLayer, sizeof(backupLowerLayer));
+    strncpy(backupLowerLayer, lowerLayer, sizeof(backupLowerLayer) -1);  //CID:136386 - Buffer size warning
+    backupLowerLayer[sizeof(backupLowerLayer) -1] = '\0';
     strncpy(stMsgData->paramValue, lowerLayer, TR69HOSTIFMGR_MAX_PARAM_LEN );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stMsgData->paramValue);

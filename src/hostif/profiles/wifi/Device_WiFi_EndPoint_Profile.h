@@ -49,7 +49,7 @@ class hostIf_WiFi_EndPoint_Profile {
 
     static  GHashTable *ifHash;
     static GMutex* m_mutex;
-    int dev_id;
+    int dev_id = 0;  //CID:103090 - UNINIT_CTOR
     hostIf_WiFi_EndPoint_Profile(int dev_id);
     ~hostIf_WiFi_EndPoint_Profile() {};
 

@@ -124,7 +124,7 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
     const char *pSetting;
-    int instanceNumber;
+    int instanceNumber = 0;  //CID:84325 - UNINIT
     hostIf_DeviceInfo::getLock();
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
@@ -1213,11 +1213,13 @@ void DeviceClientReqHandler::checkForUpdates()
 void DeviceClientReqHandler::notifyIARM(IARM_Bus_tr69HostIfMgr_EventId_t event_type, const char* paramName, const char* paramValue, HostIf_ParamType_t paramtype) {
     IARM_Bus_tr69HostIfMgr_EventData_t eventData;
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] DeviceClientReqHandler Notify for Parameter :- %s..\n", __FILE__, __FUNCTION__,paramName);
-    strncpy(eventData.paramName,paramName, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    strncpy(eventData.paramName,paramName, sizeof(eventData.paramName) -1);  //CID:136301 - Buffer size warning
+    eventData.paramName[sizeof(eventData.paramName) -1]  = '\0';
 
     if(paramValue)
     {
-        strncpy(eventData.paramValue, paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN);
+        strncpy(eventData.paramValue, paramValue, sizeof(eventData.paramValue) -1);
+        eventData.paramValue[sizeof(eventData.paramValue) -1] = '\0';
     }
 
     eventData.paramtype = paramtype;
