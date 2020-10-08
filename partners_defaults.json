@@ -45,8 +45,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "https://5df09-linear.v.fwmrm.net/scte/request?nw=384777&csid=linear_endpoint_x1&resp=scte-130&prof=linear_mvpd"
    },
    "sky-de" : {
-       "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
-       "Device.Time.NTPServer2" : "ntp.ccp.xcal.tv",
+       "Device.Time.NTPServer1" : "devicetime1.sky.com",
+       "Device.Time.NTPServer2" : "devicetime2.sky.com",
        "Device.Time.NTPServer3" : "time.google.com",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL_dev" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "",
@@ -72,8 +72,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Network.ManualIPSettings.Enable" : "True"
    },
     "sky-it" : {
-       "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
-       "Device.Time.NTPServer2" : "ntp.ccp.xcal.tv",
+       "Device.Time.NTPServer1" : "devicetime1.sky.com",
+       "Device.Time.NTPServer2" : "devicetime2.sky.com",
        "Device.Time.NTPServer3" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL_dev" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "",
@@ -98,8 +98,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Network.ManualIPSettings.Enable" : "True"
    },
     "sky-uk" : {
-       "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
-       "Device.Time.NTPServer2" : "ntp.ccp.xcal.tv",
+       "Device.Time.NTPServer1" : "devicetime1.sky.com",
+       "Device.Time.NTPServer2" : "devicetime2.sky.com",
        "Device.Time.NTPServer3" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL_dev" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL" : "",
