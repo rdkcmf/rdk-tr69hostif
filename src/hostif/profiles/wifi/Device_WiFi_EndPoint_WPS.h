@@ -45,7 +45,7 @@ class hostIf_WiFi_EndPoint_WPS {
 
     static  GHashTable *ifHash;
 //    GMutex* m_mutex = NULL;
-    int dev_id;
+    int dev_id  = 0;   //CID:102980 - UNINIT_CTOR
     hostIf_WiFi_EndPoint_WPS(int dev_id);
     ~hostIf_WiFi_EndPoint_WPS() {};
 

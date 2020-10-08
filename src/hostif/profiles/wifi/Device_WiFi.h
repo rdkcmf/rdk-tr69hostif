@@ -168,7 +168,7 @@
  */
 
 class WiFiDevice {
-    void *ctxt;
+    void *ctxt = NULL; //CID:103345,102998 - UNINIT_CTOR,UNINIT
     static  GHashTable *devHash;
 
     int dev_id;

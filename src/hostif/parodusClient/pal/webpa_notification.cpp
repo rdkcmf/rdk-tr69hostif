@@ -174,16 +174,18 @@ int getnotifyparamList(char ***notifyParamList,int *ptrnotifyListSize)
     }
     fseek(fp, 0, SEEK_END);
     ch_count = ftell(fp);
+    if(ch_count < 1)
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"WebPA notification file is Empty %s\n", webpaNotifyConfigFile);
+        fclose(fp);
+        return -1;
+    }
     fseek(fp, 0, SEEK_SET);
     notifycfg_file_content = (char *) malloc(sizeof(char) * (ch_count + 1));
     fread(notifycfg_file_content, 1, ch_count,fp);
     notifycfg_file_content[ch_count] ='\0';
-    fclose(fp);
-    if(ch_count < 1)
-    {
-        RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"WebPA notification file is Empty %s\n", webpaNotifyConfigFile);
-        return -1;
-    }
+    fclose(fp);   //CID:18630 - NEGATIVE RETURNS
+  
     cJSON *notify_cfg = cJSON_Parse(notifycfg_file_content);
     cJSON *notifyArray = cJSON_GetObjectItem(notify_cfg,"Notify");
     if(NULL != notifyArray)

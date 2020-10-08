@@ -151,7 +151,11 @@ void WiFiDevice::shutdown()
 }
 
 hostIf_WiFi::hostIf_WiFi(int dev_id):
-    dev_id(dev_id)
+    dev_id(dev_id),
+    uiRadioNumberOfEntries(0),
+    uiSSIDNumberOfEntries(0),
+    uiAccessPointNumberOfEntries(0),
+    uiEndPointNumberOfEntries(0)  //CID:103645 - UNINIT_CTOR
 {
 
 }

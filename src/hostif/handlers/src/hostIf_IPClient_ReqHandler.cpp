@@ -927,7 +927,7 @@ void IPClientReqHandler::checkForUpdates()
                         }
 
                     }
-                    else if(matchComponent(positionAfterInstanceNumber, "IPv4Address", &positionAfterSubInstanceNumber, subInstanceNumber))
+                    else if((positionAfterInstanceNumber != NULL) && (matchComponent(positionAfterInstanceNumber, "IPv4Address", &positionAfterSubInstanceNumber, subInstanceNumber)))  //CID:80424 - Forward Null
                     {
                         hostIf_IPv4Address *pIfaceIPv4 = hostIf_IPv4Address::getInstance(instanceNumber);
                         if(pIfaceIPv4)

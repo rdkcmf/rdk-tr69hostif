@@ -681,7 +681,8 @@ int hostIf_IPv6Address::get_IPv6Address_Status(HOSTIF_MsgData_t *stMsgData,int s
         *pChanged = true;
     }
     bCalledStatus = true;
-    strncpy (backupIPv6AddressStatus, status, BUFF_LENGTH_16);
+    strncpy (backupIPv6AddressStatus, status, sizeof(backupIPv6AddressStatus) -1);  //CID:136468 - Buffer size warning
+    backupIPv6AddressStatus[sizeof(backupIPv6AddressStatus) -1] = '\0';
     strncpy (stMsgData->paramValue, status, BUFF_LENGTH_16);
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (status);
@@ -816,7 +817,8 @@ int hostIf_IPv6Address::get_IPv6Address_IPAddress(HOSTIF_MsgData_t *stMsgData,in
         *pChanged = true;
     }
     bCalledIPAddress = true;
-    strncpy (backupIPv6AddressIPAddress, ipv6Address, BUFF_LENGTH_64);
+    strncpy (backupIPv6AddressIPAddress, ipv6Address, sizeof(backupIPv6AddressIPAddress) -1);  //CID:136333 - Buffer size warning
+    backupIPv6AddressIPAddress[sizeof(backupIPv6AddressIPAddress) -1] = '\0';
     strncpy (stMsgData->paramValue, ipv6Address, BUFF_LENGTH_64);
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (ipv6Address);
@@ -896,7 +898,8 @@ int hostIf_IPv6Address::get_IPv6Address_Origin(HOSTIF_MsgData_t *stMsgData,int s
         *pChanged = true;
     }
     bCalledOrigin = true;
-    strncpy (backupIPv6AddressOrigin, origin, BUFF_LENGTH_32);
+    strncpy (backupIPv6AddressOrigin, origin, sizeof(backupIPv6AddressOrigin) -1);  //CID:136548 - Buffer size warning
+    backupIPv6AddressOrigin[sizeof(backupIPv6AddressOrigin) -1] = '\0';
     strncpy (stMsgData->paramValue, origin, BUFF_LENGTH_32);
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (origin);
@@ -944,7 +947,8 @@ int hostIf_IPv6Address::get_IPv6Address_Prefix (HOSTIF_MsgData_t *stMsgData,int 
     RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s,%d] pathnameOfRowInIPv6PrefixTable = %s",
             __FUNCTION__, __LINE__, pathnameOfRowInIPv6PrefixTable);
 
-    strncpy (stMsgData->paramValue, pathnameOfRowInIPv6PrefixTable, TR69HOSTIFMGR_MAX_PARAM_LEN);
+    strncpy (stMsgData->paramValue, pathnameOfRowInIPv6PrefixTable, sizeof(stMsgData->paramValue) -1);  //CID:136393 - Buffer size warning
+    stMsgData->paramValue [sizeof(stMsgData->paramValue) -1] = '\0';
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (pathnameOfRowInIPv6PrefixTable);
 
@@ -1163,7 +1167,8 @@ int hostIf_IPv6Address::get_IPv6Prefix_Status(HOSTIF_MsgData_t *stMsgData,int su
         *pChanged = true;
     }
     bCalledStatus = true;
-    strncpy (backupIPv6PrefixStatus, status, BUFF_LENGTH_16);
+    strncpy (backupIPv6PrefixStatus, status, sizeof(backupIPv6PrefixStatus) -1);  //CID:136608 - Buffer size warning
+    backupIPv6PrefixStatus[sizeof(backupIPv6PrefixStatus) -1] = '\0';
     strncpy (stMsgData->paramValue, status, BUFF_LENGTH_16);
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (status);
@@ -1259,7 +1264,8 @@ int hostIf_IPv6Address::get_IPv6Prefix_Prefix(HOSTIF_MsgData_t *stMsgData,int su
         *pChanged = true;
     }
     bCalledIPAddress = true;
-    strncpy (backupIPv6PrefixPrefix, prefix, BUFF_LENGTH_64);
+    strncpy (backupIPv6PrefixPrefix, prefix, sizeof(backupIPv6PrefixPrefix) -1);  //CID:136410 - Buffer size warning
+    backupIPv6PrefixPrefix[sizeof(backupIPv6PrefixPrefix) -1] = '\0';
     strncpy (stMsgData->paramValue, prefix, BUFF_LENGTH_64);
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (prefix);
@@ -1339,7 +1345,8 @@ int hostIf_IPv6Address::get_IPv6Prefix_Origin(HOSTIF_MsgData_t *stMsgData,int su
         *pChanged = true;
     }
     bCalledOrigin = true;
-    strncpy (backupIPv6PrefixOrigin, origin, BUFF_LENGTH_32);
+    strncpy (backupIPv6PrefixOrigin, origin, sizeof(backupIPv6PrefixOrigin) -1);  //CID:136504 - Buffer size warning
+    backupIPv6PrefixOrigin[sizeof(backupIPv6PrefixOrigin) -1] = '\0';
     strncpy (stMsgData->paramValue, origin, BUFF_LENGTH_32);
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (origin);

@@ -96,7 +96,7 @@
 class hostIf_WiFi_SSID {
 
     static  GHashTable *ifHash;
-    int dev_id;
+    int dev_id = 0;  //CID:103919 - UNINIT_CTOR
     hostIf_WiFi_SSID(int dev_id);
     ~hostIf_WiFi_SSID() {};
 

@@ -42,7 +42,7 @@
 class hostIf_WiFi_EndPoint_Security {
 
     static  GHashTable *ifHash;
-    int dev_id;
+    int dev_id  = 0;  //CID:103185 - UNINIT_CTOR
     hostIf_WiFi_EndPoint_Security(int dev_id);
     ~hostIf_WiFi_EndPoint_Security() {};
 

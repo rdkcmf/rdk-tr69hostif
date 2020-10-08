@@ -273,8 +273,10 @@ int hostIf_IPActivePort::get_Device_IP_ActivePort_LocalIPAddress(HOSTIF_MsgData_
         *pChanged =  true;
     }
     bCalledLocalIPAddress = true;
-    strncpy(backupLocalIPAddress,activePort.localIpAddress,_LENGTH_IPADDR );
-    strncpy(stMsgData->paramValue,activePort.localIpAddress,_LENGTH_IPADDR );
+    strncpy(backupLocalIPAddress,activePort.localIpAddress,sizeof(backupLocalIPAddress) -1);  //CID:136360 - Buffer size warning
+    backupLocalIPAddress[sizeof(backupLocalIPAddress) -1] = '\0';
+    strncpy(stMsgData->paramValue,activePort.localIpAddress,sizeof(stMsgData->paramValue) -1);
+    stMsgData->paramValue[sizeof(stMsgData->paramValue) -1] = '\0';
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen( activePort.localIpAddress);
 
@@ -336,8 +338,10 @@ int hostIf_IPActivePort::get_Device_IP_ActivePort_RemoteIPAddress(HOSTIF_MsgData
         *pChanged =  true;
     }
     bCalledRemoteIPAddress = true;
-    strncpy(backupRemoteIPAddress,activePort.remoteIpAddress,_LENGTH_IPADDR );
-    strncpy(stMsgData->paramValue,activePort.remoteIpAddress,_LENGTH_IPADDR );
+    strncpy(backupRemoteIPAddress,activePort.remoteIpAddress,sizeof(backupRemoteIPAddress) -1);  //CID:136383 - Buffer size warning
+    backupRemoteIPAddress[sizeof(backupRemoteIPAddress) -1] = '\0';
+    strncpy(stMsgData->paramValue,activePort.remoteIpAddress,sizeof(stMsgData->paramValue) -1);
+    stMsgData->paramValue[sizeof(stMsgData->paramValue) -1] = '\0';
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen( activePort.remoteIpAddress);
     return OK;

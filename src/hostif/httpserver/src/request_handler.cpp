@@ -384,7 +384,10 @@ static WDMP_STATUS validateAgainstDataModel(REQ_TYPE reqType, char* paramName, c
    *bsUpdate = getBSUpdateEnum(dmParam.bsUpdate);
    if(reqType == GET)
    {
-       *dataType = getWdmpDataType(dmParam.dataType);
+       if(dmParam.dataType != NULL)
+       {
+          *dataType = getWdmpDataType(dmParam.dataType);  //CID:89885 - FORWARD NULL
+       }
        if(dmParam.defaultValue)
           *defaultValue = strdup(dmParam.defaultValue);
    }

@@ -273,7 +273,7 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
         break;
 
     case eStatus:
-        memset(hostIf_EthernetInterface::stEthInterface.status,'\0',S_LENGTH);
+        memset(hostIf_EthernetInterface::stEthInterface.status,'\0',sizeof(hostIf_EthernetInterface::stEthInterface.status));   //CID:45367 - OVERRUN
 
         if (OK != getEthernetInterfaceName (ethInterfaceNum, ethernetInterfaceName))
             return 0;

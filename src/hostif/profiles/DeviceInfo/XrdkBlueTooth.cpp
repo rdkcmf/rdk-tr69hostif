@@ -685,7 +685,8 @@ int hostIf_DeviceInfoRdk_xBT::getDiscoveredDevice_DeviceType(HOSTIF_MsgData_t *s
             if (pType)
             {
                 RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: The Discovered Devices (index : %d) device type is \'%s\'.\n", __FUNCTION__, devIndex-1, pType);
-                strncpy(stMsgData->paramValue, pType, TR69HOSTIFMGR_MAX_PARAM_LEN);
+                strncpy(stMsgData->paramValue, pType, sizeof(stMsgData->paramValue) -1);  //CID:136537 - Buffer size warning
+                stMsgData->paramValue[sizeof(stMsgData->paramValue) -1] = '\0';
             }
             else
             {
@@ -922,7 +923,8 @@ int hostIf_DeviceInfoRdk_xBT::getPairedDevice_Profile(HOSTIF_MsgData_t *stMsgDat
 
             RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: The Paired Devices (index : %d) profile is \'%s\'.\n", __FUNCTION__, devIndex-1, serviceInfo);
             memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
-            strncpy(stMsgData->paramValue, serviceInfo, TR69HOSTIFMGR_MAX_PARAM_LEN);
+            strncpy(stMsgData->paramValue, serviceInfo, sizeof(stMsgData->paramValue) -1);  //CID:136585 - Buffer size warning
+            stMsgData->paramValue[sizeof(stMsgData->paramValue) -1] = '\0';
         }
         else
         {
@@ -1106,7 +1108,8 @@ int hostIf_DeviceInfoRdk_xBT::getPairedDevice_DeviceType(HOSTIF_MsgData_t *stMsg
             if (pType)
             {
                 RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: The Paired Devices (index : %d) device type is \'%s\'.\n", __FUNCTION__, devIndex-1, pType);
-                strncpy(stMsgData->paramValue, pType, TR69HOSTIFMGR_MAX_PARAM_LEN);
+                strncpy(stMsgData->paramValue, pType, sizeof(stMsgData->paramValue) -1);  //CID:136581 - Buffer size warning
+                stMsgData->paramValue[sizeof(stMsgData->paramValue) -1] = '\0';
             }
             else
             {
@@ -1347,7 +1350,8 @@ int hostIf_DeviceInfoRdk_xBT::getDeviceInfo_Profile(HOSTIF_MsgData_t *stMsgData)
             }
 
             RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Profile is \'%s\'.\n", __FUNCTION__, __LINE__, serviceInfo);
-            strncpy(stMsgData->paramValue, serviceInfo, TR69HOSTIFMGR_MAX_PARAM_LEN);
+            strncpy(stMsgData->paramValue, serviceInfo, sizeof(stMsgData->paramValue) -1);  //CID:136500 - Buffer size warning
+            stMsgData->paramValue[sizeof(stMsgData->paramValue) -1] = '\0';
         }
         else
         {
@@ -1490,7 +1494,8 @@ int hostIf_DeviceInfoRdk_xBT::getConnectedDevice_DeviceType(HOSTIF_MsgData_t *st
             if (pType)
             {
                 RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: The Connected Devices (index : %d) device type is \'%s\'.\n", __FUNCTION__, devIndex-1, pType);
-                strncpy(stMsgData->paramValue, pType, TR69HOSTIFMGR_MAX_PARAM_LEN);
+                strncpy(stMsgData->paramValue, pType, sizeof(stMsgData->paramValue) -1);  //CID:136567  - Buffer size warning
+                stMsgData->paramValue[sizeof(stMsgData->paramValue) -1] = '\0';
             }
             else
             {

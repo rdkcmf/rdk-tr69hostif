@@ -1022,7 +1022,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_FirstUseDate(HOSTIF_MsgData_t * stM
     }
 
     tm = gmtime(&(st.st_mtime));
-    strftime(buffer, 80,  "%Y-%m-%dT%H:%M:%S", tm);
+    strftime(buffer, sizeof(buffer),  "%Y-%m-%dT%H:%M:%S", tm);  //CID:81299 - OVERRUN
     strftime(timeZoneTmp, sizeof(timeZoneTmp),  "%z", tm);
     sprintf(buffer + strlen(buffer), ".%.6d%s", tm->tm_sec, timeZoneTmp);
 
@@ -1298,7 +1298,8 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(HOSTIF_MsgData
             *pChanged =  true;
         }
         bCalledX_COMCAST_COM_STB_IP = true;
-        strncpy(backupX_COMCAST_COM_STB_IP,ipaddr.c_str(),_BUF_LEN_64 );
+        strncpy(backupX_COMCAST_COM_STB_IP,ipaddr.c_str(),sizeof(backupX_COMCAST_COM_STB_IP) -1);  //CID:136623 - Buffer size warning
+        backupX_COMCAST_COM_STB_IP [sizeof(backupX_COMCAST_COM_STB_IP) -1] = '\0';
         memset(stMsgData->paramValue, '\0', _BUF_LEN_64);
         stMsgData->paramLen = ipaddr.length();
         strncpy(stMsgData->paramValue, ipaddr.c_str(), stMsgData->paramLen);
@@ -1447,7 +1448,8 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(H
                 }
 
                 bCalledX_COMCAST_COM_FirmwareFilename = true;
-                strncpy(backupX_COMCAST_COM_FirmwareFilename,pch,_BUF_LEN_64 );
+                strncpy(backupX_COMCAST_COM_FirmwareFilename,pch,sizeof(backupX_COMCAST_COM_FirmwareFilename) -1);  //CID:136569 - Buffer size
+                backupX_COMCAST_COM_FirmwareFilename[sizeof(backupX_COMCAST_COM_FirmwareFilename) -1] = '\0';
                 strncpy(stMsgData->paramValue,pch,_BUF_LEN_64 );
                 strncpy((char *) stMsgData->paramValue, pch, stMsgData->paramLen +1 );
             }
@@ -1916,7 +1918,7 @@ int hostIf_DeviceInfo::get_xOpsDMLogsUploadStatus(HOSTIF_MsgData_t *stMsgData)
     if (curLogUploadStatus == NULL)
     {
         sprintf (curLogUploadStatus, "Unknown: Failed to malloc %d bytes.", n);
-        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] curLogUploadStatus = %s\n", __FUNCTION__, curLogUploadStatus);
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] curLogUploadStatus is Null\n", __FUNCTION__);   //CID:84731 - Forward Null
     }
     else if ((logUpfile = fopen (CURRENT_LOG_UPLOAD_STATUS, "r")) == NULL)
     {
@@ -2472,7 +2474,8 @@ int hostIf_DeviceInfo::get_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
     }
     else
     {
-        strncpy(stMsgData->paramValue, reverseSSHArgs.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
+        strncpy(stMsgData->paramValue, reverseSSHArgs.c_str(), sizeof(stMsgData->paramValue) -1);  //CID:136563 - Buffer size warning
+        stMsgData->paramValue[sizeof(stMsgData->paramValue) -1] = '\0';
     }
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting ... \n",__FUNCTION__);
     return OK;
@@ -2572,7 +2575,8 @@ int hostIf_DeviceInfo::get_xOpsReverseSshStatus(HOSTIF_MsgData_t *stMsgData)
 
     if (isRsshactive())
     {
-        strncpy(stMsgData->paramValue, activeStr.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN );
+        strncpy(stMsgData->paramValue, activeStr.c_str(), sizeof(stMsgData->paramValue) -1);  //CID:136402 - Buffer size warning
+        stMsgData->paramValue[sizeof(stMsgData->paramValue) -1] = '\0';
     }
     else
     {
@@ -3196,7 +3200,8 @@ int hostIf_DeviceInfo::readFirmwareInfo(char *param, HOSTIF_MsgData_t * stMsgDat
             pch++;
         }
         memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
-        strncpy(stMsgData->paramValue, pch, TR69HOSTIFMGR_MAX_PARAM_LEN );
+        strncpy(stMsgData->paramValue, pch, sizeof(stMsgData->paramValue) -1);  //CID:136525 - Buffer size warning
+        stMsgData->paramValue[sizeof(stMsgData->paramValue) -1] = '\0';
         stMsgData->paramtype = hostIf_StringType;
         stMsgData->paramLen = strlen(pch);
         delete[] cstr;
@@ -3356,7 +3361,7 @@ string hostIf_DeviceInfo::getStbMacIf_fr_devProperties()
         char *stbMacIf = getenvOrDefault ((char *)"DEFAULT_ESTB_INTERFACE", "");
 
         int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
-        if(fd) {
+        if(fd > 0) {
             strncpy(ifr.ifr_name, stbMacIf,IFNAMSIZ-1);
             if (0 == ioctl(fd, SIOCGIFHWADDR, &ifr)) {
                 unsigned char *mac = NULL;
@@ -3373,6 +3378,11 @@ string hostIf_DeviceInfo::getStbMacIf_fr_devProperties()
             else {
                 RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed in ioctl() with  \'%s\'..\n", __FUNCTION__, __LINE__, strerror (errno) );
             }
+            close (fd);  //CID:89478 - NEGATIVE RETURNS
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Socket failed with  \'%s\'..\n", __FUNCTION__, __LINE__, strerror (errno) );
             close (fd);
         }
     } catch (const std::exception &e) {

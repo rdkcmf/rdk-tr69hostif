@@ -47,6 +47,7 @@
 #include <net/if.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <errno.h>
 #include "Device_IP.h"
 
 
@@ -544,7 +545,8 @@ int hostIf_IPInterface::get_Interface_Status(HOSTIF_MsgData_t *stMsgData, bool *
     }
     bCalledStatus = true;
     strncpy(stMsgData->paramValue,stIPInterfaceInstance.status,TR69HOSTIFMGR_MAX_PARAM_LEN );
-    strncpy(backupStatus,stIPInterfaceInstance.status,_BUF_LEN_16 );
+    strncpy(backupStatus,stIPInterfaceInstance.status,sizeof(backupStatus) -1);  //CID:136596 - Buffer size warning
+    backupStatus[sizeof(backupStatus) -1] = '\0';
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stIPInterfaceInstance.status);
 
@@ -812,8 +814,15 @@ void hostIf_IPInterface::getActiveFlags (char* nameOfInterface, struct ifreq& if
     memset (&ifr, 0, sizeof(ifr));
     strcpy (ifr.ifr_name, nameOfInterface);
     int fd = socket (PF_INET, SOCK_DGRAM, IPPROTO_IP);
-    ioctl (fd, SIOCGIFFLAGS, &ifr);
-    close (fd);
+    if(fd > 0)
+    {
+        ioctl (fd, SIOCGIFFLAGS, &ifr);
+        close (fd);
+    }
+    else
+    {
+        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s(): fd: %d, Failed due to [\'%s\' (%d)] \n", __FUNCTION__, fd, strerror(errno), errno);  //CID:18636 - NEGATIVE RETURNS
+    }
 }
 
 bool hostIf_IPInterface::isLoopback (char* nameOfInterface)
@@ -842,8 +851,16 @@ int hostIf_IPInterface::getMTU (char* nameOfInterface)
     memset (&ifr, 0, sizeof(ifr));
     strcpy (ifr.ifr_name, nameOfInterface);
     int fd = socket (PF_INET, SOCK_DGRAM, IPPROTO_IP);
-    ioctl (fd, SIOCGIFMTU, &ifr);
-    close (fd);
+    if(fd > 0)
+    {
+        ioctl (fd, SIOCGIFMTU, &ifr);
+        close (fd);
+    }
+    else
+    {
+        RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s(): fd: %d, Failed due to [\'%s\' (%d)] \n", __FUNCTION__,fd, strerror(errno), errno);  //CID:18626 - NEGATIVE RETURNS
+        close (fd);
+    }
     return ifr.ifr_mtu;
 }
 

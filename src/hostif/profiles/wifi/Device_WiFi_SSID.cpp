@@ -112,13 +112,13 @@ hostIf_WiFi_SSID::hostIf_WiFi_SSID(int dev_id):
     enable(false),
     LastChange(0)
 {
-    memset(status,0 , BUFF_LENGTH_64);
-    memset(alias, 0, BUFF_LENGTH_64);
-    memset(name,0, BUFF_LENGTH_32);
-    memset(LowerLayers,0, BUFF_LENGTH_1024);
-    memset(BSSID,0, BUFF_MAC);
-    memset(MACAddress,0, BUFF_MAC);
-    memset(SSID,0, BUFF_LENGTH_32);
+    memset(status,0 , sizeof(status));  //CID:103996 - OVERRUN
+    memset(alias, 0, sizeof(alias));  //CID:103531 - OVERRUN
+    memset(name,0, sizeof(name));
+    memset(LowerLayers,0, sizeof(LowerLayers));
+    memset(BSSID,0, sizeof(BSSID));
+    memset(MACAddress,0, sizeof(MACAddress));
+    memset(SSID,0, sizeof(SSID));  //CID:103108 - OVERRUN
 }
 
 int hostIf_WiFi_SSID::get_Device_WiFi_SSID_Fields(int ssidIndex)

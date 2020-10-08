@@ -107,6 +107,7 @@ hostIf_WiFi_AccessPoint_AssociatedDevice::hostIf_WiFi_AccessPoint_AssociatedDevi
     Retransmissions(0),
     Active(false)
 {
+    m_mutex = NULL;  //CID:103455 - UNINIT_CTOR
     memset(MACAddress, 0, 17);
 }
 
