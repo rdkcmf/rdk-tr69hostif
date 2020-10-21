@@ -1196,6 +1196,20 @@ public:
     * @retval NOK if operation fails.
     */
     int set_xOpsDeviceMgmt_hwHealthTest_DramThreshold(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_RFC_hwHealthTestWAN_WANEndPointURL
+    *
+    * This method is used to set the hardware health test WAN test case URL.
+    * URL to be used to check public WAN connectivity.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.hwHealthTestWAN.WANTestEndPointURL
+    *   Data type: string - URL to set.
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_RFC_hwHealthTestWAN_WANEndPointURL(HOSTIF_MsgData_t *);
 #endif /* USE_HWSELFTEST_PROFILE */
 
     int validate_ParamValue(HOSTIF_MsgData_t *);
