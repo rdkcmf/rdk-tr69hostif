@@ -495,7 +495,9 @@ int main(int argc, char *argv[])
 
     g_main_loop_unref (main_loop);
     g_thread_join(hostIf_JsonIfThread);
+#ifndef NEW_HTTP_SERVER_DISABLE
     g_thread_join(HTTPServerThread);
+#endif
     g_thread_join(updateHandler_runThread);    
     pthread_join(parodus_init_tid,NULL);
 
