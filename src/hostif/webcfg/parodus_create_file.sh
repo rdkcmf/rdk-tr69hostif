@@ -38,6 +38,20 @@ CURL_FILE_RESPONSE="/tmp/adzvfchig-conf.mch"
 
 #source /etc/utopia/service.d/log_capture_path.sh
 
+get_PartnerIdFromAuthService()
+{
+    # use partner-id from auth service
+    if getDeviceIdResponse=$(curl -f -s -d POST http://127.0.0.1:50050/authService/getDeviceId); then
+	PartnerId=$(echo $getDeviceIdResponse | cut -d\, -f2 | tr -d \} | cut -d: -f2 | tr -d \" | xargs)
+	#echo "$(date) authservice returned Partner-id as \"$PartnerId\""
+    fi
+    if [ "$PartnerId" == "" ] || [ "$PartnerId" == "unknown" ]; then
+        PartnerId=""
+    else
+        PartnerId="*,$PartnerId"
+    fi
+}
+
 runcURL()
 {
 		if [ -f /usr/bin/configparamgen ]; then
@@ -53,10 +67,12 @@ runcURL()
 					#echo "Parodus: SER_NUM is $SER_NUM"
 					#echo "Parodus: Transaction-Id is $UUID"
 					#echo "Parodus: WEBCONFIG_INTERFACE is $WEBCONFIG_INTERFACE"
+					get_PartnerIdFromAuthService
+					#echo "WEBCONFIG: PartnerId is $PartnerId"
 					retry_count=1
 					while [ true ]
 					do
-						CURL_TOKEN="curl -w '%{http_code}\n'  --output $CURL_RESPONSE --cacert $CERT_PATH  -E $CURL_FILE --header X-Midt-Mac-Address:\"$MAC\" --header X-Midt-Serial-Number:\"$SER_NUM\" --header X-Midt-Uuid:\"$UUID\" --header X-Midt-Transaction-Id:\"$UUID\" $SERVER_URL"
+						CURL_TOKEN="curl -w '%{http_code}\n'  --output $CURL_RESPONSE --cacert $CERT_PATH  -E $CURL_FILE --header X-Midt-Mac-Address:\"$MAC\" --header X-Midt-Serial-Number:\"$SER_NUM\" --header X-Midt-Uuid:\"$UUID\" --header X-Midt-Transaction-Id:\"$UUID\" --header X-Midt-Partner-Id:\"$PartnerId\" $SERVER_URL"
 						result= eval $CURL_TOKEN > $HTTP_CODE
 						ret=$?
 						sleep 1
