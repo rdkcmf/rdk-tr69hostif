@@ -29,6 +29,7 @@
 #include "libpd.h"
 #include "hostIf_tr69ReqHandler.h"
 #include "webpa_notification.h"
+#include "Device_DeviceInfo.h"
 #include "cJSON.h"
 
 #define NOTIFY_PARAM_VALUE_CHANGE  ""
@@ -38,6 +39,16 @@ GAsyncQueue* NotificationHandler::notificationQueue = NULL;
 
 static void addToJsonObject (cJSON* json, const char* key, const char* value, const WAL_DATA_TYPE type);
 static void converttoWalType(HostIf_ParamType_t paramType,WAL_DATA_TYPE* pwalType);
+
+typedef struct _notify_params
+{
+    char * delay;
+    char * time;
+    char * status;
+    char * download_status;
+    char * system_ready_time;
+} notify_params_t;
+
 
 //Constructor
 NotificationHandler::NotificationHandler()
@@ -71,14 +82,14 @@ void NotificationHandler::registerUpdateCallback(parodusNotificationCallback cb)
 
 void NotificationHandler::pushNotification(const char* destination, const char* payload)
 {
-    NotifyData* notifyDataPtr;
-    Notify_Data* notify_data;
-    ParamNotify* paramNotify;
+    NotifyData* notifyDataPtr = NULL;
+    Notify_Data* notify_data = NULL;
+    ParamNotify* paramNotify = NULL;
 
     if (NULL == notificationQueue || NULL == notifyUpdateCallback)
     {
         RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: notificationQueue = %p, notifyUpdateCallback %p \n",
-                __FUNCTION__, notificationQueue, notifyUpdateCallback);
+                 __FUNCTION__, notificationQueue, notifyUpdateCallback);
     }
     else if (NULL == destination || NULL == payload)
     {
@@ -149,6 +160,7 @@ void NotificationHandler::pushKeyValueNotification(const char* destination, cons
     NotificationHandler::getInstance()->pushNotification(destination, payload);
 }
 
+
 void addToJsonObject (cJSON* json, const char* key, const char* value, const WAL_DATA_TYPE type)
 {
     switch (type)
@@ -216,6 +228,74 @@ static void converttoWalType(HostIf_ParamType_t paramType,WAL_DATA_TYPE* pwalTyp
     default:
         *pwalType = WAL_STRING;
         break;
+    }
+}
+
+void NotificationHandler::push_device_mgmt_notifications(char* delay, char* time, char* download_status, char* status, char* system_ready_time)
+{
+    int sendStatus = -1;
+    cJSON *notifyPayload = NULL;
+    unsigned long bootTime = 0;
+
+    LOG_ENTRY_EXIT;
+
+    notifyPayload = cJSON_CreateObject();
+
+    if(notifyPayload != NULL)
+    {
+        cJSON_AddStringToObject(notifyPayload,"device_id", getNotifySource ());
+        if(status !=NULL)
+        {
+            cJSON_AddStringToObject(notifyPayload,"status", status);
+        }
+        if(time !=NULL)
+        {
+            cJSON_AddStringToObject(notifyPayload,"start-time", time);
+        }
+
+        if(download_status !=NULL)
+        {
+            cJSON_AddStringToObject(notifyPayload,"download-status", (strcmp(download_status, "true") == 0)?"success":"failure");
+        }
+
+        if ((status !=NULL) && (strcmp(status, "reboot-pending") == 0))
+        {
+            HOSTIF_MsgData_t stBootUpData = {0};
+            hostIf_DeviceInfo::getInstance(0)->get_X_RDKCENTRAL_COM_BootTime(&stBootUpData);
+            bootTime = get_ulong(stBootUpData.paramValue);
+            cJSON_AddNumberToObject(notifyPayload,"boot-time", bootTime);
+
+            char* lastRebootReason = NULL;
+            HOSTIF_MsgData_t stMgsData = {0};
+            hostIf_DeviceInfo::getInstance(0)->get_X_RDKCENTRAL_COM_LastRebootReason(&stMgsData);
+            lastRebootReason = stMgsData.paramValue;
+            RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "LastRebootReason is %s\n", lastRebootReason);
+
+            if(lastRebootReason !=NULL)
+            {
+                cJSON_AddStringToObject(notifyPayload,"reboot-reason", lastRebootReason);
+            }
+
+            if(delay !=NULL)
+            {
+                cJSON_AddNumberToObject(notifyPayload,"delay", atoi(delay));
+            }
+        }
+
+        if ((status !=NULL) && (strcmp(status, "fully-manageable") == 0) && (system_ready_time != NULL))
+        {
+            HOSTIF_MsgData_t stBootUpData = {0};
+            hostIf_DeviceInfo::getInstance(0)->get_X_RDKCENTRAL_COM_BootTime(&stBootUpData);
+            bootTime = get_ulong(stBootUpData.paramValue);
+            cJSON_AddNumberToObject(notifyPayload,"boot-time", bootTime);
+            cJSON_AddNumberToObject(notifyPayload,"system-ready-time", atoi(system_ready_time));
+        }
+
+        char* payload = cJSON_PrintUnformatted (notifyPayload);
+        cJSON_Delete(notifyPayload);
+
+        const char *destination = "event:device-status";
+        NotificationHandler::getInstance()->pushNotification(destination, payload);
     }
 }
 

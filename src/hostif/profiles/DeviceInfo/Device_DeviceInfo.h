@@ -126,48 +126,54 @@
 #define LOG_UPLOAD_SCR	"/lib/rdk/UploadLogsNow.sh"
 #define CURRENT_LOG_UPLOAD_STATUS "/opt/loguploadstatus.txt"
 
-#define xOpsDMUploadLogsNow_STR 	"Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMUploadLogsNow"
-#define xOpsDMLogsUploadStatus_STR 	"Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMLogsUploadStatus"
+#define XRDK_BOOT_TIME                                  "Device.DeviceInfo.X_RDKCENTRAL-COM_BootTime"
+#define xFirmwareDownloadNow_STR                        "Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadNow" /* boolean [w] Trigger download on set true. */
+#define X_RDKCENTRAL_COM_LastRebootReason               "Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason"
 
-#define TR181_AUTOREBOOT_ENABLE         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.AutoReboot.Enable"
+/* Profile: X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging. */
+#define xOpsDMUploadLogsNow_STR                         "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMUploadLogsNow"
+#define xOpsDMLogsUploadStatus_STR                      "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMLogsUploadStatus"
+#define xOpsDMMoCALogEnabled                            "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMMoCALogEnabled"
+#define xOpsDMMoCALogPeriod                             "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMMoCALogPeriod"
+/* Profile: X_RDKCENTRAL-COM_xOpsDeviceMgmt.ReverseSSH. */
+#define xOpsReverseSshTrigger_STR                       "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.ReverseSSH.xOpsReverseSshTrigger"
+#define xOpsReverseSshArgs_STR                          "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.ReverseSSH.xOpsReverseSshArgs"
+#define xOpsReverseSshStatus_STR                        "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.ReverseSSH.xOpsReverseSshStatus"
+#define xOpsForwardSshEnable_STR                        "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.ForwardSSH.Enable"
+/* Profile: X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC. */
+#define X_OPS_RPC_PROFILE                               "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC."
+#define X_OPS_RPC_REBOOTNOW                             "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.RebootNow"
+#define X_OPS_RPC_DEV_MANAGEABLE_NOTIFICATION           "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.DeviceManageableNotification"
+#define X_OPS_RPC_FW_DNLD_STARTED_NOTIFICATION          "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.FirmwareDownloadStartedNotification"
+#define X_OPS_RPC_FW_DNLD_COMPLETED_NOTIFICATION        "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.FirmwareDownloadCompletedNotification"
+#define X_OPS_RPC_REBOOT_PENDING_NOTIFICATION           "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.RebootPendingNotification"
+#define X_RDK_RFC_MANGEBLENOTIFICATION_ENABLE           "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ManageableNotification.Enable"
+/* Profile: X_RDKCENTRAL-COM_RFC */
+#define TR181_RFC_PREFIX                                "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC"
+#define TR181_RFC_RESET_DATA_START                      "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.ClearDB"
+#define TR181_RFC_RESET_DATA_END                        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.ClearDBEnd"
+#define HDR_DV_RFC_ENABLE                               "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DolbyVision.Enable"
+/* Profile: X_RDKCENTRAL-COM_RFC.Feature */
+#define RFC_WL_ROAM_TRIGGER_RF                          "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RoamTrigger"
+#define MS12_DAPV2_RFC_ENABLE                           "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MS12.DAPv2_Enable"
+#define MS12_DE_RFC_ENABLE                              "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MS12.DE_Enable"
+#define LE_RFC_ENABLE                                   "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LoudnessEquivalence.Enable"
+#define HDR_RFC_ENABLE                                  "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HdrEnable.Enable"
+#define UHD_RFC_ENABLE                                  "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.UhdEnable.Enable"
+#define XRE_CONTAINER_RFC_ENABLE                        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LXC.XRE.Enable"
+#define TR181_AUTOREBOOT_ENABLE                         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.AutoReboot.Enable"
+/* Profile: X_RDKCENTRAL-COM_RFC.Control */
+#define RFC_CTL_RETRIEVE_NOW                            "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.RetrieveNow"
+/* Profile: X_RDKCENTRAL-COM_IPRemoteSupport */
+#define IPREMOTE_SUPPORT                                "Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.Enable"
+#define IPREMOTE_IPADDRESS                              "Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.IPAddr"
+#define IPREMOTE_MACADDRESS                             "Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.MACAddr"
+/* Profile: X_RDKCENTRAL-COM_XRPolling */
+#define XRPOLLING_ACTION                                "Device.DeviceInfo.X_RDKCENTRAL-COM_XRPolling.Action"
 
-#define xOpsDMMoCALogEnabled 	"Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMMoCALogEnabled"
-#define xOpsDMMoCALogPeriod 	"Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMMoCALogPeriod"
-
-#define xOpsReverseSshTrigger_STR "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.ReverseSSH.xOpsReverseSshTrigger"
-#define xOpsReverseSshArgs_STR "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.ReverseSSH.xOpsReverseSshArgs"
-#define xOpsReverseSshStatus_STR "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.ReverseSSH.xOpsReverseSshStatus"
-
-#define xOpsForwardSshEnable_STR "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.ForwardSSH.Enable"
-
-#define XRDK_BOOT_TIME "Device.DeviceInfo.X_RDKCENTRAL-COM_BootTime"
-
-#define xOpsRPCRebootNow "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.RPC.RebootNow"
-
-#define TR181_RFC_PREFIX	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC"
-#define TR181_RFC_RESET_DATA_START     "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.ClearDB"
-#define TR181_RFC_RESET_DATA_END		"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.ClearDBEnd"
-#define HDR_DV_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DolbyVision.Enable"
+#define PARTNER_ID                                      "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId"
 
 
-#define RFC_WL_ROAM_TRIGGER_RF	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RoamTrigger"
-#define MS12_DAPV2_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MS12.DAPv2_Enable"
-#define MS12_DE_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MS12.DE_Enable"
-#define LE_RFC_ENABLE   "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LoudnessEquivalence.Enable"
-#define HDR_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HdrEnable.Enable"
-#define UHD_RFC_ENABLE	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.UhdEnable.Enable"
-#define XRE_CONTAINER_RFC_ENABLE "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LXC.XRE.Enable"
-
-#define RFC_CTL_RETRIEVE_NOW	"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.RetrieveNow"
-
-#define xFirmwareDownloadNow_STR	"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadNow" /* boolean [w] Trigger download on set true. */
-
-#define IPREMOTE_SUPPORT  "Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.Enable"
-#define IPREMOTE_IPADDRESS "Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.IPAddr"
-#define IPREMOTE_MACADDRESS "Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.MACAddr"
-#define XRPOLLING_ACTION  "Device.DeviceInfo.X_RDKCENTRAL-COM_XRPolling.Action"
-
-#define PARTNER_ID "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId"
 /**
  * @brief This class provides the interface for getting device information.
  * @ingroup TR69_HOSTIF_DEVICEINFO_CLASSES
@@ -223,7 +229,11 @@ class hostIf_DeviceInfo {
     static XRFCStorage m_rfcStorage;
 #endif
     static XBSStore *m_bsStore;
-    static string m_xrPollingAction;
+    static string       m_xrPollingAction;
+
+    std::string         m_strXOpsDevManageableNotification;
+    std::string         m_strXOpsRPCFwDwldStartedNotification;
+    bool                m_bXOpsRPCFwDwldCompletedNotification;
 
     string getEstbIp();
     bool isRsshactive();
@@ -239,8 +249,23 @@ class hostIf_DeviceInfo {
     int set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *);
 
     int set_xRDKCentralComRFCRetrieveNow(HOSTIF_MsgData_t *);
-    int set_xRDKCentralComRFCAutoRebootEnable(HOSTIF_MsgData_t*);  
+
+    /* AutoReboot handlers */
+    int set_xRDKCentralComRFCAutoRebootUptime(HOSTIF_MsgData_t*);
+    int set_xRDKCentralComRFCAutoRebootEnable(HOSTIF_MsgData_t*);
     int ScheduleAutoReboot(bool);
+
+    int get_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t *);
+    int get_xOpsRPCDevManageableNotification(HOSTIF_MsgData_t *);
+    int get_xOpsRPCFwDwldStartedNotification(HOSTIF_MsgData_t *);
+    int get_xOpsRPCFwDwldCompletedNotification(HOSTIF_MsgData_t*);
+    int get_xOpsRPCRebootPendingNotification(HOSTIF_MsgData_t*);
+    int set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t *);
+    int set_xOpsRPCDevManageableNotification(HOSTIF_MsgData_t *);
+    int set_xOpsRPCFwDwldStartedNotification(HOSTIF_MsgData_t *);
+    int set_xOpsRPCFwDwldCompletedNotification(HOSTIF_MsgData_t*);
+    int set_xOpsRPCRebootPendingNotification(HOSTIF_MsgData_t*);
+    static void systemMgmtTimePathMonitorThr();
 
 public:
 
@@ -256,8 +281,11 @@ public:
 
     static void releaseLock();
 
+    static void send_DeviceManageableNotification();
+
     GHashTable* getNotifyHash();
 
+//    void runSystemMgmtTimePathMonitor();
     /**
     * Description. This is the getter api for DeviceInfo for
     *  Device.DeviceInfo Profile.
@@ -1029,7 +1057,9 @@ public:
     * @retval OK if it is successful.
     * @retval NOK if operation fails.
     */
-    int set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t *);
+    int get_xOpsRPC_Profile(HOSTIF_MsgData_t *);
+    int set_xOpsRPC_Profile(HOSTIF_MsgData_t *);
+
 
     int get_xOpsDeviceMgmtForwardSSHEnable (HOSTIF_MsgData_t *);
 
@@ -1038,48 +1068,48 @@ public:
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *, bool *pChanged = NULL);
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(HOSTIF_MsgData_t *);
 
-   /*
-    * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpaddress
-    *
-    * This method is to get the ipremote interface ipaddress.
-    * with following TR-069 definition:
-    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.IPAddr
-    *   Data type: String - Arguments Ipaddress
-    *
-    * @retval OK if it is successful.
-    * @retval NOK if operation fails.
-    */
+    /*
+     * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpaddress
+     *
+     * This method is to get the ipremote interface ipaddress.
+     * with following TR-069 definition:
+     *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.IPAddr
+     *   Data type: String - Arguments Ipaddress
+     *
+     * @retval OK if it is successful.
+     * @retval NOK if operation fails.
+     */
 
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpaddress(HOSTIF_MsgData_t *);
 
-   /*
-    * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMACaddress
-    *
-    * This method is to get the ipremote interface MAC address.
-    * with following TR-069 definition:
-    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.MACAddr
-    *   Data type: String - Arguments MACaddress
-    *
-    * @retval OK if it is successful.
-    * @retval NOK if operation fails.
-    */
+    /*
+     * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMACaddress
+     *
+     * This method is to get the ipremote interface MAC address.
+     * with following TR-069 definition:
+     *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.MACAddr
+     *   Data type: String - Arguments MACaddress
+     *
+     * @retval OK if it is successful.
+     * @retval NOK if operation fails.
+     */
 
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMACaddress(HOSTIF_MsgData_t *);
 
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(HOSTIF_MsgData_t *, bool *pChanged = NULL);
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(HOSTIF_MsgData_t *);
 
-  /*
-    * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId
-    *
-    * This method is to get the PartnerId of the device.
-    * with following TR-069 definition:
-    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId
-    *   Data type: String - Arguments PartnerId
-    *
-    * @retval OK if it is successful.
-    * @retval NOK if operation fails.
-    */
+    /*
+      * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId
+      *
+      * This method is to get the PartnerId of the device.
+      * with following TR-069 definition:
+      *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId
+      *   Data type: String - Arguments PartnerId
+      *
+      * @retval OK if it is successful.
+      * @retval NOK if operation fails.
+      */
 
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId(HOSTIF_MsgData_t *);
 
@@ -1158,7 +1188,7 @@ public:
     *
     * @retval OK if it is successful.
     * @retval NOK if operation fails.
-    */    
+    */
     int set_xOpsDeviceMgmt_hwHealthTest_ExecuteTuneTest(HOSTIF_MsgData_t *);
 
     /**
@@ -1255,6 +1285,8 @@ public:
 
     int set_xFirmwareDownloadNow(HOSTIF_MsgData_t *);
 
+    int get_X_RDKCENTRAL_COM_LastRebootReason(HOSTIF_MsgData_t *);
+    int set_X_RDKCENTRAL_COM_LastRebootReason(HOSTIF_MsgData_t *);
 };
 /* End of doxygen group */
 /**

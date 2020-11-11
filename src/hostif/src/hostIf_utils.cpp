@@ -46,8 +46,11 @@ static bool gGatewayConnStatus = false;
 static bool legacyRFC = false;
 #endif
 
+const char* ntp_time_received_file="/tmp/timeReceivedNTP";
+const char *webpa_start_tm_file ="/tmp/webpa/start_time";
+
 EntryExitLogger::EntryExitLogger (const char* func, const char* file) :
-        func (func), file (file)
+    func (func), file (file)
 {
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entry: %s [%s]\n", func, file);
 }
@@ -166,13 +169,13 @@ void put_uint(char *ptr, uint val)
 
 int get_ulong(const char* ptr)
 {
-	unsigned long *ret = (unsigned long *)ptr;
+    unsigned long *ret = (unsigned long *)ptr;
     return *ret;
 }
 
 void put_ulong(char *ptr, unsigned long val)
 {
-	unsigned long *tmp = (unsigned long *)ptr;
+    unsigned long *tmp = (unsigned long *)ptr;
     *tmp = val;
 }
 
@@ -488,6 +491,73 @@ HostIf_Source_Type_t getBSUpdateEnum(const char *bsUpdate)
     else if (strcasecmp(bsUpdate, "default") == 0)
         return HOSTIF_SRC_DEFAULT;
     return HOSTIF_NONE;
+}
+
+bool isWebpaReady()
+{
+    return ((access("/tmp/webpa/start_time", F_OK) == 0)?true:false);
+}
+
+bool isNtpTimeFilePresent()
+{
+    return ((access(ntp_time_received_file, F_OK) == 0)?true:false);
+}
+
+unsigned long get_system_manageble_ntp_time()
+{
+    unsigned long ret = 0;
+    FILE* fp = fopen(ntp_time_received_file, "r");
+
+    if (fp == NULL) {
+        return ret;
+    }
+
+    char* line = NULL;
+    size_t len = 0;
+
+    if((getline(&line, &len, fp)) != -1) {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Date : \"%s\".\n", line);
+    }
+
+    fclose(fp);
+
+    struct tm tm = {0};
+    time_t epoch = 0;
+    char* s_time = NULL;
+
+    s_time =  strptime(line, "%a %b %d %H:%M:%S %Z %Y", &tm);
+
+    if (NULL != s_time ) {
+        epoch = mktime(&tm);
+        ret = (unsigned long)epoch;
+    }
+    else {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Failed to parse NTP Date Format from \'%f\' file.\n ", __FUNCTION__, ntp_time_received_file);
+    }
+    if (line) free(line);
+    return ret;
+}
+
+unsigned long get_device_manageble_time()
+{
+    unsigned long epoch_time = 0;
+    FILE *fptr = NULL;
+    int counter = 0;
+
+    do {
+        if(epoch_time || counter++ >=5 )
+            break;
+        if ((fptr = fopen(webpa_start_tm_file, "r")) != NULL) {
+            fscanf(fptr,"%ld", &epoch_time);
+            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"Device Manageble Time =%ld\n", epoch_time);
+            fclose(fptr);
+        }
+        if(epoch_time == 0)
+            sleep(1);
+    }
+    while(epoch_time == 0);
+
+    return epoch_time;
 }
 
 /** @} */

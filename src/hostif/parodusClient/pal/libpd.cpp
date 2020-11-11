@@ -26,6 +26,10 @@
 #include <unistd.h>
 #include <math.h>
 #include <pthread.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
 #include "libpd.h"
 #include "rdk_debug.h"
 #include "cJSON.h"
@@ -80,8 +84,8 @@ void libpd_set_notifyConfigFile(const char* configFile)
 
 void stop_parodus_recv_wait()
 {
-   exit_parodus_recv = true;
-   pthread_cond_signal(&parodus_cond);
+    exit_parodus_recv = true;
+    pthread_cond_signal(&parodus_cond);
 }
 /**
  * Initialize libpd and Load Data model, Invoke connection to parodus
@@ -90,7 +94,13 @@ void *libpd_client_mgr(void *)
 {
     // Load Data model
     int status =-1;
-    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Loading DB \n");
+    //RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Loading DB \n");
+    const char *fl = "/tmp/webpa";
+    int err = mkdir(fl, S_IRWXU | S_IRWXG);
+    if((err != 0) && (EEXIST == errno))
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failed to create \"%s\" folder with error no(%d). \n", fl, errno);
+    }
 
     status = checkDataModelStatus();
     if(status != 0)
@@ -126,7 +136,7 @@ static void parodus_receive_wait()
     wrp_msg_t *res_wrp_msg ;
 
     struct timespec start,end,*startPtr,*endPtr,currTime;
-    
+
     startPtr = &start;
     endPtr = &end;
     char *contentType = NULL;
@@ -169,16 +179,16 @@ static void parodus_receive_wait()
             res_wrp_msg->msg_type = wrp_msg->msg_type;
             if(wrp_msg->u.req.dest != NULL)
                 res_wrp_msg->u.req.source = strdup(wrp_msg->u.req.dest);
-            if(wrp_msg->u.req.source != NULL) 
+            if(wrp_msg->u.req.source != NULL)
                 res_wrp_msg->u.req.dest = strdup(wrp_msg->u.req.source);
-            if(wrp_msg->u.req.transaction_uuid != NULL) 
+            if(wrp_msg->u.req.transaction_uuid != NULL)
                 res_wrp_msg->u.req.transaction_uuid = strdup(wrp_msg->u.req.transaction_uuid);
-            
+
             contentType = (char *)malloc(sizeof(char)*(strlen(CONTENT_TYPE_JSON)+1));
             strncpy(contentType,CONTENT_TYPE_JSON,strlen(CONTENT_TYPE_JSON)+1);
             res_wrp_msg->u.req.content_type = contentType;
             int sendStatus = libparodus_send(libparodus_instance, res_wrp_msg);
-            
+
             if(sendStatus == 0)
             {
                 RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Sent message successfully to parodus\n");
@@ -200,7 +210,7 @@ static void parodus_receive_wait()
     }
     else
     {
-       RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failure in closing libparodus receiver, Ret = %d\n",rtn);
+        RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failure in closing libparodus receiver, Ret = %d\n",rtn);
     }
     libparodus_shutdown(&libparodus_instance);
     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"End of parodus_upstream\n");
@@ -226,16 +236,16 @@ void sendNotification(char *payload, char *source, char *destination)
     memset(notif_wrp_msg, 0, sizeof(wrp_msg_t));
 
     notif_wrp_msg ->msg_type = WRP_MSG_TYPE__EVENT;
-    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"source: %s\n",source);
+    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"source: %s\n",source);
     notif_wrp_msg ->u.event.source = strdup(source);
-    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"destination: %s\n", destination);
+    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"destination: %s\n", destination);
     notif_wrp_msg ->u.event.dest = strdup(destination);
     contentType = (char *)malloc(sizeof(char)*(strlen(CONTENT_TYPE_JSON)+1));
     strncpy(contentType,CONTENT_TYPE_JSON,strlen(CONTENT_TYPE_JSON)+1);
     notif_wrp_msg->u.event.content_type = contentType;
-    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"content_type is %s\n",notif_wrp_msg->u.event.content_type);
+    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"content_type is %s\n",notif_wrp_msg->u.event.content_type);
 
-    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Notification payload: %s\n",payload);
+    RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Notification payload: %s\n",payload);
     notif_wrp_msg ->u.event.payload = (void *)payload;
     notif_wrp_msg ->u.event.payload_size = strlen((const char*)notif_wrp_msg ->u.event.payload);
 
@@ -385,6 +395,17 @@ static void connect_parodus()
         {
             RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Init for parodus Success..!!\n");
             RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"WebPA is now ready to process requests\n");
+
+            const char* webpa_start_tm_file = "/tmp/webpa/start_time";
+
+            if(access(webpa_start_tm_file, F_OK) !=0)
+            {
+                FILE *fp = fopen(webpa_start_tm_file, "w");
+                if (fp != NULL) {
+                    fprintf(fp,"%ld", time(NULL));
+                    fclose(fp);
+                }
+            }
             break;
         }
         else

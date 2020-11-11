@@ -53,6 +53,8 @@ public:
 
     void pushValueChangeNotification(IARM_Bus_tr69HostIfMgr_EventData_t& event);
     void pushKeyValueNotification(const char* destination, const char* key, const char* value);
+    void push_device_mgmt_notifications(char* delay, char* startTime, char* dwnldStatus, char* status, char* systemReadyTime);
+
 };
 
 #endif //_HOSTIF_NOTIFICATION_HANDLER_H_

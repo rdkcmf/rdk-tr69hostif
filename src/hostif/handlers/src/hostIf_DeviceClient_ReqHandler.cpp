@@ -132,8 +132,8 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     if (stMsgData->bsUpdate != HOSTIF_NONE)
     {
         if ( (stMsgData->bsUpdate == HOSTIF_SRC_RFC && stMsgData->requestor == HOSTIF_SRC_RFC) ||
-             (stMsgData->bsUpdate == HOSTIF_SRC_ALL && (stMsgData->requestor == HOSTIF_SRC_RFC || stMsgData->requestor == HOSTIF_SRC_WEBPA)) )
-         {
+                (stMsgData->bsUpdate == HOSTIF_SRC_ALL && (stMsgData->requestor == HOSTIF_SRC_RFC || stMsgData->requestor == HOSTIF_SRC_WEBPA)) )
+        {
             hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
             stMsgData->instanceNum = instanceNumber;
             if(!pIface)
@@ -142,8 +142,8 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
                 return NOK;
             }
             ret = pIface->set_xRDKCentralComBootstrap(stMsgData);
-         }
-         else
+        }
+        else
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] Not setting the bootstrap param:%s [bsUpdate=%d, requestor=%d]\n", __FUNCTION__, stMsgData->paramName, stMsgData->bsUpdate, stMsgData->requestor);
     }
     else if(strncasecmp(stMsgData->paramName,"Device.DeviceInfo",strlen("Device.DeviceInfo"))==0)
@@ -162,12 +162,12 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
             ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(stMsgData);
         }
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareToDownload") == 0 ||
-                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareToDownload") == 0)
+                 strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareToDownload") == 0)
         {
             ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(stMsgData);
         }
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareDownloadStatus") == 0 ||
-                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadStatus") == 0)
+                 strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadStatus") == 0)
         {
             ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadStatus(stMsgData);
         }
@@ -204,14 +204,14 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_xOpsReverseSshArgs(stMsgData);
         }
-        else if (strcasecmp(stMsgData->paramName,xOpsRPCRebootNow) == 0)
+        else if (strncmp(stMsgData->paramName,X_OPS_RPC_PROFILE, strlen(X_OPS_RPC_PROFILE)) == 0)
         {
-            ret = pIface->set_xOpsDeviceMgmtRPCRebootNow (stMsgData);
+            ret = pIface->set_xOpsRPC_Profile(stMsgData);
         }
-	else if (strncasecmp(stMsgData->paramName,xOpsForwardSshEnable_STR,strlen(xOpsForwardSshEnable_STR)) == 0)
-	{
-	    ret = pIface->set_xOpsDeviceMgmtForwardSSHEnable(stMsgData);
-	}
+        else if (strncasecmp(stMsgData->paramName,xOpsForwardSshEnable_STR,strlen(xOpsForwardSshEnable_STR)) == 0)
+        {
+            ret = pIface->set_xOpsDeviceMgmtForwardSSHEnable(stMsgData);
+        }
         else if (strcasecmp(stMsgData->paramName,IPREMOTE_SUPPORT) == 0)
         {
             ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(stMsgData);
@@ -260,7 +260,7 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
 #endif /* USE_HWSELFTEST_PROFILE */
         else if (!strcasecmp(stMsgData->paramName, xFirmwareDownloadNow_STR))
         {
-        	ret = pIface->set_xFirmwareDownloadNow(stMsgData);
+            ret = pIface->set_xFirmwareDownloadNow(stMsgData);
         }
         else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadUseCodebig"))
         {
@@ -268,9 +268,9 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         }
         else
         {
-           ret = NOK;
-           stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
-           RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Failed, since Attempt To Set a NonWritable Parameter \"%s\"\n", __FUNCTION__, stMsgData->paramName);
+            ret = NOK;
+            stMsgData->faultCode = fcAttemptToSetaNonWritableParameter;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Failed, since Attempt To Set a NonWritable Parameter \"%s\"\n", __FUNCTION__, stMsgData->paramName);
         }
 
         if( ret == OK )
@@ -353,9 +353,9 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         }
         else
         {
-             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
-             stMsgData->faultCode = fcInvalidParameterName;
-             ret = NOK;   
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+            stMsgData->faultCode = fcInvalidParameterName;
+            ret = NOK;
         }
     }
     else if(matchComponent(stMsgData->paramName,"Device.DeviceInfo.Processor",&pSetting,instanceNumber))
@@ -373,9 +373,9 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         }
         else
         {
-             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
-             stMsgData->faultCode = fcInvalidParameterName;
-             ret = NOK;   
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+            stMsgData->faultCode = fcInvalidParameterName;
+            ret = NOK;
         }
     }
     else if(strncasecmp(stMsgData->paramName,"Device.DeviceInfo.ProcessStatus",strlen("Device.DeviceInfo.ProcessStatus"))==0)
@@ -397,9 +397,9 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         }
         else
         {
-             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
-             stMsgData->faultCode = fcInvalidParameterName;
-             ret = NOK;   
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+            stMsgData->faultCode = fcInvalidParameterName;
+            ret = NOK;
         }
     }
     else if(strncasecmp(stMsgData->paramName,xOpsForwardSshEnable_STR,strlen(xOpsForwardSshEnable_STR)) == 0)
@@ -503,17 +503,17 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             ret = pIface->get_Device_DeviceInfo_X_COMCAST_COM_STB_IP(stMsgData);
         }
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareFilename") == 0 ||
-                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareFilename") == 0)
+                 strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareFilename") == 0)
         {
             ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(stMsgData);
         }
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareToDownload") == 0 ||
-                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareToDownload") == 0)
+                 strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareToDownload") == 0)
         {
             ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareToDownload(stMsgData);
         }
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_FirmwareDownloadStatus") == 0 ||
-                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadStatus") == 0)
+                 strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadStatus") == 0)
         {
             ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadStatus(stMsgData);
         }
@@ -542,7 +542,7 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             ret = pIface->get_Device_DeviceInfo_SoftwareVersion(stMsgData);
         }
         else if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_COMCAST-COM_Reset") == 0 ||
-                strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_Reset") == 0)
+                 strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_Reset") == 0)
         {
             ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_Reset(stMsgData);
         }
@@ -633,11 +633,19 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             ret = pIface->get_xOpsDeviceMgmt_hwHealthTestTune_TuneResults(stMsgData);
         }
 #endif /* USE_HWSELFTEST_PROFILE */
+        else if (strncmp(stMsgData->paramName,X_OPS_RPC_PROFILE, strlen(X_OPS_RPC_PROFILE)) == 0)
+        {
+            ret = pIface->get_xOpsRPC_Profile(stMsgData);
+        }
+        else if (strncmp(stMsgData->paramName,X_RDKCENTRAL_COM_LastRebootReason, strlen(X_RDKCENTRAL_COM_LastRebootReason)) == 0)
+        {
+            ret = pIface->get_X_RDKCENTRAL_COM_LastRebootReason(stMsgData);
+        }
         else
         {
-             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
-             stMsgData->faultCode = fcInvalidParameterName;
-             ret = NOK;   
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
+            stMsgData->faultCode = fcInvalidParameterName;
+            ret = NOK;
         }
     }
     hostIf_DeviceInfo::releaseLock();
