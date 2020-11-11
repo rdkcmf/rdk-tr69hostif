@@ -53,13 +53,14 @@ thread XBSStore::partnerIdThread;
 bool XBSStore::m_stopped = false;
 mutex XBSStore::mtx_stopped;
 condition_variable XBSStore::cv;
+mutex XBSStore::g_instance_mutex;
 
 size_t static writeCurlResponse(void *ptr, size_t size, size_t nmemb, string stream)
 {
-   size_t realsize = size * nmemb;
-   string temp(static_cast<const char*>(ptr), realsize);
-   stream.append(temp);
-   return realsize;
+    size_t realsize = size * nmemb;
+    string temp(static_cast<const char*>(ptr), realsize);
+    stream.append(temp);
+    return realsize;
 }
 void XBSStore::getAuthServicePartnerID()
 {
@@ -75,7 +76,7 @@ void XBSStore::getAuthServicePartnerID()
             {
                 RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: RFC service in progress. Retry after 30 sec\n", __FUNCTION__);
                 unique_lock<mutex> lck(mtx_stopped);
-                cv.wait_for(lck, 30*sec, []{return m_stopped;});
+                cv.wait_for(lck, 30*sec, [] {return m_stopped;});
                 continue;
             }
             else
@@ -89,7 +90,7 @@ void XBSStore::getAuthServicePartnerID()
                 break;
             }
         }
-        
+
         string newPartnerId = "";
         string response;
         CURL *curl = curl_easy_init();
@@ -150,7 +151,7 @@ void XBSStore::getAuthServicePartnerID()
         {
             RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: partnerId not found. Retry after 30 sec\n", __FUNCTION__);
             unique_lock<mutex> lck(mtx_stopped);
-            cv.wait_for(lck, 30*sec, []{return m_stopped;});
+            cv.wait_for(lck, 30*sec, [] {return m_stopped;});
         }
     }
 }
@@ -166,6 +167,7 @@ void XBSStore::resetCacheAndStore()
         }   //CID:80489 - Checked Return
    }
    xbsJournalInstance->resetCacheAndStore();
+
 }
 
 bool XBSStore::loadFromJson()
@@ -325,18 +327,18 @@ bool XBSStore::setRawValue(const string &key, const string &value, HostIf_Source
             {
                 RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "Property value exists, don't have to overwrite\n");
                 if(sourceType != xbsJournalInstance->getJournalSource(key))
-                   xbsJournalInstance->setJournalValue(key, value, sourceType); //Update the journal with the latest source so that the value will not be overriden by less favored source later.
+                    xbsJournalInstance->setJournalValue(key, value, sourceType); //Update the journal with the latest source so that the value will not be overriden by less favored source later.
                 return true;
             }
         }
 
         //Keep an updated firmware value in the journal even though it is not active configuration.
         if(sourceType == HOSTIF_SRC_DEFAULT &&
-           (xbsJournalInstance->getJournalSource(key) == HOSTIF_SRC_RFC || xbsJournalInstance->getJournalSource(key) == HOSTIF_SRC_WEBPA) )
+                (xbsJournalInstance->getJournalSource(key) == HOSTIF_SRC_RFC || xbsJournalInstance->getJournalSource(key) == HOSTIF_SRC_WEBPA) )
         {
-           RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Update firmware value in journal even though it is not active..\n");
-           xbsJournalInstance->setJournalValue(key, value, sourceType);
-           return true;
+            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Update firmware value in journal even though it is not active..\n");
+            xbsJournalInstance->setJournalValue(key, value, sourceType);
+            return true;
         }
         ofstream ofs(m_filename, ios::trunc | ios::out);
         if(!ofs.is_open())
@@ -404,7 +406,7 @@ bool XBSStore::clearRfcValues()
 
     for (unordered_map<string, string>::iterator it=m_dict.begin(); it!=m_dict.end(); ++it)
     {
-       ofs << it->first << '=' << it->second << endl;
+        ofs << it->first << '=' << it->second << endl;
     }
     ofs.flush();
     ofs.close();
@@ -429,11 +431,11 @@ faultCode_t  XBSStore::overrideValue(HOSTIF_MsgData_t *stMsgData)
     }
     else if (strcasecmp(stMsgData->paramName,BS_CLEAR_DB_END) == 0)
     {
-       clearRfcValues();
-       xbsJournalInstance->rfcUpdateEnd();
-       m_rfcUpdateInProgress = false;
-       stMsgData->faultCode = fcNoFault;
-       return stMsgData->faultCode;
+        clearRfcValues();
+        xbsJournalInstance->rfcUpdateEnd();
+        m_rfcUpdateInProgress = false;
+        stMsgData->faultCode = fcNoFault;
+        return stMsgData->faultCode;
     }
 
     mtx.lock();
@@ -453,7 +455,7 @@ faultCode_t  XBSStore::overrideValue(HOSTIF_MsgData_t *stMsgData)
     }
     else if(stMsgData->requestor == HOSTIF_SRC_RFC && xbsJournalInstance->getJournalSource(stMsgData->paramName) != HOSTIF_SRC_WEBPA)
     {
-       sourceType = HOSTIF_SRC_RFC;
+        sourceType = HOSTIF_SRC_RFC;
     }
     else
     {
@@ -596,9 +598,14 @@ XBSStore* XBSStore::getInstance()
 
     if(!xbsInstance)
     {
-        xbsInstance = new XBSStore;
-        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: Start thread getAuthServicePartnerID \n", __FUNCTION__);
-        partnerIdThread = thread(getAuthServicePartnerID);
+        std::lock_guard<std::mutex> guard(g_instance_mutex);
+        if(!xbsInstance)
+        {
+            xbsInstance = new XBSStore;
+            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: Start thread getAuthServicePartnerID \n", __FUNCTION__);
+            partnerIdThread = thread(getAuthServicePartnerID);
+            partnerIdThread.detach();
+        }
     }
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s \n", __FUNCTION__);
@@ -609,5 +616,4 @@ void XBSStore::stop()
 {
     m_stopped = true;
     cv.notify_one();
-    partnerIdThread.join();
 }

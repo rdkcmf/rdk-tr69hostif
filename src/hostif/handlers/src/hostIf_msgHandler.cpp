@@ -326,7 +326,7 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
         GList *keys = list;
         while(keys) {
             char *data = (char *)keys->data;
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] DATA = %s",__FUNCTION__, data);
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] DATA = %s\n",__FUNCTION__, data);
             if(strncmp(data,pParam,strlen(data)) == 0)
             {
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] pParam: %s data:%s\n", __FUNCTION__,pParam, data);

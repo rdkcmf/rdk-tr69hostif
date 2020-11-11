@@ -30,7 +30,6 @@
 #endif
 #include "hostIf_main.h"
 #include "hostIf_tr69ReqHandler.h"
-//#include "hostIf_dsClient_ReqHandler.h"
 #include "hostIf_jsonReqHandler.h"
 
 #ifndef NEW_HTTP_SERVER_DISABLE
@@ -64,7 +63,7 @@
 
 #ifdef WEB_CONFIG_ENABLED
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #include <webcfg.h>
 }
 #endif
@@ -77,8 +76,7 @@ extern "C"{
 #endif
 
 #include "hostIf_rbus_Dml_Provider.h"
-
-//static void killAllThreads();
+#include "Device_DeviceInfo.h"
 
 //------------------------------------------------------------------------------
 // Initialize global variables and functions.
@@ -186,6 +184,9 @@ int GetFeatureEnabled(char *cmd)
     return isFeatureEnabled;
 }
 #endif
+
+
+
 
 //------------------------------------------------------------------------------
 // main: HostIfMgr main
@@ -475,7 +476,8 @@ int main(int argc, char *argv[])
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Parodus init thread create failed\n");
     }
-    
+
+
 #if defined(WEB_CONFIG_ENABLED)
     initWebConfigMultipartTask(0);
 #elif defined(WEBCONFIG_LITE_ENABLE)
@@ -498,14 +500,16 @@ int main(int argc, char *argv[])
         std::unique_lock<std::mutex> lck(mtx_httpServerThreadDone);
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Waiting(max 10 sec) for http server thread to be complete...\n");
         auto sec = chrono::seconds(1);
-        cv_httpServerThreadDone.wait_for(lck, 10*sec, []{return httpServerThreadDone;});
+        cv_httpServerThreadDone.wait_for(lck, 10*sec, [] {return httpServerThreadDone;});
     }
 #ifdef ENABLE_SD_NOTIFY
     sd_notifyf(0, "READY=1\n"
-       "STATUS=tr69hostif is Successfully Initialized\n"
-          "MAINPID=%lu", (unsigned long) getpid());
+               "STATUS=tr69hostif is Successfully Initialized\n"
+               "MAINPID=%lu", (unsigned long) getpid());
     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"tr69hostif sd notify envent  is sent  Successfully, httpServerThreadDone=%d\n", httpServerThreadDone);
 #endif
+
+    hostIf_DeviceInfo::send_DeviceManageableNotification();
 
     main_loop = g_main_loop_new (NULL, FALSE);
     g_main_loop_run(main_loop);
@@ -598,30 +602,7 @@ void exit_gracefully (int sig_received)
     }
 }
 
-//------------------------------------------------------------------------------
-// hostIf_logger: logged the messages
-//------------------------------------------------------------------------------
-#if 0
-void tr69hostIf_logger (const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
-{
-    logfilename = (gchar *)user_data;
 
-    if(NULL == logfile) {
-        logfile = g_fopen (logfilename, "a");
-        // Fall back to console output if unable to open file
-        g_print ("%s : %s\n", date_str,(char *)message);
-        return;
-    }
-    date_str = g_time_val_to_iso8601(&timeval);
-    g_fprintf (logfile, "%s : %s\n", date_str, message);
-
-    if(date_str) {
-        g_free (date_str);
-    }
-
-    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
-}
-#endif
 //------------------------------------------------------------------------------
 // hostIf_logger: logged the messages
 //------------------------------------------------------------------------------
@@ -656,7 +637,6 @@ static void usage()
         \n" << endl;
 #endif
 }
-
 
 /** @} */
 /** @} */

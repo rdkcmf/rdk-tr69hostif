@@ -106,6 +106,8 @@ void put_int(char *ptr, int val);
 
 uint get_uint(char *ptr);
 
+void put_uint(char *ptr, uint val);
+
 bool get_boolean(const char *ptr);
 
 void put_boolean(char *ptr, bool val);
@@ -166,6 +168,12 @@ void setLegacyRFCEnabled(bool value);
 bool legacyRFCEnabled();
 #endif
 HostIf_Source_Type_t getBSUpdateEnum(const char *bsUpdate);
+
+bool isWebpaReady();
+bool isNtpTimeFilePresent();
+unsigned long get_system_manageble_ntp_time();
+unsigned long get_device_manageble_time();
+
 
 #endif /* HOSTIF_UTILS_H_*/
 

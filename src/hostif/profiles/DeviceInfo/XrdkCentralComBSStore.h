@@ -50,6 +50,7 @@ private:
     static bool m_stopped;
     static mutex mtx_stopped;
     static condition_variable cv;
+    static mutex g_instance_mutex;
     std::unordered_map<std::string, std::string> m_dict;
 
     XBSStore();
