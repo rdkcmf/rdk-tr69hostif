@@ -153,7 +153,12 @@ void XBSStoreJournal::resetCacheAndStore()
 {
    m_dict.clear();
    if (!m_filename.empty())
-      remove(m_filename.c_str());
+   {
+        if(remove(m_filename.c_str()) != 0)
+        {
+              RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s:  Error occured , File is not removed .\n", __FUNCTION__);
+        }
+   }  //CID:86529 - checked Return
 }
 
 bool XBSStoreJournal::loadJournalRecordsIntoCache()

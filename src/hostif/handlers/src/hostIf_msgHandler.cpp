@@ -304,13 +304,13 @@ bool hostIf_initalize_ConfigManger()
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"Invalid Hostif Manager for param %s, Skipping...\n", param);
             }
         }
-        fclose(fp);
     }
     else
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed to initialize hash table.\n");
         bVal = false;
     }
+    fclose(fp);  //CID:82865 - Resource leak
     return bVal;
 }
 

@@ -697,9 +697,9 @@ int DeviceClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         // Inserting Notification parameter to Notify Hash Table,
         // Note that neither keys nor values are copied when inserted into the GHashTable, so they must exist for the lifetime of the GHashTable
         // There for allocating a memory for both Param name and param value. This should be freed whenever we disable Notification.
-        char *notifyKey;
-        notifyKey = (char*) malloc(sizeof(char)*strlen(stMsgData->paramName)+1);
-        if(NULL != notifyValuePtr)
+        char *notifyKey = NULL;
+        notifyKey = (char*) calloc(sizeof(char),strlen(stMsgData->paramName)+1);
+        if((NULL != notifyValuePtr) && (NULL != notifyKey))
         {
             *notifyValuePtr = 1;
             strcpy(notifyKey,stMsgData->paramName);
@@ -711,6 +711,8 @@ int DeviceClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
             ret = NOK;
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Not able to allocate Notify pointer %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
         }
+        free(notifyKey);//CID:86943 - Resource leak
+        free(notifyValuePtr);
     }
     else
     {

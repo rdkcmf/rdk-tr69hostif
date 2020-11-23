@@ -224,8 +224,12 @@ void init_rbus_dml_provider()
     rbusError_t rc = RBUS_ERROR_SUCCESS;
     rbusDataElement_t* dataElements = NULL;
     int i = 0;
-
-    rbus_open(&rbusHandle, "tr69hostif");
+    rc = rbus_open(&rbusHandle, "tr69hostif");
+    if(rc != RBUS_ERROR_SUCCESS)
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "consumer: rbus_open failed: %d\n", rc);
+        return ;
+    }  //CID:161936 - checked return
 
     char **pParamNameList = (char**) calloc (MAX_NUM_PARAMETERS, sizeof(char*));
     int num_of_params = 0;
@@ -290,7 +294,6 @@ void init_rbus_dml_provider()
                     if(pParamNameList[i]) free(pParamNameList[i]);
                 }
 
-                if(pParamNameList) free(pParamNameList);
             }
         }
     }
@@ -298,6 +301,7 @@ void init_rbus_dml_provider()
     {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s][rbusdml] Exception: %s\r\n",__FUNCTION__, e.what());
     }
+    if(pParamNameList) free(pParamNameList);  //CID:161937 - Resource leak
 }
 
 

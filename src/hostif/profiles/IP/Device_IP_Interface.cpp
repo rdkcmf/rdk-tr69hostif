@@ -814,15 +814,12 @@ void hostIf_IPInterface::getActiveFlags (char* nameOfInterface, struct ifreq& if
     memset (&ifr, 0, sizeof(ifr));
     strcpy (ifr.ifr_name, nameOfInterface);
     int fd = socket (PF_INET, SOCK_DGRAM, IPPROTO_IP);
-    if(fd > 0)
-    {
-        ioctl (fd, SIOCGIFFLAGS, &ifr);
-        close (fd);
-    }
-    else
-    {
+    if (fd < 0) {
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s(): fd: %d, Failed due to [\'%s\' (%d)] \n", __FUNCTION__, fd, strerror(errno), errno);  //CID:18636 - NEGATIVE RETURNS
+        return;
     }
+    ioctl (fd, SIOCGIFFLAGS, &ifr);
+    close(fd);
 }
 
 bool hostIf_IPInterface::isLoopback (char* nameOfInterface)

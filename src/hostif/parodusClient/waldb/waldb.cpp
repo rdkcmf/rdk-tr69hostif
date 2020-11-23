@@ -208,10 +208,24 @@ int getNumberofInstances(const char* paramName)
             char *getParamList[1];
             getParamList[0] = (char*) calloc(1,MAX_PARAMETER_LENGTH);
             strncpy(getParamList[0],numberOfEntitiesParam,MAX_PARAMETER_LENGTH);
-            param_t **parametervalArr = (param_t **) malloc(sizeof(param_t**));
-            *parametervalArr = NULL;
-            ret = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS *)*1);
-            retCount = (size_t *) malloc(sizeof(size_t) * 1);
+            param_t **parametervalArr = (param_t **) malloc(sizeof(param_t **));
+            if(parametervalArr)
+            {
+                *parametervalArr = NULL; //CID:44089 - Reverse_inull
+            }
+            ret = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS));
+            retCount = (size_t *) malloc(sizeof(size_t));
+            if(ret == NULL)
+            {
+                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"ret is null\n");
+                return instanceCount;
+            }
+            if(retCount == NULL)
+            {
+                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"ret is null\n");
+                free(ret);
+                return instanceCount;
+            }
             getValues(const_cast<const char**>(getParamList), 1, &parametervalArr, &retCount,&ret);
             if( *retCount > 0 && (NULL != parametervalArr) && NULL != (*parametervalArr)[0].value )
             {
@@ -220,10 +234,6 @@ int getNumberofInstances(const char* paramName)
             // Lets free all allocated values
             if(getParamList[0])
                 free(getParamList[0]);
-            if(ret)
-                free(ret);
-            if(retCount)
-                free(retCount);
             if(NULL != parametervalArr && NULL != *parametervalArr)
             {
                 if((*parametervalArr)[0].value)
@@ -235,6 +245,8 @@ int getNumberofInstances(const char* paramName)
             if(NULL != parametervalArr) {
                 free(parametervalArr);
             }
+            free(ret);
+            free(retCount);
         }
     }
     return instanceCount;
@@ -1036,7 +1048,7 @@ void test_get_complete_param_list()
     RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"======================================================================\n");
     for(i=0; i< num_of_params; i++)
     {
-        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF," [%d] Parameter : [ %s (%s)]\n", i +1, pParam_name_list[i]);
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF," [%d] Parameter : [(%s)]\n", i +1, pParam_name_list[i]);
         free(pParam_name_list[i]);
     }
     free(pParam_name_list);

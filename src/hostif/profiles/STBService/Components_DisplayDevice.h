@@ -88,7 +88,7 @@
  */
 class  hostIf_STBServiceDisplayDevice
 {
-    ~hostIf_STBServiceDisplayDevice() {};
+
     int dev_id;
     device::VideoOutputPort& vPort;
 
@@ -104,7 +104,6 @@ class  hostIf_STBServiceDisplayDevice
     bool bCalledSupportedResolution;
     bool bCalledPreferredResolution;
 
-private:
     int getStatus(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     int getEDID_BYTES(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     int getX_COMCAST_COM_EDID(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
@@ -116,6 +115,7 @@ public:
     void doUpdates(const char *baseName, updateCallback mUpdateCallback);
     int handleSetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData);
     int handleGetMsg(const char *paramName, HOSTIF_MsgData_t *stMsgData);
+    ~hostIf_STBServiceDisplayDevice() {};
 
 };
 

@@ -171,7 +171,6 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
 {
     req_struct *reqObj = NULL;
     res_struct *resObj = NULL;
-    char *payload = NULL;
     WDMP_STATUS ret = WDMP_FAILURE, setRet = WDMP_FAILURE;
     int paramCount = 0, i = 0, retCount=0, index = 0, error = 0;
     const char *getParamList[MAX_PARAMETERNAME_LEN];
@@ -331,13 +330,17 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
                 resObj->retStatus[0] = ret;
                 RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Response:> resObj->retStatus[0] = %d\n",resObj->retStatus[0]);
             }
+
+            if(retList)
+            {
+                free(retList);  //18678 - Resource leak
+            }
         }
         break;
         }
     }
-    wdmp_form_response(resObj,&payload);
+    wdmp_form_response(resObj,resPayload);
 
-    *resPayload = payload;
     if(resPayload) 
     {
         RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> Payload = %s\n", *resPayload);
@@ -458,7 +461,7 @@ static void setRebootReason(param_t param, WEBPA_SET_TYPE setType)
     if(strcmp(param.name, WEBPA_DEVICE_REBOOT_PARAM) == 0 && strcmp(param.value, WEBPA_DEVICE_REBOOT_VALUE) == 0)
     {
         rebootParam = (param_t *) malloc(sizeof(param_t));
-        retReason = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS *)*1);
+        retReason = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS));  //CID:18217 - sizeof_mismatch
 
         RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"RDKB_REBOOT : Reboot triggered through WEBPA\n");
         rebootParam[0].name = strdup("Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason");

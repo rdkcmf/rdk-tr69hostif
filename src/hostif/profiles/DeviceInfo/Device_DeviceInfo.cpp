@@ -1918,9 +1918,8 @@ int hostIf_DeviceInfo::get_xOpsDMLogsUploadStatus(HOSTIF_MsgData_t *stMsgData)
     size_t n = 1024;
     char* curLogUploadStatus = (char*) malloc (n);
 
-    if (curLogUploadStatus == NULL)
+    if(curLogUploadStatus  == NULL)   //CID:88476 - Reverse_inull
     {
-        sprintf (curLogUploadStatus, "Unknown: Failed to malloc %d bytes.", n);
         RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] curLogUploadStatus is Null\n", __FUNCTION__);   //CID:84731 - Forward Null
     }
     else if ((logUpfile = fopen (CURRENT_LOG_UPLOAD_STATUS, "r")) == NULL)
@@ -1937,7 +1936,7 @@ int hostIf_DeviceInfo::get_xOpsDMLogsUploadStatus(HOSTIF_MsgData_t *stMsgData)
     else
     {
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s] Successfully read from %s. The value is \'%s\'. \n", __FUNCTION__, CURRENT_LOG_UPLOAD_STATUS,
-                 curLogUploadStatus);
+                  curLogUploadStatus);
         fclose (logUpfile);
     }
 
@@ -3466,8 +3465,11 @@ int hostIf_DeviceInfo::writeFirmwareInfo(char *param, HOSTIF_MsgData_t * stMsgDa
             infwDwnfile.close();
             tmpfwDwnfile.close();
         }
-        remove(FW_DWN_FILE_PATH);
-        rename(TEMP_FW_DWN_FILE_PATH, FW_DWN_FILE_PATH);
+           //CID:90007 , 82197-Checked return
+        if((remove(FW_DWN_FILE_PATH) == 0) && (rename(TEMP_FW_DWN_FILE_PATH, FW_DWN_FILE_PATH) == 0))
+        {
+            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] File removed from the path ,  Temp file is set \n", __FUNCTION__);
+        }
 
     } catch (const std::exception e) {
         std::cout << __FUNCTION__ << "An exception occurred. " << e.what() << endl;

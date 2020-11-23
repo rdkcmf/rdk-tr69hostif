@@ -78,9 +78,12 @@ char * getNotifySource()
         getParamList[0]= (char*) calloc(1,MAX_PARAMETER_LENGTH);
         strncpy(getParamList[0],DEVICE_ESTB_MAC_PARAM,MAX_PARAMETER_LENGTH);
         param_t **parametervalArr = (param_t **) malloc(sizeof(param_t **));
-        *parametervalArr = NULL;
-        ret = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS *)*1);
-        retCount = (size_t *) malloc(sizeof(size_t) * 1);
+        if(parametervalArr)
+        {
+            *parametervalArr = NULL; //CID:44089 - Reverse_inull
+        }
+        ret = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS));  //CID:18425 - sizeofmismatch
+        retCount = (size_t *) malloc(sizeof(size_t));
         getValues(const_cast<const char**>(getParamList), 1, &parametervalArr, &retCount, &ret);
         notificationSource = (char*) malloc(WEBPA_NOTIFY_SRC_LEN);
         if((NULL != parametervalArr) && (NULL != *parametervalArr) && (NULL != (*parametervalArr)[0].value))
@@ -212,6 +215,10 @@ int getnotifyparamList(char ***notifyParamList,int *ptrnotifyListSize)
     else
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Unable to parse Configuration file");
+    }
+    if(notifycfg_file_content)
+    {
+        free(notifycfg_file_content);
     }
     return 0;
 }

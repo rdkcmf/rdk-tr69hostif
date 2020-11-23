@@ -90,7 +90,7 @@ class  hostIf_STBServiceHDMI
 {
     static GHashTable *ifHash;
     hostIf_STBServiceHDMI(int devid, device::VideoOutputPort& port);
-    ~hostIf_STBServiceHDMI() {};
+    ~hostIf_STBServiceHDMI();
     static GMutex *m_mutex;
     int dev_id;
     device::VideoOutputPort& vPort;

@@ -38,6 +38,13 @@
 #define BS_CLEAR_DB_END "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.Control.ClearDBEnd"
 #define RFC_SERVICE_LOCK "/tmp/.rfcServiceLock"
 
+#define CURL_EASY_SETOPT(CURL , CURLoption , Value)\
+    if (curl_easy_setopt(CURL , CURLoption , Value) != CURLE_OK ) {\
+                RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: curl_easy_setopt setopt failed ...\n", __FUNCTION__);\
+        }
+/*CID:121745 - checked return */
+
+
 XBSStore* XBSStore::xbsInstance = NULL;
 XBSStoreJournal* XBSStore::xbsJournalInstance = NULL;
 recursive_mutex XBSStore::mtx;
@@ -88,9 +95,9 @@ void XBSStore::getAuthServicePartnerID()
         if(curl)
         {
             RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: call curl to get partner ID..\n", __FUNCTION__);
-            curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:50050/authService/getDeviceId");
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCurlResponse);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+            CURL_EASY_SETOPT(curl, CURLOPT_URL, "http://127.0.0.1:50050/authService/getDeviceId");
+            CURL_EASY_SETOPT(curl, CURLOPT_WRITEFUNCTION, writeCurlResponse);
+            CURL_EASY_SETOPT(curl, CURLOPT_WRITEDATA, &response);
             CURLcode res = curl_easy_perform(curl);
             long http_code = 0;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
@@ -151,7 +158,12 @@ void XBSStore::resetCacheAndStore()
 {
    m_dict.clear();
    if (!m_filename.empty())
-      remove(m_filename.c_str());
+   {
+        if(remove(m_filename.c_str()) != 0)
+        {
+            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Error occured ,File is not removed.\n", __FUNCTION__);
+        }   //CID:80489 - Checked Return
+   }
    xbsJournalInstance->resetCacheAndStore();
 }
 
