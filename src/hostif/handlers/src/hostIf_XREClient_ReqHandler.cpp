@@ -542,7 +542,7 @@ void XREClientReqHandler::checkForUpdates()
         sprintf(tmp_buff,"Device.X_COMCAST-COM_Xcalibur.Client.XRE.%s","xreEnable");
         if(mUpdateCallback) mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
     }
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreStatus(&msgData,&bChanged);
@@ -553,7 +553,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreVersion(&msgData,&bChanged);
@@ -564,7 +564,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreReceiverId(&msgData,&bChanged);
@@ -575,7 +575,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreSessionId(&msgData,&bChanged);
@@ -586,7 +586,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreSessionLastModTs(&msgData,&bChanged);
@@ -597,7 +597,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreSessionUptime(&msgData,&bChanged);
@@ -608,7 +608,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreLastURLAccessed(&msgData,&bChanged);
@@ -619,7 +619,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreMinCmdProcTime(&msgData,&bChanged);
@@ -630,7 +630,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreAvgCmdProcTime(&msgData,&bChanged);
@@ -641,7 +641,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreMaxCmdProcTime(&msgData,&bChanged);
@@ -652,7 +652,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreCommandCnt(&msgData,&bChanged);
@@ -663,7 +663,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreErrorCnt(&msgData,&bChanged);
@@ -674,7 +674,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotViewCnt(&msgData,&bChanged);
@@ -685,7 +685,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotAppCnt(&msgData,&bChanged);
@@ -696,7 +696,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotRectCnt(&msgData,&bChanged);
@@ -707,7 +707,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotTxtCnt(&msgData,&bChanged);
@@ -718,7 +718,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotHtmlTxtCnt(&msgData,&bChanged);
@@ -729,7 +729,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotTxtIpCnt(&msgData,&bChanged);
@@ -740,7 +740,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotFontCnt(&msgData,&bChanged);
@@ -751,7 +751,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotVideoCnt(&msgData,&bChanged);
@@ -762,7 +762,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotSoundCnt(&msgData,&bChanged);
@@ -773,7 +773,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotStyleshtCnt(&msgData,&bChanged);
@@ -784,7 +784,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));   //CID:84676 - Bad sizeof  and 88167 mimatch
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotImgCnt(&msgData,&bChanged);
@@ -795,7 +795,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotNineSliceImgCnt(&msgData,&bChanged);
@@ -806,7 +806,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotFlashCnt(&msgData,&bChanged);
@@ -817,7 +817,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreTotAnimCnt(&msgData,&bChanged);
@@ -828,7 +828,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreRefreshXreSession(&msgData,&bChanged);
@@ -839,7 +839,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreFlushLocalCache(&msgData,&bChanged);
@@ -850,7 +850,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreLogLevel(&msgData,&bChanged);
@@ -861,7 +861,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreGetTWPDiags(&msgData,&bChanged);
@@ -872,7 +872,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreChannelMapId(&msgData,&bChanged);
@@ -883,7 +883,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreControllerId(&msgData,&bChanged);
@@ -894,7 +894,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xrePlantId(&msgData,&bChanged);
@@ -905,7 +905,7 @@ void XREClientReqHandler::checkForUpdates()
     }
 
 
-    memset(&msgData,0,sizeof(&msgData));
+    memset(&msgData,0,sizeof(msgData));
     memset(tmp_buff,0,TR69HOSTIFMGR_MAX_PARAM_LEN);
     bChanged =  false;
     get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreVodId(&msgData,&bChanged);

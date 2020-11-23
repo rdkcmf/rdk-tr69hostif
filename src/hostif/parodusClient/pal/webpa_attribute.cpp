@@ -39,7 +39,7 @@ extern unsigned int g_notifyListSize;
 /*                             Function Prototypes                            */
 /*----------------------------------------------------------------------------*/
 static WAL_STATUS get_AttribValues_tr69hostIf(HOSTIF_MsgData_t *ptrParam);
-static WAL_STATUS set_AttribValues_tr69hostIf (HOSTIF_MsgData_t param);
+static WAL_STATUS set_AttribValues_tr69hostIf (HOSTIF_MsgData_t *param);
 static WAL_STATUS getParamAttributes(const char *pParameterName, AttrVal ***attr, int *TotalParams);
 static WAL_STATUS setParamAttributes(const char *pParameterName, const AttrVal *attArr);
 
@@ -162,13 +162,13 @@ static WAL_STATUS getParamAttributes(const char *pParameterName, AttrVal ***attr
 /**
  * generic Api for set attribute HostIf parameters through IARM_TR69Bus
  **/
-static WAL_STATUS set_AttribValues_tr69hostIf (HOSTIF_MsgData_t param)
+static WAL_STATUS set_AttribValues_tr69hostIf (HOSTIF_MsgData_t *param)  //CID:18602,18273 - Passbyvalue
 {
     int retStatus = -1;
-    param.reqType = HOSTIF_SETATTRIB;
+    param->reqType = HOSTIF_SETATTRIB;
 
     // Try to set value
-    retStatus = hostIf_SetAttributesMsgHandler(&param);
+    retStatus = hostIf_SetAttributesMsgHandler(param);
 
     if(retStatus != 0)
     {
@@ -177,7 +177,7 @@ static WAL_STATUS set_AttribValues_tr69hostIf (HOSTIF_MsgData_t param)
     }
     else
     {
-        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"[%s:%s:%d] Set Successful for value : %s\n", __FILE__, __FUNCTION__, __LINE__, (char *)param.paramValue);
+        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"[%s:%s:%d] Set Successful for value : %s\n", __FILE__, __FUNCTION__, __LINE__, (char *)param->paramValue);
     }
     return WAL_SUCCESS;
 }
@@ -210,6 +210,6 @@ static WAL_STATUS setParamAttributes(const char *pParameterName, const AttrVal *
     strcpy(Param.paramName, pParameterName);
     strcpy(Param.paramValue, attArr->value);
     Param.paramtype = hostIf_IntegerType;
-    ret = set_AttribValues_tr69hostIf (Param);
+    ret = set_AttribValues_tr69hostIf (&Param);
     return ret;
 }

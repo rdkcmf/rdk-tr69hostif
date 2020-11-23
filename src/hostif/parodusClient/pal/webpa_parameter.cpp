@@ -43,7 +43,7 @@ int isWildCardParam(const char *paramName);
 static void converttohostIfType(char *ParamDataType,HostIf_ParamType_t* pParamType);
 static void converttoWalType(HostIf_ParamType_t paramType,WAL_DATA_TYPE* pwalType);
 static WAL_STATUS SetParamInfo(ParamVal paramVal , char * transaction_id);
-static WAL_STATUS set_ParamValues_tr69hostIf (HOSTIF_MsgData_t param);
+static WAL_STATUS set_ParamValues_tr69hostIf (HOSTIF_MsgData_t *param);
 static WAL_STATUS convertFaultCodeToWalStatus(faultCode_t faultCode);
 
 /*----------------------------------------------------------------------------*/
@@ -387,7 +387,7 @@ static WAL_STATUS SetParamInfo(ParamVal paramVal, char * transactionID)
             Param.transactionID[_BUF_LEN_256-1]='\0';
         }
 
-        ret = set_ParamValues_tr69hostIf(Param);
+        ret = set_ParamValues_tr69hostIf(&Param);
         RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"set_ParamValues_tr69hostIf %d\n",ret);
     }
     else
@@ -424,21 +424,21 @@ static WDMP_STATUS get_ParamValues_tr69hostIf(HOSTIF_MsgData_t *ptrParam)
 /**
  * generic Api for get HostIf parameters through IARM_TR69Bus
  **/
-static WAL_STATUS set_ParamValues_tr69hostIf (HOSTIF_MsgData_t ptrParam)
+static WAL_STATUS set_ParamValues_tr69hostIf (HOSTIF_MsgData_t *ptrParam)
 {
     int status = -1;
     WAL_STATUS retStatus = WAL_FAILURE;
 
-    ptrParam.reqType = HOSTIF_SET;
-    status = hostIf_SetMsgHandler(&ptrParam);
+    ptrParam->reqType = HOSTIF_SET;
+    status = hostIf_SetMsgHandler(ptrParam);
     if(status != 0) {
         RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"[%s:%s:%d] Error in Set Message Handler Status : %d\n", __FILE__, __FUNCTION__, __LINE__, status);
-        retStatus = convertFaultCodeToWalStatus(ptrParam.faultCode);
+        retStatus = convertFaultCodeToWalStatus(ptrParam->faultCode);
     }
     else
     {
         retStatus = WAL_SUCCESS;
-        RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s:%s:%d] The value for param: %s is %s paramLen : %d\n", __FILE__, __FUNCTION__, __LINE__, ptrParam.paramName,ptrParam.paramValue, ptrParam.paramLen);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s:%s:%d] The value for param: %s is %s paramLen : %d\n", __FILE__, __FUNCTION__, __LINE__, ptrParam->paramName,ptrParam->paramValue, ptrParam->paramLen);
     }
     return retStatus;
 }

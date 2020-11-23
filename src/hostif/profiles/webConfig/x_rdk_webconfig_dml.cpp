@@ -75,7 +75,12 @@ char *readWebcfgURL()
         if(bytes) {
             val = (char *)malloc(sizeof(char) *(bytes + 1));
             memset(val,0, sizeof(char) *(bytes + 1));
-            fread(val,bytes,1,fp);
+            if(!fread(val,bytes,1,fp))  //CID:160850
+            {
+                fclose(fp);
+                free(val);
+                return NULL;
+            }
         }
         fclose(fp);
     }
@@ -333,13 +338,15 @@ int X_RDK_WebConfig_dml::setWebcfgForceSync(HOSTIF_MsgData_t * stMsgData)
 
     keyValue = stMsgData->paramValue;
     val = strdup(keyValue.c_str());
-    if (stMsgData->requestor == HOSTIF_SRC_WEBPA)
-        ret = setForceSync(val, stMsgData->transactionID, 0);
-    else
-        ret = setForceSync(val, "", 0);
+    if(val)  //CID:160853 - Reverse_inull
+    {
+        if (stMsgData->requestor == HOSTIF_SRC_WEBPA)
+            ret = setForceSync(val, stMsgData->transactionID, 0);
+        else
+            ret = setForceSync(val, NULL, 0);
 
-    if(val)
         free(val);
+    }
     if(1 != ret) {
         RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"[%s]xWebConfig: Set force sync failed \r\n",__FUNCTION__);
         return NOK;

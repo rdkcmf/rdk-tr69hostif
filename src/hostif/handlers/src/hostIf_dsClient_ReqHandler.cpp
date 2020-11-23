@@ -235,6 +235,7 @@ int DSClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             stMsgData->faultCode = fcNoFault;
         }
+        hostIf_STBServiceCapabilities::closeInstance(pIface);   //CID:80678- Resource leak
     }
     else if(strcasecmp(stMsgData->paramName,
                                   "Device.Services.STBService.1.Enable") == 0)

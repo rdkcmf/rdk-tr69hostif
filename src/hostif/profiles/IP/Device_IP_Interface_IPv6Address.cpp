@@ -499,7 +499,7 @@ int hostIf_IPv6Address::removeIp(int interfaceNo, char *value)
              * Socket Creation is successful.
              * Format the supplied IP address into INET6 protocol format
              */
-            memset(&sai6, 0, sizeof(struct sockaddr));
+            memset(&sai6, 0, sizeof(sockaddr_in6));  //CID:18430 - sizeofmismatch
             sai6.sin6_family = AF_INET6;
             sai6.sin6_port = 0;
 
@@ -565,7 +565,7 @@ int hostIf_IPv6Address::setIp(int interfaceNo, char *value)
              * Socket Creation is successful.
              * Format the supplied IP address into INET6 protocol format
              */
-            memset(&sai6, 0, sizeof(struct sockaddr));
+            memset(&sai6, 0, sizeof(sockaddr_in6));  //CID:18189 - sizeofmismatch
             sai6.sin6_family = AF_INET6;
             sai6.sin6_port = 0;
 
@@ -941,7 +941,10 @@ int hostIf_IPv6Address::get_IPv6Address_Prefix (HOSTIF_MsgData_t *stMsgData,int 
     strcpy (pathnameOfRowInIPv6PrefixTable, stMsgData->paramName);
     const char *positionAfterInstanceNumber = 0;
     int instanceNumber = 0;
-    matchComponent (pathnameOfRowInIPv6PrefixTable, "Device.IP.Interface", &positionAfterInstanceNumber, instanceNumber);
+    if(!matchComponent (pathnameOfRowInIPv6PrefixTable, "Device.IP.Interface", &positionAfterInstanceNumber, instanceNumber))
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"hostIf_IPv6Address : matchComponent error  \n");
+    }  //CID:31038 - Checked return
     sprintf ((char*) positionAfterInstanceNumber, "%s%d.", "IPv6Prefix.", subInstanceNo);
 
     RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s,%d] pathnameOfRowInIPv6PrefixTable = %s",

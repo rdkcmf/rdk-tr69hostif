@@ -192,9 +192,12 @@ hostIf_STBServiceHDMI::hostIf_STBServiceHDMI(int devid, device::VideoOutputPort&
     bCalledName = false;
 
     displayDevice = new hostIf_STBServiceDisplayDevice(devid, vPort);
-
 }
 
+hostIf_STBServiceHDMI::~hostIf_STBServiceHDMI() {
+
+    delete displayDevice;
+}
 /**
  * @brief This function set the HDMI interface updates such as Status, Enable,
  * ResolutionMode, ResolutionValue etc in a connected HDMI port.

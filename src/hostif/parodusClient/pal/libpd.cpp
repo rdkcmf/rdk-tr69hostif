@@ -145,7 +145,10 @@ static void parodus_receive_wait()
             clock_gettime(CLOCK_MONOTONIC, &currTime);
             currTime.tv_sec += 5;
             pthread_mutex_lock(&parodus_lock);
-            pthread_cond_timedwait(&parodus_cond, &parodus_lock,&currTime );
+            if(0 != pthread_cond_timedwait(&parodus_cond, &parodus_lock,&currTime ))
+            {
+                RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"parodus_receive_wait()::%s:%d wait for key acquisition timed out");  //CID:119759 - checked return
+            }
             pthread_mutex_unlock(&parodus_lock);
             continue;
         }
@@ -303,24 +306,28 @@ static void get_parodus_url(char *parodus_url, char *client_url)
         {
             fseek(fp, 0, SEEK_SET);
             webpaCfgFile = (char *) malloc(sizeof(char) * (ch_count + 1));
-            fread(webpaCfgFile, 1, ch_count,fp);
-            webpaCfgFile[ch_count] ='\0';
-            fclose(fp);
-            //CID:18143 - NEGATIVE RETURNS - since ch_count cannot be negative
-            cJSON *webpa_cfg = cJSON_Parse(webpaCfgFile);
-            if(webpa_cfg)
+            if(webpaCfgFile)
             {
-                cJSON *pUrl = NULL;
-                cJSON *cUrl = NULL;
-
-                pUrl = cJSON_GetObjectItem(webpa_cfg,"ParodusURL");
-                cUrl = cJSON_GetObjectItem(webpa_cfg,"ParodusClientURL");
-                if((NULL != pUrl && NULL != cUrl) && (NULL != pUrl->valuestring && NULL != pUrl->valuestring))
+                fread(webpaCfgFile, 1, ch_count,fp);
+                webpaCfgFile[ch_count] ='\0';
+                fclose(fp);
+                //CID:18143 - NEGATIVE RETURNS - since ch_count cannot be negative
+                cJSON *webpa_cfg = cJSON_Parse(webpaCfgFile);
+                if(webpa_cfg)
                 {
-                    strncpy(parodus_url,pUrl->valuestring,strlen(pUrl->valuestring));
-                    strncpy(client_url,cUrl->valuestring,strlen(pUrl->valuestring));
-                    getStatus = 1;
-                }
+                    cJSON *pUrl = NULL;
+                    cJSON *cUrl = NULL;
+
+                    pUrl = cJSON_GetObjectItem(webpa_cfg,"ParodusURL");
+                    cUrl = cJSON_GetObjectItem(webpa_cfg,"ParodusClientURL");
+                    if((NULL != pUrl && NULL != cUrl) && (NULL != pUrl->valuestring && NULL != pUrl->valuestring))
+                    {
+                        strncpy(parodus_url,pUrl->valuestring,strlen(pUrl->valuestring));
+                        strncpy(client_url,cUrl->valuestring,strlen(pUrl->valuestring));
+                        getStatus = 1;
+                    }
+                 }
+                 free(webpaCfgFile);//CID:18606 - Resource leak
             }
         }
     }

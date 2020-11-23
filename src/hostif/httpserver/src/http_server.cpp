@@ -95,7 +95,7 @@ static void HTTPRequestHandler(
         {
             if(!pcCallerID || !strlen(pcCallerID))
             {
-                pcCallerID = strdup("Unknown");
+                pcCallerID = "Unknown";
                 RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s:%s] Unknown Caller ID, GET is allowed by default\n", __FUNCTION__, __FILE__);
             }
             else
@@ -137,6 +137,8 @@ static void HTTPRequestHandler(
             {
                 soup_message_set_status_full (msg, SOUP_STATUS_INTERNAL_SERVER_ERROR, "POST Not Allowed without CallerID");
                 RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%s] Exiting.. POST operation not allowed with unknown CallerID\n", __FUNCTION__, __FILE__);
+                wdmp_free_req_struct(reqSt);
+                reqSt = NULL;
                 return;
             }
             else
@@ -170,6 +172,8 @@ static void HTTPRequestHandler(
              {
                  soup_message_set_status_full (msg, SOUP_STATUS_INTERNAL_SERVER_ERROR, "Invalid request format");
                  RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%s] Exiting.. Request couldn't be processed\n", __FUNCTION__, __FILE__);
+                 wdmp_free_req_struct(reqSt);
+                 reqSt = NULL;
                  return;
              }
         }
@@ -177,6 +181,8 @@ static void HTTPRequestHandler(
         {
             soup_message_set_status_full (msg, SOUP_STATUS_NOT_IMPLEMENTED, "Method not implemented");
             RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%s] Exiting.. Unsupported operation \n", __FUNCTION__, __FILE__);
+            wdmp_free_req_struct(reqSt);
+            reqSt = NULL;
             return;
         }
         char *buf = cJSON_Print(jsonResponse);

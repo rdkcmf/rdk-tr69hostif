@@ -832,13 +832,18 @@ int hostIf_DeviceInfoRdk_xBT::getDiscoveredDevice_Connected(HOSTIF_MsgData_t *st
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Entering..\n", __FUNCTION__, __LINE__);
     BTRMGR_DevicesProperty_t deviceProperty;
     memset (&deviceProperty, 0, sizeof (deviceProperty));
+    BTRMGR_Result_t rc = BTRMGR_RESULT_SUCCESS;
 
     try {
         int devIndex = stMsgData->instanceNum;
         if((devIndex && disDevList.m_numOfDevices) && (devIndex <= disDevList.m_numOfDevices)) {
 
             /* Get the signal level */
-            BTRMGR_GetDeviceProperties(0, disDevList.m_deviceProperty[devIndex-1].m_deviceHandle, &deviceProperty);
+            rc = BTRMGR_GetDeviceProperties(0, disDevList.m_deviceProperty[devIndex-1].m_deviceHandle, &deviceProperty);
+            if (BTRMGR_RESULT_SUCCESS != rc)
+            {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d]xBlueTooth: Failed at BTRMGR  \r\n",__FUNCTION__, __LINE__);
+            }  //CID:97330 - checked return
             RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s]xBlueTooth: The Discovered Devices (index : %d) Connection Status is \'%d\'.\n", __FUNCTION__, devIndex-1, deviceProperty.m_isConnected);
 
             put_boolean(stMsgData->paramValue, deviceProperty.m_isConnected);
