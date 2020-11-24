@@ -59,6 +59,8 @@
 #ifdef ENABLE_SD_NOTIFY
 #include <systemd/sd-daemon.h>
 #endif
+#include <mutex>
+#include <condition_variable>
 
 #ifdef WEB_CONFIG_ENABLED
 #ifdef __cplusplus
@@ -97,6 +99,10 @@ GHashTable* paramMgrhash = NULL;
 static void usage();
 T_ARGLIST argList = {{'\0'}, 0};
 static int isShutdownTriggered = 0;
+
+std::mutex mtx_httpServerThreadDone;
+std::condition_variable cv_httpServerThreadDone;
+bool httpServerThreadDone = false;
 
 // Parodus Init Thread
 pthread_t parodus_init_tid;
@@ -425,13 +431,6 @@ int main(int argc, char *argv[])
     }
 #endif
 
-#ifdef ENABLE_SD_NOTIFY
-    sd_notifyf(0, "READY=1\n"
-               "STATUS=tr69hostif is Successfully Initialized\n"
-               "MAINPID=%lu", (unsigned long) getpid());
-    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"tr69hostif sd notify envent  is sent  Successfully\n");
-#endif
-
 #ifdef PID_FILE_PATH
 #define xstr(s) str(s)
 #define str(s) #s
@@ -475,6 +474,21 @@ int main(int argc, char *argv[])
 
     /* Initialized Rbus interface for TR181 Data*/
     init_rbus_dml_provider();
+
+    // Send sd notify event after http server thread is complete.
+    if (httpServerThreadDone == false)
+    {
+        std::unique_lock<std::mutex> lck(mtx_httpServerThreadDone);
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Waiting(max 10 sec) for http server thread to be complete...\n");
+        auto sec = chrono::seconds(1);
+        cv_httpServerThreadDone.wait_for(lck, 10*sec, []{return httpServerThreadDone;});
+    }
+#ifdef ENABLE_SD_NOTIFY
+    sd_notifyf(0, "READY=1\n"
+       "STATUS=tr69hostif is Successfully Initialized\n"
+          "MAINPID=%lu", (unsigned long) getpid());
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"tr69hostif sd notify envent  is sent  Successfully, httpServerThreadDone=%d\n", httpServerThreadDone);
+#endif
 
     main_loop = g_main_loop_new (NULL, FALSE);
     g_main_loop_run(main_loop);

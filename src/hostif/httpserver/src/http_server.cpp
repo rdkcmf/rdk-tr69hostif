@@ -38,6 +38,12 @@ extern "C"
 #include "waldb.h"
 #include "request_handler.h"
 #include "libsoup/soup.h"
+#include <mutex>
+#include <condition_variable>
+
+extern std::mutex mtx_httpServerThreadDone;
+extern std::condition_variable cv_httpServerThreadDone;
+extern bool httpServerThreadDone;
 
 extern T_ARGLIST argList;
 static SoupServer  *http_server = NULL;
@@ -245,6 +251,12 @@ void *HTTPServerStartThread(void *msg)
             ofs.close();
 
         RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"SERVER: Started server successfully.\n");
+    }
+
+    {
+        std::unique_lock<std::mutex> lck(mtx_httpServerThreadDone);
+        httpServerThreadDone = true;
+        cv_httpServerThreadDone.notify_all();
     }
 
     RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
