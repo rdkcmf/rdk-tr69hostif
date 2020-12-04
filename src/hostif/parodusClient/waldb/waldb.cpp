@@ -563,8 +563,6 @@ DB_STATUS getChildParamNamesFromDataModel(void *dbhandle,char *paramName,char **
     if(dbhandle == NULL)
         return DB_FAILURE;
 
-    const std::lock_guard<std::mutex> lock(g_db_mutex);
-
     if(isWildCardParam(parameterName))
     {
         XMLDocument *doc = (XMLDocument *) dbhandle;
