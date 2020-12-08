@@ -110,7 +110,7 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerName" : "Sky",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.PartnerProductName" : "Sky",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "SKY",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.NetflixESNprefix" : "SKYGBR",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.XconfUrl" : "https://secure.xconfds.sky.coast.xcal.tv",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.SsrUrl" : "https://secure.ssr.sky.coast.xcal.tv",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.TelemetryEndpoint.URL" : "stbrtl-sky.stb.r53.xcal.tv",
