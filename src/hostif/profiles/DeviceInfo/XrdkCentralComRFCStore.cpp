@@ -71,7 +71,8 @@ void XRFCStore::reloadCache()
     //copy the local settings from tr181localstore.ini to main DB tr181store.ini
     for (unordered_map<string, string>::iterator it=m_local_dict.begin(); it!=m_local_dict.end(); ++it)
     {
-        m_dict[it->first] = it->second;
+        if(m_dict.find(it->first) == m_dict.end())
+            m_dict[it->first] = it->second;
     }
     ofstream ofs(m_filename, ios::trunc | ios::out);
     if(!ofs.is_open())
