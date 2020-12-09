@@ -80,20 +80,7 @@ void libpd_set_notifyConfigFile(const char* configFile)
 
 void stop_parodus_recv_wait()
 {
-   int ret = 0;
    exit_parodus_recv = true;
-
-   // Close libparodus receiver 
-   ret = libparodus_close_receiver (libparodus_instance);
-   if(ret == 0)
-   {
-       RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Successfully closed libparodus receiver. \n");
-   }
-   else
-   {
-       RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failure in closing libparodus receiver, Ret = %d\n",ret);
-   }
-   // Unblock parodus thread from conditional wait.
    pthread_cond_signal(&parodus_cond);
 }
 /**
@@ -202,6 +189,15 @@ static void parodus_receive_wait()
             wrp_free_struct (res_wrp_msg);
             wrp_free_struct(wrp_msg);
         }
+    }
+    rtn = libparodus_close_receiver (libparodus_instance);
+    if(rtn == 0)
+    {
+        RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"Successfully closed libparodus receiver. \n");
+    }
+    else
+    {
+       RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Failure in closing libparodus receiver, Ret = %d\n",rtn);
     }
     libparodus_shutdown(&libparodus_instance);
     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"End of parodus_upstream\n");

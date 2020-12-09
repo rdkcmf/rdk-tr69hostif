@@ -419,11 +419,28 @@ int main(int argc, char *argv[])
     //------------------------------------------------------------------------------
     // hostIf_HttpServerStart: Soup HTTP Server
     //------------------------------------------------------------------------------
-    hostIf_JsonIfThread = g_thread_new("hostIf_JsonIfThread", (GThreadFunc)jsonIfHandlerThread, NULL);
+    if( (hostIf_JsonIfThread = g_thread_create(    (GThreadFunc)jsonIfHandlerThread,
+                               (void *)hostIf_JsonIfMsg,
+                               TRUE,
+                               &err1)) == NULL)
+    {
+        g_critical("Thread create failed: %s!!\n", err1->message );
+        g_error_free (err1);
+    }
+
+
 #ifndef NEW_HTTP_SERVER_DISABLE
     if(!legacyRFCEnabled())
     {
-        HTTPServerThread = g_thread_new("HTTPServerThread", (GThreadFunc)HTTPServerStartThread, NULL);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"legacyRFC Set to False, Starting New HTTP Server\n");
+        if((HTTPServerThread = g_thread_create((GThreadFunc)HTTPServerStartThread,
+                                               (void *)HTTPServerName,
+                                               TRUE,
+                                               &httpError)) == NULL)
+        {
+            g_critical("New HTTP Server Thread Create failed: %s!!\n", httpError->message );
+            g_error_free (httpError);
+        }
     }
     else
     {
@@ -492,12 +509,19 @@ int main(int argc, char *argv[])
 
     main_loop = g_main_loop_new (NULL, FALSE);
     g_main_loop_run(main_loop);
-
     g_main_loop_unref (main_loop);
-    g_thread_join(hostIf_JsonIfThread);
-    g_thread_join(HTTPServerThread);
-    g_thread_join(updateHandler_runThread);    
-    pthread_join(parodus_init_tid,NULL);
+
+    if(hostIf_JsonIfThread)
+        g_thread_join(hostIf_JsonIfThread);
+
+#ifndef NEW_HTTP_SERVER_DISABLE
+    if(HTTPServerThread)
+        g_thread_join(HTTPServerThread);
+#endif
+    if(updateHandler_runThread)
+        g_thread_join(updateHandler_runThread);
+    if(parodus_init_tid)
+        pthread_join(parodus_init_tid,NULL);
 
     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"\n\n----------------------EXITING MAIN PROGRAM----------------------\n");
     return 0 ;
