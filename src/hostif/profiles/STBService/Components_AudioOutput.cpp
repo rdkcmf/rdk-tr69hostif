@@ -57,6 +57,7 @@
 #define COMCAST_AUDIOENCODING_STRING "X_COMCAST-COM_AudioEncoding"
 #define COMCAST_AUDIOCOMPRESSION_STRING "X_COMCAST-COM_AudioCompression"
 #define COMCAST_AUDIOGAIN_STRING "X_COMCAST-COM_AudioGain"
+#define COMCAST_DIALOGENHANCEMENT_STRING "X_COMCAST-COM_DialogEnhancement"
 
 
 GHashTable * hostIf_STBServiceAudioInterface::ifHash = NULL;
@@ -166,12 +167,13 @@ hostIf_STBServiceAudioInterface::hostIf_STBServiceAudioInterface(int devid, devi
     backupAudioLevel=0;
     strcpy(backupAudioDB," ");
     strcpy(backupAudioLoopThru," ");
-    strcpy(backupAudioCompression," ");
+    backupAudioCompression=0;
     strcpy(backupAudioEncoding," ");
     strcpy(backupAudioGain," ");
     strcpy(backupMinAudioDB," ");
     strcpy(backupMaxAudioDB," ");
     strcpy(backupAudioOptimalLevel," ");
+    backupDialogEnhancement=0;
     bCalledStatus = false;
     bCalledCancelMute = false;
     bCalledAudioStereoMode = false;
@@ -184,6 +186,7 @@ hostIf_STBServiceAudioInterface::hostIf_STBServiceAudioInterface(int devid, devi
     bCalledMinAudioDB = false;
     bCalledMaxAudioDB = false;
     bCalledAudioOptimalLevel = false;
+    bCalledDialogEnhancement = false;
 }
 
 /**
@@ -229,6 +232,10 @@ int hostIf_STBServiceAudioInterface::handleSetMsg(const char *pSetting, HOSTIF_M
     else if (strcasecmp(pSetting, COMCAST_AUDIOCOMPRESSION_STRING) == 0)
     {
         ret = setX_COMCAST_COM_AudioCompression(stMsgData);
+    }
+    else if (strcasecmp(pSetting, COMCAST_DIALOGENHANCEMENT_STRING) == 0)
+    {
+        ret = setX_COMCAST_COM_DialogEnhancement(stMsgData);
     }
     return ret;
 }
@@ -309,6 +316,10 @@ int hostIf_STBServiceAudioInterface::handleGetMsg(const char *paramName, HOSTIF_
     else if(strcasecmp(paramName, COMCAST_AUDIOGAIN_STRING) == 0)
     {
         ret = getX_COMCAST_COM_AudioGain(stMsgData);
+    }
+    else if(strcasecmp(paramName, COMCAST_DIALOGENHANCEMENT_STRING) == 0)
+    {
+        ret = getX_COMCAST_COM_DialogEnhancement(stMsgData);
     }
     return ret;
 }
@@ -470,6 +481,20 @@ void hostIf_STBServiceAudioInterface::doUpdates(updateCallback mUpdateCallback)
             mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
         }
     }
+    memset(&msgData,0,sizeof(msgData));
+    memset(tmp_buff,0,PARAM_LEN);
+    bChanged =  false;
+    msgData.instanceNum=dev_id;
+    getX_COMCAST_COM_DialogEnhancement(&msgData,&bChanged);
+    if(bChanged)
+    {
+        snprintf(tmp_buff, PARAM_LEN, UPDATE_FORMAT_STRING, BASE_NAME, dev_id, COMCAST_DIALOGENHANCEMENT_STRING);
+        if(mUpdateCallback)
+        {
+            mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+        }
+    }
+
 }
 
 int hostIf_STBServiceAudioInterface::getNumberOfInstances(HOSTIF_MsgData_t *stMsgData)
@@ -874,12 +899,7 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioFormat(HOSTIF_MsgData
  * Description  : Set Audio Compression
  * Precondition : None
  * Precondition : None
- * Input        : stMsgData->paramValue -> 0-4
-                                           0 = None
-                                           1 = Light
-                                           2 = Medium
-                                           3 = Heavy
-                                           4 = Max
+ * Input        : stMsgData->paramValue -> 0-10
 
  * Return       : OK -> Success
                   NOK -> Failure
@@ -888,7 +908,7 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioFormat(HOSTIF_MsgData
 int hostIf_STBServiceAudioInterface::setX_COMCAST_COM_AudioCompression(const HOSTIF_MsgData_t *stMsgData)
 {
     int newComp = get_int(stMsgData->paramValue);
-    if (newComp < device::AudioCompression::kNone || newComp >= device::AudioCompression::kMax)
+    if (newComp < 0 || newComp > 10)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Failed due to Invalid value: %d\n",__FUNCTION__, newComp);
         return NOK;
@@ -915,11 +935,6 @@ int hostIf_STBServiceAudioInterface::setX_COMCAST_COM_AudioCompression(const HOS
  * Return       : OK -> Success
                   NOK -> Failure
                   stMsgData->paramValue -> the audio compression
-                                           0 = None
-                                           1 = Light
-                                           2 = Medium
-                                           3 = Heavy
-                                           4 = Max
 ************************************************************/
 
 int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioCompression(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
@@ -927,34 +942,16 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioCompression(HOSTIF_Ms
     try {
         int compression = aPort.getCompression();
 
-        if(compression == 0)
-        {
-            strncpy(stMsgData->paramValue,"None", PARAM_LEN);
-        }
-        else if ((compression > 0 )&&(compression < 5)) 
-        {
-            strncpy(stMsgData->paramValue,"Light", PARAM_LEN);
-        }
-        else if ((compression > 5 )&&(compression < 12)) 
-        {
-            strncpy(stMsgData->paramValue,"Medium", PARAM_LEN);
-        }
-        else if ((compression > 12 )&&(compression < 16)) 
-        {
-            strncpy(stMsgData->paramValue,"Heavy", PARAM_LEN);
-        }
-
-        stMsgData->paramValue[PARAM_LEN-1] = '\0';
-        stMsgData->paramtype = hostIf_StringType;
-        stMsgData->paramLen = strlen(stMsgData->paramValue);
-        if(bCalledAudioCompression && pChanged && strcmp(backupAudioCompression, stMsgData->paramValue))
+        put_int(stMsgData->paramValue, compression);
+        stMsgData->paramtype = hostIf_UnsignedIntType;
+        stMsgData->paramLen = sizeof(unsigned int);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] \n",__FUNCTION__, stMsgData->paramValue);
+        if(bCalledAudioCompression && pChanged && (backupAudioCompression != get_int(stMsgData->paramValue)))
         {
             *pChanged = true;
         }
         bCalledAudioCompression = true;
-        strncpy(backupAudioCompression, stMsgData->paramValue, _BUF_LEN_16);
-        backupAudioCompression[PARAM_LEN-1] = '\0';
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] \n",__FUNCTION__, stMsgData->paramValue);
+        backupAudioCompression = get_int(stMsgData->paramValue);
     }
     catch (const std::exception e) {
         RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception: %s\r\n",__FUNCTION__, e.what());
@@ -1301,6 +1298,73 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioOptimalLevel(HOSTIF_M
     return OK;
 }
 
+/************************************************************
+ * Description  : Set Dialog Enhancement Level
+ * Precondition : None
+ * Precondition : None
+ * Input        : stMsgData->paramValue -> 0-16
+
+ * Return       : OK -> Success
+                  NOK -> Failure
+************************************************************/
+
+int hostIf_STBServiceAudioInterface::setX_COMCAST_COM_DialogEnhancement(const HOSTIF_MsgData_t *stMsgData)
+{
+    int newLevel = get_int(stMsgData->paramValue);
+
+    if (newLevel < 0 || newLevel > 16)
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Failed due to invalid value : %d\n",__FUNCTION__, newLevel);
+        return NOK;
+    }
+
+    try {
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Value: %s \n",__FUNCTION__, stMsgData->paramValue);
+        aPort.setDialogEnhancement(newLevel);
+    }
+    catch (const std::exception e) {
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
+        return NOK;
+    }
+
+    return OK;
+}
+
+/************************************************************
+ * Description  : Get Dialog Enhancement Level
+ * Precondition : None
+ * Input        : stMsgData for result return.
+                  pChanged
+
+ * Return       : OK -> Success
+                  NOK -> Failure
+                  stMsgData->paramValue -> the dialog enhancement level
+************************************************************/
+
+int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_DialogEnhancement(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
+{
+    try {
+        int enhancementLevel = 0;
+        enhancementLevel = aPort.getDialogEnhancement();
+
+        put_int(stMsgData->paramValue, enhancementLevel);
+        stMsgData->paramtype = hostIf_UnsignedIntType;
+        stMsgData->paramLen = sizeof(unsigned int);
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] \n",__FUNCTION__, stMsgData->paramValue);
+        if(bCalledDialogEnhancement && pChanged && (backupDialogEnhancement != get_int(stMsgData->paramValue)))
+        {
+            *pChanged = true;
+        }
+        bCalledDialogEnhancement = true;
+        backupDialogEnhancement = get_int(stMsgData->paramValue);
+    }
+    catch (const std::exception e) {
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
+        return NOK;
+    }
+
+    return OK;
+}
 
 /** @} */
 /** @} */
