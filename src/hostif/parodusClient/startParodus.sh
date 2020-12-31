@@ -79,8 +79,7 @@ get_webpa_max_waiting_time()
 
 get_hardware_mac()
 {
-    hw_mac=$(getEstbMacAddressWithoutColon)
-    [ -z "$hw_mac" ] && [ -e "/tmp/.macAddress" ] && hw_mac=$(sed 's/://g' /tmp/.macAddress)
+    [ -e "/tmp/.macAddress" ] && hw_mac=$(sed 's/://g' /tmp/.macAddress)
     echo "$hw_mac"
 }
 
