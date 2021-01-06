@@ -20,7 +20,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    },
    "comcast" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -44,7 +46,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "True",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "https://5df09-linear.v.fwmrm.net/scte/request?nw=384777&csid=linear_endpoint_x1&resp=scte-130&prof=linear_mvpd",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "https://5df09-linear.v.fwmrm.net/scte/request?nw=384777&csid=linear_endpoint_x1&resp=scte-130&prof=linear_mvpd",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    },
    "sky-de" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -72,7 +76,9 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Network.ManualIPSettings.Enable" : "True",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix"
    },
     "sky-italia" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -99,7 +105,9 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Network.ManualIPSettings.Enable" : "True",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix"
    },
     "sky-uk" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -126,7 +134,9 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Network.ManualIPSettings.Enable" : "True",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix"
    },
    "sky-uk-dev" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -153,7 +163,9 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Network.ManualIPSettings.Enable" : "True",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix"
    },
    "xglobal" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -201,7 +213,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    },
    "cox-hospitality" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -224,7 +238,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    },
    "cox-dev" : {
         "Device.Time.NTPServer1" : "cpentp.services.coxlab.net",
@@ -247,7 +263,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    },
    "cox-qa" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -270,7 +288,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    },
    "MIT" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -290,7 +310,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    },
    "shaw" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -313,7 +335,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    },
    "shaw-dev" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -336,7 +360,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    },
    "rogers" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -357,7 +383,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    },
    "rogers-dev" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -378,7 +406,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    },
    "videotron" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -401,6 +431,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.ByteRangeDownload" : "False",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "http://dai-lsa-prod-cmcsa.g.comcast.com/slr-director/v2/PlacementRequest",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
    }
 }
