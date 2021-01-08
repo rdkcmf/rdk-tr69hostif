@@ -99,7 +99,7 @@ void hostIf_IARM_IF_Stop();
 
 #define IARM_BUS_TR69HOSTIFMGR_API_RegisterForEvents       "tr69HostIfRegisterForEvents" /*!< Registers for events from tr69hostIf, on this call, add/remove events will be re-broadcasted*/
 
-#define TR69HOSTIFMGR_MAX_PARAM_LEN     (2*1024)
+#define TR69HOSTIFMGR_MAX_PARAM_LEN     (4*1024)
 
 #define _BUF_LEN_16 16
 
