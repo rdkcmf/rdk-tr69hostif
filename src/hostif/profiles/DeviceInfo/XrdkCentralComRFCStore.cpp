@@ -336,7 +336,8 @@ bool init_rfcdefaults()
             string filepath = RFCDEFAULTS_ETC_DIR;
             std::ifstream file1( filepath.append(ent->d_name) ) ;
             combined_file << file1.rdbuf();
-         }
+            combined_file << "\n";
+	 }
       }
       closedir (dir);
    }
