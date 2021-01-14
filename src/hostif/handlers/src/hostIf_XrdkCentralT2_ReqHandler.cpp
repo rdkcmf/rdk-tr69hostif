@@ -91,8 +91,28 @@ int XRdkCentralT2::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s] Found string as %s.\n", __FUNCTION__, __FILE__, stMsgData->paramName);
     if(strcasecmp(stMsgData->paramName, "Device.X_RDKCENTRAL-COM_T2.ReportProfiles") == 0) {
         if(stMsgData->paramValue) {
-            RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s] Found parameter value as %s.\n", __FUNCTION__, __FILE__, stMsgData->paramValue);
-            setRbusStringParam(T2_REPORT_PROFILE_PARAM, stMsgData->paramValue);
+            if (stMsgData->isLengthyParam && NULL != stMsgData->paramValueLong) {
+                char* paramValueGetVal = NULL;
+                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s] Assigning long value to rbus%s.\n", __FUNCTION__, __FILE__, stMsgData->paramValueLong);
+                setRbusStringParam(T2_REPORT_PROFILE_PARAM, stMsgData->paramValueLong);
+
+                /*Cross check*/
+                if(OK == getRbusStringParam(T2_REPORT_PROFILE_PARAM, &paramValueGetVal)) {
+                    //Check length
+                    int iIpLen = strlen (stMsgData->paramValueLong);
+                    int iOpLen = strlen (paramValueGetVal);
+                    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s:%s] ReportProfiles written data size:%d data size read:%d\n", __FUNCTION__, __FILE__, iIpLen, iOpLen);
+                }
+                else {
+                    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s:%s] Device.X_RDKCENTRAL-COM_T2.ReportProfiles cross check get failed\n", __FUNCTION__, __FILE__);
+                }
+                free (stMsgData->paramValueLong);
+                stMsgData->paramValueLong = NULL;
+            }
+            else {
+                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s:%s] Found parameter value as %s.\n", __FUNCTION__, __FILE__, stMsgData->paramValue);
+                setRbusStringParam(T2_REPORT_PROFILE_PARAM, stMsgData->paramValue);
+            }
         }
         ret = OK ;
 
@@ -137,9 +157,26 @@ int XRdkCentralT2::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     if(strcasecmp(stMsgData->paramName, "Device.X_RDKCENTRAL-COM_T2.ReportProfiles") == 0)
     {
         RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Pass through function to be called over RBUS for %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+        stMsgData->isLengthyParam = true;
         if(OK == getRbusStringParam(T2_REPORT_PROFILE_PARAM, &paramValue)) {
-            strncpy(stMsgData->paramValue, paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN-1);
-            stMsgData->paramValue[TR69HOSTIFMGR_MAX_PARAM_LEN-1] = '\0';
+            if (stMsgData->isLengthyParam) {
+                int iParamLen = strlen (paramValue);
+                stMsgData->paramValueLong = (char*) malloc (iParamLen+1);
+                if (NULL == stMsgData->paramValueLong) {
+                    RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] [%d] memory allocation failed.\n", __FUNCTION__, __LINE__);
+                    ret = NOK;
+                    return ret;
+                }
+                else {
+                    memset (stMsgData->paramValueLong, '\0', iParamLen+1);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] read data size: %d\n", __FILE__, __FUNCTION__, __LINE__, iParamLen);
+                    strncpy(stMsgData->paramValueLong, paramValue, iParamLen);
+                }
+            }
+            else {
+                strncpy(stMsgData->paramValue, paramValue, TR69HOSTIFMGR_MAX_PARAM_LEN-1);
+                stMsgData->paramValue[TR69HOSTIFMGR_MAX_PARAM_LEN-1] = '\0';
+            }
             ret = OK ;
         }
 

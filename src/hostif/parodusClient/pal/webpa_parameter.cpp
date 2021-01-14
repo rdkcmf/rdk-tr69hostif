@@ -162,12 +162,16 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
 
                     // Convert Param.paramtype to ParamVal.type
                     getRet = get_ParamValues_tr69hostIf (&Param);
-
                     // Fill Only if we can able to get Proper value
                     if(WDMP_SUCCESS == getRet)
                     {
+                        int iParamValSize = MAX_PARAM_LENGTH;
+                        if (Param.isLengthyParam && (NULL != Param.paramValueLong)) {
+                            iParamValSize = strlen(Param.paramValueLong)+1;
+                        }
+
                         (*parametervalPtrPtr)[index][successWcCnt].name = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
-                        (*parametervalPtrPtr)[index][successWcCnt].value = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
+                        (*parametervalPtrPtr)[index][successWcCnt].value = (char*) calloc (iParamValSize, sizeof(char));
                         if ((*parametervalPtrPtr)[index][successWcCnt].name == NULL || (*parametervalPtrPtr)[index][successWcCnt].value == NULL)
                         {
                             RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Error allocating memory\n");
@@ -192,10 +196,15 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                             snprintf ((*parametervalPtrPtr)[index][successWcCnt].value, MAX_PARAM_LENGTH, "%u", *((unsigned long *) Param.paramValue));
                             break;
                         case hostIf_StringType:
-                            strncat ((*parametervalPtrPtr)[index][successWcCnt].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
-                            break;
                         default: // handle as string
-                            strncat ((*parametervalPtrPtr)[index][successWcCnt].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
+                            if (Param.isLengthyParam && (NULL != Param.paramValueLong)) {
+                                strncat ((*parametervalPtrPtr)[index][successWcCnt].value, Param.paramValueLong, iParamValSize);
+                                free (Param.paramValueLong);
+                                Param.paramValueLong = NULL;
+                            }
+                            else {
+                                strncat ((*parametervalPtrPtr)[index][successWcCnt].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
+                            }
                             break;
                         }
                         memset(&Param, '\0', sizeof(HOSTIF_MsgData_t));
@@ -239,10 +248,15 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                 ret = get_ParamValues_tr69hostIf (&Param);
                 if (ret == WDMP_SUCCESS)
                 {
+                    int iParamValSize = MAX_PARAM_LENGTH;
+                    if (Param.isLengthyParam && (NULL != Param.paramValueLong)) {
+                        iParamValSize = strlen(Param.paramValueLong)+1;
+                    }
+
                     // allocate parametervalPtr as a single param_t and initialize variables
                     (*parametervalPtrPtr)[index] = (param_t*) calloc (1, sizeof(param_t));
                     (*parametervalPtrPtr)[index][0].name = (char*) calloc (strlen(pParameterName)+1, sizeof(char));
-                    (*parametervalPtrPtr)[index][0].value = (char*) calloc (MAX_PARAM_LENGTH, sizeof(char));
+                    (*parametervalPtrPtr)[index][0].value = (char*) calloc (iParamValSize, sizeof(char));
                     (*parametervalPtrPtr)[index][0].type = WDMP_STRING;
 
                     if (NULL == (*parametervalPtrPtr)[index] || NULL == (*parametervalPtrPtr)[index][0].name || NULL == (*parametervalPtrPtr)[index][0].value)
@@ -275,10 +289,15 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
                             snprintf ((*parametervalPtrPtr)[index][0].value, MAX_PARAM_LENGTH, "%u", *((unsigned long *) Param.paramValue));
                             break;
                         case hostIf_StringType:
-                            strncat ((*parametervalPtrPtr)[index][0].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
-                            break;
                         default: // handle as string
-                            strncat ((*parametervalPtrPtr)[index][0].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
+                            if (Param.isLengthyParam && (NULL != Param.paramValueLong)) {
+                                strncat ((*parametervalPtrPtr)[index][0].value, Param.paramValueLong, iParamValSize);
+                                free (Param.paramValueLong);
+                                Param.paramValueLong = NULL;
+                            }
+                            else {
+                                strncat ((*parametervalPtrPtr)[index][0].value, Param.paramValue, MAX_PARAM_LENGTH - 1);
+                            }
                             break;
                         }
                         RDK_LOG (RDK_LOG_DEBUG, LOG_PARODUS_IF, "CMCSA:: GetParamInfo value is %s\n", (*parametervalPtrPtr)[index][0].value);
@@ -342,6 +361,17 @@ static WAL_STATUS SetParamInfo(ParamVal paramVal, char * transactionID)
         strncpy(Param.paramName, paramVal.name,MAX_PARAM_LENGTH-1);
         Param.paramName[MAX_PARAM_LENGTH-1]='\0';
 
+        Param.isLengthyParam = false;
+        Param.paramValueLong = NULL;
+        if (strcasecmp(Param.paramName, "Device.X_RDKCENTRAL-COM_T2.ReportProfiles") == 0) {
+
+            RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s:%s:%d] Device.X_RDKCENTRAL-COM_T2.ReportProfiles allocating long buff \n", __FILE__, __FUNCTION__, __LINE__);
+            Param.isLengthyParam = true;
+        }
+        else {
+            RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"[%s:%s:%d] Not Device.X_RDKCENTRAL-COM_T2.ReportProfiles. Param.paramName: %s \n", __FILE__, __FUNCTION__, __LINE__, Param.paramName);
+        }
+
         if (Param.paramtype == hostIf_BooleanType)
         {
             bool* boolPtr = (bool*) Param.paramValue;
@@ -376,8 +406,31 @@ static WAL_STATUS SetParamInfo(ParamVal paramVal, char * transactionID)
         }
         else
         {
-            strncpy(Param.paramValue, paramVal.value,MAX_PARAM_LENGTH-1);
-            Param.paramValue[MAX_PARAM_LENGTH-1]='\0';
+
+            if (Param.isLengthyParam) {
+                int iParamLen = strlen(paramVal.value);
+                if (TR69HOSTIFMGR_MAX_LONG_PARAM_LEN < iParamLen) {
+                    RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"[%s:%s:%d] Longer than expected parameter. Max len:%d iParamLen: %d\n", 
+                       __FILE__, __FUNCTION__, __LINE__, TR69HOSTIFMGR_MAX_LONG_PARAM_LEN, iParamLen);
+                    ret = WAL_ERR_INVALID_PARAMETER_VALUE;
+                    return ret;
+                }
+                Param.paramValueLong = (char*) malloc (iParamLen+1);
+                if (NULL == Param.paramValueLong) {
+                    RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF," Memory allocation failed.\n");
+                    ret = WAL_STATUS_RESOURCES;                   
+                    return ret; 
+                }
+                else {
+                    memset (Param.paramValueLong, '\0', iParamLen+1);
+                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"[%s:%s:%d] Long iParamLen: %d\n", __FILE__, __FUNCTION__, __LINE__, iParamLen);
+                    strncpy(Param.paramValueLong, paramVal.value, iParamLen);
+                }
+            }
+            else {
+                strncpy(Param.paramValue, paramVal.value,MAX_PARAM_LENGTH-1);
+                Param.paramValue[MAX_PARAM_LENGTH-1]='\0';
+            }
         }
 
         /* transactionID */

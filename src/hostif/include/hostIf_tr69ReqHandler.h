@@ -101,6 +101,8 @@ void hostIf_IARM_IF_Stop();
 
 #define TR69HOSTIFMGR_MAX_PARAM_LEN     (4*1024)
 
+#define TR69HOSTIFMGR_MAX_LONG_PARAM_LEN (200*1024)
+
 #define _BUF_LEN_16 16
 
 #define _BUF_LEN_32 32
@@ -168,6 +170,7 @@ typedef enum _HostIf_Source_Type_t
 typedef struct _HostIf_MsgData_t {
     char paramName[TR69HOSTIFMGR_MAX_PARAM_LEN];   			/*!< Parameter name with complete request path */
     char paramValue[TR69HOSTIFMGR_MAX_PARAM_LEN];   			/*!< Parameter Value */
+    char* paramValueLong;                            /*Heap allocation for lengthy param val*/
     char transactionID[_BUF_LEN_256];   			/*!< transaction identifier Value */
     short paramLen;             	/*!< Size of Response parameter data*/
     short instanceNum;              /*!< Instances number of Response parameter data*/
@@ -176,6 +179,7 @@ typedef struct _HostIf_MsgData_t {
     faultCode_t faultCode;          /*!< Fault codes as per BroadBand cwmp amendment*/
     HostIf_Source_Type_t requestor;   /*!< Requestor that made the set/get request*/
     HostIf_Source_Type_t bsUpdate; /*!< Bootstrap update level*/
+    bool isLengthyParam;
 } HOSTIF_MsgData_t;
 
 /*! Events published from TR69 host interface */
