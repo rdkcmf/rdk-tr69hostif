@@ -725,6 +725,63 @@
          </syntax>
        </parameter>
     </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Sysint." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+       <parameter base="XcalUrl" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
+       <parameter base="CcpUrl" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
+       <parameter base="XconfUrl" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
+       <parameter base="CCRProxyUrl" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
+       <parameter base="EDGEDNSProxyUrl" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
+       <parameter base="CDNCCPUrl" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
+       <parameter base="DAC15CDLUrl" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
+       <parameter base="XconfDEVUrl" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
+       <parameter base="FkpsBrokerUrl" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
+       <parameter base="FkpsUrl" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
+       <parameter base="PRODCDLUrl" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
+     </object>
      <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.recorder." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
       <parameter base="UpdateSchedule" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>
