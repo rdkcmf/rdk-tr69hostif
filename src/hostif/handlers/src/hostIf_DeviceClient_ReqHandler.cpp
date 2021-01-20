@@ -216,6 +216,10 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEnable(stMsgData);
         }
+        else if (strcasecmp(stMsgData->paramName,PARTNER_ID) == 0)
+        {
+            ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId(stMsgData);
+        }
         else if (strcasecmp(stMsgData->paramName,XRPOLLING_ACTION) == 0)
         {
             ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(stMsgData);
@@ -601,6 +605,10 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         else if (strcasecmp(stMsgData->paramName,IPREMOTE_MACADDRESS) == 0)
         {
             ret= pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMACaddress(stMsgData);
+        }
+        else if ( !strcasecmp(stMsgData->paramName, PARTNER_ID) )
+        {
+            ret= pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId(stMsgData);
         }
         else if (strcasecmp(stMsgData->paramName,XRPOLLING_ACTION) == 0)
         {

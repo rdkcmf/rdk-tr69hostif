@@ -56,6 +56,7 @@
 #include "Device_DeviceInfo.h"
 #include "hostIf_utils.h"
 #include "pwrMgr.h"
+#include <curl/curl.h>
 
 #include "dsTypes.h"
 #include "host.hpp"
@@ -100,6 +101,7 @@
 #define TR069DOSLIMIT_THRESHOLD "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Tr069DoSLimit.Threshold"
 #define MIN_TR69_DOS_THRESHOLD 0
 #define MAX_TR69_DOS_THRESHOLD 30
+#define HTTP_OK 200
 
 GHashTable* hostIf_DeviceInfo::ifHash = NULL;
 GHashTable* hostIf_DeviceInfo::m_notifyHash = NULL;
@@ -109,6 +111,7 @@ void *ResetFunc(void *);
 
 
 static int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t *);
+static int get_PartnerId_From_Curl(string& );
 static char stbMacCache[TR69HOSTIFMGR_MAX_PARAM_LEN] = {'\0'};
 static string reverseSSHArgs;
 static string stunnelSSHArgs;
@@ -2237,6 +2240,203 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(HO
     return OK;
 }
 
+size_t static writeCurlResponse(void *ptr, size_t size, size_t nmemb, string stream)
+{
+    size_t realsize = size * nmemb;
+    string temp(static_cast<const char*>(ptr), realsize);
+    stream.append(temp);
+    return realsize;
+}
+
+int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId(HOSTIF_MsgData_t *stMsgData)
+{
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+    string n_PartnerId="";
+    string current_PartnerId="";
+    int ret = NOK;
+
+    n_PartnerId=getStringValue(stMsgData); /* this is the value to set from RFC */
+
+    if(n_PartnerId.empty())
+    {
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] We received empty Buffer \n", __FUNCTION__);
+        return NOK;
+    }
+
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Calling get_PartnerId_From_Curl \n",__FUNCTION__);
+
+    /* get the value from the curl and see if they are different */
+    ret = get_PartnerId_From_Curl (current_PartnerId);
+
+    //we get a valid partnerID after the curl.
+    if( !current_PartnerId.empty() && ret == OK )
+    {
+        if( n_PartnerId.compare(current_PartnerId) )
+        {
+            CURL *curl = curl_easy_init();
+            bool upload_flag = false;
+            if(curl)
+            {
+                /* We have different partner IDs
+                 * set the partnerId using setpartnerid() */
+                long http_code = 0;
+                RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] call curl to set partner ID.. with New PartnerId = %s \n", __FUNCTION__, n_PartnerId);
+
+                curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:50050/authService/setPartnerId");
+                curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)n_PartnerId.length());
+                curl_easy_setopt(curl, CURLOPT_POSTFIELDS,n_PartnerId.c_str());
+
+                CURLcode res = curl_easy_perform(curl);
+
+                if ( res == CURLE_OK )
+                {
+                    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+                    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] curl response : %d http response code: %ld\n", __FUNCTION__, res, http_code);
+                }
+
+                curl_easy_cleanup(curl);
+
+                if( res == CURLE_OK && http_code == HTTP_OK )
+                {
+                    upload_flag = true;
+                    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] PartnerID uploaded using Curl Success \n",__FUNCTION__);
+                }
+                else
+                {
+                    RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] curl returned with error : %d http response code: %ld\n",\
+                            __FUNCTION__, res, http_code);
+                    return NOK;
+                }
+            }
+            else {
+                RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] curl init failed\n", __FUNCTION__);
+                return NOK;
+            }
+
+            /* Reload the bootstrap config if CURLE_OK */
+            int ret=NOK;
+
+            if (upload_flag)
+            {
+                ret = m_bsStore->overrideValue(stMsgData);
+            }
+            if (ret == OK)
+            {
+                if ( !m_bsStore->call_loadJson() )
+                {
+                    RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] loadFromJson() failed for new partner id %s,\
+                            continuing with older config from partner id %s \n", __FUNCTION__, n_PartnerId.c_str(), current_PartnerId.c_str());
+                    return NOK;
+                }
+            }
+            else
+            {
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Bootstrap update failed for new partner id %s,\
+                        continuing with older config from partner id %s\n",__FUNCTION__,n_PartnerId.c_str(), current_PartnerId.c_str());
+                return NOK;
+            }
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] PartnerIDs are same. \n",__FUNCTION__);
+            return OK;
+        }
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] We received empty Buffer \n", __FUNCTION__);
+        return NOK;
+    }
+
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] PartnerID uploaded using Curl Success =>\
+            Updated new partnerid:%s to authservice \n",__FUNCTION__, n_PartnerId.c_str());
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
+    return OK;
+}
+
+int static get_PartnerId_From_Curl( string& current_PartnerId )
+{
+    string response="";
+    CURL *curl = curl_easy_init();
+
+    if(curl)
+    {
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] call curl to get partner ID..\n", __FUNCTION__);
+
+        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:50050/authService/getDeviceId");
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCurlResponse);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+
+        CURLcode res = curl_easy_perform(curl);
+
+        long http_code = 0;
+
+        if(res == CURLE_OK)
+        {
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] curl response : %d http response code: %ld\n", __FUNCTION__, res, http_code);
+        }
+
+        curl_easy_cleanup(curl);
+
+        if(res == CURLE_OK && http_code == HTTP_OK )
+        {
+            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] curl response string = %s\n", __FUNCTION__, response.c_str());
+            cJSON* root = cJSON_Parse(response.c_str());
+            if(root)
+            {
+                cJSON* partnerID    = cJSON_GetObjectItem(root, "partnerId");
+                if(partnerID->type == cJSON_String && partnerID->valuestring && strlen(partnerID->valuestring) > 0)
+                {
+                    RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Found partnerID value = %s\n", partnerID->valuestring);
+                    current_PartnerId = partnerID->valuestring;
+                }
+                cJSON_Delete(root);
+            }
+            else
+            {
+                RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] json parse error\n", __FUNCTION__);
+                return NOK;
+            }
+        }
+        else
+        {
+            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] curl returned error with : %d http response code: %ld\n", __FUNCTION__, res, http_code);
+            return NOK;
+        }
+    }
+    else
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] curl init failed\n", __FUNCTION__);
+        return NOK;
+    }
+
+    return OK;
+}
+
+
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId(HOSTIF_MsgData_t *stMsgData)
+{
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+    string current_PartnerId = "";
+    int ret = NOK;
+
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Calling get_PartnerId_From_Curl \n",__FUNCTION__);
+    ret = get_PartnerId_From_Curl( current_PartnerId );
+    /* we get a valid partnerID after the curl */
+    if( !current_PartnerId.empty() && ret == OK )
+    {
+        stMsgData->paramLen = current_PartnerId.length();
+        strncpy(stMsgData->paramValue, current_PartnerId.c_str(), stMsgData->paramLen);
+        stMsgData->paramtype = hostIf_StringType;
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] We received empty Buffer after curl \n", __FUNCTION__);
+        return NOK;
+    }
+    return OK;
+}
 
 int hostIf_DeviceInfo::set_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
 {

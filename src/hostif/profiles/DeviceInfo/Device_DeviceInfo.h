@@ -167,6 +167,7 @@
 #define IPREMOTE_MACADDRESS "Device.DeviceInfo.X_RDKCENTRAL-COM_IPRemoteSupport.MACAddr"
 #define XRPOLLING_ACTION  "Device.DeviceInfo.X_RDKCENTRAL-COM_XRPolling.Action"
 
+#define PARTNER_ID "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId"
 /**
  * @brief This class provides the interface for getting device information.
  * @ingroup TR69_HOSTIF_DEVICEINFO_CLASSES
@@ -1065,6 +1066,33 @@ public:
 
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(HOSTIF_MsgData_t *, bool *pChanged = NULL);
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(HOSTIF_MsgData_t *);
+
+  /*
+    * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId
+    *
+    * This method is to get the PartnerId of the device.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId
+    *   Data type: String - Arguments PartnerId
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId(HOSTIF_MsgData_t *);
+
+    /**
+     * @brief set_Device.DeviceInfo_X_RDKCENTRAL-COM_Syndication_PartnerId
+     *
+     * This method is used to process the PartnerId.
+     * with following TR-069 definition:
+     * Parameter Name:Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId
+     * Data type: integer - Unused.
+     * @retval OK if it is successful.
+     * @retval NOK if operation fails.
+     */
+
+    int set_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId(HOSTIF_MsgData_t *);
 
 #ifdef USE_HWSELFTEST_PROFILE
     /**
