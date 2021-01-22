@@ -290,12 +290,12 @@ int MoCAInterfaceAssociatedDevice::get_TxBcastRate(HOSTIF_MsgData_t *stMsgData,u
         /* Get NodeID from associate ID*/
         const uint32_t associatedId = associatedDeviceNum;
         uint32_t nodeID;
-        if(RMH_SUCCESS != RMH_RemoteNode_GetRxBroadcastPhyRate(rmh, associatedId, &nodeID)) {
+        if(RMH_SUCCESS != RMH_RemoteNode_GetNodeIdFromAssociatedId(rmh, associatedId, &nodeID)) {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Failed in RMH_RemoteNode_GetNodeIdFromAssociatedId for AssociatedId (%d) \n",__FUNCTION__,associatedDeviceNum);
             return NOK;
         }
-        float response;
-        if(RMH_SUCCESS == RMH_RemoteNode_GetRxMapPower(rmh, nodeID, &response)) {
+        uint32_t response;
+        if(RMH_SUCCESS == RMH_RemoteNode_GetRxBroadcastPhyRate(rmh, nodeID, &response)) {
             put_int(stMsgData->paramValue, (int)response);
             ret = OK;
         }
