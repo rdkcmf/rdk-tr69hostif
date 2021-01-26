@@ -3072,16 +3072,7 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     }
     else if (strcasecmp(stMsgData->paramName,LE_RFC_ENABLE) == 0)
     {
-        string stringValue = getStringValue(stMsgData);
-        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] LE RFC status:%s\n",__FUNCTION__,stringValue.c_str());
-        if(strcasecmp(stringValue.c_str(),"true") == 0)
-        {
-            device::Host::getInstance().getAudioOutputPort("HDMI0").enableLEConfig(1);
-        }
-        else
-        {
-            device::Host::getInstance().getAudioOutputPort("HDMI0").enableLEConfig(0);
-        }
+       ret = set_xRDKCentralComRFCLoudnessEquivalenceEnable(stMsgData);
     }
     else if (strcasecmp(stMsgData->paramName,HDR_RFC_ENABLE) == 0)
     {
@@ -3233,6 +3224,38 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *stMsgD
         ret = OK;
     }
     system("wl roam_trigger &");
+    return ret;
+}
+
+int hostIf_DeviceInfo::set_xRDKCentralComRFCLoudnessEquivalenceEnable(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOK;
+    bool enable = false;
+    dsError_t status = dsERR_GENERAL;
+
+    if(stMsgData->paramtype == hostIf_BooleanType)
+    {
+        enable = get_boolean(stMsgData->paramValue);
+
+        //set the value TRUE/FALSE.
+        status = device::Host::getInstance().getAudioOutputPort("HDMI0").enableLEConfig((enable)?1:0);
+        if(status != dsERR_NONE)
+        {
+            /* We return NOK and log for all failed/unsupported calls. */
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] enableLEConfig failed/unsupported \n",__FUNCTION__);
+            ret = NOK;
+        }
+        else
+        {
+            ret = OK;
+        }
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong data type for %s, please use boolean(0/1) to set.\n"
+                , __FUNCTION__, __LINE__, stMsgData->paramName);
+        stMsgData->faultCode = fcInvalidParameterType;
+    }
     return ret;
 }
 
