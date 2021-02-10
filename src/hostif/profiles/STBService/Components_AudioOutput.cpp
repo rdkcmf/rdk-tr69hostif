@@ -863,9 +863,14 @@ int hostIf_STBServiceAudioInterface::getX_COMCAST_COM_AudioFormat(HOSTIF_MsgData
         switch(aPort.getEncoding().getId())
         {
             case dsAUDIO_ENC_NONE:
+                strncpy(stMsgData->paramValue, "None", PARAM_LEN);
+                break;
+
+            case dsAUDIO_ENC_DISPLAY:
+                /* Platform-selected digital audio encoding format. */
                 strncpy(stMsgData->paramValue, "Other", PARAM_LEN);
                 break;
-        
+
             case dsAUDIO_ENC_PCM:
                 strncpy(stMsgData->paramValue, "PCM", PARAM_LEN);
                 break;
