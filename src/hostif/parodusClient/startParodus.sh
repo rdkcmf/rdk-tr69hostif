@@ -26,8 +26,14 @@ CRUD_CONFIG_FILE="/opt/parodus_cfg.json"
 SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
 CONFIG_RES_FILE="/tmp/adzvfchig-res.mch"
 JWT_KEY="/etc/ssl/certs/webpa-rs256.pem"
-DNS_TEXT_URL="fabric.xmidt.comcast.net"
-TOKEN_SERVER_URL="https://issuer.xmidt.comcast.net:8080/issue"
+DNS_TEXT_URL=$(tr181 -g Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.HostIf.ParodusDnsTextUrl 2>&1)
+if [ -z "$DNS_TEXT_URL" ]; then
+   DNS_TEXT_URL="fabric.xmidt.comcast.net"
+fi
+TOKEN_SERVER_URL=$(tr181 -g Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.HostIf.ParodusTokenServerUrl 2>&1)
+if [ -z "$TOKEN_SERVER_URL" ]; then
+   TOKEN_SERVER_URL="https://issuer.xmidt.comcast.net:8080/issue"
+fi
 
 REBOOT_REASON_SECURE_FILE="/opt/secure/reboot/previousreboot.info"
 REBOOT_REASON_REGULAR_FILE="/opt/persistent/previousreboot.info"
@@ -117,7 +123,11 @@ get_BootTime()
 parodus_start_up()
 {
     # Getting Webpa Parameters
-    ServerIP=$(get_webpa_string_parameter "ServerIP")
+    ServerIP=$(tr181 -g Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.HostIf.ParodusServerUrl 2>&1)
+    if [ -z "$ServerIP" ]; then
+         ServerIP=$(get_webpa_string_parameter "ServerIP")
+    fi
+
     ACQUIRE_JWT=$(get_webpa_number_parameter "acquire-jwt")
     if [ -z "$ACQUIRE_JWT" ]; then
         ACQUIRE_JWT=1

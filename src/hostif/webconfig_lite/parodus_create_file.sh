@@ -29,7 +29,10 @@ TIMEOUT=30
 #TODO add it common config file
 CURL_RESPONSE="/tmp/.cURLresponse"
 #CLICMD="/tmp/cliCMD"
-SERVER_URL="https://issuer.xmidt.comcast.net:8080/issue"
+SERVER_URL=$(tr181 -g Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.HostIf.ParodusTokenServerUrl 2>&1)
+if [ -z "$SERVER_URL" ]; then
+   SERVER_URL="https://issuer.xmidt.comcast.net:8080/issue"
+fi
 
 HTTP_CODE="/tmp/cfg_http_code"
 CURL_FILE="/tmp/adzvfchig-res.mch"
