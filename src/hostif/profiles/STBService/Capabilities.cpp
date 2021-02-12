@@ -227,7 +227,7 @@ static const char* getTR181ResolutionString(std::string &resolution)
         return "1280x720p/59.94Hz";
     else if("1080i" == resolution)
         return "1920x1080i/59.94Hz";
-    else if("1080p60" == resolution)
+    else if(("1080p60" == resolution) || ("1080p" == resolution))
         return "1920x1080p/59.94Hz";
     else if("2160p30" == resolution)
         return "3840x2160p/30Hz";
@@ -237,6 +237,22 @@ static const char* getTR181ResolutionString(std::string &resolution)
         return "720x480i/59.94Hz";
     else if("480p" == resolution)
         return "720x480p/59.94Hz";
+    else if(("576p50" == resolution) || ("576p" == resolution))
+        return "720x576p/50Hz";
+    else if("720p50" == resolution)
+        return "1280x720p/50Hz";
+    else if("1080p30" == resolution)
+        return "1920x1080p/30Hz";
+    else if(("1080i50" == resolution) || ("1080i25" == resolution))
+        return "1920x1080i/50Hz";
+    else if("1080p24" == resolution)
+        return "1920x1080p/24Hz";
+    else if("1080p50" == resolution)
+        return "1920x1080p/50Hz";
+    else if("2160p50" == resolution)
+        return "3840x2160p/50Hz";
+    else if ("1080p25" == resolution)
+        return "1920x1080p/25Hz";
     else
     {
         RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Unhandled resolution: %s. Cannot translate!\n", __FUNCTION__, resolution.c_str());
