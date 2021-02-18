@@ -270,6 +270,20 @@
         </syntax>
       </parameter>
     </object>
+    <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ThunderTestClient." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+      <parameter base="ServerURL" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+          <default type="factory" value="wss://thunderstrikes.stb.r53.xcal.tv:8443"/>
+        </syntax>
+      </parameter>
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <boolean/>
+          <default type="factory" value="false"/>
+        </syntax>
+      </parameter>
+    </object>
     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.WarehouseHost." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
       <parameter base="CName1" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>
