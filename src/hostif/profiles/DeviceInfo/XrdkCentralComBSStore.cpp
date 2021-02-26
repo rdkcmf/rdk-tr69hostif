@@ -28,7 +28,8 @@
 #include "XrdkCentralComBSStore.h"
 #include "hostIf_utils.h"
 #include "rfcapi.h"
-
+#include <sys/stat.h>
+#include <sys/types.h>
 #define BS_STORE_KEY "BS_STORE_FILENAME"
 #define BS_JOURNAL_KEY "BS_JOURNAL_FILENAME"
 #define RFC_PROPERTIES_FILE "/etc/rfc.properties"
@@ -293,6 +294,12 @@ bool XBSStore::setRawValue(const string &key, const string &value, HostIf_Source
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
 
     RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, " %s: m_initialUpdate=%d\n", __FUNCTION__, m_initialUpdate);
+    std::string outputDir="/opt/secure/RFC";
+    struct stat st;
+    if(stat(outputDir.c_str(),&st) != 0)  //creating RFC directory if doesn't exist
+    {
+	 mkdir(outputDir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
+    }
     if(m_initialUpdate)
     {
         ofstream ofs(m_filename, ios::out | ios::app);
@@ -331,7 +338,6 @@ bool XBSStore::setRawValue(const string &key, const string &value, HostIf_Source
            xbsJournalInstance->setJournalValue(key, value, sourceType);
            return true;
         }
-
         ofstream ofs(m_filename, ios::trunc | ios::out);
         if(!ofs.is_open())
         {
