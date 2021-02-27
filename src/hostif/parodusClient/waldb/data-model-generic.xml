@@ -634,6 +634,11 @@
            <string/>
          </syntax>
        </parameter>
+       <parameter base="ignoreIpMode" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+         <syntax>
+           <string/>
+         </syntax>
+       </parameter>
     </object>
      <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.recorder." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
       <parameter base="UpdateSchedule" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
