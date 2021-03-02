@@ -2688,9 +2688,6 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
     {
         map<string,string> parsedMap;
         string inputStr(stMsgData->paramValue);
-        string ipv6_fileName = "/tmp/estb_ipv6";
-
-        bool ipv6Enabled = (!access (ipv6_fileName.c_str(), F_OK))?true:false;
         std::size_t start = inputStr.find_first_not_of(";"), end = start;
         while (start != string::npos)
         {
@@ -2710,14 +2707,18 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
         // two paths to follow either reversessh or stunnel based on whether the parsed map contains type key
         if (!parsedMap.count("type")) {
             reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":";
-
-            if (ipv6Enabled)
+            string estbip = getEstbIp();
+            unsigned char buf[sizeof(struct in6_addr)];
+	    //Check if estbip is ipv6 address
+            if (inet_pton(AF_INET6, estbip.c_str(), buf))
             {
-                reverseSSHArgs += "[" + getEstbIp() + "]";
+                reverseSSHArgs += "[" + estbip + "]";
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] SSH Tunnel estb ipv6 address is : %s\n",__FUNCTION__,estbip.c_str());
             }
             else
             {
-                reverseSSHArgs += getEstbIp();
+                reverseSSHArgs += estbip;
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] SSH Tunnel estb ipv4 address is : %s\n",__FUNCTION__,estbip.c_str());
             }
 
             reverseSSHArgs +=  ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
