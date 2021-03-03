@@ -361,12 +361,12 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     else if(matchComponent(stMsgData->paramName,"Device.DeviceInfo.Processor",&pSetting,instanceNumber))
     {
         hostIf_DeviceProcessorInterface *pIfaceProcessor = hostIf_DeviceProcessorInterface::getInstance(instanceNumber);
-        stMsgData->instanceNum = instanceNumber;
         if(!pIfaceProcessor)
         {
             hostIf_DeviceInfo::releaseLock();
             return NOK;
         }
+        stMsgData->instanceNum = instanceNumber;
         if(strcasecmp(pSetting,"Architecture")==0)
         {
             ret = pIfaceProcessor->get_Device_DeviceInfo_Processor_Architecture(stMsgData);

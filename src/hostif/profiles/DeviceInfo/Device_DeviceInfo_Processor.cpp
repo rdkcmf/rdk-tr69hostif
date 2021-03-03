@@ -44,6 +44,11 @@ GMutex* hostIf_DeviceProcessorInterface::m_mutex = NULL;
 hostIf_DeviceProcessorInterface* hostIf_DeviceProcessorInterface::getInstance(int dev_id)
 {
     hostIf_DeviceProcessorInterface* pRet = NULL;
+    if(dev_id > getNumOfProcessorEntries())
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"Processor interface instace doesnot exist..\n");
+        return pRet;
+    }
 
     if(ifHash)
     {
