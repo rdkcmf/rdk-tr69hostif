@@ -191,6 +191,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsDCMUpload.Enable" : "true",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsLogUpload.Enable" : "true",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.TR069support.Enable" : "false"
    },
    "cox" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
