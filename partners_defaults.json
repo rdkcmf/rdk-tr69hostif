@@ -22,7 +22,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    },
    "comcast" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -48,7 +49,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "https://5df09-linear.v.fwmrm.net/scte/request?nw=384777&csid=linear_endpoint_x1&resp=scte-130&prof=linear_mvpd",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    },
    "sky-de" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -78,7 +80,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Network.ManualIPSettings.Enable" : "True",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "true",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true"
    },
     "sky-italia" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -107,7 +110,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Network.ManualIPSettings.Enable" : "True",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "true",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true"
    },
     "sky-uk" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -136,7 +140,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Network.ManualIPSettings.Enable" : "True",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "true",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true"
    },
    "sky-uk-dev" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -165,7 +170,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Network.ManualIPSettings.Enable" : "True",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "true",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "true",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true"
    },
    "xglobal" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -189,8 +195,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PlacementReqUrl" : "",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "true",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsDCMUpload.Enable" : "true",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsLogUpload.Enable" : "true",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.TR069support.Enable" : "false",
@@ -220,7 +227,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    },
    "cox-hospitality" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -245,7 +253,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    },
    "cox-dev" : {
         "Device.Time.NTPServer1" : "cpentp.services.coxlab.net",
@@ -270,7 +279,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    },
    "cox-qa" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -295,7 +305,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    },
    "MIT" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -317,7 +328,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    },
    "shaw" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -342,7 +354,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    },
    "shaw-dev" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -367,7 +380,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    },
    "rogers" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -390,7 +404,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    },
    "rogers-dev" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -413,7 +428,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    },
    "videotron" : {
         "Device.Time.NTPServer1" : "ntp.ccp.xcal.tv",
@@ -438,6 +454,7 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LSA.PSNUrl" : "http://dai-lsa-psn-prod-cmcsa.gslb2.comcast.com/slr-director/PSN",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.HDMICECDaemon.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
    }
 }
