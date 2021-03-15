@@ -180,11 +180,28 @@ int EthernetClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     else if(matchComponent(stMsgData->paramName,
                            "Device.Ethernet.Interface",&pSetting,instanceNumber))
     {
-        stMsgData->instanceNum = instanceNumber;
         if(!instanceNumber)	{
             hostIf_EthernetInterface::releaseLock();
             return NOK;
         }
+        HOSTIF_MsgData_t msgData;
+        memset(&msgData,0,sizeof(msgData));
+        if(hostIf_EthernetInterface::get_Device_Ethernet_InterfaceNumberOfEntries(&msgData) != OK)
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Get number of interfaces failed \n", __FUNCTION__, __LINE__);
+            hostIf_EthernetInterface::releaseLock();
+            return NOK;
+        
+        }
+        int tmpInterfaceCount = get_int(msgData.paramValue);
+        if(instanceNumber > tmpInterfaceCount)
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] instanceNumber : \'%d\' is Not Supported. Total number of interfaces : \'%d\' \n", __FUNCTION__, __LINE__, \
+                                                                            instanceNumber,tmpInterfaceCount);
+            hostIf_EthernetInterface::releaseLock();
+            return NOK;
+        }
+        stMsgData->instanceNum = instanceNumber;
         hostIf_EthernetInterface *pIface = hostIf_EthernetInterface::getInstance(instanceNumber);
         hostIf_EthernetInterfaceStats *pIfaceStats = hostIf_EthernetInterfaceStats::getInstance(instanceNumber);
         if(!pIface)

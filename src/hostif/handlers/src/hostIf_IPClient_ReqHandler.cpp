@@ -147,17 +147,34 @@ int IPClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     int ret = NOT_HANDLED;
     const char *positionAfterInstanceNumber = 0;
     int instanceNumber = 0;
+    HOSTIF_MsgData_t msgData;
+
+
+    int interfaceNumberOfEntries = 0;
+
+    memset(&msgData,0,sizeof(msgData));
 
     std::lock_guard<std::mutex> lg (m_mutex);
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-
+    
     if (matchComponent (stMsgData->paramName, "Device.IP.Interface", &positionAfterInstanceNumber, instanceNumber))
     {
-        stMsgData->instanceNum = instanceNumber;
-
         if (!instanceNumber)
             return NOK;
+
+        if (hostIf_IP::get_Device_IP_InterfaceNumberOfEntries (&msgData) != OK)
+        {
+             return NOK;
+        }
+
+        interfaceNumberOfEntries = get_int (msgData.paramValue);
+
+        if(instanceNumber > interfaceNumberOfEntries)
+             return NOK;
+
+        stMsgData->instanceNum = instanceNumber;
+
 
         const char *positionAfterSubInstanceNumber = 0;
         int subInstanceNumber;
