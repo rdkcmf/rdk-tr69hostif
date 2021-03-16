@@ -193,7 +193,9 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : ""
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsDCMUpload.Enable" : "true",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsLogUpload.Enable" : "true",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.TR069support.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.TR069support.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.XconfUrl" : "https://secure.xconfds.coast.xcal.tv",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.SsrUrl" : "https://secure.ssr.coast.xcal.tv"
    },
    "cox" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
