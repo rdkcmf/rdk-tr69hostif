@@ -250,6 +250,10 @@ class hostIf_DeviceInfo {
 
     int set_xRDKCentralComRFCRetrieveNow(HOSTIF_MsgData_t *);
 
+#ifdef ENABLE_LLAMA_PLATCO
+    int set_xRDKCentralComRFCVideoTelFreq(HOSTIF_MsgData_t *);
+#endif
+
     /* AutoReboot handlers */
     int set_xRDKCentralComRFCAutoRebootUptime(HOSTIF_MsgData_t*);
     int set_xRDKCentralComRFCAutoRebootEnable(HOSTIF_MsgData_t*);

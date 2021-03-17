@@ -3099,6 +3099,12 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     {
         ret = set_xRDKCentralComRFCRetrieveNow(stMsgData);
     }
+#ifdef ENABLE_LLAMA_PLATCO
+    else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.VideoTelemetry.FrequncyMinutes"))
+    {
+        ret = set_xRDKCentralComRFCVideoTelFreq(stMsgData);
+    }
+#endif
     else if (!strcasecmp(stMsgData->paramName,TR181_AUTOREBOOT_ENABLE) )
     {
         ret = set_xRDKCentralComRFCAutoRebootEnable(stMsgData);
@@ -3352,6 +3358,30 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCRetrieveNow(HOSTIF_MsgData_t *stMsgD
     return ret;
 }
 
+#ifdef ENABLE_LLAMA_PLATCO
+int hostIf_DeviceInfo::set_xRDKCentralComRFCVideoTelFreq(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOK;
+    unsigned int tmpVal = 0;
+    char execBuf[100] = {'\0'};
+    if (stMsgData->paramtype == hostIf_UnsignedIntType)
+    {
+        tmpVal = get_uint(stMsgData->paramValue);
+        if (tmpVal > 0 && tmpVal <=60)
+        {
+            sprintf(execBuf, "sh /lib/rdk/vdec-statistics.sh %d &", tmpVal);
+            v_secure_system("sh /lib/rdk/vdec-statistics.sh %d &", tmpVal);
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully executed \"%s\" with \"%s\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, execBuf);
+            ret = OK;
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] FrequncyMinutes value should be in the range between 1 to 60 (Minutes) \n", __FUNCTION__, __LINE__); 
+        }
+    }
+    return ret;
+}
+#endif
 int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
 {
     int ret = OK;
