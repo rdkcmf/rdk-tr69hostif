@@ -298,6 +298,7 @@
      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>
           <boolean/>
+           <default type="factory" value="false"/>
         </syntax>
      </parameter>
     </object>
