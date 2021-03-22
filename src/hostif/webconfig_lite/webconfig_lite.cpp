@@ -850,7 +850,7 @@ static void execute_token_script(char *token, char *name, size_t len, char *mac,
             {
                 RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:Read the token \n");
                 fgets(token, len, out);
-                RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:Token =%s \n",token);
+                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"webconfig_lite:Token =%s \n",token);
                 pclose(out);
             }
             fclose(file);
