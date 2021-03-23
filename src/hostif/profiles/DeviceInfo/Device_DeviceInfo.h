@@ -129,7 +129,7 @@
 #define xOpsDMUploadLogsNow_STR 	"Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMUploadLogsNow"
 #define xOpsDMLogsUploadStatus_STR 	"Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMLogsUploadStatus"
 
-
+#define TR181_AUTOREBOOT_ENABLE         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.AutoReboot.Enable"
 
 #define xOpsDMMoCALogEnabled 	"Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMMoCALogEnabled"
 #define xOpsDMMoCALogPeriod 	"Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMMoCALogPeriod"
@@ -239,6 +239,8 @@ class hostIf_DeviceInfo {
     int set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *);
 
     int set_xRDKCentralComRFCRetrieveNow(HOSTIF_MsgData_t *);
+    int set_xRDKCentralComRFCAutoRebootEnable(HOSTIF_MsgData_t*);  
+    int ScheduleAutoReboot(bool);
 
 public:
 

@@ -3116,6 +3116,10 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     {
         ret = set_xRDKCentralComRFCRetrieveNow(stMsgData);
     }
+    else if (!strcasecmp(stMsgData->paramName,TR181_AUTOREBOOT_ENABLE) )
+    {
+        ret = set_xRDKCentralComRFCAutoRebootEnable(stMsgData);
+    }
 #ifdef USE_HWSELFTEST_PROFILE
     else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.Enable"))
     {
@@ -3152,22 +3156,76 @@ int hostIf_DeviceInfo::get_xRDKCentralComBootstrap(HOSTIF_MsgData_t *stMsgData)
 
 int hostIf_DeviceInfo::get_xRDKCentralComRFC(HOSTIF_MsgData_t *stMsgData)
 {
+    int ret=NOK;
 #ifndef NEW_HTTP_SERVER_DISABLE
     if(!legacyRFCEnabled())
     {
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling getValue in New RFC Store I/O\n",__FUNCTION__);
-        return m_rfcStore->getValue(stMsgData);
+        ret=m_rfcStore->getValue(stMsgData);
     }
     else
     {
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Calling getValue in Old RFC Storage I/O\n",__FUNCTION__);
-        return m_rfcStorage.getValue(stMsgData);
+        ret=m_rfcStorage.getValue(stMsgData);
     }
 #else
-    return m_rfcStorage.getValue(stMsgData);
+    ret=m_rfcStorage.getValue(stMsgData);
 #endif
+
+    return ret;
+}
+int hostIf_DeviceInfo::set_xRDKCentralComRFCAutoRebootEnable(HOSTIF_MsgData_t *stMsgData)
+{
+    bool enableStatus = false;
+    int ret = OK;
+    int l_uptime = 0;
+    bool bValue = false;
+
+    if(stMsgData->paramtype == hostIf_BooleanType)
+    {
+        enableStatus=get_boolean(stMsgData->paramValue);
+
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] %s: %s\n",  __FUNCTION__, __LINE__ \
+                ,stMsgData->paramName, (enableStatus)? "true":"false");
+
+        /* Call Schedule Auto Reboot */
+        ret = ScheduleAutoReboot(enableStatus);
+        if ( NOK == ret )
+        {
+            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s] ScheduleAutoReboot Failed \n", __FUNCTION__);
+        }
+    }
+    else
+    {
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] Value Incorrect, Auto Reboot Enable status unchanged \n" \
+                , __FUNCTION__);
+        ret=NOK;
+    }
+
+    return ret;
 }
 
+int hostIf_DeviceInfo::ScheduleAutoReboot(bool bValue)
+{
+    int ret = OK;
+    char cmd[100] = {'\0'};
+
+
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d]  bValue = %s\n" \
+            ,  __FUNCTION__, __LINE__, bValue? "true" : "false" );
+
+    /* Call the script for scheduling
+     * cron args with Reboot day and bValue */
+    snprintf(cmd,sizeof(cmd),"sh /lib/rdk/ScheduleAutoReboot.sh %d &", bValue);
+#ifdef YOCTO_BUILD
+    v_secure_system("sh /lib/rdk/ScheduleAutoReboot.sh %d &", bValue);
+#else
+    system(cmd);
+#endif
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully executed \"%s\". \n", __FUNCTION__, __LINE__, cmd);
+    ret = OK;
+    return ret;
+}
 
 int hostIf_DeviceInfo::set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *stMsgData)
 {
