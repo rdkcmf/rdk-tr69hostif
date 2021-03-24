@@ -37,6 +37,7 @@
 #include <webconfig_utils.h>
 #include <libpd.h>
 #include <unistd.h>
+#include "rfcapi.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -77,27 +78,28 @@ struct token_data {
 
 typedef struct _notify_params
 {
-	char * url;
-	long status_code;
-	char * application_status;
-	int application_details;
-	char * request_timestamp;
-	char * version;
-	char * transaction_uuid;
+    char * url;
+    long status_code;
+    char * application_status;
+    int application_details;
+    char * request_timestamp;
+    char * version;
+    char * transaction_uuid;
 } notify_params_t;
 
-typedef struct tr181Data
+typedef struct _tr181Data
 {
     //size_t paramCnt;
-    char name[512];
-    char value[16];
-};
+    std::string name;
+    std::string value;
+    int datatype;
+} tr181Data;
 /*----------------------------------------------------------------------------*/
 /*                            File Scoped Variables                           */
 /*----------------------------------------------------------------------------*/
-static char serialNum[64]={'\0'};
-char webpa_auth_token[4096]={'\0'};
-static char g_ETAG[64]={'\0'};
+static char serialNum[64]= {'\0'};
+char webpa_auth_token[4096]= {'\0'};
+static char g_ETAG[64]= {'\0'};
 static char deviceMac[64] = {'\0'};
 static char *webconfigEndPoint=NULL;
 tr181Data tr181data;
@@ -144,8 +146,8 @@ void parse_set_request(cJSON *request)
 
         if(cJSON_GetObjectItem(reqParamObj, "name") != NULL)
         {
-            strcpy(tr181data.name,cJSON_GetObjectItem(reqParamObj, "name")->valuestring);
-            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The Name = %s\n",tr181data.name);
+            tr181data.name = cJSON_GetObjectItem(reqParamObj, "name")->valuestring;
+            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The Name = %s\n",tr181data.name.c_str());
         }
         else
         {
@@ -156,10 +158,10 @@ void parse_set_request(cJSON *request)
         {
             if(cJSON_GetObjectItem(reqParamObj, "value")->valuestring != NULL)
             {
-                strcpy(tr181data.value, cJSON_GetObjectItem(reqParamObj, "value")->valuestring);
-                RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The param value =%s \n",tr181data.value);
+                tr181data.value = cJSON_GetObjectItem(reqParamObj, "value")->valuestring;
+                RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The param value =%s \n",tr181data.value.c_str());
             }
-            else 
+            else
             {
                 RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:Parameter value field is not a string \n");
             }
@@ -167,7 +169,8 @@ void parse_set_request(cJSON *request)
 
         if (cJSON_GetObjectItem(reqParamObj, "dataType") != NULL)
         {
-            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The data Type = %d \n",cJSON_GetObjectItem(reqParamObj, "dataType")->valueint);
+            tr181data.datatype = cJSON_GetObjectItem(reqParamObj, "dataType")->valueint;
+            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The data Type = %d \n", tr181data.datatype);
         }
     }
 
@@ -178,9 +181,9 @@ void * initWebConfigTask(void *)
 {
     RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite: [%s] %d **** Entering webconfig task thread ****** \n", __FUNCTION__, __LINE__);
 
-    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:**** calling processWebconfigSync  ****** \n"); 
-    
-    processWebconfigSync(); 
+    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:**** calling processWebconfigSync  ****** \n");
+
+    processWebconfigSync();
 
     if(webconfigEndPoint != NULL)
     {
@@ -265,16 +268,16 @@ static int handleHttpResponse(long response_code, char *webConfigData, int retry
     current_time = time(NULL);
     snprintf(currentTime,sizeof(currentTime),"%d",(int)current_time);
     //read the configversion from /opt/data
-    
-     FILE *ConfigFilePtr = NULL;
-     /*write the configVersion/docVersion to the file "/opt/persistent/webconfig_Version"*/
-     if(ConfigFilePtr = fopen(CONFIG_VERSION_FILE,"r"))
-     {
 
-           fread(configVersion, MAX_BUF_SIZE, 1, ConfigFilePtr);
-           RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"The config version file exists with value =%s \n",configVersion);
-           fclose(ConfigFilePtr);
-     }
+    FILE *ConfigFilePtr = NULL;
+    /*write the configVersion/docVersion to the file "/opt/persistent/webconfig_Version"*/
+    if(ConfigFilePtr = fopen(CONFIG_VERSION_FILE,"r"))
+    {
+
+        fread(configVersion, MAX_BUF_SIZE, 1, ConfigFilePtr);
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"The config version file exists with value =%s \n",configVersion);
+        fclose(ConfigFilePtr);
+    }
 
     if(response_code == 304)
     {
@@ -332,10 +335,10 @@ static int handleHttpResponse(long response_code, char *webConfigData, int retry
     }
     else if(response_code == 404)
     {
-         RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:Action not supported. response_code:%d\n", response_code);
-         RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite: Something went wrong on the device side re try again \n");
-         //addWebConfigNotifyMsg(webconfigEndPoint, response_code, NULL, 0, currentTime , configVersion, transaction_uuid);
-         return ERR;
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:Action not supported. response_code:%d\n", response_code);
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite: Something went wrong on the device side re try again \n");
+        //addWebConfigNotifyMsg(webconfigEndPoint, response_code, NULL, 0, currentTime , configVersion, transaction_uuid);
+        return ERR;
 
     }
     else if(response_code == 429)
@@ -365,7 +368,7 @@ static int handleHttpResponse(long response_code, char *webConfigData, int retry
 
 /*
  * @brief Initialize curl object with required options. create configData using libcurl.
- * @param[out] configData 
+ * @param[out] configData
  * @param[in] len total configData size
  * @param[in] r_count Number of curl retries on ipv4 and ipv6 mode during failure
  * @return returns 0 if success, otherwise failed to fetch auth token and will be retried.
@@ -422,19 +425,19 @@ static int requestWebConfigData(char **configData, long *code, char **transactio
         curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
 
         // setting curl resolve option as default mode.
-        //If any failure, retry with v4 first and then v6 mode. 
+        //If any failure, retry with v4 first and then v6 mode.
         RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:curl Ip resolve option set as default mode\n");
         curl_easy_setopt(curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_WHATEVER);
         curl_easy_setopt(curl, CURLOPT_CAPATH, CA_CERT_PATH);
-        // disconnect if it is failed to validate server's cert 
+        // disconnect if it is failed to validate server's cert
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
-        // Verify the certificate's name against host 
+        // Verify the certificate's name against host
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
-        // To use TLS version 1.2 or later 
+        // To use TLS version 1.2 or later
         curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
         // To follow HTTP 3xx redirections
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        // Perform the request, res will get the return code 
+        // Perform the request, res will get the return code
         res = curl_easy_perform(curl);
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
         RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:webConfig curl response %d http_code %d\n", res, response_code);
@@ -491,7 +494,7 @@ static size_t write_callback_fn(void *buffer, size_t size, size_t nmemb, struct 
 
     data->size += (size * nmemb);
 
-    tmp = (char *)realloc(data->data, data->size + 1); // +1 for '\0' 
+    tmp = (char *)realloc(data->data, data->size + 1); // +1 for '\0'
 
     if(tmp) {
         data->data = tmp;
@@ -548,7 +551,7 @@ static void stripSpaces(char *str, char **final_str)
 {
     int i=0, j=0;
 
-    for(i=0;str[i]!='\0';++i)
+    for(i=0; str[i]!='\0'; ++i)
     {
         if(str[i]!=' ')
         {
@@ -594,25 +597,16 @@ static int processJsonDocument(char *jsonData, int *retStatus, char **docVersion
     if(parseStatus ==1)
     {
         RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite: ****webconfig set Request **** \n");
-        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The param name =%s \n",tr181data.name);
-        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The param value =%s \n",tr181data.value);
-        command = "tr181 -s ";
-        command += tr181data.name;
-        command += " -v ";
-        command += tr181data.value;
-        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The final command to set =%s \n",command.c_str());
-        exitstatus = system(command.c_str());
-        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The exit status = %d \n",WEXITSTATUS(exitstatus));
-        if(WEXITSTATUS(exitstatus) == 0)
-        {
-            //send the success case notification to the cloud
-            *retStatus = WEXITSTATUS(exitstatus);
-            return SUCCESS;
-        }else{
-            //send failure case notification to the cloud
-            *retStatus = WEXITSTATUS(exitstatus);
-            return ERR;
-        }
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The param name =%s \n",tr181data.name.c_str());
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The param value =%s \n",tr181data.value.c_str());
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The param dataType =%d \n",tr181data.datatype);
+        DATA_TYPE data_type = (DATA_TYPE)tr181data.datatype;
+
+        WDMP_STATUS rfcStatus = setRFCParameter((char*)"webconfig",tr181data.name.c_str() , tr181data.value.c_str(), data_type);
+
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:The setRFCParameter return = %s \n",rfcStatus);
+
+        return (WDMP_SUCCESS == rfcStatus)? SUCCESS : ERR;
     }
     else
     {
@@ -755,7 +749,7 @@ static void createCurlheader( struct curl_slist *list, struct curl_slist **heade
     RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:Start of createCurlheader\n");
     //Fetch auth JWT token from cloud.
     getAuthToken();
-    
+
     // auth_header
     snprintf(auth_header, MAX_HEADER_LEN, "Authorization:Bearer %s", (0 < strlen(webpa_auth_token) ? webpa_auth_token : NULL));
     list = curl_slist_append(list, auth_header);
@@ -766,7 +760,7 @@ static void createCurlheader( struct curl_slist *list, struct curl_slist **heade
         fread(current_version, MAX_BUF_SIZE, 1, ConfigFilePtr);
         if(strlen(current_version)!=0)
         {
-           snprintf(version_header, MAX_BUF_SIZE, "IF-NONE-MATCH:%s", current_version);
+            snprintf(version_header, MAX_BUF_SIZE, "IF-NONE-MATCH:%s", current_version);
         }
         else
         {
@@ -870,7 +864,7 @@ static void execute_token_script(char *token, char *name, size_t len, char *mac,
 static void createNewAuthToken(char *newToken, size_t len, char *hw_mac, char* hw_serial_number)
 {
     int token_retry_count=0;
-    
+
     while(1)
     {
         if(( access( CURL_FILE, F_OK ) != -1 ))
@@ -891,7 +885,7 @@ static void createNewAuthToken(char *newToken, size_t len, char *hw_mac, char* h
             }
             /*no retries are required*/
             break;
-        } 
+        }
         else
         {
             // file doesn't exist

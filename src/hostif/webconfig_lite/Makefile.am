@@ -25,10 +25,10 @@ AM_CXXFLAGS= -I$(top_srcdir)/src/hostif/parodusClient/pal \
             -I$(top_srcdir)/src/hostif/parodusClient/waldb \
             -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/wrp-c \
             -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/glib-2.0 \
-	    -I${PKG_CONFIG_SYSROOT_DIR}$(libdir)/glib-2.0/include \
+	        -I${PKG_CONFIG_SYSROOT_DIR}$(libdir)/glib-2.0/include \
             -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/wdmp-c 
 
-libwebconfiglite_la_LDFLAGS= -lpthread -lcjson -ltrower-base64 -lwrp-c  -lm -luuid -lstdc++ -lcurl  -lrdkloggers
+libwebconfiglite_la_LDFLAGS= -lpthread -lcjson -ltrower-base64 -lwrp-c  -lm -luuid -lstdc++ -lcurl  -lrdkloggers -lrfcapi
 libwebconfiglite_la_LIBADD = $(top_builddir)/src/hostif/parodusClient/waldb/libwaldb.la
 libwebconfiglite_la_LIBADD += $(top_builddir)/src/hostif/parodusClient/pal/libparodusclient.la
 libwebconfiglite_la_SOURCES = webconfig_lite.cpp webconfig_utils.cpp 
