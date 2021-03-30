@@ -224,12 +224,12 @@ bool XBSStore::loadFromJson()
 
         cJSON *configObject = partnerConfig->child;
 
-        //Check if any params were removed in firmware update
+        //Check if any params were removed in firmware update. Do not remove params that were set by RFC/WebPA.
         bool removedEntries = false;
         for (unordered_map<string, string>::iterator it=m_dict.begin(); it!=m_dict.end();)
         {
             string key = it->first;
-            if (!cJSON_GetObjectItem(partnerConfig, key.c_str()) && key.compare(TR181_PARTNER_ID_KEY) != 0)
+            if (!cJSON_GetObjectItem(partnerConfig, key.c_str()) && key.compare(TR181_PARTNER_ID_KEY) != 0 && xbsJournalInstance->getJournalSource(key) == HOSTIF_SRC_DEFAULT)
             {
                 RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: Remove param %s from bootstrap store, size=%d\n", __FUNCTION__, key.c_str(), m_dict.size());
                 removedEntries = true;
@@ -441,9 +441,7 @@ faultCode_t  XBSStore::overrideValue(HOSTIF_MsgData_t *stMsgData)
     mtx.lock();
     if (m_dict.find(stMsgData->paramName) == m_dict.end())
     {
-        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Param does not exist in bootstrap store. Cannot override.\n");
-        mtx.unlock();
-        return fcInternalError;
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "Param does not exist in bootstrap store. Allowing override.\n");
     }
 
     const string &givenValue = getStringValue(stMsgData);
