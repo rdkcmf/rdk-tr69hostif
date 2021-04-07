@@ -108,21 +108,21 @@ static void HTTPRequestHandler(
                 wdmp_form_get_response(respSt, jsonResponse);
 
                 // WDMP Code sets a generic statusCode, the following lines replace it with an actual error code.
-		int new_st_code = 0;
+                int new_st_code = 0;
 
                 for(int paramIndex = 0; paramIndex < respSt->paramCnt; paramIndex++)
                 {
-                   if(respSt->retStatus[paramIndex] != 0 || paramIndex == respSt->paramCnt-1)
-                   {
-		      new_st_code =  respSt->retStatus[paramIndex];
-                      break;
-                   }
+                    if(respSt->retStatus[paramIndex] != 0 || paramIndex == respSt->paramCnt-1)
+                    {
+                        new_st_code =  respSt->retStatus[paramIndex];
+                        break;
+                    }
                 }
-		cJSON * stcode = cJSON_GetObjectItem(jsonResponse, "statusCode");
-		if( NULL != stcode)
-		{
-		     cJSON_SetIntValue(stcode, new_st_code);
-		}
+                cJSON * stcode = cJSON_GetObjectItem(jsonResponse, "statusCode");
+                if( NULL != stcode)
+                {
+                    cJSON_SetIntValue(stcode, new_st_code);
+                }
             }
             else
             {
@@ -156,26 +156,26 @@ static void HTTPRequestHandler(
 
                 for(int paramIndex = 0; paramIndex < respSt->paramCnt; paramIndex++)
                 {
-                   if(respSt->retStatus[paramIndex] != 0 || paramIndex == respSt->paramCnt-1)
-                   {
-                      new_st_code =  respSt->retStatus[paramIndex];
-                      break;
-                   }
+                    if(respSt->retStatus[paramIndex] != 0 || paramIndex == respSt->paramCnt-1)
+                    {
+                        new_st_code =  respSt->retStatus[paramIndex];
+                        break;
+                    }
                 }
-		cJSON * stcode = cJSON_GetObjectItem(jsonResponse, "statusCode");
+                cJSON * stcode = cJSON_GetObjectItem(jsonResponse, "statusCode");
                 if( NULL != stcode)
                 {
-                     cJSON_SetIntValue(stcode, new_st_code);
+                    cJSON_SetIntValue(stcode, new_st_code);
                 }
-             }
-             else
-             {
-                 soup_message_set_status_full (msg, SOUP_STATUS_INTERNAL_SERVER_ERROR, "Invalid request format");
-                 RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%s] Exiting.. Request couldn't be processed\n", __FUNCTION__, __FILE__);
-                 wdmp_free_req_struct(reqSt);
-                 reqSt = NULL;
-                 return;
-             }
+            }
+            else
+            {
+                soup_message_set_status_full (msg, SOUP_STATUS_INTERNAL_SERVER_ERROR, "Invalid request format");
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"[%s:%s] Exiting.. Request couldn't be processed\n", __FUNCTION__, __FILE__);
+                wdmp_free_req_struct(reqSt);
+                reqSt = NULL;
+                return;
+            }
         }
         else
         {
@@ -185,9 +185,13 @@ static void HTTPRequestHandler(
             reqSt = NULL;
             return;
         }
+
         char *buf = cJSON_Print(jsonResponse);
-        soup_message_set_response(msg, (const char *) "application/json", SOUP_MEMORY_COPY, buf, strlen(buf));
-        soup_message_set_status (msg, SOUP_STATUS_OK);
+
+        if(buf) {
+            soup_message_set_response(msg, (const char *) "application/json", SOUP_MEMORY_COPY, buf, strlen(buf));
+            soup_message_set_status (msg, SOUP_STATUS_OK);
+        }
 
         wdmp_free_req_struct(reqSt);
         reqSt = NULL;
@@ -195,8 +199,11 @@ static void HTTPRequestHandler(
         cJSON_Delete(jsonResponse);
         wdmp_free_res_struct(respSt);
         respSt = NULL;
-        free(buf);
-        buf = NULL;
+
+        if(buf != NULL) {
+            free(buf);
+            buf = NULL;
+        }
     }
     else
     {
