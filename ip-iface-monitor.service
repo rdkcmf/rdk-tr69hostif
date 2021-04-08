@@ -25,8 +25,8 @@ After=moca.service
 
 [Service]
 Type=oneshot
-ExecStartPre=/bin/sh -c '/lib/rdk/getNonRootUserStatus.sh'
-ExecStart=/bin/sh -c 'if [ -f /tmp/.EnableNonRootUser ]; then /bin/su non-root -c "/lib/rdk/ipIfaceMonitor.sh &"; else /bin/sh -c "/lib/rdk/ipIfaceMonitor.sh &"; fi'
+ExecStartPre=/bin/busybox sh -c '/lib/rdk/getNonRootUserStatus.sh'
+ExecStart=/bin/busybox sh -c 'if [ -f /tmp/.EnableNonRootUser ]; then /bin/su non-root -c "/lib/rdk/ipIfaceMonitor.sh &"; else /bin/busybox sh -c "/lib/rdk/ipIfaceMonitor.sh &"; fi'
 RemainAfterExit=yes
 
 [Install]
