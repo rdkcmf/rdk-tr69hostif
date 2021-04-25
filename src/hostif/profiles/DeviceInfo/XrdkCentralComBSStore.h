@@ -26,6 +26,8 @@
 #include <mutex>
 #include <condition_variable>
 #include <XrdkCentralComBSStoreJournal.h>
+#include "cJSON.h"
+
 using namespace std;
 
 class XBSStore
@@ -64,6 +66,7 @@ private:
     void initBSPropertiesFileName();
     bool loadBSPropertiesIntoCache();
     void resetCacheAndStore();
+    bool getPartnerDeviceConfig(cJSON* partnerConfig, const string & partnerId);
     bool loadFromJson();
     bool clearRfcValues();
     static void getAuthServicePartnerID();

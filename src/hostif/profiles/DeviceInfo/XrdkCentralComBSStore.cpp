@@ -23,7 +23,6 @@
 #include <string>
 #include <ctype.h>
 #include <curl/curl.h>
-#include "cJSON.h"
 
 #include "XrdkCentralComBSStore.h"
 #include "hostIf_utils.h"
@@ -34,6 +33,7 @@
 #define BS_JOURNAL_KEY "BS_JOURNAL_FILENAME"
 #define RFC_PROPERTIES_FILE "/etc/rfc.properties"
 #define BS_JSON_FILE "/etc/partners_defaults.json"
+#define BS_JSON_DEVICE_FILE "/etc/partners_defaults_device.json"
 #define TR181_PARTNER_ID_KEY "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId"
 #define BS_CLEAR_DB_START "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.Control.ClearDB"
 #define BS_CLEAR_DB_END "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.Control.ClearDBEnd"
@@ -170,6 +170,63 @@ void XBSStore::resetCacheAndStore()
 
 }
 
+// Get device specific bootstrap defaults and give precedence to these values over generic bootstrap defaults.
+bool XBSStore::getPartnerDeviceConfig(cJSON* partnerConfig, const string & partnerId)
+{
+    ifstream ifs_json_device(BS_JSON_DEVICE_FILE);
+    if(!ifs_json_device.is_open())
+    {
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: Device specific file [%s] does not exist\n", __FUNCTION__, BS_JSON_DEVICE_FILE);
+        return true;
+    }
+
+    ifs_json_device.seekg(0, std::ios::end);
+    size_t size = ifs_json_device.tellg();
+    string buffer_device(size, ' ');
+    ifs_json_device.seekg(0);
+    ifs_json_device.read(&buffer_device[0], size);
+    const char *jsonTextDevice = buffer_device.c_str();
+
+    cJSON *jsonDevice = cJSON_Parse(jsonTextDevice);
+    if (!jsonDevice)
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: json parse error for device file \n", __FUNCTION__);
+        return false;
+    }
+
+    cJSON* partnerDeviceConfig = cJSON_GetObjectItem(jsonDevice, partnerId.c_str());
+    if (!partnerDeviceConfig)
+    {
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"%s: Unknown partner:%s, using default.\n", __FUNCTION__, partnerId.c_str() );
+        partnerDeviceConfig = cJSON_GetObjectItem(jsonDevice, "default" );
+
+        if (!partnerDeviceConfig)
+        {
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF,"%s: Error for partner:%s, error = [%s]\n", __FUNCTION__, partnerId.c_str(), cJSON_GetErrorPtr());
+            return true;
+        }
+    }
+
+    cJSON *configDeviceObject = partnerDeviceConfig->child;
+    while( configDeviceObject )
+    {
+        char *configDeviceKey = configDeviceObject->string;
+        char *configDeviceValue = configDeviceObject->valuestring;
+
+        if (cJSON_GetObjectItem(partnerConfig, configDeviceKey)) {
+            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"%s: key %s exist in generic json...replace entry\n", __FUNCTION__, configDeviceKey );
+            cJSON_ReplaceItemInObject(partnerConfig, configDeviceKey, cJSON_CreateString(configDeviceValue));
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"%s: key %s does NOT exist generic json...add new entry\n", __FUNCTION__, configDeviceKey );
+            cJSON_AddItemToObject(partnerConfig, configDeviceKey, cJSON_CreateString(configDeviceValue));
+        }
+        configDeviceObject = configDeviceObject->next;
+    }
+    return true;
+}
+
 bool XBSStore::loadFromJson()
 {
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
@@ -210,6 +267,12 @@ bool XBSStore::loadFromJson()
         }
     }
     if(partnerConfig->type == cJSON_Object) {
+        if(!getPartnerDeviceConfig(partnerConfig, partnerId))
+        {
+            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: error reading partners_defaults_device.json \n", __FUNCTION__);
+            return false;
+        }
+
         ifstream ifs_bsini(m_filename);
         if (ifs_bsini.is_open()) {
             RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s: File [%s] exist. Look for any default parameter changes.\n", __FUNCTION__, m_filename.c_str());
