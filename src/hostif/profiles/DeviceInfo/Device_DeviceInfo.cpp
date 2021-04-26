@@ -4039,6 +4039,72 @@ void hostIf_DeviceInfo::systemMgmtTimePathMonitorThr()
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s]Exiting...\n", __FUNCTION__);
 }
 
+int hostIf_DeviceInfo::get_X_RDKCENTRAL_COM_experience( HOSTIF_MsgData_t *stMsgData)
+{
+    string resp="";
+    string experience = "";
+
+    CURL *curl = curl_easy_init();
+
+    if(NULL == curl)
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s]Failed at curl_easy_init.\n", __FUNCTION__);
+        return NOK;
+    }
+
+    if(curl)
+    {
+        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:50050/authService/getExperience");
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCurlResponse);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resp);
+
+        CURLcode res = curl_easy_perform(curl);
+
+        long http_code = 0;
+
+        if(res == CURLE_OK)
+        {
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] curl response : %d http response code: %ld\n", __FUNCTION__, res, http_code);
+        }
+
+        curl_easy_cleanup(curl);
+
+        if(res == CURLE_OK && http_code == HTTP_OK )
+        {
+            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] curl response string = %s\n", __FUNCTION__, resp.c_str());
+
+            cJSON* root = cJSON_Parse(resp.c_str());
+
+            if(root)
+            {
+                cJSON* jsonObj    = cJSON_GetObjectItem(root, "experience");
+
+                if(jsonObj->type == cJSON_String && jsonObj->valuestring && (strlen(jsonObj->valuestring) > 0))
+                {
+                    RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s]The parameter [%s] value is [%s].\n", __FUNCTION__, stMsgData->paramName, jsonObj->valuestring);
+                    experience = jsonObj->valuestring;
+                }
+
+                cJSON_Delete(root);
+            }
+            else
+            {
+                RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] json parse error\n", __FUNCTION__);
+                return NOK;
+            }
+        }
+    }
+
+    if(!experience.empty()) {
+        strncpy(stMsgData->paramValue, experience.c_str(), TR69HOSTIFMGR_MAX_PARAM_LEN-1 );
+    }
+    else {
+        return NOK;
+    }
+
+    return OK;
+}
 
 /* End of doxygen group */
 /**

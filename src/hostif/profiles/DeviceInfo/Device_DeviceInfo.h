@@ -129,6 +129,7 @@
 #define XRDK_BOOT_TIME                                  "Device.DeviceInfo.X_RDKCENTRAL-COM_BootTime"
 #define xFirmwareDownloadNow_STR                        "Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadNow" /* boolean [w] Trigger download on set true. */
 #define X_RDKCENTRAL_COM_LastRebootReason               "Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason"
+#define X_RDKCENTRAL_COM_Experience                     "Device.DeviceInfo.X_RDKCENTRAL-COM_Experience"
 
 /* Profile: X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging. */
 #define xOpsDMUploadLogsNow_STR                         "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMUploadLogsNow"
@@ -1291,6 +1292,7 @@ public:
 
     int get_X_RDKCENTRAL_COM_LastRebootReason(HOSTIF_MsgData_t *);
     int set_X_RDKCENTRAL_COM_LastRebootReason(HOSTIF_MsgData_t *);
+    int get_X_RDKCENTRAL_COM_experience(HOSTIF_MsgData_t *);
 };
 /* End of doxygen group */
 /**

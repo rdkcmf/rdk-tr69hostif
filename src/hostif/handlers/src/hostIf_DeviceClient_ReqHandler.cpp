@@ -641,6 +641,10 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->get_X_RDKCENTRAL_COM_LastRebootReason(stMsgData);
         }
+        else if(strncmp(stMsgData->paramName,X_RDKCENTRAL_COM_Experience, strlen(X_RDKCENTRAL_COM_Experience)) == 0)
+        {
+            ret = pIface->get_X_RDKCENTRAL_COM_experience(stMsgData);
+        }
         else
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
