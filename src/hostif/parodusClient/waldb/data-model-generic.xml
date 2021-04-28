@@ -1007,6 +1007,11 @@
                 <boolean/>
             </syntax>
         </parameter>
+        <parameter base="WolWakeEnable" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+            <syntax>
+                <boolean/>
+            </syntax>
+        </parameter>
         <parameter base="AppList" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
             <syntax>
                 <string/>
