@@ -230,6 +230,9 @@
       <parameter base="AudioConfidenceThreshold" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax> <string/> </syntax>
       </parameter>
+      <parameter base="AudioDuckingType" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax> <int/> </syntax>
+      </parameter>
       <parameter base="AudioDuckingLevel" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax> <string/> </syntax>
       </parameter>
