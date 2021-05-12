@@ -170,7 +170,7 @@ parodus_start_up()
         PartnerId="*,$PartnerId"
     fi
 
-    local reboot_reason=$(cat $REBOOT_INFO | grep "reason" | cut -d: -f2 | cut -d, -f1)
+    local reboot_reason=$(cat $REBOOT_INFO | grep "\"reason\"" | cut -d: -f2 | cut -d, -f1)
     if [ -z "$reboot_reason" ] || [ ' ' = "$reboot_reason" ]; then
         echo "Last Reboot reason is not Known."
         reboot_reason="Unknown"
