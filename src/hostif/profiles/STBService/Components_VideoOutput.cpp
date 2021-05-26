@@ -45,6 +45,7 @@
 #define VIDEO_FORMAT_STRING "VideoFormat"
 #define AR_BEHAVIOR_STRING "AspectRatioBehaviour"
 #define HDCP_STRING "HDCP"
+#define DISPLAY_NAME_STRING "Name"
 #define ENABLED_STRING "Enabled"
 #define DISABLED_STRING "Disabled"
 
@@ -148,12 +149,14 @@ hostIf_STBServiceVideoOutput::hostIf_STBServiceVideoOutput(int devid, device::Vi
 {
     strcpy(backupAspectRatioBehaviour," ");
     strcpy(backupDisplayFormat," ");
+    strcpy(backupDisplayName," ");
     strcpy(backupVideoFormat," ");
     backupHDCP = false;
     strcpy(backupVideoOutputStatus," ");
 
     bCalledAspectRatioBehaviour = false;
     bCalledDisplayFormat = false;
+    bCalledDisplayName = false;
     bCalledVideoFormat = false;
     bCalledHDCP = false;
     bCalledVideoOutputStatus = false;
@@ -224,6 +227,10 @@ int hostIf_STBServiceVideoOutput::handleGetMsg(const char *paramName, HOSTIF_Msg
     {
         ret = getHDCP(stMsgData);
     }
+    else if(strcasecmp(paramName, DISPLAY_NAME_STRING) == 0)
+    {
+        ret = getName(stMsgData);
+    }
 
     return ret;
 }
@@ -263,6 +270,19 @@ void hostIf_STBServiceVideoOutput::doUpdates(updateCallback mUpdateCallback)
     if(bChanged)
     {
         snprintf(tmp_buff, PARAM_LEN, UPDATE_FORMAT_STRING, BASE_NAME, dev_id, DISPLAY_FORMAT_STRING);
+        if(mUpdateCallback)
+        {
+            mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
+        }
+    }
+    memset(&msgData,0,sizeof(msgData));
+    memset(tmp_buff,0,PARAM_LEN);
+    bChanged =  false;
+    msgData.instanceNum=dev_id;
+    getName(&msgData,&bChanged);
+    if(bChanged)
+    {
+        snprintf(tmp_buff, PARAM_LEN, UPDATE_FORMAT_STRING, BASE_NAME, dev_id, DISPLAY_NAME_STRING);
         if(mUpdateCallback)
         {
             mUpdateCallback(IARM_BUS_TR69HOSTIFMGR_EVENT_VALUECHANGED,tmp_buff, msgData.paramValue, msgData.paramtype);
@@ -480,6 +500,40 @@ int hostIf_STBServiceVideoOutput::getDisplayFormat(HOSTIF_MsgData_t *stMsgData,b
     return OK;
 }
 
+/************************************************************
+ //TODO
+ * Description  : Get VideoOutput Display Name
+ * Precondition : None
+ * Input        : stMsgData for result return.
+                  pChanged
+
+ * Return       : OK -> Success
+                  NOK -> Failure
+                stMsgData->paramValue -> Display Name string.
+
+************************************************************/
+int hostIf_STBServiceVideoOutput::getName(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
+{
+    try {
+        sprintf(stMsgData->paramValue,"%s",vPort.getName().c_str());
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] : Value: %s \n",__FUNCTION__, stMsgData->paramValue);
+        stMsgData->paramtype = hostIf_StringType;
+        stMsgData->paramLen = strlen(stMsgData->paramValue);
+        if(bCalledDisplayName && pChanged && strcmp(backupDisplayName, stMsgData->paramValue))
+        {
+            *pChanged = true;
+        }
+        bCalledDisplayName = true;
+        strncpy(backupDisplayName,stMsgData->paramValue,_BUF_LEN_16-1);
+        backupDisplayName[_BUF_LEN_16-1] = '\0';
+    }
+    catch (const std::exception e) {
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s] Exception\r\n",__FUNCTION__);
+        return NOK;
+    }
+
+    return OK;
+}
 /************************************************************
  * Description  : Get if HDCP is being used in this Video Output or not.
  * Precondition : None

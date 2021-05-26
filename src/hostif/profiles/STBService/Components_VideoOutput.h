@@ -100,12 +100,14 @@ class  hostIf_STBServiceVideoOutput
 
     char backupAspectRatioBehaviour[_BUF_LEN_16];
     char backupDisplayFormat[_BUF_LEN_16];
+    char backupDisplayName[_BUF_LEN_16];
     char backupVideoFormat[_BUF_LEN_16];
     bool backupHDCP;
     char backupVideoOutputStatus[_BUF_LEN_16];
 
     bool bCalledAspectRatioBehaviour;
     bool bCalledDisplayFormat;
+    bool bCalledDisplayName;
     bool bCalledVideoFormat;
     bool bCalledHDCP;
     bool bCalledVideoOutputStatus;
@@ -113,6 +115,7 @@ class  hostIf_STBServiceVideoOutput
 private:
     int getAspectRatioBehaviour(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     int getDisplayFormat(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
+    int getName(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     int getVideoFormat(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     int getHDCP(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
     int getStatus(HOSTIF_MsgData_t *stMsgData,bool *pChanged = NULL);
