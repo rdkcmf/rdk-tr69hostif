@@ -174,6 +174,7 @@
 
 #define PARTNER_ID                                      "Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId"
 
+#define FWDNLD_DEFER_REBOOT                             "Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadDeferReboot"
 
 /**
  * @brief This class provides the interface for getting device information.
@@ -222,6 +223,7 @@ class hostIf_DeviceInfo {
     static string m_xFirmwareToDownload;
     static bool m_xFirmwareDownloadNow;
     static bool m_xFirmwareDownloadUseCodebig;
+    static bool m_xFirmwareDownloadDeferReboot;
 
 #ifndef NEW_HTTP_SERVER_DISABLE
     static XRFCStore *m_rfcStore;
@@ -727,6 +729,8 @@ public:
      */
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadUseCodebig(HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
+    int get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadDeferReboot(HOSTIF_MsgData_t *, bool *pChanged = NULL);
+
     int get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadPercent (HOSTIF_MsgData_t *, bool *pChanged = NULL);
 
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareUpdateState (HOSTIF_MsgData_t *, bool *pChanged = NULL);
@@ -961,6 +965,7 @@ public:
     int set_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadURL (HOSTIF_MsgData_t *);
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayType(HOSTIF_MsgData_t *);
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadUseCodebig(HOSTIF_MsgData_t *);
+    int set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadDeferReboot(HOSTIF_MsgData_t *);
 
     /**
     * @brief set_xOpsDMUploadLogsNow.
@@ -1346,6 +1351,7 @@ public:
     int get_X_RDKCENTRAL_COM_LastRebootReason(HOSTIF_MsgData_t *);
     int set_X_RDKCENTRAL_COM_LastRebootReason(HOSTIF_MsgData_t *);
     int get_X_RDKCENTRAL_COM_experience(HOSTIF_MsgData_t *);
+
 };
 /* End of doxygen group */
 /**

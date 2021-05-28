@@ -47,6 +47,7 @@ private:
 
     std::unordered_map<std::string, std::string> m_dict;
     std::unordered_map<std::string, std::string> m_local_dict;
+    std::unordered_map<std::string, std::string> m_nonpersist_dict;
     std::unordered_map<std::string, std::string> m_dict_rfcdefaults;
 
     XRFCStore();
@@ -57,8 +58,9 @@ private:
     string getRawValue(const string &key);
     bool setRawValue(const string &key, const string &value);
     faultCode_t clearValue(const string &key, const string &value);
-    bool writeHashToFile(const string &key, const string &value, unordered_map<string, string> &dict, string &filename);
+    bool writeHashToFile(const string &key, const string &value, unordered_map<string, string> &dict, const string &filename);
     void initTR181PropertiesFileName();
+    bool loadFileToCache(const string &filename, unordered_map<string, string> &dict);
     bool loadTR181PropertiesIntoCache();
 };
 

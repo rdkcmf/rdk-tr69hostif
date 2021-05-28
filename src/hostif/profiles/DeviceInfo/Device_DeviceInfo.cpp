@@ -127,6 +127,7 @@ string hostIf_DeviceInfo::m_xFirmwareDownloadURL;
 string hostIf_DeviceInfo::m_xFirmwareToDownload;
 bool hostIf_DeviceInfo::m_xFirmwareDownloadNow;
 bool hostIf_DeviceInfo::m_xFirmwareDownloadUseCodebig;
+bool hostIf_DeviceInfo::m_xFirmwareDownloadDeferReboot;
 
 #ifndef NEW_HTTP_SERVER_DISABLE
 XRFCStore* hostIf_DeviceInfo::m_rfcStore;
@@ -1550,6 +1551,17 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadUs
         return NOK;
 }
 
+// Get the Defer Reboot flag value which is already set using 'Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadDeferReboot' tr-181 parameter
+int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadDeferReboot(HOSTIF_MsgData_t* stMsgData, bool *pChanged)
+{
+    stMsgData->paramtype = hostIf_BooleanType;
+    stMsgData->paramLen = sizeof(bool);
+
+    put_boolean(stMsgData->paramValue, m_xFirmwareDownloadDeferReboot);
+
+    return OK;
+}
+
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_FirmwareDownloadPercent (HOSTIF_MsgData_t* stMsgData, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
@@ -2124,6 +2136,14 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadUs
 {
     m_xFirmwareDownloadUseCodebig = get_boolean(stMsgData->paramValue);
     RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s]Successfully set \"%s\" to \"%d\". \n", __FUNCTION__, stMsgData->paramName, m_xFirmwareDownloadUseCodebig);
+    return OK;
+}
+
+// Set 'FW download Defer Reboot' based on 'Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadDeferReboot' request
+int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadDeferReboot(HOSTIF_MsgData_t *stMsgData)
+{
+    m_xFirmwareDownloadDeferReboot = get_boolean(stMsgData->paramValue);
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s]Successfully set \"%s\" to \"%d\". \n", __FUNCTION__, stMsgData->paramName, m_xFirmwareDownloadDeferReboot);
     return OK;
 }
 
@@ -3696,10 +3716,10 @@ int hostIf_DeviceInfo::set_xFirmwareDownloadNow(HOSTIF_MsgData_t *stMsgData)
                     (!m_xFirmwareDownloadURL.empty()) && (!m_xFirmwareToDownload.empty())) {
 
                 char cmd[200] = {'\0'};
-                sprintf(cmd, "%s %s %s %s %d &",userTriggerDwScr, m_xFirmwareDownloadProtocol.c_str(), m_xFirmwareDownloadURL.c_str(), m_xFirmwareToDownload.c_str(), m_xFirmwareDownloadUseCodebig);
+                sprintf(cmd, "%s %s %s %s %d %d &",userTriggerDwScr, m_xFirmwareDownloadProtocol.c_str(), m_xFirmwareDownloadURL.c_str(), m_xFirmwareToDownload.c_str(), m_xFirmwareDownloadUseCodebig, m_xFirmwareDownloadDeferReboot);
 
 #ifdef YOCTO_BUILD
-                ret = v_secure_system("%s %s %s %s %d &",userTriggerDwScr, m_xFirmwareDownloadProtocol.c_str(), m_xFirmwareDownloadURL.c_str(), m_xFirmwareToDownload.c_str(), m_xFirmwareDownloadUseCodebig);
+                ret = v_secure_system("%s %s %s %s %d %d &",userTriggerDwScr, m_xFirmwareDownloadProtocol.c_str(), m_xFirmwareDownloadURL.c_str(), m_xFirmwareToDownload.c_str(), m_xFirmwareDownloadUseCodebig, m_xFirmwareDownloadDeferReboot);
 #else
                 ret = system (cmd);
 #endif
@@ -3716,6 +3736,7 @@ int hostIf_DeviceInfo::set_xFirmwareDownloadNow(HOSTIF_MsgData_t *stMsgData)
                 m_xFirmwareDownloadURL.clear();
                 m_xFirmwareDownloadNow = false;
                 m_xFirmwareDownloadUseCodebig = false;
+                m_xFirmwareDownloadDeferReboot = false;
                 ret = OK;
             }
             else {

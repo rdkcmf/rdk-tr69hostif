@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <fstream>
 #include <string>
+#include <string.h>
 #include <ctype.h>
 #include <sstream>
 
@@ -29,6 +30,8 @@
 #define TR181_RFC_STORE_KEY "TR181_STORE_FILENAME"
 #define RFC_PROPERTIES_FILE "/etc/rfc.properties"
 #define RFCDEFAULTS_FILE "/tmp/rfcdefaults.ini"
+#define TR181_STORE_NONPERSISTENT_FILE "/opt/secure/RFC/tr181store_nonpersist.ini"
+#define TR181_RFC_NONPERSISTENT_PREFIX "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.NonPersistent."
 #define RFCDEFAULTS_ETC_DIR "/etc/rfcdefaults/"
 
 #ifdef ENABLE_LLAMA_PLATCO
@@ -57,6 +60,9 @@ void XRFCStore::clearAll()
 
     ofstream ofs(m_filename, ofstream::trunc);
     ofs.close();
+
+    ofstream ofs2(TR181_STORE_NONPERSISTENT_FILE, ofstream::trunc);
+    ofs2.close();
 
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s \n", __FUNCTION__);
 }
@@ -101,8 +107,20 @@ string XRFCStore::getRawValue(const string &key)
 {
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
 
-    unordered_map<string,string>::const_iterator it = m_dict.find(key);
-    if (it == m_dict.end()) {
+    std::unordered_map<std::string, std::string> &dict = m_dict;
+    if (strstr((char *)key.c_str(),TR181_RFC_NONPERSISTENT_PREFIX) != NULL)
+    {
+        dict = m_nonpersist_dict;
+        ifstream ifs_rfc("/tmp/.rfcSyncDone");
+        if(!ifs_rfc.is_open())
+        {
+           RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: file /tmp/.rfcSyncDone doesn't exist, use default value.\n", __FUNCTION__);
+           return "";
+        }
+    }
+
+    unordered_map<string,string>::const_iterator it = dict.find(key);
+    if (it == dict.end()) {
         return "";
     }
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s : Value = %s \n", __FUNCTION__, it->second.c_str());
@@ -136,7 +154,7 @@ bool XRFCStore::setRawValue(const string &key, const string &value)
     return true;
 }
 
-bool XRFCStore::writeHashToFile(const string &key, const string &value, unordered_map<string, string> &dict, string &filename)
+bool XRFCStore::writeHashToFile(const string &key, const string &value, unordered_map<string, string> &dict, const string &filename)
 {
     ofstream ofs(filename, ios::trunc | ios::out);
 
@@ -225,7 +243,7 @@ faultCode_t XRFCStore::getValue(HOSTIF_MsgData_t *stMsgData)
         }
         else
         {
-           RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s : Parameter Not Found in rfcdefaults\n", stMsgData->paramName);
+           RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s : Parameter Not Found in rfcdefaults\n", stMsgData->paramName);
            stMsgData->faultCode = fcInternalError;
         }
     }
@@ -246,6 +264,27 @@ faultCode_t  XRFCStore::setValue(HOSTIF_MsgData_t *stMsgData)
     if (!strcmp(stMsgData->paramName,TR181_CLEAR_PARAM))
     {
         return clearValue(stMsgData->paramName, givenValue);
+    }
+
+    if (strstr(stMsgData->paramName,TR181_RFC_NONPERSISTENT_PREFIX) != NULL)
+    {
+        if(stMsgData->requestor == HOSTIF_SRC_RFC)
+        {
+            if(!writeHashToFile(stMsgData->paramName, givenValue, m_nonpersist_dict, TR181_STORE_NONPERSISTENT_FILE))
+            {
+                RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Failed to write to nonpersistent file \n");
+                return fcInternalError;
+            }
+            else
+            {
+                return fcNoFault;
+            }
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Only RFC is allowed to set NonPersistent params.\n");
+            return fcInternalError;
+        }
     }
 
     if (stMsgData->requestor == HOSTIF_SRC_WEBPA) {
@@ -308,11 +347,15 @@ void XRFCStore::initTR181PropertiesFileName()
                 if(!strcmp(key.c_str(), TR181_RFC_STORE_KEY))
                 {
                     m_filename = value;
+                    // get rid of quotes, it is quite common with properties files
+                    m_filename.erase(remove(m_filename.begin(), m_filename.end(), '\"'), m_filename.end());
                     RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "TR181 Properties FileName = %s\n", m_filename.c_str());
                 }
                 else if(!strcmp(key.c_str(), TR181_LOCAL_STORE_KEY))
                 {   
                     m_local_filename = value;
+                    // get rid of quotes, it is quite common with properties files
+                    m_local_filename.erase(remove(m_local_filename.begin(), m_local_filename.end(), '\"'), m_local_filename.end());
                     RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "TR181 Local FileName = %s\n", m_local_filename.c_str());
                 }
             }
@@ -355,22 +398,20 @@ bool init_rfcdefaults()
    return true;
 }
 
-bool XRFCStore::loadTR181PropertiesIntoCache()
+bool XRFCStore::loadFileToCache(const string &filename, unordered_map<string, string> &dict)
 {
-    RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
-    if(m_filename.empty())
+    RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
+    if(filename.empty())
     {
-        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Invalid TR181 Properties filename, Unable to load properties\n");
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s Invalid/empty filename, Unable to load properties\n", __FUNCTION__);
         return false;
     }
-    // get rid of quotes, it is quite common with properties files
-    m_filename.erase(remove(m_filename.begin(), m_filename.end(), '\"'), m_filename.end());
-    m_dict.clear();
+    dict.clear();
 
-    RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "TR181 Properties File :  %s \n", m_filename.c_str());
-    ifstream ifs_tr181(m_filename);
+    RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s TR181 Properties File :  %s \n", __FUNCTION__, filename.c_str());
+    ifstream ifs_tr181(filename);
     if (!ifs_tr181.is_open()) {
-        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Trying to open a non-existent file [%s] \n", __FUNCTION__, m_filename.c_str());
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Trying to open a non-existent file [%s] \n", __FUNCTION__, filename.c_str());
     }
     else
     {
@@ -380,43 +421,20 @@ bool XRFCStore::loadTR181PropertiesIntoCache()
             if (splitterPos < line.length()) {
                 string key = line.substr(0, splitterPos);
                 string value = line.substr(splitterPos+1, line.length());
-                m_dict[key] = value;
+                dict[key] = value;
                 RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "Key = %s : Value = %s\n", key.c_str(), value.c_str());
             }
         }
         ifs_tr181.close();
     }
+    return true;
+}
 
-
-    if(m_local_filename.empty())
-    {
-        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Invalid TR181 local filename, Unable to load properties\n");
-        return false;
-    }
-    // get rid of quotes, it is quite common with properties files
-    m_local_filename.erase(remove(m_local_filename.begin(), m_local_filename.end(), '\"'), m_local_filename.end());
-    m_local_dict.clear();
-
-    RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "TR181 Local File :  %s \n", m_local_filename.c_str());
-    ifstream ifs_local_tr181(m_local_filename);
-    if (!ifs_local_tr181.is_open()) {
-        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Trying to open a non-existent file [%s] \n", __FUNCTION__, m_local_filename.c_str());
-    }
-    else
-    {   
-        string line;
-        while (getline(ifs_local_tr181, line)) {
-            size_t splitterPos = line.find('=');
-            if (splitterPos < line.length()) {
-                string key = line.substr(0, splitterPos);
-                string value = line.substr(splitterPos+1, line.length());
-                m_local_dict[key] = value;
-                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF, "Key = %s : Value = %s\n", key.c_str(), value.c_str());
-            }
-        }
-        ifs_local_tr181.close();
-    }
-
+bool XRFCStore::loadTR181PropertiesIntoCache()
+{
+    loadFileToCache(m_filename, m_dict);
+    loadFileToCache(m_local_filename, m_local_dict);
+    loadFileToCache(TR181_STORE_NONPERSISTENT_FILE, m_nonpersist_dict);
 
     ifstream ifs_rfcdef(RFCDEFAULTS_FILE);
     if (!ifs_rfcdef.is_open()) {

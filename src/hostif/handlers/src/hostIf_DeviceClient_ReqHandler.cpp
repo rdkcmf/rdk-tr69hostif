@@ -267,6 +267,10 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadUseCodebig(stMsgData);
         }
+        else if (!strcasecmp(stMsgData->paramName, FWDNLD_DEFER_REBOOT))
+        {
+            ret = pIface->set_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadDeferReboot(stMsgData);
+        }
         else
         {
             ret = NOK;
@@ -645,6 +649,10 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         else if(strncmp(stMsgData->paramName,X_RDKCENTRAL_COM_Experience, strlen(X_RDKCENTRAL_COM_Experience)) == 0)
         {
             ret = pIface->get_X_RDKCENTRAL_COM_experience(stMsgData);
+        }
+        else if (!strcasecmp(stMsgData->paramName, FWDNLD_DEFER_REBOOT))
+        {
+            ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadDeferReboot(stMsgData);
         }
         else
         {
