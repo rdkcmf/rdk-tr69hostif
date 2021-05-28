@@ -1276,6 +1276,58 @@ public:
     * @retval NOK if operation fails.
     */
     int set_RFC_hwHealthTestWAN_WANEndPointURL(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xRDKCentralComRFC_hwHealthTest_ResultFilter_Enable
+    *
+    * This method is used to enable the hardware health test result filter feature.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.ResultFilter.Enable
+    *   Data type: boolean - Enable (True)/disable (False) health test result filter functionality.
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xRDKCentralComRFC_hwHealthTest_ResultFilter_Enable(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xRDKCentralComRFC_hwHealthTest_ResultFilter_QueueDepth
+    *
+    * This method is used to set the number of last results to be stored for hardware health test result-filter feature.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.ResultFilter.QueueDepth
+    *   Data type: unsigned int - QueueDepth to set (<=100)
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xRDKCentralComRFC_hwHealthTest_ResultFilter_QueueDepth(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.ResultFilter.FilterParams
+    *
+    * This method is used to set filter parameters to be applied for each component of hardware health test result-filter feature.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.ResultFilter.FilterParams
+    *   Data type: string - ordered list of comma separated values.
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xRDKCentralComRFC_hwHealthTest_ResultFilter_FilterParams(HOSTIF_MsgData_t *);
+
+    /**
+    * @brief set_xRDKCentralComRFC_hwHealthTest_ResultFilter_ResultsFiltered
+    *
+    * This method is used to enable the hardware health test filtered results to shown on UI/WEBPA/Resultsfile.
+    * with following TR-069 definition:
+    *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.ResultFilter.ResultsFiltered
+    *   Data type: boolean - Enable (True)/disable (False) health test filtered results display.
+    *
+    * @retval OK if it is successful.
+    * @retval NOK if operation fails.
+    */
+    int set_xRDKCentralComRFC_hwHealthTest_ResultFilter_ResultsFiltered(HOSTIF_MsgData_t *);
 #endif /* USE_HWSELFTEST_PROFILE */
 
     int validate_ParamValue(HOSTIF_MsgData_t *);

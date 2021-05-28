@@ -1137,5 +1137,27 @@
         </syntax>
       </parameter>
     </object>
+    <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.ResultFilter." access="readOnly" minEntries="0" maxEntries="unbounded" addObjIdx="0" delObjIdx="0">
+      <parameter base="Enable" access="writeOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="-1" setIdx="18001">
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="QueueDepth" access="writeOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="-1" setIdx="18001">
+        <syntax>
+          <unsignedInt/>
+        </syntax>
+      </parameter>
+      <parameter base="FilterParams" access="writeOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="-1" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="ResultsFiltered" access="writeOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="-1" setIdx="18001">
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+    </object>
   </model>
 </dm:document>

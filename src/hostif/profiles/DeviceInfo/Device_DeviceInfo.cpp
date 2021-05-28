@@ -2913,6 +2913,26 @@ int hostIf_DeviceInfo::set_RFC_hwHealthTestWAN_WANEndPointURL(HOSTIF_MsgData_t *
 {
     return hwselftest::set_Device_DeviceInfo_RFC_hwHealthTestWAN_WANEndPointURL(LOG_TR69HOSTIF, stMsgData)? OK : NOK;
 }
+
+int hostIf_DeviceInfo::set_xRDKCentralComRFC_hwHealthTest_ResultFilter_Enable(HOSTIF_MsgData_t *stMsgData)
+{
+    return hwselftest::set_Device_DeviceInfo_xRDKCentralComRFC_hwHealthTest_ResultFilter_Enable(LOG_TR69HOSTIF, stMsgData)? OK : NOK;
+}
+
+int hostIf_DeviceInfo::set_xRDKCentralComRFC_hwHealthTest_ResultFilter_QueueDepth(HOSTIF_MsgData_t *stMsgData)
+{
+    return hwselftest::set_Device_DeviceInfo_xRDKCentralComRFC_hwHealthTest_ResultFilter_QueueDepth(LOG_TR69HOSTIF, stMsgData)? OK : NOK;
+}
+
+int hostIf_DeviceInfo::set_xRDKCentralComRFC_hwHealthTest_ResultFilter_FilterParams(HOSTIF_MsgData_t *stMsgData)
+{
+    return hwselftest::set_Device_DeviceInfo_xRDKCentralComRFC_hwHealthTest_ResultFilter_FilterParams(LOG_TR69HOSTIF, stMsgData)? OK : NOK;
+}
+
+int hostIf_DeviceInfo::set_xRDKCentralComRFC_hwHealthTest_ResultFilter_ResultsFiltered(HOSTIF_MsgData_t *stMsgData)
+{
+    return hwselftest::set_Device_DeviceInfo_xRDKCentralComRFC_hwHealthTest_ResultFilter_ResultsFiltered(LOG_TR69HOSTIF, stMsgData)? OK : NOK;
+}
 #endif /* USE_HWSELFTEST_PROFILE */
 /*
  * * int hostIf_DeviceInfo::validate_ParamValue(HOSTIF_MsgData * sMsgData)
@@ -3124,6 +3144,22 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTestWAN.WANTestEndPointURL"))
     {
         ret = set_RFC_hwHealthTestWAN_WANEndPointURL(stMsgData);
+    }
+    else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.ResultFilter.Enable"))
+    {
+        ret = set_xRDKCentralComRFC_hwHealthTest_ResultFilter_Enable(stMsgData);
+    }
+    else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.ResultFilter.QueueDepth"))
+    {
+        ret = set_xRDKCentralComRFC_hwHealthTest_ResultFilter_QueueDepth(stMsgData);
+    }
+    else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.ResultFilter.FilterParams"))
+    {
+        ret = set_xRDKCentralComRFC_hwHealthTest_ResultFilter_FilterParams(stMsgData);
+    }
+    else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.ResultFilter.ResultsFiltered"))
+    {
+        ret = set_xRDKCentralComRFC_hwHealthTest_ResultFilter_ResultsFiltered(stMsgData);
     }
 #endif /* USE_HWSELFTEST_PROFILE */
     return ret;
