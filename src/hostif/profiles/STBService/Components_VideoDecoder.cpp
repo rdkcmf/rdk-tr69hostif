@@ -292,7 +292,9 @@ void hostIf_STBServiceVideoDecoder::doUpdates(updateCallback mUpdateCallback)
 int hostIf_STBServiceVideoDecoder::getContentAspectRatio(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     try {
-        device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(std::string("HDMI").append(int_to_string(stMsgData->instanceNum-1)));
+        std::string strVideoPort = device::Host::getInstance().getDefaultVideoPortName();
+        std::string videoPortName = strVideoPort.substr(0, strVideoPort.size()-1);
+        device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(videoPortName.append(int_to_string(stMsgData->instanceNum-1)));
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] vPort.isDisplayConnected(): %d \n",__FUNCTION__, vPort.isDisplayConnected());
 
         if (true == vPort.isDisplayConnected()) {

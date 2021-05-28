@@ -3311,7 +3311,8 @@ int hostIf_DeviceInfo::set_xRDKCentralComUhdRFCEnable(HOSTIF_MsgData_t *stMsgDat
     if(stMsgData->paramtype == hostIf_BooleanType)
     {
         enable = get_boolean(stMsgData->paramValue);
-        device::Host::getInstance().getVideoOutputPort("HDMI0").forceDisable4KSupport(!enable);
+        std::string strVideoPort = device::Host::getInstance().getDefaultVideoPortName();
+        device::Host::getInstance().getVideoOutputPort(strVideoPort.c_str()).forceDisable4KSupport(!enable);
         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] Successfully set \"%s\" to \"%d\". \n", __FUNCTION__, __LINE__, stMsgData->paramName, enable);
         ret = OK;
     }
