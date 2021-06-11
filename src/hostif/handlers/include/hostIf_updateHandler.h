@@ -42,8 +42,7 @@ typedef void (*updateCallback)(IARM_Bus_tr69HostIfMgr_EventId_t, const char* par
 class updateHandler {
 
     static bool stopped;
-    static std::mutex mtx;
-    static std::condition_variable ctv;
+    static GThread *thread;
 
 public:
     static void Init();

@@ -460,7 +460,6 @@ int main(int argc, char *argv[])
     // updateHandler::init :  Update handler thread for polling table profiles
     //------------------------------------------------------------------------------
     updateHandler::Init();
-    updateHandler_runThread = g_thread_new("updateHandler_runThread", (GThreadFunc)updateHandler::run, NULL);
 
     //------------------------------------------------------------------------------
     // Initialize WebPA Module
@@ -522,8 +521,6 @@ int main(int argc, char *argv[])
     if(HTTPServerThread)
         g_thread_join(HTTPServerThread);
 #endif
-    if(updateHandler_runThread)
-        g_thread_join(updateHandler_runThread);
     if(parodus_init_tid)
         pthread_join(parodus_init_tid,NULL);
 
