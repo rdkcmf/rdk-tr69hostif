@@ -30,7 +30,13 @@
 #define RFC_PROPERTIES_FILE "/etc/rfc.properties"
 #define RFCDEFAULTS_FILE "/tmp/rfcdefaults.ini"
 #define RFCDEFAULTS_ETC_DIR "/etc/rfcdefaults/"
-#define TR181_LOCAL_STORE_KEY "TR181_LOCAL_STORE_FILENAME"
+
+#ifdef ENABLE_LLAMA_PLATCO
+   #define TR181_LOCAL_STORE_KEY "TR181_LOCAL_STORE_AMLOGIC_FILENAME"
+#else
+   #define TR181_LOCAL_STORE_KEY "TR181_LOCAL_STORE_FILENAME"
+#endif
+
 #define TR181_CLEAR_PARAM "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.ClearParam"
 XRFCStore* XRFCStore::xrfcInstance = NULL;
 
