@@ -34,6 +34,7 @@
 #include "illegalArgumentException.hpp"
 #include "exception.hpp"
 #include "Components_VideoOutput.h"
+#include "safec_lib.h"
 
 #define DEV_NAME "VideoOutput"
 #define BASE_NAME "Device.Services.STBService.1.Components.VideoOutput"
@@ -149,12 +150,33 @@ void hostIf_STBServiceVideoOutput::releaseLock()
  */
 hostIf_STBServiceVideoOutput::hostIf_STBServiceVideoOutput(int devid, device::VideoOutputPort& port) : dev_id(devid), vPort(port)
 {
-    strcpy(backupAspectRatioBehaviour," ");
-    strcpy(backupDisplayFormat," ");
-    strcpy(backupDisplayName," ");
-    strcpy(backupVideoFormat," ");
+    errno_t rc = -1;
+    rc=strcpy_s(backupAspectRatioBehaviour,sizeof(backupAspectRatioBehaviour)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    rc=strcpy_s(backupDisplayFormat,sizeof(backupDisplayFormat)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    rc=strcpy_s(backupDisplayName,sizeof(backupDisplayName)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    rc=strcpy_s(backupVideoFormat,sizeof(backupVideoFormat)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     backupHDCP = false;
-    strcpy(backupVideoOutputStatus," ");
+    rc=strcpy_s(backupVideoOutputStatus,sizeof(backupVideoOutputStatus)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
 
     bCalledAspectRatioBehaviour = false;
     bCalledDisplayFormat = false;

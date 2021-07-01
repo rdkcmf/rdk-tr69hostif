@@ -31,6 +31,7 @@
 #include "hostIf_utils.h"
 #include "Device_DHCPv4_Client.h"
 #include "hostIf_DHCPv4Client_ReqHandler.h"
+#include "safec_lib.h"
 
 DHCPv4ClientReqHandler* DHCPv4ClientReqHandler::pInstance = NULL;
 
@@ -230,7 +231,12 @@ int DHCPv4ClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         if(NULL != notifyValuePtr)
         {
             *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
+	    errno_t rc = -1;
+            rc=strcpy_s(notifyKey,strlen(stMsgData->paramName)+1,stMsgData->paramName);
+	    if(rc!=EOK)
+       	    {
+	   	ERR_CHK(rc);
+    	    }
             g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
             ret = OK;
         }

@@ -90,6 +90,7 @@
 #endif
 
 #include "hostIf_NotificationHandler.h"
+#include "safec_lib.h"
 
 #define VERSION_FILE                       "/version.txt"
 #define SOC_ID_FILE                        "/var/log/socprov.log"
@@ -383,6 +384,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SoftwareVersion(HOSTIF_MsgData_t * 
     bool isJenkinsbuild = false;
     bool versionFlag = false;
     char version[100] = {'\0'};
+    errno_t rc = -1;
 
     try {
         if (versionfile.is_open())
@@ -400,8 +402,11 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SoftwareVersion(HOSTIF_MsgData_t * 
                     while(isspace(*tmpStr)) {
                         tmpStr++;
                     }
-                    strcpy(version, tmpStr);
-
+                    rc=strcpy_s(version,sizeof(version), tmpStr);
+		    if(rc!=EOK)
+		    {
+			ERR_CHK(rc);
+		    }
                     versionFlag = true;
                     if(!isTrunkbuild)	break;
                 }
@@ -1052,6 +1057,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_FirstUseDate(HOSTIF_MsgData_t * stM
  */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
+    errno_t rc = -1;
     int ret = NOT_HANDLED;
 #if !defined (USE_DEV_PROPERTIES_CONF)
     IARM_Bus_MFRLib_GetSerializedData_Param_t param;
@@ -1060,6 +1066,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgDat
     param.type = mfrSERIALIZED_TYPE_DEVICEMAC;
     int len = strlen(stbMacCache);
 
+    
     try
     {
         if((stbMacCache[0] == '\0') && (len == 0)) {
@@ -1109,7 +1116,13 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgDat
     memset(stMsgData->paramValue, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN );
     string stb_mac = getStbMacIf_fr_devProperties();
     if(!stb_mac.empty())
-        strcpy(stMsgData->paramValue, stb_mac.c_str());
+    {
+        rc=strcpy_s(stMsgData->paramValue,sizeof(stMsgData->paramValue), stb_mac.c_str());
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
+    }
     else
         stMsgData->faultCode = fcInvalidParameterValue;
     stMsgData->paramLen = stb_mac.length();
@@ -1386,6 +1399,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_PowerStatus(HOSTIF_Ms
  */
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(HOSTIF_MsgData_t * stMsgData, bool *pChanged)
 {
+    errno_t rc = -1;
     string line;
     bool curFileFlag = true;
     ifstream curFwfile(CURENT_FW_FILE);
@@ -1438,7 +1452,11 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(H
 
             if(line.length()) {
                 char * cstr = new char [line.length()+1];
-                strcpy (cstr, line.c_str());
+                rc=strcpy_s (cstr,(line.length()+1), line.c_str());
+		if(rc!=EOK)
+		{
+			ERR_CHK(rc);
+		}
                 char * pch = NULL;
                 pch = strstr (cstr,":");
                 pch++;
@@ -1752,6 +1770,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus (HOSTIF
     bool check_GatewayConnStatus = false;
     bool check_XreConnStatus = false;
     char statusStr[TR69HOSTIFMGR_MAX_PARAM_LEN] = {'\0'};
+    errno_t rc = -1;
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering \n",__FUNCTION__);
 
@@ -1786,7 +1805,11 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus (HOSTIF
         if(get_GatewayConnStatus() == true)
         {
             memset(statusStr, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
-            strcpy(statusStr, "Connection successful");
+            rc=strcpy_s(statusStr,sizeof(statusStr), "Connection successful");
+	    if(rc!=EOK)
+	    {
+		ERR_CHK(rc);
+	    }
             check_AcsConnStatus = true;
         }
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] BootStatus: %s GatewayConnStatuss: %d\n", __FILE__, __FUNCTION__, statusStr, get_GatewayConnStatus());
@@ -1817,7 +1840,11 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus (HOSTIF
         if(get_ACSStatus() == true)
         {
             memset(statusStr, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
-            strcpy(statusStr, "Contacting ACS");
+            rc=strcpy_s(statusStr,sizeof(statusStr), "Contacting ACS");
+	    if(rc!=EOK)
+	    {
+		ERR_CHK(rc);
+	    }
             check_XreConnStatus = true;
         }
 //	RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] BootStatus: %s gAcsConnStatus: %d\n", __FILE__, __FUNCTION__, statusBuf, get_ACSStatus());
@@ -1881,13 +1908,14 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_CPUTemp(HOSTIF_Msg
 
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayType(HOSTIF_MsgData_t * stMsgData,bool *pChanged)
 {
+    errno_t rc = -1;
     int ret = OK;
     char prefGatewayValue[GATEWAY_NAME_SIZE];
     FILE *fp;
     if((fp=fopen(PREFERRED_GATEWAY_FILE,"r"))==NULL)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s]Unable to open file\n", __FUNCTION__);
-        strcpy(prefGatewayValue,"");
+        prefGatewayValue[0]='\0';
 
     }
     else
@@ -1895,7 +1923,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayTy
         if(fgets(prefGatewayValue, GATEWAY_NAME_SIZE, fp) == NULL)
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s]not able to read string from file \n", __FUNCTION__);
-            strcpy(prefGatewayValue,"");
+	    prefGatewayValue[0]='\0';
         }
         fclose(fp);
     }
@@ -2508,6 +2536,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportEna
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpaddress(HOSTIF_MsgData_t *stMsgData)
 {
     string line;
+    errno_t rc = -1;
     char ipAddress[100] = {'\0'};
     ifstream remoteInterface_file(IPREMOTE_INTERFACE_INFO);
     try
@@ -2523,7 +2552,11 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpa
                     while(isspace(*tmpStr)) {
                         tmpStr++;
                     }
-                    strcpy(ipAddress, tmpStr);
+                    rc=strcpy_s(ipAddress,sizeof(ipAddress), tmpStr);
+		    if(rc!=EOK)
+		    {
+			ERR_CHK(rc);
+		    }
                 }
             }
             remoteInterface_file.close();
@@ -2534,7 +2567,11 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpa
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] File not exists, IpRemoteInterface file open failed \n", __FUNCTION__);
 
             //values not populated so unknown.
-            strcpy(ipAddress,"unknown");
+            rc=strcpy_s(ipAddress,sizeof(ipAddress),"unknown");
+	    if(rc!=EOK)
+            {
+                   ERR_CHK(rc);
+            }
             snprintf((char *)stMsgData->paramValue, strlen(stMsgData->paramValue)-1, "%s",ipAddress);
         }
 
@@ -2552,6 +2589,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpa
 int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMACaddress(HOSTIF_MsgData_t *stMsgData)
 {
     string line;
+    errno_t rc = -1;
     char macAddress[100] = {'\0'};
     ifstream remoteInterface_file(IPREMOTE_INTERFACE_INFO);
     try
@@ -2567,7 +2605,11 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMAC
                     while(isspace(*tmpStr)) {
                         tmpStr++;
                     }
-                    strcpy(macAddress, tmpStr);
+                    rc=strcpy_s(macAddress,sizeof(macAddress), tmpStr);
+		    if(rc!=EOK)
+		    {
+			ERR_CHK(rc);
+		    }
                 }
             }
             remoteInterface_file.close();
@@ -2578,7 +2620,11 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMAC
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] File not exists, IpRemoteInterface file open failed \n", __FUNCTION__);
 
             //values not populated so unknown.
-            strcpy(macAddress,"unknown");
+            rc=strcpy_s(macAddress,sizeof(macAddress),"unknown");
+	    if(rc!=EOK)
+            {
+                  ERR_CHK(rc);
+            }
             snprintf((char *)stMsgData->paramValue, strlen(stMsgData->paramValue)-1, "%s",macAddress);
         }
 
@@ -2831,6 +2877,7 @@ int hostIf_DeviceInfo::get_xOpsDeviceMgmtForwardSSHEnable(HOSTIF_MsgData_t * stM
 
 int hostIf_DeviceInfo::set_xOpsDeviceMgmtForwardSSHEnable(HOSTIF_MsgData_t * stMsgData)
 {
+    errno_t rc = -1;
     LOG_ENTRY_EXIT;
     char ForwardSSH[10]="true";   //Default value
     FILE *fp;
@@ -2843,15 +2890,29 @@ int hostIf_DeviceInfo::set_xOpsDeviceMgmtForwardSSHEnable(HOSTIF_MsgData_t * stM
     else
     {
         RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Default Enable value:%s --> Parameter[%s]\n", __FUNCTION__, ForwardSSH, stMsgData->paramName);
-        if (get_boolean(stMsgData->paramValue))
+        /*rc = strcpy_s(ForwardSSH, sizeof(ForwardSSH), get_boolean(stMsgData->paramValue) ? "true" : "false");
+        if (rc != EOK) 
+	{
+        	ERR_CHK(rc);
+    	}*/
+	if (get_boolean(stMsgData->paramValue))
         {
-            strcpy(ForwardSSH,"true");
-        }
+            rc=strcpy_s(ForwardSSH,sizeof(ForwardSSH),"true");
+	    if(rc!=EOK)
+	    {
+		ERR_CHK(rc);
+	
+    	    }
+	}
         else
         {
-            strcpy(ForwardSSH,"false");
+            rc=strcpy_s(ForwardSSH,sizeof(ForwardSSH),"false");
+	    if(rc!=EOK)
+            {
+                ERR_CHK(rc);
+            }
         }
-        fprintf(fp,"ForwardSSH=%s", ForwardSSH);
+	fprintf(fp,"ForwardSSH=%s", ForwardSSH);
     }
     fclose(fp);
     return OK;
@@ -3503,6 +3564,7 @@ int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t * stMsgData)
 int hostIf_DeviceInfo::readFirmwareInfo(char *param, HOSTIF_MsgData_t * stMsgData)
 {
     int ret = NOK;
+    errno_t rc = -1;
     string line;
     ifstream fwDwnfile(FW_DWN_FILE_PATH);
 
@@ -3528,7 +3590,11 @@ int hostIf_DeviceInfo::readFirmwareInfo(char *param, HOSTIF_MsgData_t * stMsgDat
             return NOK;
         }
 
-        strcpy (cstr, line.c_str());
+        rc=strcpy_s (cstr,(line.length()+1), line.c_str());
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
         char * pch = NULL;
         pch = strstr (cstr,"|");
         if (pch == NULL) {
@@ -3824,14 +3890,24 @@ int hostIf_DeviceInfo::get_xOpsRPC_Profile(HOSTIF_MsgData_t * stMsgData)
 int hostIf_DeviceInfo::get_xOpsRPCDevManageableNotification(HOSTIF_MsgData_t* stMsgData)
 {
     char *chVal = (char *)(!m_strXOpsDevManageableNotification.empty() ? m_strXOpsDevManageableNotification.c_str() : "0");
-    strcpy(stMsgData->paramValue, chVal);
+    errno_t rc = -1;
+    rc=strcpy_s(stMsgData->paramValue,sizeof(stMsgData->paramValue), chVal);
+    if(rc!=EOK)
+    {
+	ERR_CHK(rc);
+    }
     return OK;
 }
 
 int hostIf_DeviceInfo::get_xOpsRPCFwDwldStartedNotification(HOSTIF_MsgData_t* stMsgData)
 {
     char *chVal = (char *)((!m_strXOpsRPCFwDwldStartedNotification.empty()) ? m_strXOpsRPCFwDwldStartedNotification.c_str() : "0");
-    strcpy(stMsgData->paramValue, chVal);
+    errno_t rc = -1;
+    rc=strcpy_s(stMsgData->paramValue,sizeof(stMsgData->paramValue), chVal);
+    if(rc!=EOK)
+    {
+        ERR_CHK(rc);
+    }
     return OK;
 }
 
@@ -3903,11 +3979,15 @@ int hostIf_DeviceInfo::set_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t * stMsgD
 int hostIf_DeviceInfo::set_xOpsRPCDevManageableNotification(HOSTIF_MsgData_t *stMsgData) {
     LOG_ENTRY_EXIT;
 
+    errno_t rc = -1;
     m_strXOpsDevManageableNotification.clear();
 
     HOSTIF_MsgData_t stRfcData = {0};
-    strcpy(stRfcData.paramName, X_RDK_RFC_MANGEBLENOTIFICATION_ENABLE);
-
+    rc=strcpy_s(stRfcData.paramName,sizeof(stRfcData.paramName), X_RDK_RFC_MANGEBLENOTIFICATION_ENABLE);
+    if(rc!=EOK)
+    {
+ 	ERR_CHK(rc);
+    }
     if((get_xRDKCentralComRFC(&stRfcData) == OK) && (strncmp(stRfcData.paramValue, "true", sizeof("true")) == 0))
     {
         m_strXOpsDevManageableNotification = stMsgData->paramValue;
@@ -3926,11 +4006,15 @@ int hostIf_DeviceInfo::set_xOpsRPCDevManageableNotification(HOSTIF_MsgData_t *st
 int hostIf_DeviceInfo::set_xOpsRPCFwDwldStartedNotification(HOSTIF_MsgData_t *stMsgData) {
     LOG_ENTRY_EXIT;
 
+    errno_t rc = -1;
     m_strXOpsRPCFwDwldStartedNotification.clear();
     /* Check for RFC */
     HOSTIF_MsgData_t stRfcData = {0};
-    strcpy(stRfcData.paramName, X_RDK_RFC_MANGEBLENOTIFICATION_ENABLE);
-
+    rc=strcpy_s(stRfcData.paramName,sizeof(stRfcData.paramName), X_RDK_RFC_MANGEBLENOTIFICATION_ENABLE);
+    if(rc!=EOK)
+    {
+        ERR_CHK(rc);
+    }
     if((get_xRDKCentralComRFC(&stRfcData) == OK) && (strncmp(stRfcData.paramValue, "true", sizeof("true")) == 0))
     {
         m_strXOpsRPCFwDwldStartedNotification = stMsgData->paramValue;
@@ -3947,10 +4031,14 @@ int hostIf_DeviceInfo::set_xOpsRPCFwDwldStartedNotification(HOSTIF_MsgData_t *st
 
 int hostIf_DeviceInfo::set_xOpsRPCFwDwldCompletedNotification(HOSTIF_MsgData_t *stMsgData) {
     LOG_ENTRY_EXIT;
+    errno_t rc = -1;
     /* Check for RFC */
     HOSTIF_MsgData_t stRfcData = {0};
-    strcpy(stRfcData.paramName, X_RDK_RFC_MANGEBLENOTIFICATION_ENABLE);
-
+    rc=strcpy_s(stRfcData.paramName,sizeof(stRfcData.paramName), X_RDK_RFC_MANGEBLENOTIFICATION_ENABLE);
+    if(rc!=EOK)
+    {
+        ERR_CHK(rc);
+    }
     if((get_xRDKCentralComRFC(&stRfcData) == OK) && (strncmp(stRfcData.paramValue, "true", sizeof("true")) == 0))
     {
         m_bXOpsRPCFwDwldCompletedNotification = get_boolean(stMsgData->paramValue);
@@ -3971,9 +4059,13 @@ int hostIf_DeviceInfo::set_xOpsRPCFwDwldCompletedNotification(HOSTIF_MsgData_t *
 int hostIf_DeviceInfo::set_xOpsRPCRebootPendingNotification(HOSTIF_MsgData_t *stMsgData) {
     LOG_ENTRY_EXIT;
     /* Check for RFC */
+    errno_t rc = -1;
     HOSTIF_MsgData_t stRfcData = {0};
-    strcpy(stRfcData.paramName, X_RDK_RFC_MANGEBLENOTIFICATION_ENABLE);
-
+    rc=strcpy_s(stRfcData.paramName,sizeof(stRfcData.paramName), X_RDK_RFC_MANGEBLENOTIFICATION_ENABLE);
+    if(rc!=EOK)
+    {
+        ERR_CHK(rc);
+    }
     if((get_xRDKCentralComRFC(&stRfcData) == OK) && (strncmp(stRfcData.paramValue, "true", sizeof("true")) == 0))
     {
         unsigned int uinVal = get_uint(stMsgData->paramValue);

@@ -38,6 +38,7 @@
 #include <libpd.h>
 #include <unistd.h>
 #include "rfcapi.h"
+#include "safec_lib.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -491,6 +492,7 @@ static size_t write_callback_fn(void *buffer, size_t size, size_t nmemb, struct 
     size_t index = data->size;
     size_t n = (size * nmemb);
     char* tmp;
+    errno_t safec_rc = -1;
 
     data->size += (size * nmemb);
 
@@ -506,7 +508,11 @@ static size_t write_callback_fn(void *buffer, size_t size, size_t nmemb, struct 
         return 0;
     }
 
-    memcpy((data->data + index), buffer, n);
+    safec_rc=memcpy_s((data->data + index),sizeof(data->data)-index, buffer, n);
+    if(safec_rc!=EOK)
+	{
+		ERR_CHK(safec_rc);
+	}
     data->data[data->size] = '\0';
 
     return size * nmemb;
@@ -1079,6 +1085,7 @@ static char *replaceMacWord(const char *s, const char *macW, const char *deviceM
 {
     char *result;
     int i, cnt = 0;
+    int temp_var;
     int deviceMACWlen = strlen(deviceMACW);
     int macWlen = strlen(macW);
     // Counting the number of times mac word occur in the string
@@ -1093,12 +1100,18 @@ static char *replaceMacWord(const char *s, const char *macW, const char *deviceM
     }
 
     result = (char *)malloc(i + cnt * (deviceMACWlen - macWlen) + 1);
+    temp_var=(i + cnt * (deviceMACWlen - macWlen) + 1);
     i = 0;
     while (*s)
     {
         if (strstr(s, macW) == s)
         {
-            strcpy(&result[i], deviceMACW);
+	    errno_t rc = -1;
+            rc=strcpy_s(&result[i],(temp_var - i), deviceMACW);
+	    if(rc!=EOK)
+       	    {
+    		    ERR_CHK(rc);
+	    }
             i += deviceMACWlen;
             s += macWlen;
         }

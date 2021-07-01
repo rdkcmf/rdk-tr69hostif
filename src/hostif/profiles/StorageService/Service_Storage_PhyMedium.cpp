@@ -135,8 +135,8 @@ int hostIf_PhysicalMedium::rebuildHash()
     memset(&stMsgData, 0 ,sizeof(stMsgData));
     if(OK == hostIf_StorageSrvc :: get_Device_StorageSrvc_ClientNumberOfEntries(&stMsgData))
     {
-        memcpy(&storageServiceMaxInstance ,stMsgData.paramValue,sizeof(int));
-        for(int storageServiceInstance = 1; storageServiceInstance<= storageServiceMaxInstance; storageServiceInstance++)
+	storageServiceMaxInstance = stMsgData.paramValue;
+	for(int storageServiceInstance = 1; storageServiceInstance<= storageServiceMaxInstance; storageServiceInstance++)
         {
             memset(&stMsgData, 0 ,sizeof(stMsgData));
             if((phyMedMaxInstance = getPhysicalMediumNumberOfEntries (storageServiceInstance))!=0)

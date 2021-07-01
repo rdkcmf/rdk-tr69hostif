@@ -25,6 +25,7 @@
 
 #include <webcfg_utils.h>
 #include <stdlib.h>
+#include "safec_lib.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -105,12 +106,21 @@ char* get_deviceMAC(void)
 int Get_Webconfig_URL( char *pString)
 {
     char *webcfg_url = readWebcfgURL();
+    errno_t rc = -1;
 
     if(webcfg_url) {
-        strcpy(pString,webcfg_url);
+        rc=strcpy_s(pString,(strlen(webcfg_url)+1),webcfg_url);
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
         free(webcfg_url);
     } else {
-        strcpy(pString, BLE_DETECTION_WEBCFG_ENDPOINT);
+        rc=strcpy_s(pString,sizeof(BLE_DETECTION_WEBCFG_ENDPOINT) ,BLE_DETECTION_WEBCFG_ENDPOINT);
+	if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
     }
     RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webcfg: [%s] %d %s \n", __FUNCTION__, __LINE__, pString);
     return 0;
@@ -204,9 +214,13 @@ void setValues(const param_t paramVal[], const unsigned int paramCount, const in
 
 int setForceSync(char* pString, char *transactionId,int *pStatus)
 {
+    errno_t rc = -1;
     memset(force_sync,0,sizeof(force_sync));
-    strcpy(force_sync,pString);
-
+    rc=strcpy_s(force_sync,sizeof(force_sync),pString);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     if((force_sync[0] !='\0') && (strlen(force_sync)>0)) {
         if(strlen(force_sync_transID)>0) {
             RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webcfg: [%s] %d Force sync is already in progress, Ignoring this request.\n",__FUNCTION__, __LINE__);
@@ -216,8 +230,13 @@ int setForceSync(char* pString, char *transactionId,int *pStatus)
             pthread_mutex_lock (get_global_sync_mutex());
 
             if(transactionId !=NULL && (strlen(transactionId)>0)) {
-                strcpy(force_sync_transID, transactionId);
-            }
+                rc=strcpy_s(force_sync_transID,sizeof(force_sync_transID), transactionId);
+                if(rc!=EOK)
+        	{
+        	        ERR_CHK(rc);
+	        }
+
+	    }
             pthread_cond_signal(get_global_sync_condition());
             pthread_mutex_unlock(get_global_sync_mutex());
         }

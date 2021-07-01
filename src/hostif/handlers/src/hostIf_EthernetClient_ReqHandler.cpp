@@ -35,6 +35,7 @@
 #include "hostIf_EthernetClient_ReqHandler.h"
 #include "Device_Ethernet_Interface.h"
 #include "Device_Ethernet_Interface_Stats.h"
+#include "safec_lib.h"
 
 EthernetClientReqHandler* EthernetClientReqHandler::pInstance = NULL;
 updateCallback EthernetClientReqHandler::mUpdateCallback = NULL;
@@ -375,7 +376,12 @@ int EthernetClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData
         if((NULL != notifyValuePtr) && (NULL != notifyKey))
         {
             *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
+	    errno_t rc = -1;
+            rc=strcpy_s(notifyKey,strlen(stMsgData->paramName)+1,stMsgData->paramName);
+	    if(rc!=EOK)
+    	    {
+	    	ERR_CHK(rc);
+    	    }
             g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
             ret = OK;
         }

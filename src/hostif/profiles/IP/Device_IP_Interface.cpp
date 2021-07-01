@@ -49,7 +49,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include "Device_IP.h"
-
+#include "safec_lib.h"
 
 // TODO: fix potential bug with initialization, as structure definition now has a "#ifdef IPV6_SUPPORT"
 IPInterface hostIf_IPInterface::stIPInterfaceInstance = {FALSE,FALSE,FALSE,FALSE,{"Down"},{'\0'},{'\0'},0,{'\0'},{'\0'},FALSE,0,{"Normal"},FALSE,0,
@@ -150,9 +150,9 @@ hostIf_IPInterface::hostIf_IPInterface(int dev_id):
     backupMaxMTUSize(0)
 
 {
-    strcpy(backupType,"");
-    strcpy(backupName,"");
-    strcpy(backupStatus,"");
+    backupType[0]='\0';
+    backupName[0]='\0';
+    backupStatus[0]='\0';
 }
 
 hostIf_IPInterface* hostIf_IPInterface::getInstance(int dev_id)
@@ -412,6 +412,7 @@ int hostIf_IPInterface::get_Interface_IPv4Enable(HOSTIF_MsgData_t *stMsgData, bo
 {
     LOG_ENTRY_EXIT;
 
+    errno_t rc = -1;
     // Separating this out from Enable/Status as they are independent variables as per
     // the spec: https://www.broadband-forum.org/cwmp/tr-181-2-11-0.html
     // "Note that IPv4Enable is independent of Enable, and that to administratively enable
@@ -426,8 +427,20 @@ int hostIf_IPInterface::get_Interface_IPv4Enable(HOSTIF_MsgData_t *stMsgData, bo
     // "Once detached from the IPv4 stack, the interface will now no longer be able to
     // pass IPv4 packets, and will be operationally down (unless also attached to an
     // enabled IPv6 stack)."
-    strcpy (stIPInterfaceInstance.status,
-            stIPInterfaceInstance.enable && (stIPInterfaceInstance.iPv4Enable || stIPInterfaceInstance.iPv6Enable) ? STATE_UP : STATE_DOWN);
+//    rc=strcpy_s (stIPInterfaceInstance.status,sizeof(stIPInterfaceInstance.status),
+  //          stIPInterfaceInstance.enable && (stIPInterfaceInstance.iPv4Enable || stIPInterfaceInstance.iPv6Enable) ? STATE_UP : STATE_DOWN);
+    if(stIPInterfaceInstance.enable && (stIPInterfaceInstance.iPv4Enable || stIPInterfaceInstance.iPv6Enable))
+    {
+	    rc=strcpy_s (stIPInterfaceInstance.status,sizeof(stIPInterfaceInstance.status),STATE_UP);
+    }
+    else
+    {
+	    rc=strcpy_s (stIPInterfaceInstance.status,sizeof(stIPInterfaceInstance.status),STATE_DOWN);
+    }
+    if(rc!=EOK)
+    {
+	ERR_CHK(rc);
+    }
     // TODO: Why write to Status when read requested on IPv4Enable?
 
     //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Enable: %d IPv4Enable: %d Status: %s \n",__FUNCTION__,stIPInterfaceInstance.enable,stIPInterfaceInstance.iPv4Enable,stIPInterfaceInstance.status);
@@ -449,10 +462,24 @@ int hostIf_IPInterface::get_Interface_IPv6Enable(HOSTIF_MsgData_t *stMsgData, bo
 {
     LOG_ENTRY_EXIT;
 
+    errno_t rc = -1;
     stIPInterfaceInstance.iPv6Enable = (getIPv6AddressNumberOfEntries () >= 1);
 
-    strcpy (stIPInterfaceInstance.status,
-            stIPInterfaceInstance.enable && (stIPInterfaceInstance.iPv4Enable || stIPInterfaceInstance.iPv6Enable) ? STATE_UP : STATE_DOWN);
+    //rc=strcpy_s (stIPInterfaceInstance.status,sizeof(stIPInterfaceInstance.status),
+            //stIPInterfaceInstance.enable && (stIPInterfaceInstance.iPv4Enable || stIPInterfaceInstance.iPv6Enable) ? STATE_UP : STATE_DOWN);
+    if(stIPInterfaceInstance.enable && (stIPInterfaceInstance.iPv4Enable || stIPInterfaceInstance.iPv6Enable))
+    {
+	    rc=strcpy_s (stIPInterfaceInstance.status,sizeof(stIPInterfaceInstance.status),STATE_UP);
+    }
+    else
+    {
+	    rc=strcpy_s (stIPInterfaceInstance.status,sizeof(stIPInterfaceInstance.status),STATE_DOWN);
+    }
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+
     // TODO: Why write to Status when read requested on IPv6Enable?
 
     //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Enable: %d IPv6Enable: %d Status: %s \n",__FUNCTION__,stIPInterfaceInstance.enable,stIPInterfaceInstance.iPv6Enable,stIPInterfaceInstance.status);
@@ -495,9 +522,22 @@ void hostIf_IPInterface::getInterfaceOperationalState (char* operationalState)
 {
     LOG_ENTRY_EXIT;
 
+    errno_t rc = -1;
     struct ifreq ifr;
     getActiveFlags (nameOfInterface, ifr);
-    strcpy (operationalState, (ifr.ifr_flags & IFF_UP) ? STATE_UP : STATE_DOWN);
+    //rc=strcpy_s (operationalState, IP_STATUS_LENGTH,(ifr.ifr_flags & IFF_UP) ? STATE_UP : STATE_DOWN);
+    if(ifr.ifr_flags & IFF_UP)
+    {
+	    rc=strcpy_s (operationalState, IP_STATUS_LENGTH,STATE_UP);
+    }
+    else
+    {
+	    rc=strcpy_s (operationalState, IP_STATUS_LENGTH,STATE_DOWN);
+    }
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
 }
 
 /**
@@ -599,7 +639,12 @@ int hostIf_IPInterface::get_Interface_Name(HOSTIF_MsgData_t *stMsgData, bool *pC
 {
     LOG_ENTRY_EXIT;
 
-    strcpy (stIPInterfaceInstance.name, nameOfInterface);
+    errno_t rc = -1;
+    rc=strcpy_s (stIPInterfaceInstance.name,sizeof(stIPInterfaceInstance.name), nameOfInterface);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
 
     RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s(): Interface name = %s \n", __FUNCTION__, stIPInterfaceInstance.name);
 
@@ -787,12 +832,31 @@ int hostIf_IPInterface::get_Interface_Type(HOSTIF_MsgData_t *stMsgData, bool *pC
 {
     LOG_ENTRY_EXIT;
 
+    errno_t rc = -1;
     if (isLoopback (nameOfInterface))
-        strcpy (stIPInterfaceInstance.type, "Loopback");
+    {
+        rc=strcpy_s (stIPInterfaceInstance.type,sizeof(stIPInterfaceInstance.type), "Loopback");
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
+    }
     else if (0 == strncmp (nameOfInterface, "eth", 3) || 0 == strncmp (nameOfInterface, "wlan", 4))
-        strcpy (stIPInterfaceInstance.type, "Normal");
+    {
+        rc=strcpy_s (stIPInterfaceInstance.type,sizeof(stIPInterfaceInstance.type), "Normal");
+	if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
+    }
     else
-        strcpy (stIPInterfaceInstance.type, "Tunneled");
+    {
+        rc=strcpy_s (stIPInterfaceInstance.type,sizeof(stIPInterfaceInstance.type), "Tunneled");
+	if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
+    }
 
     RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s(): Type: %s \n", __FUNCTION__, stIPInterfaceInstance.type);
 
@@ -812,7 +876,12 @@ int hostIf_IPInterface::get_Interface_Type(HOSTIF_MsgData_t *stMsgData, bool *pC
 void hostIf_IPInterface::getActiveFlags (char* nameOfInterface, struct ifreq& ifr)
 {
     memset (&ifr, 0, sizeof(ifr));
-    strcpy (ifr.ifr_name, nameOfInterface);
+    errno_t rc = -1;
+    rc=strcpy_s (ifr.ifr_name,sizeof(ifr.ifr_name), nameOfInterface);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     int fd = socket (PF_INET, SOCK_DGRAM, IPPROTO_IP);
     if (fd < 0) {
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s(): fd: %d, Failed due to [\'%s\' (%d)] \n", __FUNCTION__, fd, strerror(errno), errno);  //CID:18636 - NEGATIVE RETURNS
@@ -846,7 +915,12 @@ int hostIf_IPInterface::getMTU (char* nameOfInterface)
 
     struct ifreq ifr;
     memset (&ifr, 0, sizeof(ifr));
-    strcpy (ifr.ifr_name, nameOfInterface);
+    errno_t rc = -1;
+    rc=strcpy_s (ifr.ifr_name,sizeof(ifr.ifr_name), nameOfInterface);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     int fd = socket (PF_INET, SOCK_DGRAM, IPPROTO_IP);
     if(fd > 0)
     {

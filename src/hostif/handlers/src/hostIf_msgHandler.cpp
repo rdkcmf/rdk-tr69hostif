@@ -36,6 +36,7 @@
 #include "hostIf_dsClient_ReqHandler.h"
 #include "hostIf_DeviceClient_ReqHandler.h"
 #include "hostIf_XrdkCentralT2_ReqHandler.h"
+#include "safec_lib.h"
 
 #ifdef USE_XRESRC
 #include "hostIf_XREClient_ReqHandler.h"
@@ -163,12 +164,17 @@ void hostIf_Free_stMsgData (HOSTIF_MsgData_t *stMsgData)
 //------------------------------------------------------------------------------
 void hostIf_Init_Dummy_stMsgData (HOSTIF_MsgData_t **stMsgData)
 {
+    errno_t rc = -1;
     HOSTIF_MsgData_t *stMsgDummyData = NULL;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     if(NULL == *stMsgData)
     {
         stMsgDummyData = new HOSTIF_MsgData_t();
-        strcpy(stMsgDummyData->paramName, TEST_STR);
+        rc=strcpy_s(stMsgDummyData->paramName,sizeof(stMsgDummyData->paramName), TEST_STR);
+	if(rc!=EOK)
+    	{
+	    ERR_CHK(rc);
+    	}
         stMsgDummyData->reqType = HOSTIF_GET;
         stMsgDummyData->instanceNum = 0;
         *stMsgData = stMsgDummyData;

@@ -47,6 +47,7 @@
 #include <sys/time.h>
 #include <string.h>
 #include "Device_Time.h"
+#include "safec_lib.h"
 
 #define TIME_ZONE_LENGTH 8
 
@@ -63,8 +64,8 @@ hostIf_Time::hostIf_Time(int dev_id):
     bCalledLocalTimeZone(false),
     bCalledCurrentLocalTime(false)
 {
-    strcpy(backupLocalTimeZone,"");
-    strcpy(backupCurrentLocalTime,"");
+    backupLocalTimeZone[0]='\0';
+    backupCurrentLocalTime[0]='\0';
     m_bsStore = XBSStore::getInstance();
 }
 
@@ -221,6 +222,7 @@ int hostIf_Time::get_Device_Time_CurrentLocalTime(HOSTIF_MsgData_t *stMsgData, b
 {
     time_t rawtime;
     struct tm * timeinfo;
+     errno_t rc = -1;
     char buffer [_BUF_LEN_64] = {'\0'};
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FILE__, __FUNCTION__);
     char timeZoneTmp[7];
@@ -239,8 +241,16 @@ int hostIf_Time::get_Device_Time_CurrentLocalTime(HOSTIF_MsgData_t *stMsgData, b
     }
 
     bCalledCurrentLocalTime = true;
-    strcpy(stMsgData->paramValue, buffer);
-    strcpy(backupCurrentLocalTime,buffer);
+    rc=strcpy_s(stMsgData->paramValue,sizeof(stMsgData->paramValue), buffer);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    rc=strcpy_s(backupCurrentLocalTime,sizeof(backupCurrentLocalTime),buffer);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
 
     RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] buffer : %s stMsgData->paramValue: %s\n", __FILE__, __FUNCTION__, buffer, stMsgData->paramValue);
 

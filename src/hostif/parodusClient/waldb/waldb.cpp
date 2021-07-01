@@ -28,6 +28,7 @@
 #include "hostIf_main.h"
 #include "hostIf_utils.h"
 #include "hostIf_tr69ReqHandler.h"
+#include "safec_lib.h"
 
 using namespace tinyxml2;
 #define MAX_PARAMETER_LENGTH 512
@@ -182,6 +183,7 @@ void initNumEntityParamList()
 int getNumberofInstances(const char* paramName)
 {
     int instanceCount = 0;
+    errno_t safec_rc = -1;
     if(NULL != paramName)
     {
         char *position = NULL;
@@ -196,12 +198,20 @@ int getNumberofInstances(const char* paramName)
             const char* paramValue = (const char *) g_hash_table_lookup(instanceNumParamHash,parameter);
             if(NULL != paramValue)
             {
-                strcpy(numberOfEntitiesParam,paramValue);
-            }
+                safec_rc=strcpy_s(numberOfEntitiesParam,sizeof(numberOfEntitiesParam),paramValue);
+                if(safec_rc!= EOK)
+	    	{
+		    ERR_CHK(safec_rc);
+	    	}
+	    }
             else // Normal Parameters Number of Entity param = ParamName + "NumberOfEntries"
             {
-                strcpy(position-1,"NumberOfEntries");
-            }
+                safec_rc=strcpy_s(position-1,MAX_PARAMETER_LENGTH-((char *)position - (char*)numberOfEntitiesParam),"NumberOfEntries");
+            	if(safec_rc!= EOK)
+                {
+                    ERR_CHK(safec_rc);
+                }
+	    }
             // Get the number of instances using getValues
             WDMP_STATUS *ret ;
             size_t *retCount = 0;
@@ -293,13 +303,18 @@ int isWildCardParam(char *paramName)
  */
 void replaceWithInstanceNumber(char *paramName, int instanceNumber)
 {
+    errno_t safec_rc = -1;
     char *position;
     char number[10];
 
     if(!(position = strstr(paramName, INSTANCE_NUMBER_INDICATOR)))
         return;
     sprintf(number,"%d.",instanceNumber);
-    strcpy(paramName+(strlen(paramName)-4),number);
+    safec_rc=strcpy_s(paramName+(strlen(paramName)-4),MAX_PARAMETER_LENGTH,number);
+    if(safec_rc!= EOK)
+    {
+	    ERR_CHK(safec_rc);
+    }
 }
 
 /**
@@ -359,6 +374,7 @@ int checkMatchingParameter(const char* attrValue, char* paramName, int* ret)
  */
 void appendNextObject(char* currentParam, const char* pAttparam)
 {
+    errno_t safec_rc = -1;
     while(true)
     {
         if(!(*currentParam == *pAttparam) )
@@ -383,6 +399,7 @@ void appendNextObject(char* currentParam, const char* pAttparam)
         pAttparam++;
     }
     // Copy rest of the un matching strings to currentParam
+    // TO DO: Since the size of the destination buffer is not predictable using strcpy
     strcpy(currentParam, pAttparam);
 }
 /**
@@ -394,6 +411,7 @@ void appendNextObject(char* currentParam, const char* pAttparam)
  */
 static XMLNode* getList(XMLNode *pParent,char *paramName,char* currentParam,char **ptrParamList,char **pParamDataTypeList,int *paramCount)
 {
+    errno_t safec_rc = -1;
     XMLNode* pChild;
     const char* maxEntries;
     int isReccursiveCall = 0;
@@ -460,7 +478,11 @@ static XMLNode* getList(XMLNode *pParent,char *paramName,char* currentParam,char
                     zeroInstance[0] = '\0';
                 }
                 // If matching found update the current parameter with wild card input string
-                if( status && !isReccursiveCall) strcpy(currentParam, paramName);
+                if( status && !isReccursiveCall) 
+		{
+			//TO DO: Since currentParam size is not predictable using strcpy
+			strcpy(currentParam, paramName);
+		}
                 // Append if current attribute contains {i} to current param
                 appendNextObject(currentParam, pAttrib->Value());
                 XMLNode* bChild,*sChild;
@@ -503,18 +525,28 @@ static XMLNode* getList(XMLNode *pParent,char *paramName,char* currentParam,char
                         {
                             memset(tparaName, 0,MAX_PARAMETER_LENGTH);
                             int len=strlen(currentParam)-4;
-                            strcpy(tparaName, pChild->Parent()->ToElement()->FirstAttribute()->Value());
-                            // Replace {i} with current instance number and call recursively
+                            safec_rc=strcpy_s(tparaName, MAX_PARAMETER_LENGTH, pChild->Parent()->ToElement()->FirstAttribute()->Value());
+                            if(safec_rc != EOK)
+	    		    {
+		    		ERR_CHK(safec_rc);
+	    		    }
+			    // Replace {i} with current instance number and call recursively
                             replaceWithInstanceNumber(currentParam,i);
                             sChild = getList(pChild,tparaName,currentParam,ptrParamList,pParamDataTypeList,paramCount);
-                            strcpy(currentParam+len, INSTANCE_NUMBER_INDICATOR);
-                            i++;
+                            //TO DO:Since curretParam size is not predictable using strcpy
+			    strcpy(currentParam+len, INSTANCE_NUMBER_INDICATOR);
+			    i++;
                         }
                         pChild = sChild;
                         // Seems like instance count is empty
                         if (!instanceNumber)
-                        {   strcpy(zeroInstance, pAttrib->Value());
-                            pChild = pChild->Parent();
+                        {   
+			    safec_rc=strcpy_s(zeroInstance,MAX_PARAMETER_LENGTH, pAttrib->Value());
+                            if(safec_rc != EOK)
+                            {
+                                ERR_CHK(safec_rc);
+                            }
+			    pChild = pChild->Parent();
                         }
                     }
                 }

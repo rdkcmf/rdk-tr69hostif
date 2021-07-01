@@ -25,7 +25,7 @@
 #include <stddef.h>
 #include "cJSON.h"
 #include "rdk_debug.h"
-
+#include "safec_lib.h"
 
 #define DEVICE_ESTB_MAC_PARAM       "Device.DeviceInfo.X_COMCAST-COM_STB_MAC"
 #define WEBPA_UNKNOWN_PARAM_VALUE   "Unknown"
@@ -161,6 +161,7 @@ int getnotifyparamList(char ***notifyParamList,int *ptrnotifyListSize)
     int i = 0;
     int ch_count = 0;
     FILE *fp = NULL;
+    errno_t rc = -1;
 
     // Read file notification Configuration file
     if(NULL == webpaNotifyConfigFile)
@@ -201,7 +202,11 @@ int getnotifyparamList(char ***notifyParamList,int *ptrnotifyListSize)
             if(temp_ptr)
             {
                 (*notifyParamList)[i] = (char *)malloc(sizeof(char ) * (strlen(temp_ptr)+1));
-                strcpy((*notifyParamList)[i],temp_ptr);
+                rc=strcpy_s((*notifyParamList)[i],(strlen(temp_ptr)+1),temp_ptr);
+		if(rc!=EOK)
+		{
+			ERR_CHK(rc);
+		}
                 RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Notify Param  = %s\n", temp_ptr);
             }
         }

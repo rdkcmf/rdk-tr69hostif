@@ -48,6 +48,7 @@
 #include "Device_IP_Interface.h"
 #include "hostIf_utils.h"
 #include "Device_IP.h"
+#include "safec_lib.h"
 
 #ifdef YOCTO_BUILD
 #include "secure_wrapper.h"
@@ -129,10 +130,15 @@ hostIf_IPv4Address::hostIf_IPv4Address(int dev_id):
     bCalledAddressingType(0),
     backupEnable (false)
 {
-    strcpy (backupStatus, "");
-    strcpy (backupIPAddress, "");
-    strcpy (backupSubnetMask, "");
-    strcpy (backupAddressingType, "Static");
+    errno_t rc = -1;
+    backupStatus[0]='\0';
+    backupIPAddress[0]='\0';
+    backupSubnetMask[0]='\0';
+    rc=strcpy_s (backupAddressingType,sizeof(backupAddressingType), "Static");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
 }
 
 hostIf_IPv4Address* hostIf_IPv4Address::getInstance(int dev_id)
@@ -348,11 +354,27 @@ int hostIf_IPv4Address::get_IPv4Address_Enable(HOSTIF_MsgData_t *stMsgData,int s
 int hostIf_IPv4Address::get_IPv4Address_Status(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
-
+    errno_t rc = -1;
     char status[BUFF_LENGTH_16];
     struct in_addr in_address;
     struct in_addr in_mask;
-    strcpy (status, (OK == getIPv4AddressAndMask (subInstanceNo, in_address, in_mask)) ? "Enabled" : "Disabled");
+    //rc=strcpy_s (status,sizeof(status) ,(OK == getIPv4AddressAndMask (subInstanceNo, in_address, in_mask)) ? "Enabled" : "Disabled");
+    if(OK == getIPv4AddressAndMask (subInstanceNo, in_address, in_mask))
+    {
+	    rc=strcpy_s (status,sizeof(status) ,"Enabled");
+    	    if(rc!=EOK)
+	    {
+		ERR_CHK(rc);
+	    }
+    }
+    else
+    {
+	    rc=strcpy_s (status,sizeof(status) ,"Disabled");
+    	    if(rc!=EOK)
+            {
+                ERR_CHK(rc);
+            }
+    }
 
     if (bCalledStatus && pChanged && strncmp (status, backupStatus, BUFF_LENGTH_16))
     {
@@ -549,6 +571,7 @@ int hostIf_IPv4Address::get_IPv4Address_AddressingType(HOSTIF_MsgData_t *stMsgDa
     // first verify that we have an IPv4 address for the given instance
     struct in_addr in_address;
     struct in_addr in_mask;
+    errno_t rc = -1;
     if (OK != getIPv4AddressAndMask (subInstanceNo, in_address, in_mask))
         return NOK;
 
@@ -558,11 +581,19 @@ int hostIf_IPv4Address::get_IPv4Address_AddressingType(HOSTIF_MsgData_t *stMsgDa
     char addressingType[BUFF_LENGTH_16];
     if (hostIf_IPInterface::isLoopback (nameOfInterface))
     {
-        strcpy (addressingType, "Static");
+        rc=strcpy_s (addressingType,sizeof(addressingType), "Static");
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
     }
     else if (isLinkLocalAddress (in_address))
     {
-        strcpy (addressingType, "AutoIP");
+        rc=strcpy_s (addressingType,sizeof(addressingType), "AutoIP");
+        if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
     }
     /*
      * If a MoCA / WiFi interface (specified by MOCA_INTERFACE / WIFI_INTERFACE in /etc/device.properties)
@@ -574,11 +605,19 @@ int hostIf_IPv4Address::get_IPv4Address_AddressingType(HOSTIF_MsgData_t *stMsgDa
              ((hasPhysicalInterfaceAs (getenvOrDefault ("WIFI_INTERFACE", ""))) &&
               (0 == strcmp (ipv4Address, getenvOrDefault ("DEFAULT_WIFI_IFACE_IP", "")))))
     {
-        strcpy (addressingType, "Static");
+        rc=strcpy_s (addressingType,sizeof(addressingType), "Static");
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
     }
     else
     {
-        strcpy (addressingType, "DHCP"); // DHCP - otherwise (assume)
+        rc=strcpy_s (addressingType,sizeof(addressingType), "DHCP"); // DHCP - otherwise (assume)
+        if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
     }
 
     if (bCalledAddressingType && pChanged && strncmp (addressingType, backupAddressingType, BUFF_LENGTH_16))

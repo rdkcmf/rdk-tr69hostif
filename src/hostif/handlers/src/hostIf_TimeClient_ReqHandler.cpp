@@ -31,6 +31,7 @@
 //#define HAVE_VALUE_CHANGE_EVENT
 #include "hostIf_main.h"
 #include "hostIf_TimeClient_ReqHandler.h"
+#include "safec_lib.h"
 
 TimeClientReqHandler* TimeClientReqHandler::pInstance = NULL;
 updateCallback TimeClientReqHandler::mUpdateCallback = NULL;
@@ -226,7 +227,12 @@ int TimeClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         if((NULL != notifyValuePtr) && (NULL != notifyKey))
         {
             *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
+	    errno_t rc = -1;
+            rc=strcpy_s(notifyKey,strlen(stMsgData->paramName)+1,stMsgData->paramName);
+	    if(rc!=EOK)
+    	    {
+	    	ERR_CHK(rc);
+    	    }
             g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
             ret = OK;
         }
@@ -274,7 +280,12 @@ int TimeClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         if((NULL != notifyValuePtr) && (NULL != notifyKey))
         {
             *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
+	    errno_t rc = -1;
+            rc=strcpy_s(notifyKey,strlen(stMsgData->paramName)+1,stMsgData->paramName);
+	    if(rc!=EOK)
+    	    {
+	    	ERR_CHK(rc);
+    	    }
             g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
             ret = OK;
         }

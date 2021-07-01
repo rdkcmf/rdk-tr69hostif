@@ -36,6 +36,7 @@
 #include "exception.hpp"
 #include "Components_HDMI.h"
 #include "Components_DisplayDevice.h"
+#include "safec_lib.h"
 
 #define DEV_NAME "HDMI"
 #define BASE_NAME "Device.Services.STBService.1.Components.HDMI"
@@ -183,10 +184,23 @@ void hostIf_STBServiceHDMI::releaseLock()
  */
 hostIf_STBServiceHDMI::hostIf_STBServiceHDMI(int devid, device::VideoOutputPort& port) : dev_id(devid), vPort(port)
 {
+    errno_t rc = -1;
     backupEnable = false;
-    strcpy(backupStatus, " ");
-    strcpy(backupResolutionValue," ");
-    strcpy(backupName," ");
+    rc=strcpy_s(backupStatus,sizeof(backupStatus), " ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    rc=strcpy_s(backupResolutionValue,sizeof(backupResolutionValue)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    rc=strcpy_s(backupName,sizeof(backupName)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
 
     bCalledEnable = false;
     bCalledStatus = false;

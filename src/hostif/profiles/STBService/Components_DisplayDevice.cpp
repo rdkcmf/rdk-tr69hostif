@@ -31,6 +31,7 @@
 
 
 #include "Components_DisplayDevice.h"
+#include "safec_lib.h"
 
 #define STATUS_STRING "Status"
 #define EEDID_STRING "EEDID"
@@ -59,11 +60,32 @@
  */
 hostIf_STBServiceDisplayDevice::hostIf_STBServiceDisplayDevice(int devId, device::VideoOutputPort& port) : dev_id(devId), vPort(port)
 {
-    strcpy(backupDisplayDeviceStatus," ");
-    strcpy(backupEDID," ");
-    strcpy(backupEDIDBytes," ");
-    strcpy(backupSupportedResolution," ");
-    strcpy(backupPreferredResolution," ");
+    errno_t rc = -1;
+    rc=strcpy_s(backupDisplayDeviceStatus,sizeof(backupDisplayDeviceStatus)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    rc=strcpy_s(backupEDID,sizeof(backupEDID)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    rc=strcpy_s(backupEDIDBytes,sizeof(backupEDIDBytes)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    rc=strcpy_s(backupSupportedResolution,sizeof(backupSupportedResolution)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    rc=strcpy_s(backupPreferredResolution,sizeof(backupPreferredResolution)," ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
 
     bCalledDisplayDeviceStatus = false;
     bCalledEDID = false;

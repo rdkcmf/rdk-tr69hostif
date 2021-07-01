@@ -136,9 +136,9 @@ hostIf_IPActivePort::hostIf_IPActivePort(int dev_id):
     backupLocalPort(0),
     backupRemotePort(0)
 {
-    strcpy(backupLocalIPAddress,"");
-    strcpy(backupRemoteIPAddress,"");
-    strcpy(backupStatus,"");
+    backupLocalIPAddress[0]='\0';
+    backupRemoteIPAddress[0]='\0';
+    backupStatus[0]='\0';
 
 }
 

@@ -40,10 +40,10 @@
 #include <net/if.h>
 
 #include "Device_Ethernet_Interface.h"
-
 #ifdef YOCTO_BUILD
 #include "secure_wrapper.h"
 #endif
+#include "safec_lib.h"
 
 EthernetInterface hostIf_EthernetInterface::stEthInterface = {0,};
 
@@ -168,11 +168,10 @@ hostIf_EthernetInterface::hostIf_EthernetInterface(int dev_id):
     bCalledMaxBitRate(false),
     bCalledDuplexMode(false)
 {
-    strcpy(backupStatus,"");
-    strcpy(backupName,"");
-    strcpy(backupMACAddress,"");
-    strcpy(backupDuplexMode,"");
-
+    backupStatus[0]='\0';
+    backupName[0]='\0';
+    backupMACAddress[0]='\0';
+    backupDuplexMode[0]='\0';
 }
 
 hostIf_EthernetInterface::~hostIf_EthernetInterface()
@@ -186,9 +185,8 @@ hostIf_EthernetInterface::~hostIf_EthernetInterface()
 static int getEthernetInterfaceName (unsigned int ethInterfaceNum, char* name)
 {
     int ret = NOK;
-
-    strcpy (name, "");
-
+    errno_t rc = -1;
+    name[0]='\0';
     //retrieve the current interfaces
     struct if_nameindex* ifname = if_nameindex ();
 
@@ -199,7 +197,11 @@ static int getEthernetInterfaceName (unsigned int ethInterfaceNum, char* name)
         {
             if ((strncmp (ifnp->if_name, "eth", 3) == 0) && (++count == ethInterfaceNum))
             {
-                strcpy (name, ifnp->if_name);
+                rc=strcpy_s (name, BUFF_LENGTH_64,ifnp->if_name);
+		if(rc!=EOK)
+        	{
+                	ERR_CHK(rc);
+        	}
                 ret = OK;
                 break;
             }
@@ -226,6 +228,7 @@ static int getEthernetInterfaceName (unsigned int ethInterfaceNum, char* name)
 static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEthInterfaceMembers ethInterfaceMem)
 {
     FILE *fp;
+    errno_t rc = -1;
     char resultBuff[BUFF_LENGTH] = {'\0'};
     char cmd[BUFF_LENGTH] = {'\0'};
     int temp = 0;
@@ -298,8 +301,23 @@ static int get_Device_Ethernet_Interface_Fields(unsigned int ethInterfaceNum,EEt
             sscanf(resultBuff,"%d",&temp);
         }
 
-        strcpy (hostIf_EthernetInterface::stEthInterface.status, (TRUE == temp) ? "Up" : "Down");
-
+        //rc=strcpy_s (hostIf_EthernetInterface::stEthInterface.status,sizeof(hostIf_EthernetInterface::stEthInterface.status) ,(TRUE == temp) ? "Up" : "Down");
+	if(TRUE==temp)
+	{
+		rc=strcpy_s (hostIf_EthernetInterface::stEthInterface.status,sizeof(hostIf_EthernetInterface::stEthInterface.status) ,"Up");
+		if(rc!=EOK)
+		{
+			ERR_CHK(rc);
+		}
+	}
+	else
+	{
+		rc=strcpy_s (hostIf_EthernetInterface::stEthInterface.status,sizeof(hostIf_EthernetInterface::stEthInterface.status) ,"Down");
+        	if(rc!=EOK)
+        	{
+                	ERR_CHK(rc);
+        	}
+	}
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): Interface %u Status: %s \n",
                 __FUNCTION__, ethInterfaceNum, hostIf_EthernetInterface::stEthInterface.status);
 
@@ -570,13 +588,18 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Status(HOSTIF_MsgDat
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eStatus);
 
+    errno_t rc = -1;
     if(bCalledStatus && pChanged && strncmp(stEthInterface.status,backupStatus,_BUF_LEN_16-1))
     {
         *pChanged = true;
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] Ethernet Interface Status Changed..", __FUNCTION__, __FILE__, __LINE__);
     }
     bCalledStatus = true;
-    strcpy(backupStatus, stEthInterface.status);
+    rc=strcpy_s(backupStatus,sizeof(backupStatus), stEthInterface.status);
+    if(rc!=EOK)
+    {
+	ERR_CHK(rc);
+    }
     strncpy(stMsgData->paramValue,stEthInterface.status,_BUF_LEN_16-1 );
     stMsgData->paramValue[_BUF_LEN_16-1] = '\0';
     stMsgData->paramtype = hostIf_StringType;
@@ -600,12 +623,17 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_Name(HOSTIF_MsgData_
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eName);
 
+    errno_t rc = -1;
     if(bCalledName && pChanged && strncmp(stEthInterface.name,backupName,_BUF_LEN_16-1))
     {
         *pChanged = true;
     }
     bCalledName = true;
-    strcpy(backupName, stEthInterface.name);
+    rc=strcpy_s(backupName,sizeof(backupName), stEthInterface.name);
+    if(rc!=EOK)
+    {
+	ERR_CHK(rc);
+    }
     strncpy(stMsgData->paramValue,stEthInterface.name,_BUF_LEN_16-1 );
     stMsgData->paramValue[_BUF_LEN_16-1] = '\0';
     stMsgData->paramtype = hostIf_StringType;
@@ -711,12 +739,17 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_MACAddress(HOSTIF_Ms
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eMACAddress);
 
+    errno_t rc = -1;
     if(bCalledMACAddress && pChanged && strncmp(stEthInterface.mACAddress,backupMACAddress,S_LENGTH-1))
     {
         *pChanged = true;
     }
     bCalledMACAddress = true;
-    strcpy(backupMACAddress, stEthInterface.mACAddress);
+    rc=strcpy_s(backupMACAddress,sizeof(backupMACAddress), stEthInterface.mACAddress);
+    if(rc!=EOK)
+    {
+	ERR_CHK(rc);
+    }
     strncpy(stMsgData->paramValue,stEthInterface.mACAddress,S_LENGTH );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stEthInterface.mACAddress);
@@ -773,12 +806,17 @@ int hostIf_EthernetInterface::get_Device_Ethernet_Interface_DuplexMode(HOSTIF_Ms
 {
     get_Device_Ethernet_Interface_Fields(dev_id, eDuplexMode);
 
+    errno_t rc = -1;
     if(bCalledDuplexMode && pChanged && strncmp(stEthInterface.duplexMode,backupDuplexMode,_BUF_LEN_16-1))
     {
         *pChanged = true;
     }
     bCalledDuplexMode = true;
-    strcpy(backupDuplexMode, stEthInterface.duplexMode);
+    rc=strcpy_s(backupDuplexMode,sizeof(backupDuplexMode), stEthInterface.duplexMode);
+    if(rc!=EOK)
+    {
+	ERR_CHK(rc);
+    }
     strncpy(stMsgData->paramValue,stEthInterface.duplexMode,_BUF_LEN_16-1 );
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen(stEthInterface.duplexMode);

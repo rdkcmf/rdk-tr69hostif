@@ -29,8 +29,9 @@
 * @{
 **/
 
-
+#include <cstddef>
 #include "hostIf_main.h"
+#include "safec_lib.h"
 #ifdef USE_MoCA_PROFILE
 #include "hostIf_MoCAClient_ReqHandler.h"
 #include "Device_MoCA_Interface.h"
@@ -691,8 +692,13 @@ int MoCAClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         notifyKey = (char*) malloc(sizeof(char)*strlen(stMsgData->paramName)+1);
         if(NULL != notifyValuePtr)
         {
+	    errno_t rc = -1;
             *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
+	    rc=strcpy_s(notifyKey,strlen(stMsgData->paramName)+1,stMsgData->paramName);
+	    if(rc!=EOK)
+    	    {
+	    	ERR_CHK(rc);
+    	    }
             g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
             ret = OK;
         }
@@ -707,7 +713,6 @@ int MoCAClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         ret = NOK;
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] MoCAClientReqHandler Not able to get notifyhash  %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
     }
-
     MoCAInterface::releaseLock();
     return ret;
 }
@@ -824,7 +829,12 @@ void MoCAClientReqHandler::checkForUpdates()
                 {
                     //RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%s] mocaIface instance is created inside if(mocaIface) \n", __FILE__, __FUNCTION__);
                     char *buff =(char*)malloc(strlen(pSetting)+1);
-                    strcpy(buff,pSetting);
+		    errno_t rc = -1;
+		    rc=strcpy_s(buff,(strlen(pSetting)+1),pSetting);
+		    if(rc!=EOK)
+    		    {
+	    		ERR_CHK(rc);
+    		    }
                     int subInstanceNumber;
                     const char *pSubSetting = (char*)malloc(strlen(pSetting)+1);
                     if(matchComponent((const char*)buff,"QoS.FlowStats",&pSubSetting,subInstanceNumber))

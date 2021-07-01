@@ -49,6 +49,7 @@
 
 #include "snmpAdapter.h"
 #include <fstream>
+#include "safec_lib.h"
 
 #ifdef YOCTO_BUILD
 #include "secure_wrapper.h"
@@ -228,6 +229,7 @@ int hostIf_snmpAdapter::get_ValueFromSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
     char delimeter[] = " \t\n\r\f\v";
     map<string,string>::iterator it;
     string consoleString("");
+    errno_t rc = -1;
 
     if(stMsgData)
     {
@@ -249,11 +251,20 @@ int hostIf_snmpAdapter::get_ValueFromSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
                     string subStr = consoleString.substr(pos + 1);
                     subStr.erase(0, subStr.find_first_not_of(delimeter));
                     subStr.erase(subStr.find_last_not_of(delimeter) + 1);
-                    strcpy(stMsgData->paramValue, subStr.c_str());
-                }
+                    rc=strcpy_s(stMsgData->paramValue,sizeof(stMsgData->paramValue), subStr.c_str());
+                    if(rc!=EOK)
+		    {
+			ERR_CHK(rc);
+		    }
+		}
                 else
-                    strcpy(stMsgData->paramValue, resultBuff);
-
+		{
+                    rc=strcpy_s(stMsgData->paramValue,sizeof(stMsgData->paramValue), resultBuff);
+		    if(rc!=EOK)
+                    {
+                        ERR_CHK(rc);
+                    }
+		}
                 stMsgData->paramtype = hostIf_StringType;
                 RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] %s %s\n", __FUNCTION__, stMsgData->paramName, stMsgData->paramValue);
                 ret = OK;

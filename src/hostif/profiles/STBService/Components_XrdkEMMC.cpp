@@ -43,11 +43,13 @@
 #else
 #include "storageMgr.h"
 #endif // ifdef USE_RDK_STORAGE_MANAGER_V2
+#include "safec_lib.h"
 
 hostIf_STBServiceXeMMC *hostIf_STBServiceXeMMC::instance = NULL;
 
 hostIf_STBServiceXeMMC* hostIf_STBServiceXeMMC::getInstance()
 {
+    errno_t safec_rc = -1;
     if (!instance)
     {
         char emmcDeviceID[RDK_STMGR_MAX_STRING_LENGTH] = "";
@@ -59,9 +61,17 @@ hostIf_STBServiceXeMMC* hostIf_STBServiceXeMMC::getInstance()
         {
             if (RDK_STMGR_DEVICE_TYPE_EMMCCARD == deviceInfoList.m_devices[i].m_type)
             {
-                memcpy (&emmcDeviceID, &deviceInfoList.m_devices[i].m_deviceID, RDK_STMGR_MAX_STRING_LENGTH);
-                memcpy (&emmcPartitionID, &deviceInfoList.m_devices[i].m_partitions, RDK_STMGR_MAX_STRING_LENGTH);
-                break;
+                safec_rc=memcpy_s (emmcDeviceID, RDK_STMGR_MAX_STRING_LENGTH , &deviceInfoList.m_devices[i].m_deviceID,RDK_STMGR_MAX_STRING_LENGTH);
+                if(safec_rc!=EOK)
+	        {
+		    ERR_CHK(safec_rc);
+	        }
+		safec_rc=memcpy_s (emmcPartitionID, RDK_STMGR_MAX_STRING_LENGTH , &deviceInfoList.m_devices[i].m_partitions,RDK_STMGR_MAX_STRING_LENGTH);
+                if(safec_rc!=EOK)
+                {
+                    ERR_CHK(safec_rc);
+                }
+		break;
             }
         }
 
@@ -222,15 +232,20 @@ int hostIf_STBServiceXeMMC::getLotID(HOSTIF_MsgData_t *stMsgData)
 
     stMsgData->paramtype = hostIf_StringType;
 
+    errno_t rc = -1;
     eSTMGRDeviceInfo deviceInfo;
     if (RDK_STMGR_RETURN_SUCCESS == rdkStorage_getDeviceInfo (emmcDeviceID, &deviceInfo))
     {
-        strcpy((char*) stMsgData->paramValue, deviceInfo.m_hwVersion);
+        rc=strcpy_s((char*) stMsgData->paramValue, sizeof(stMsgData->paramValue),deviceInfo.m_hwVersion);
+	if(rc!=EOK)
+    	{
+	    ERR_CHK(rc);
+    	}
         return OK;
     }
     else
     {
-        strcpy((char*) stMsgData->paramValue, "");
+        stMsgData->paramValue[0]='\0';
         return NOK;
     }
 }
@@ -241,15 +256,20 @@ int hostIf_STBServiceXeMMC::getManufacturer(HOSTIF_MsgData_t *stMsgData)
 
     stMsgData->paramtype = hostIf_StringType;
 
+    errno_t rc = -1;
     eSTMGRDeviceInfo deviceInfo;
     if (RDK_STMGR_RETURN_SUCCESS == rdkStorage_getDeviceInfo (emmcDeviceID, &deviceInfo))
     {
-        strcpy((char*) stMsgData->paramValue, deviceInfo.m_manufacturer);
+        rc=strcpy_s((char*) stMsgData->paramValue,sizeof(stMsgData->paramValue), deviceInfo.m_manufacturer);
+	if(rc!=EOK)
+        {
+            ERR_CHK(rc);
+        }
         return OK;
     }
     else
     {
-        strcpy((char*) stMsgData->paramValue, "");
+        stMsgData->paramValue[0]='\0';
         return NOK;
     }
 }
@@ -260,15 +280,20 @@ int hostIf_STBServiceXeMMC::getModel(HOSTIF_MsgData_t *stMsgData)
 
     stMsgData->paramtype = hostIf_StringType;
 
+    errno_t rc = -1;
     eSTMGRDeviceInfo deviceInfo;
     if (RDK_STMGR_RETURN_SUCCESS == rdkStorage_getDeviceInfo (emmcDeviceID, &deviceInfo))
     {
-        strcpy((char*) stMsgData->paramValue, deviceInfo.m_model);
+        rc=strcpy_s((char*) stMsgData->paramValue,sizeof(stMsgData->paramValue), deviceInfo.m_model);
+	if(rc!=EOK)
+        {
+            ERR_CHK(rc);
+        }
         return OK;
     }
     else
     {
-        strcpy((char*) stMsgData->paramValue, "");
+        stMsgData->paramValue[0]='\0';
         return NOK;
     }
 }
@@ -298,15 +323,20 @@ int hostIf_STBServiceXeMMC::getSerialNumber(HOSTIF_MsgData_t *stMsgData)
 
     stMsgData->paramtype = hostIf_StringType;
 
+    errno_t rc = -1;
     eSTMGRDeviceInfo deviceInfo;
     if (RDK_STMGR_RETURN_SUCCESS == rdkStorage_getDeviceInfo (emmcDeviceID, &deviceInfo))
     {
-        strcpy((char*) stMsgData->paramValue, deviceInfo.m_serialNumber);
+        rc=strcpy_s((char*) stMsgData->paramValue,sizeof(stMsgData->paramValue), deviceInfo.m_serialNumber);
+	if(rc!=EOK)
+    	{
+	    ERR_CHK(rc);
+    	}
         return OK;
     }
     else
     {
-        strcpy((char*) stMsgData->paramValue, "");
+        stMsgData->paramValue[0]='\0';
         return NOK;
     }
 }
@@ -381,15 +411,20 @@ int hostIf_STBServiceXeMMC::getFirmwareVersion(HOSTIF_MsgData_t *stMsgData)
 
     stMsgData->paramtype = hostIf_StringType;
 
+    errno_t rc = -1;
     eSTMGRDeviceInfo deviceInfo;
     if (RDK_STMGR_RETURN_SUCCESS == rdkStorage_getDeviceInfo (emmcDeviceID, &deviceInfo))
     {
-        strcpy((char*) stMsgData->paramValue, deviceInfo.m_firmwareVersion);
+        rc=strcpy_s((char*) stMsgData->paramValue,sizeof(stMsgData->paramValue), deviceInfo.m_firmwareVersion);
+	if(rc!=EOK)
+    	{
+	    ERR_CHK(rc);
+    	}
         return OK;
     }
     else
     {
-        strcpy((char*) stMsgData->paramValue, "");
+        stMsgData->paramValue[0]='\0';
         return NOK;
     }
 }

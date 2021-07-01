@@ -44,6 +44,7 @@
 #include "Device_IP_Interface.h"
 #include "hostIf_utils.h"
 #include "Device_IP.h"
+#include "safec_lib.h"
 
 /**
  * @struct in6_ifreq
@@ -86,13 +87,29 @@ hostIf_IPv6Address::hostIf_IPv6Address(int dev_id):
     backupIPv6AddressEnable (false),
     backupIPv6PrefixEnable (false)
 {
-    strcpy (backupIPv6AddressStatus, "Disabled");
-    strcpy (backupIPv6AddressIPAddress, "");
-    strcpy (backupIPv6AddressOrigin, STATIC);
-
-    strcpy (backupIPv6PrefixStatus, "Disabled");
-    strcpy (backupIPv6PrefixPrefix, "");
-    strcpy (backupIPv6PrefixOrigin, STATIC);
+    errno_t rc = -1;
+    rc=strcpy_s (backupIPv6AddressStatus,sizeof(backupIPv6AddressStatus), "Disabled");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    backupIPv6AddressIPAddress[0]='\0';
+    rc=strcpy_s (backupIPv6AddressOrigin,sizeof(backupIPv6AddressOrigin), STATIC);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    rc=strcpy_s (backupIPv6PrefixStatus,sizeof(backupIPv6PrefixStatus), "Disabled");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+    backupIPv6PrefixPrefix[0]='\0';
+    rc=strcpy_s (backupIPv6PrefixOrigin,sizeof(backupIPv6PrefixOrigin), STATIC);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
 }
 
 hostIf_IPv6Address::~hostIf_IPv6Address()
@@ -480,7 +497,7 @@ bool hostIf_IPv6Address::isLinkLocalAddress (const struct in6_addr& in6_address)
 int hostIf_IPv6Address::removeIp(int interfaceNo, char *value)
 {
     LOG_ENTRY_EXIT;
-
+    errno_t safec_rc = -1;
     int rc = OK;
     struct ifreq ifr;
     struct sockaddr_in6 sai6;
@@ -516,8 +533,12 @@ int hostIf_IPv6Address::removeIp(int interfaceNo, char *value)
                  * Call the IOCTL command for remove IP.
                  */
                 ifr6.ifr6_ifindex = interfaceNo;
-                memcpy( (char *) &ifr6.ifr6_addr, (char *) &sai6.sin6_addr, sizeof(struct in6_addr));
-                ifr6.ifr6_prefixlen = 64;
+                safec_rc=memcpy_s( (char *) &ifr6.ifr6_addr, sizeof(struct in6_addr), (char *) &sai6.sin6_addr, sizeof(struct in6_addr));
+                if(safec_rc!=EOK)
+		 {
+			 ERR_CHK(safec_rc);
+		 }
+		ifr6.ifr6_prefixlen = 64;
 
                 if (ioctl(sockfd, SIOCDIFADDR, &ifr6) < 0)
                 {
@@ -546,7 +567,7 @@ int hostIf_IPv6Address::removeIp(int interfaceNo, char *value)
 int hostIf_IPv6Address::setIp(int interfaceNo, char *value)
 {
     LOG_ENTRY_EXIT;
-
+    errno_t safec_rc = -1;
     int rc = OK;
     struct ifreq ifr;
     struct sockaddr_in6 sai6;
@@ -582,8 +603,12 @@ int hostIf_IPv6Address::setIp(int interfaceNo, char *value)
                  * Call the IOCTL command for adding IP.
                  */
                 ifr6.ifr6_ifindex = interfaceNo;
-                memcpy( (char *) &ifr6.ifr6_addr, (char *) &sai6.sin6_addr, sizeof(struct in6_addr));
-                ifr6.ifr6_prefixlen = 64;
+                safec_rc=memcpy_s( (char *) &ifr6.ifr6_addr, sizeof(struct in6_addr), (char *) &sai6.sin6_addr, sizeof(struct in6_addr));
+                if(safec_rc!=EOK)
+		{
+			ERR_CHK(safec_rc);
+		}
+		ifr6.ifr6_prefixlen = 64;
 
                 if (ioctl(sockfd, SIOCSIFADDR, &ifr6) < 0)
                 {
@@ -670,12 +695,23 @@ int hostIf_IPv6Address::get_IPv6Address_Enable(HOSTIF_MsgData_t *stMsgData,int s
 int hostIf_IPv6Address::get_IPv6Address_Status(HOSTIF_MsgData_t *stMsgData,int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
-
+    errno_t rc = -1;
     char status[BUFF_LENGTH_16];
     struct in6_addr in6_address;
     struct in6_addr in6_mask;
-    strcpy (status, (OK == getIPv6AddressAndMask (subInstanceNo, in6_address, in6_mask)) ? "Enabled" : "Disabled");
-
+    //rc=strcpy_s (status,sizeof(status), (OK == getIPv6AddressAndMask (subInstanceNo, in6_address, in6_mask)) ? "Enabled" : "Disabled");
+    if(OK == getIPv6AddressAndMask (subInstanceNo, in6_address, in6_mask))
+    {
+	    rc=strcpy_s (status,sizeof(status),"Enabled");
+    }
+    else
+    {
+	    rc=strcpy_s (status,sizeof(status),"Disabled");
+    }
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     if (bCalledStatus && pChanged && strncmp (status, backupIPv6AddressStatus, BUFF_LENGTH_16))
     {
         *pChanged = true;
@@ -718,7 +754,8 @@ int hostIf_IPv6Address::get_IPv6Address_IPAddressStatus (HOSTIF_MsgData_t *stMsg
 
     This parameter is based on ipAddressStatus and ipAddressStatusTC from [RFC4293].
 */
-
+    
+    errno_t rc = -1;
     long int valid_lft;
     if (false == get_ipv6address_valid_lifetime (subInstanceNo, valid_lft))
         return NOK;
@@ -732,13 +769,38 @@ int hostIf_IPv6Address::get_IPv6Address_IPAddressStatus (HOSTIF_MsgData_t *stMsg
 
     char ipaddressStatus[BUFF_LENGTH_16];
     if (valid_lft == 0)
-        strcpy (ipaddressStatus, INVALID);
+	{
+        rc=strcpy_s (ipaddressStatus,BUFF_LENGTH_16, INVALID);
+        if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
+	}
     else if (strcasecmp (interfaceOperationalState, STATE_DOWN) == 0)
-        strcpy (ipaddressStatus, INACCESSIBLE);
+    {
+	    rc=strcpy_s (ipaddressStatus,BUFF_LENGTH_16, INACCESSIBLE);
+            if(rc!=EOK)
+    	    {
+		    ERR_CHK(rc);
+            }
+    }
     else if (preferred_lft == 0)
-        strcpy (ipaddressStatus, DEPRECATED);
+    {
+	    rc=strcpy_s (ipaddressStatus,BUFF_LENGTH_16, DEPRECATED);
+            if(rc!=EOK)
+            {
+                    ERR_CHK(rc);
+            }
+    }
     else
-        strcpy (ipaddressStatus, PREFERRED);
+    {
+        
+	    rc=strcpy_s (ipaddressStatus,BUFF_LENGTH_16, PREFERRED);
+            if(rc!=EOK)
+            {
+                    ERR_CHK(rc);
+            }
+    }
     // TODO: Unknown, Tentative, Duplicate, Optimistic
 
     // TODO:
@@ -878,19 +940,31 @@ int hostIf_IPv6Address::get_IPv6Address_Origin(HOSTIF_MsgData_t *stMsgData,int s
     struct in6_addr in6_mask;
     if (OK != getIPv6AddressAndMask (subInstanceNo, in6_address, in6_mask))
         return NOK;
-
+     errno_t rc = -1;
     char origin[BUFF_LENGTH_32];
     if (hostIf_IPInterface::isLoopback (nameOfInterface))
     {
-        strcpy (origin, WELLKNOWN);
+        rc=strcpy_s (origin,BUFF_LENGTH_32, WELLKNOWN);
+        if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
     }
     else if (isLinkLocalAddress (in6_address))
     {
-        strcpy (origin, AUTOCONFIGURED);
+        rc=strcpy_s (origin,BUFF_LENGTH_32, AUTOCONFIGURED);
+        if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
     }
     else
     {
-        strcpy (origin, AUTOCONFIGURED); // otherwise assume "AutoConfigured" (even for sit0's IPv4-compatible address "::127.0.0.1"/96 ?)
+        rc=strcpy_s (origin,BUFF_LENGTH_32, AUTOCONFIGURED); // otherwise assume "AutoConfigured" (even for sit0's IPv4-compatible address "::127.0.0.1"/96 ?)
+        if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
     }
 
     if (bCalledOrigin && pChanged && strncmp (origin, backupIPv6AddressOrigin, BUFF_LENGTH_32))
@@ -929,6 +1003,7 @@ int hostIf_IPv6Address::get_IPv6Address_Prefix (HOSTIF_MsgData_t *stMsgData,int 
     // so proceed only if an IPv6 address exists, else error.
     struct in6_addr in6_address;
     struct in6_addr in6_mask;
+    errno_t rc = -1;
     if (OK != getIPv6AddressAndMask (subInstanceNo, in6_address, in6_mask))
         return NOK;
 
@@ -938,7 +1013,11 @@ int hostIf_IPv6Address::get_IPv6Address_Prefix (HOSTIF_MsgData_t *stMsgData,int 
     // Device.IP.Interface.{i}.IPv6Prefix.{j}.
 
     char pathnameOfRowInIPv6PrefixTable[TR69HOSTIFMGR_MAX_PARAM_LEN];
-    strcpy (pathnameOfRowInIPv6PrefixTable, stMsgData->paramName);
+    rc=strcpy_s (pathnameOfRowInIPv6PrefixTable,TR69HOSTIFMGR_MAX_PARAM_LEN, stMsgData->paramName);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     const char *positionAfterInstanceNumber = 0;
     int instanceNumber = 0;
     if(!matchComponent (pathnameOfRowInIPv6PrefixTable, "Device.IP.Interface", &positionAfterInstanceNumber, instanceNumber))
@@ -1118,12 +1197,25 @@ void hostIf_IPv6Address::convert_lifetime_to_string (long int t, char* lifetime)
 {
     LOG_ENTRY_EXIT;
 
+    errno_t rc = -1;
     lifetime[0] = 0;
 
     if (t == -1) // // -1 = unknown
-        strcpy (lifetime, TIME_UNKNOWN); // "0001-01-01T00:00:00Z"
+    {
+	    rc=strcpy_s (lifetime,BUFF_LENGTH_32, TIME_UNKNOWN); // "0001-01-01T00:00:00Z"
+	    if(rc!=EOK)
+    	    {
+		    ERR_CHK(rc);
+	    }
+    }
     else if  (t == -2) // -2 = forever
-        strcpy (lifetime, TIME_INFINITY); // "9999-12-31T23:59:59Z"
+    {
+	    rc=strcpy_s (lifetime,BUFF_LENGTH_32, TIME_INFINITY); // "9999-12-31T23:59:59Z"
+	    if(rc!=EOK)
+	    {
+		    ERR_CHK(rc);
+	    }
+    }
     else
     {
         tm tmp;
@@ -1159,11 +1251,27 @@ int hostIf_IPv6Address::get_IPv6Prefix_Status(HOSTIF_MsgData_t *stMsgData,int su
 {
     LOG_ENTRY_EXIT;
 
+    errno_t rc = -1;
     char status[BUFF_LENGTH_16];
     struct in6_addr in6_prefix_address;
     unsigned int prefix_length;
-    strcpy (status, (OK == getIPv6Prefix (subInstanceNo, in6_prefix_address, prefix_length)) ? "Enabled" : "Disabled");
-
+   // rc=strcpy_s (status,sizeof(status), (OK == getIPv6Prefix (subInstanceNo, in6_prefix_address, prefix_length)) ? "Enabled" : "Disabled");
+    if(OK == getIPv6Prefix (subInstanceNo, in6_prefix_address, prefix_length))
+    {    
+	    rc=strcpy_s (status,sizeof(status),"Enabled");
+	    if(rc!=EOK)
+	    {
+		    ERR_CHK(rc);
+	    }
+    }
+    else
+    {
+	    rc=strcpy_s (status,sizeof(status),"Disabled");
+	    if(rc!=EOK)
+    	    {
+    		    ERR_CHK(rc);
+	    }
+    }
     // TODO: use a variable other than bCalledStatus which is for IPv6Address profile
     if (bCalledStatus && pChanged && strncmp (status, backupIPv6PrefixStatus, BUFF_LENGTH_16))
     {
@@ -1206,7 +1314,8 @@ int hostIf_IPv6Address::get_IPv6Prefix_PrefixStatus (HOSTIF_MsgData_t *stMsgData
     // TODO: Where do we look to find information about the valid and preferred lifetimes of a prefix ?
     // For now, valid/preferred lifetimes of the IPv6 address associated with this prefix are used
     // as the basis for deriving prefix status
-
+    
+    errno_t rc = -1;
     long int valid_lft;
     if (false == get_ipv6address_valid_lifetime (subInstanceNo, valid_lft))
         return NOK;
@@ -1220,13 +1329,37 @@ int hostIf_IPv6Address::get_IPv6Prefix_PrefixStatus (HOSTIF_MsgData_t *stMsgData
 
     char prefixStatus[BUFF_LENGTH_16];
     if (valid_lft == 0)
-        strcpy (prefixStatus, INVALID);
+    {
+        rc=strcpy_s (prefixStatus,BUFF_LENGTH_16, INVALID);
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
+    }
     else if (strcasecmp (interfaceOperationalState, STATE_DOWN) == 0)
-        strcpy (prefixStatus, INACCESSIBLE);
+    {
+	rc=strcpy_s (prefixStatus,BUFF_LENGTH_16, INACCESSIBLE);
+        if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
+    }
     else if (preferred_lft == 0)
-        strcpy (prefixStatus, DEPRECATED);
+    {
+        rc=strcpy_s (prefixStatus,BUFF_LENGTH_16, DEPRECATED);
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
+    }
     else
-        strcpy (prefixStatus, PREFERRED);
+    {
+        rc=strcpy_s (prefixStatus,BUFF_LENGTH_16, PREFERRED);
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
+    }
     // TODO: Unknown
 
     // TODO:
@@ -1319,16 +1452,25 @@ int hostIf_IPv6Address::get_IPv6Prefix_Origin (int instance, char* origin)
     // verify we have an IPv6 address for the given instance
     struct in6_addr in6_address;
     struct in6_addr in6_mask;
+    errno_t rc = -1;
     if (OK != getIPv6AddressAndMask (instance, in6_address, in6_mask))
         return NOK;
 
     if (hostIf_IPInterface::isLoopback (nameOfInterface) || isLinkLocalAddress (in6_address))
     {
-        strcpy (origin, WELLKNOWN); // "WellKnown" for loopback and link-local addresses
+        rc=strcpy_s (origin,BUFF_LENGTH_32, WELLKNOWN); // "WellKnown" for loopback and link-local addresses
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
     }
     else
     {
-        strcpy (origin, AUTOCONFIGURED); // "AutoConfigured" - otherwise (assume)
+        rc=strcpy_s (origin,BUFF_LENGTH_32, AUTOCONFIGURED); // "AutoConfigured" - otherwise (assume)
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
         // TODO: for a gateway, this should be "PrefixDelegation" (Delegated via DHCPv6)
     }
     return OK;
@@ -1398,6 +1540,7 @@ int hostIf_IPv6Address::get_IPv6Prefix_StaticType (int instance, char* staticTyp
     // first check if the StaticType parameter is relevant
 
     char origin[BUFF_LENGTH_32];
+    errno_t rc = -1;
     if (OK != get_IPv6Prefix_Origin (instance, origin))
     {
         RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Error retrieving IPv6Prefix Origin\n", __FUNCTION__);
@@ -1408,20 +1551,28 @@ int hostIf_IPv6Address::get_IPv6Prefix_StaticType (int instance, char* staticTyp
     if (strcasecmp (origin, STATIC) != 0)
     {
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "%s: StaticType = Inapplicable (IPv6Prefix origin not Static)\n", __FUNCTION__);
-        strcpy (staticType, INAPPLICABLE);
-        return OK;
+        rc=strcpy_s (staticType,BUFF_LENGTH_32, INAPPLICABLE);
+        if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
+	return OK;
     }
 
     // TODO: Implement StaticType
     RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Not Implemented\n", __FUNCTION__);
-    strcpy (staticType, NOT_IMPLEMENTED);
-
+    rc=strcpy_s (staticType,BUFF_LENGTH_32, NOT_IMPLEMENTED);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     return OK;
 }
 
 int hostIf_IPv6Address::get_IPv6Prefix_StaticType (HOSTIF_MsgData_t *stMsgData, int subInstanceNo, bool *pChanged)
 {
     LOG_ENTRY_EXIT;
+    errno_t rc = -1;
 
     char staticType[BUFF_LENGTH_32];
     if (OK != get_IPv6Prefix_StaticType (subInstanceNo, staticType))
@@ -1430,7 +1581,11 @@ int hostIf_IPv6Address::get_IPv6Prefix_StaticType (HOSTIF_MsgData_t *stMsgData, 
         return NOK;
     }
 
-    strcpy (stMsgData->paramValue, staticType);
+    rc=strcpy_s (stMsgData->paramValue,sizeof(stMsgData->paramValue), staticType);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (staticType);
 
@@ -1453,6 +1608,7 @@ int hostIf_IPv6Address::get_IPv6Prefix_ParentPrefix (int instance, char* parentP
 
     // first check if the ParentPrefix parameter is relevant
 
+    errno_t rc = -1;
     char origin[BUFF_LENGTH_32];
     if (OK != get_IPv6Prefix_Origin (instance, origin))
         return NOK;
@@ -1473,13 +1629,18 @@ int hostIf_IPv6Address::get_IPv6Prefix_ParentPrefix (int instance, char* parentP
 
     if (!relevant)
     {
-        strcpy (parentPrefix, "");
+        parentPrefix[0]='\0';
         return OK;
     }
 
     // TODO: Implement ParentPrefix
     RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Not Implemented\n", __FUNCTION__);
-    strcpy (parentPrefix, NOT_IMPLEMENTED);
+    rc=strcpy_s (parentPrefix,BUFF_LENGTH_64, NOT_IMPLEMENTED);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
+
 
     return OK;
 }
@@ -1488,11 +1649,16 @@ int hostIf_IPv6Address::get_IPv6Prefix_ParentPrefix (HOSTIF_MsgData_t *stMsgData
 {
     LOG_ENTRY_EXIT;
 
+    errno_t rc = -1;
     char parentPrefix[BUFF_LENGTH_64];
     if (OK != get_IPv6Prefix_ParentPrefix (subInstanceNo, parentPrefix))
         return NOK;
 
-    strcpy (stMsgData->paramValue, parentPrefix);
+    rc=strcpy_s (stMsgData->paramValue,sizeof(stMsgData->paramValue), parentPrefix);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (parentPrefix);
 
@@ -1515,20 +1681,24 @@ int hostIf_IPv6Address::get_IPv6Prefix_ChildPrefixBits (int instance, char* chil
     This parameter can only be modified if Origin is Static.
 */
 
+    errno_t rc = -1;
     char staticType[BUFF_LENGTH_32];
     if (OK != get_IPv6Prefix_StaticType (instance, staticType))
         return NOK;
 
     if (strcasecmp (staticType, CHILD) != 0)
     {
-        strcpy (childPrefixBits, "");
+        childPrefixBits[0]='\0';
         return OK;
     }
 
     // TODO: Implement ChildPrefixBits
     RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Not Implemented\n", __FUNCTION__);
-    strcpy (childPrefixBits, NOT_IMPLEMENTED);
-
+    rc=strcpy_s (childPrefixBits,BUFF_LENGTH_64, NOT_IMPLEMENTED);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     return OK;
 }
 
@@ -1536,11 +1706,16 @@ int hostIf_IPv6Address::get_IPv6Prefix_ChildPrefixBits (HOSTIF_MsgData_t *stMsgD
 {
     LOG_ENTRY_EXIT;
 
+    errno_t rc = -1;
     char childPrefixBits[BUFF_LENGTH_64];
     if (OK != get_IPv6Prefix_ChildPrefixBits (subInstanceNo, childPrefixBits))
         return NOK;
 
-    strcpy (stMsgData->paramValue, childPrefixBits);
+    rc=strcpy_s (stMsgData->paramValue,sizeof(stMsgData->paramValue), childPrefixBits);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (childPrefixBits);
 

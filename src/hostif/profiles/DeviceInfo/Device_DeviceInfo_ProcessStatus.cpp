@@ -38,6 +38,7 @@
 
 
 #include "Device_DeviceInfo_ProcessStatus.h"
+#include "safec_lib.h"
 
 GHashTable* hostIf_DeviceProcessStatusInterface::ifHash = NULL;
 GMutex* hostIf_DeviceProcessStatusInterface::m_mutex = NULL;
@@ -124,6 +125,7 @@ hostIf_DeviceProcessStatusInterface::hostIf_DeviceProcessStatusInterface(int dev
 
 int hostIf_DeviceProcessStatusInterface::getProcessStatusCPUUsage() {
 
+    errno_t rc = -1;
     char cmd[64] = {'\0'};
     FILE *fp = NULL;
     char resultBuffer[1024]= {'\0'};
@@ -134,7 +136,11 @@ int hostIf_DeviceProcessStatusInterface::getProcessStatusCPUUsage() {
     unsigned int temp = 0;
     //CPUUsage
     memset(cmd,'\0', sizeof(cmd));
-    strcpy(cmd,"grep '^cpu ' /proc/stat");
+    rc=strcpy_s(cmd,sizeof(cmd),"grep '^cpu ' /proc/stat");
+    if(rc!=EOK)
+    {
+	ERR_CHK(rc);
+    }
     fp = popen(cmd,"r");
 
     if(fp == NULL) {

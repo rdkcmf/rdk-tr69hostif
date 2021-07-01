@@ -24,6 +24,7 @@
 
 #include "hostIf_SNMPClient_ReqHandler.h"
 #include "snmpAdapter.h"
+#include "safec_lib.h"
 
 SNMPClientReqHandler* SNMPClientReqHandler::pInstance = NULL;
 updateCallback SNMPClientReqHandler::mUpdateCallback = NULL;
@@ -216,7 +217,12 @@ int SNMPClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         if(NULL != notifyValuePtr)
         {
             *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
+	    errno_t rc = -1;
+            rc=strcpy_s(notifyKey,strlen(stMsgData->paramName)+1,stMsgData->paramName);
+	    if(rc!=EOK)
+    	    {
+	   	ERR_CHK(rc);
+    	    }
             g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
             ret = OK;
         }

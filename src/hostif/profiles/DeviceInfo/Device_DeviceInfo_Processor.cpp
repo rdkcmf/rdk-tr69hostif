@@ -128,7 +128,7 @@ hostIf_DeviceProcessorInterface::hostIf_DeviceProcessorInterface(int devid)
 {
     dev_id = devid;
     bCalledArchitecture = false;
-    strcpy(backupArchitecture,"");
+    backupArchitecture[0]='\0';
 }
 
 

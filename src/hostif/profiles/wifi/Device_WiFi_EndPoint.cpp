@@ -38,6 +38,7 @@
 
 #include "Device_WiFi_EndPoint.h"
 #include <mutex>
+#include "safec_lib.h"
 
 extern "C" {
 #include "wifiSrvMgrIarmIf.h"
@@ -141,11 +142,16 @@ int hostIf_WiFi_EndPoint::set_Device_WiFi_EndPoint_Enable (HOSTIF_MsgData_t *stM
 
 int hostIf_WiFi_EndPoint::get_Device_WiFi_EndPoint_Status (HOSTIF_MsgData_t *stMsgData)
 {
+    errno_t rc = -1;
     LOG_ENTRY_EXIT;
     if (OK != refreshCache ())
         return NOK;
     RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Status = [%s]\n", __FUNCTION__, Status);
-    strcpy (stMsgData->paramValue, Status);
+    rc=strcpy_s (stMsgData->paramValue,sizeof(stMsgData->paramValue), Status);
+    if(rc!=EOK)
+    {
+            ERR_CHK(rc);
+    }
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (Status);
     return OK;
@@ -153,11 +159,16 @@ int hostIf_WiFi_EndPoint::get_Device_WiFi_EndPoint_Status (HOSTIF_MsgData_t *stM
 
 int hostIf_WiFi_EndPoint::get_Device_WiFi_EndPoint_Alias (HOSTIF_MsgData_t *stMsgData)
 {
+    errno_t rc = -1;
     LOG_ENTRY_EXIT;
     if (OK != refreshCache ())
         return NOK;
     RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Alias = [%s]\n", __FUNCTION__, Alias);
-    strcpy (stMsgData->paramValue, Alias);
+    rc=strcpy_s (stMsgData->paramValue,sizeof(stMsgData->paramValue), Alias);
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     stMsgData->paramtype = hostIf_StringType;
     stMsgData->paramLen = strlen (Alias);
     return OK;

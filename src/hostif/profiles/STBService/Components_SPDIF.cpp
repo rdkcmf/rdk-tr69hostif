@@ -34,6 +34,7 @@
 #include "illegalArgumentException.hpp"
 #include "exception.hpp"
 #include "Components_SPDIF.h"
+#include "safec_lib.h"
 
 #define DEV_NAME "SPDIF"
 #define BASE_NAME "Device.Services.STBService.1.Components.SPDIF"
@@ -149,7 +150,12 @@ void hostIf_STBServiceSPDIF::releaseLock()
 hostIf_STBServiceSPDIF::hostIf_STBServiceSPDIF(int devid, device::AudioOutputPort& port) : dev_id(devid), aPort(port)
 {
     backupEnable = false;
-    strcpy(backupStatus, " ");
+    errno_t rc = -1;
+    rc=strcpy_s(backupStatus,sizeof(backupStatus), " ");
+    if(rc!=EOK)
+    {
+	    ERR_CHK(rc);
+    }
     backupForcePCM = false;
     backupPassthrough = false;
     backupAudioDelay = 0;

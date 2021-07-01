@@ -44,6 +44,7 @@
 #include<string.h>
 
 #include "Device_DeviceInfo_ProcessStatus_Process.h"
+#include "safec_lib.h"
 
 GHashTable* hostIf_DeviceProcess::ifHash = NULL;
 
@@ -233,6 +234,7 @@ int getProcessFields(int iProcInstanceNum, EProcessMembers eProcessMem)
     PROCTAB *pProcTab = NULL;
     proc_t procTask;
     int iProcEntry = 0;
+    errno_t safec_rc = -1;
 
     if(NULL == (pProcTab = openproc(PROC_FILLSTAT | PROC_FILLMEM)))
     {
@@ -265,25 +267,45 @@ int getProcessFields(int iProcInstanceNum, EProcessMembers eProcessMem)
         break;
     case eProcessCommand:
         memset(processStatus.cCommand,'\0',_COMMAND_LENGTH);
-        memcpy(processStatus.cCommand,procTask.cmd,sizeof(procTask.cmd));
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"ProcessInstance: %d Command: %s\n",iProcInstanceNum, procTask.cmd);
+        safec_rc=strcpy_s(processStatus.cCommand, sizeof(processStatus.cCommand) ,procTask.cmd);
+        if(safec_rc!=EOK)
+	{
+		    ERR_CHK(safec_rc);
+	}
+	RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"ProcessInstance: %d Command: %s\n",iProcInstanceNum, procTask.cmd);
         break;
     case eProcessState:
         memset(processStatus.cState,'\0',_STATE_LENGTH);
         switch(procTask.state)
         {
         case 'R':
-            memcpy(processStatus.cState,PROCESS_STATE_RUNNING,sizeof(PROCESS_STATE_RUNNING));
-            break;
+            safec_rc=strcpy_s(processStatus.cState, sizeof(processStatus.cState) ,PROCESS_STATE_RUNNING);
+            if(safec_rc!=EOK)
+            {
+                    ERR_CHK(safec_rc);
+            }
+	    break;
         case 'S':
-            memcpy(processStatus.cState,PROCESS_STATE_SLEEPING,sizeof(PROCESS_STATE_SLEEPING));
-            break;
+            safec_rc=strcpy_s(processStatus.cState, sizeof(processStatus.cState) ,PROCESS_STATE_SLEEPING);
+            if(safec_rc!=EOK)
+            {
+                    ERR_CHK(safec_rc);
+            }
+	    break;
         case 'T':
-            memcpy(processStatus.cState,PROCESS_STATE_STOPPED,sizeof(PROCESS_STATE_STOPPED));
-            break;
+            safec_rc=strcpy_s(processStatus.cState, sizeof(processStatus.cState) ,PROCESS_STATE_STOPPED);
+            if(safec_rc!=EOK)
+            {
+                    ERR_CHK(safec_rc);
+            }
+	    break;
         case 'Z':
-            memcpy(processStatus.cState,PROCESS_STATE_ZOMBIE,sizeof(PROCESS_STATE_ZOMBIE));
-            break;
+            safec_rc=strcpy_s(processStatus.cState, sizeof(processStatus.cState) ,PROCESS_STATE_ZOMBIE);
+            if(safec_rc!=EOK)
+            {
+                    ERR_CHK(safec_rc);
+            }
+	    break;
         default:
             break;
         }
@@ -385,20 +407,36 @@ int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_PID(HOSTIF
  */
 int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_Command(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
+     errno_t rc = -1;
     g_mutex_lock(m_libproc_lock);
     if(OK != readProcessFields(stMsgData->paramName,eProcessCommand))
     {
         g_mutex_unlock(m_libproc_lock);
         return NOK;
     }
-    if(bCalledProcessCommand && pChanged && strcpy(backupProcessCommand,processStatus.cCommand))
+    rc=strcpy_s(backupProcessCommand,sizeof(backupProcessCommand),processStatus.cCommand);
+    if(rc!=EOK)
+    {
+        ERR_CHK(rc);
+    }
+
+    if(bCalledProcessCommand && pChanged && (!rc))
     {
         *pChanged =  true;
     }
     bCalledProcessCommand = true;
-    strcpy(backupProcessCommand,processStatus.cCommand);
+    rc=strcpy_s(backupProcessCommand,sizeof(backupProcessCommand),processStatus.cCommand);
+    if(rc!=EOK)  
+    {
+	ERR_CHK(rc);
+    }
 
-    strcpy(stMsgData->paramValue,processStatus.cCommand);
+    rc=strcpy_s(stMsgData->paramValue,sizeof(stMsgData->paramValue),processStatus.cCommand);
+    if(rc!=EOK)
+    {
+        ERR_CHK(rc);
+    }
+
     g_mutex_unlock(m_libproc_lock);
     return OK;
 }
@@ -517,19 +555,35 @@ int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_CPUTime(HO
 int hostIf_DeviceProcess::get_Device_DeviceInfo_ProcessStatus_Process_State(HOSTIF_MsgData_t *stMsgData,bool *pChanged)
 {
     g_mutex_lock(m_libproc_lock);
+     errno_t rc = -1;
     if(OK != readProcessFields(stMsgData->paramName,eProcessState))
     {
         g_mutex_unlock(m_libproc_lock);
         return NOK;
     }
-    if(bCalledProcessState && pChanged && strcpy(backupProcessState,processStatus.cState))
+    rc=strcpy_s(backupProcessState,sizeof(backupProcessState),processStatus.cState);
+    if(rc!=EOK)
+    {
+        ERR_CHK(rc);
+    }
+
+    if(bCalledProcessState && pChanged && (!rc))
     {
         *pChanged =  true;
     }
     bCalledProcessState = true;
-    strcpy(backupProcessState,processStatus.cState);
+    rc=strcpy_s(backupProcessState,sizeof(backupProcessState),processStatus.cState);
+    if(rc!=EOK)
+    {
+	ERR_CHK(rc);
+    }
 
-    strcpy(stMsgData->paramValue,processStatus.cState);
+    rc=strcpy_s(stMsgData->paramValue,sizeof(stMsgData->paramValue),processStatus.cState);
+    if(rc!=EOK)
+    {
+        ERR_CHK(rc);
+    }
+
     g_mutex_unlock(m_libproc_lock);
     return OK;
 }

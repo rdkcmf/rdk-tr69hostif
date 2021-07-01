@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <sstream>
 #include "hostIf_utils.h"
+#include "safec_lib.h"
 
 #if defined (RDK_DEVICE_CISCO_XI4) || defined (RDK_DEVICE_EMU)
 #define INTERFACE_ETH          "eth0"
@@ -251,14 +252,21 @@ std::string getStringValue(HOSTIF_MsgData_t *stMsgData)
 
 void putValue(HOSTIF_MsgData_t *stMsgData, const string &value)
 {
+    errno_t rc = -1;
     // std::cout << "value ot be inserted is : " << value << std::endl;
     memset(stMsgData->paramValue, 0, TR69HOSTIFMGR_MAX_PARAM_LEN);
 
     switch (stMsgData->paramtype) {
     case hostIf_StringType:
-        strcpy(stMsgData->paramValue, value.c_str());
+	{
+        rc=strcpy_s(stMsgData->paramValue,sizeof(stMsgData->paramValue), value.c_str());
+	if(rc!=EOK)
+    	{
+	    ERR_CHK(rc);
+    	}
         stMsgData->paramLen = strlen(value.c_str());
         break;
+	}
     case hostIf_IntegerType:
         put_int(stMsgData->paramValue, string_to_int(value.c_str()));
         break;

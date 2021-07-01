@@ -28,6 +28,7 @@
 #include "rdk_debug.h"
 #include "webpa_parameter.h"
 #include "webpa_notification.h"
+#include "safec_lib.h"
 
 /*----------------------------------------------------------------------------*/
 /*                            File Scoped Variables                           */
@@ -116,6 +117,7 @@ static WAL_STATUS get_AttribValues_tr69hostIf(HOSTIF_MsgData_t *ptrParam)
 static WAL_STATUS getParamAttributes(const char *pParameterName, AttrVal ***attr, int *TotalParams)
 {
     int ret = WAL_SUCCESS;
+    errno_t safec_rc = -1;
     int sizeAttrArr = 1; // Currently support only Notification parameter
     int i = 0;
     HOSTIF_MsgData_t Param = {0};
@@ -145,8 +147,12 @@ static WAL_STATUS getParamAttributes(const char *pParameterName, AttrVal ***attr
         attr[0][i]->name = (char *) malloc(sizeof(char) * MAX_PARAMETER_LENGTH);
         attr[0][i]->value = (char *) malloc(sizeof(char) * MAX_PARAMETERVALUE_LEN);
 
-        strcpy(attr[0][i]->name,pParameterName); // Currently only one attribute ie., notification, so use the parameter name to get its value
-        /* Get Notification value for the parameter from hostif */
+        safec_rc=strcpy_s(attr[0][i]->name,MAX_PARAMETER_LENGTH,pParameterName); // Currently only one attribute ie., notification, so use the parameter name to get its value
+        if(safec_rc!=EOK)
+	{
+	    ERR_CHK(safec_rc);
+	}
+	/* Get Notification value for the parameter from hostif */
         strncpy(Param.paramName,pParameterName,strlen(pParameterName)+1);
         Param.instanceNum = 0;
         Param.paramtype = hostIf_IntegerType;
@@ -187,6 +193,7 @@ static WAL_STATUS set_AttribValues_tr69hostIf (HOSTIF_MsgData_t *param)  //CID:1
  */
 static WAL_STATUS setParamAttributes(const char *pParameterName, const AttrVal *attArr)
 {
+    errno_t safec_rc = -1;
     WAL_STATUS ret = WAL_SUCCESS;
     int i = 0;
     HOSTIF_MsgData_t Param = {0};
@@ -207,8 +214,16 @@ static WAL_STATUS setParamAttributes(const char *pParameterName, const AttrVal *
         return WAL_SUCCESS; //Fake success for all setattributes now
     }
 
-    strcpy(Param.paramName, pParameterName);
-    strcpy(Param.paramValue, attArr->value);
+    safec_rc=strcpy_s(Param.paramName,sizeof(Param.paramName) ,pParameterName);
+    if(safec_rc!=EOK)
+    {
+	    ERR_CHK(safec_rc);
+    }
+    safec_rc=strcpy_s(Param.paramValue,sizeof(Param.paramValue), attArr->value);
+    if(safec_rc!=EOK)
+    {
+            ERR_CHK(safec_rc);
+    }
     Param.paramtype = hostIf_IntegerType;
     ret = set_AttribValues_tr69hostIf (&Param);
     return ret;

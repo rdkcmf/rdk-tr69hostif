@@ -31,6 +31,7 @@
 #include "hostIf_utils.h"
 #include "Device_InterfaceStack.h"
 #include "hostIf_InterfaceStackClient_ReqHandler.h"
+#include "safec_lib.h"
 
 InterfaceStackClientReqHandler* InterfaceStackClientReqHandler::pInstance = NULL;
 
@@ -221,7 +222,12 @@ int InterfaceStackClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stM
         if((NULL != notifyValuePtr) && (NULL != notifyValuePtr))
         {
             *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
+	    errno_t rc = -1;
+            rc=strcpy_s(notifyKey,strlen(stMsgData->paramName)+1,stMsgData->paramName);
+	    if(rc!=EOK)
+    	    {
+	    	ERR_CHK(rc);
+     	    }
             g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
             ret = OK;
         }

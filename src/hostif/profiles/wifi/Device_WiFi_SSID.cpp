@@ -35,10 +35,11 @@
 /*****************************************************************************
  * STANDARD INCLUDE FILES
  *****************************************************************************/
+#include <cstddef>
+#include "safec_lib.h"
 #ifdef USE_WIFI_PROFILE
 
 #include "Device_WiFi_SSID.h"
-
 extern "C" {
     /* #include "c_only_header.h"*/
 #include "wifi_common_hal.h"
@@ -123,6 +124,7 @@ hostIf_WiFi_SSID::hostIf_WiFi_SSID(int dev_id):
 
 int hostIf_WiFi_SSID::get_Device_WiFi_SSID_Fields(int ssidIndex)
 {
+    errno_t rc = -1;
     IARM_Result_t retVal = IARM_RESULT_SUCCESS;
     IARM_BUS_WiFi_DiagsPropParam_t param = {0};
     int ret;
@@ -137,11 +139,31 @@ int hostIf_WiFi_SSID::get_Device_WiFi_SSID_Fields(int ssidIndex)
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s] IARM BUS CALL failed with  : %d.\n", __FILE__, __FUNCTION__, retVal);
             return NOK;
         }
-        strcpy(name,param.data.ssid.params.name);
-        strcpy(BSSID,param.data.ssid.params.bssid);
-        strcpy(MACAddress,param.data.ssid.params.macaddr);
-        strcpy(SSID,param.data.ssid.params.ssid);
-        strcpy(status,param.data.ssid.params.status);
+        rc=strcpy_s(name,sizeof(name),param.data.ssid.params.name);
+	if(rc!=EOK)
+    	{
+	    ERR_CHK(rc);
+    	}
+        rc=strcpy_s(BSSID,sizeof(BSSID),param.data.ssid.params.bssid);
+	if(rc!=EOK)
+        {
+            ERR_CHK(rc);
+        }
+        rc=strcpy_s(MACAddress,sizeof(MACAddress),param.data.ssid.params.macaddr);
+	if(rc!=EOK)
+    	{
+	    ERR_CHK(rc);
+    	}
+        rc=strcpy_s(SSID,sizeof(SSID),param.data.ssid.params.ssid);
+	if(rc!=EOK)
+        {
+            ERR_CHK(rc);
+        }
+        rc=strcpy_s(status,sizeof(status),param.data.ssid.params.status);
+	if(rc!=EOK)
+        {
+            ERR_CHK(rc);
+        }
         enable=param.data.ssid.params.enable;
         firstExTime = time (NULL);
         RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);

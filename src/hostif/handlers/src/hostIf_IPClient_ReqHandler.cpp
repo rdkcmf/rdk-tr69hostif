@@ -45,6 +45,7 @@
 #include "Device_IP_Interface_Stats.h"
 #include "Device_IP.h"
 #include "Device_IP_Diagnostics_IPPing.h"
+#include "safec_lib.h"
 #include <mutex>
 
 std::mutex IPClientReqHandler::m_mutex;
@@ -372,6 +373,7 @@ int IPClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
     int instanceNumber = 0;
+    errno_t rc = -1;
 
     std::lock_guard<std::mutex> lg (m_mutex);
 
@@ -395,7 +397,11 @@ int IPClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         if((NULL != notifyValuePtr) && (NULL != notifyKey))
         {
             *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
+            rc=strcpy_s(notifyKey,strlen(stMsgData->paramName)+1,stMsgData->paramName);
+	    if(rc!=EOK)
+    	    {
+	    	ERR_CHK(rc);
+    	    }
             g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
             ret = OK;
         }

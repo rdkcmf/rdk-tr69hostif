@@ -77,6 +77,7 @@ typedef struct _strMgrSDcardPropParam_t {
 #else
 #include "storageMgr.h"
 #endif /* USE_RDK_STORAGE_MANAGER_V2 */
+#include "safec_lib.h"
 
 static bool getSDCardProperties(strMgrSDcardPropParam_t *);
 
@@ -354,13 +355,18 @@ int hostIf_STBServiceXSDCard::getLifeElapsed(HOSTIF_MsgData_t *stMsgData)
 
 int hostIf_STBServiceXSDCard::getLotID(HOSTIF_MsgData_t *stMsgData)
 {
+    errno_t rc = -1;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     try {
         strMgrSDcardPropParam_t param;
         memset(&param, '\0', sizeof(param));
         param.eSDPropType = SD_LotID;
         if(getSDCardProperties(&param) ) {
-            strcpy((char *)stMsgData->paramValue, (const char*) param.sdCardProp.uchVal);
+            rc=strcpy_s((char *)stMsgData->paramValue,sizeof(stMsgData->paramValue), (const char*) param.sdCardProp.uchVal);
+	    if(rc!=EOK)
+    	    {	
+		    ERR_CHK(rc);
+	    }
         }
         stMsgData->paramtype=hostIf_StringType;
     }
@@ -386,13 +392,18 @@ int hostIf_STBServiceXSDCard::getLotID(HOSTIF_MsgData_t *stMsgData)
 
 int hostIf_STBServiceXSDCard::getManufacturer(HOSTIF_MsgData_t *stMsgData)
 {
+    errno_t rc = -1;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     try {
         strMgrSDcardPropParam_t param;
         memset(&param, '\0', sizeof(param));
         param.eSDPropType = SD_Manufacturer;
         if(getSDCardProperties(&param) ) {
-            strcpy((char *)stMsgData->paramValue, (const char*) param.sdCardProp.uchVal);
+            rc=strcpy_s((char *)stMsgData->paramValue,sizeof(stMsgData->paramValue), (const char*) param.sdCardProp.uchVal);
+	    if(rc!=EOK)
+ 	    {
+		    ERR_CHK(rc);
+	    }
         }
         stMsgData->paramtype=hostIf_StringType;
     }
@@ -419,13 +430,18 @@ int hostIf_STBServiceXSDCard::getManufacturer(HOSTIF_MsgData_t *stMsgData)
 
 int hostIf_STBServiceXSDCard::getModel(HOSTIF_MsgData_t *stMsgData)
 {
+    errno_t rc = -1;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     try {
         strMgrSDcardPropParam_t param;
         memset(&param, '\0', sizeof(param));
         param.eSDPropType = SD_Model;
         if(getSDCardProperties(&param) ) {
-            strcpy((char *)stMsgData->paramValue, (const char*) param.sdCardProp.uchVal);
+            rc=strcpy_s((char *)stMsgData->paramValue,sizeof(stMsgData->paramValue), (const char*) param.sdCardProp.uchVal);
+	    if(rc!=EOK)
+    	    {
+		    ERR_CHK(rc);
+	    }
         }
         stMsgData->paramtype=hostIf_StringType;
     }
@@ -549,13 +565,18 @@ int hostIf_STBServiceXSDCard::getTSBQualified(HOSTIF_MsgData_t *stMsgData)
 
 int hostIf_STBServiceXSDCard::getStatus(HOSTIF_MsgData_t *stMsgData)
 {
+    errno_t rc = -1;
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Entering..\n", __FUNCTION__, __FILE__);
     try {
         strMgrSDcardPropParam_t param;
         memset(&param, '\0', sizeof(param));
         param.eSDPropType = SD_Status;
         if(getSDCardProperties(&param) ) {
-            strcpy((char *)stMsgData->paramValue, (const char*) param.sdCardProp.uchVal);
+            rc=strcpy_s((char *)stMsgData->paramValue,sizeof(stMsgData->paramValue), (const char*) param.sdCardProp.uchVal);
+	    if(rc!=EOK)
+	    {
+		    ERR_CHK(rc);
+	    }
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] param.sdCardProp.bchVal: %d\n", __FUNCTION__, __FILE__, param.sdCardProp.uchVal);
         }
         stMsgData->paramtype=hostIf_StringType;
@@ -572,6 +593,7 @@ int hostIf_STBServiceXSDCard::getStatus(HOSTIF_MsgData_t *stMsgData)
 
 bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
 {
+    errno_t safec_rc = -1;
 #ifdef USE_RDK_STORAGE_MANAGER_V2
     bool rc = true;
     static char sdCardDeviceID[RDK_STMGR_MAX_STRING_LENGTH] = "";
@@ -587,9 +609,17 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
         {
             if (RDK_STMGR_DEVICE_TYPE_SDCARD == deviceInfoList.m_devices[i].m_type)
             {
-                memcpy (&sdCardDeviceID, &deviceInfoList.m_devices[i].m_deviceID, RDK_STMGR_MAX_STRING_LENGTH);
-                memcpy (&sdCardPartitionID, &deviceInfoList.m_devices[i].m_partitions, RDK_STMGR_MAX_STRING_LENGTH);
-                break;
+                safec_rc=memcpy_s (&sdCardDeviceID, RDK_STMGR_MAX_STRING_LENGTH ,&deviceInfoList.m_devices[i].m_deviceID, RDK_STMGR_MAX_STRING_LENGTH);
+                if(safec_rc!= EOK)
+	        {
+		    ERR_CHK(safec_rc);
+	        }
+		safec_rc=memcpy_s (&sdCardPartitionID, RDK_STMGR_MAX_STRING_LENGTH , &deviceInfoList.m_devices[i].m_partitions, RDK_STMGR_MAX_STRING_LENGTH);
+                if(safec_rc!= EOK)
+                {
+                    ERR_CHK(safec_rc);
+                }
+		break;
             }
         }
     }
@@ -645,45 +675,111 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
 #endif
                         break;
                     case SD_LotID:
-                        strcpy (sdCardParam->sdCardProp.uchVal, deviceInfo.m_hwVersion);
+			{
+                        safec_rc=strcpy_s (sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), deviceInfo.m_hwVersion);
+			if(safec_rc!=EOK)
+    			{
+	    			ERR_CHK(safec_rc);
+    			}
                         break;
+			}
                     case SD_Manufacturer:
-                        strcpy(sdCardParam->sdCardProp.uchVal,deviceInfo.m_manufacturer);
+			{
+                        safec_rc=strcpy_s(sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal),deviceInfo.m_manufacturer);
+			if(safec_rc!=EOK)
+                        {
+                                ERR_CHK(safec_rc);
+                        }
                         break;
+			}
                     case SD_Model:
-                        strcpy (sdCardParam->sdCardProp.uchVal, deviceInfo.m_model);
+			{
+                        safec_rc=strcpy_s (sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), deviceInfo.m_model);
+			if(safec_rc!=EOK)
+                        {
+                                ERR_CHK(safec_rc);
+                        }
                         break;
+			}
                     case SD_ReadOnly:
                         sdCardParam->sdCardProp.bVal = (deviceInfo.m_status == RDK_STMGR_DEVICE_STATUS_READ_ONLY) ? true : false;
                         break;
                     case SD_SerialNumber:
-                        strcpy(sdCardParam->sdCardProp.uchVal, deviceInfo.m_serialNumber);
+			{
+                        safec_rc=strcpy_s(sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), deviceInfo.m_serialNumber);
+			if(safec_rc!=EOK)
+                        {
+                                ERR_CHK(safec_rc);
+                        }
                         break;
+			}
                     case SD_Status:
                     {
                         switch (deviceInfo.m_status)
                         {
                             case RDK_STMGR_DEVICE_STATUS_OK:
-                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_OK");
+			        {
+                                safec_rc=strcpy_s (sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), "SDCARD_OK");
+				if(safec_rc!=EOK)
+                        	{
+                                	ERR_CHK(safec_rc);
+                        	}
                                 break;
+				}
                             case RDK_STMGR_DEVICE_STATUS_READ_ONLY:
-                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_READ_ONLY");
+				{
+                                safec_rc=strcpy_s (sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), "SDCARD_READ_ONLY");
+				if(safec_rc!=EOK)
+                                {
+                                        ERR_CHK(safec_rc);
+                                }
                                 break;
+				}
                             case RDK_STMGR_DEVICE_STATUS_NOT_PRESENT:
-                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_NOT_PRESENT");
+				{
+                                safec_rc=strcpy_s (sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), "SDCARD_NOT_PRESENT");
+				if(safec_rc!=EOK)
+                                {
+                                        ERR_CHK(safec_rc);
+                                }
                                 break;
+				}
                             case RDK_STMGR_DEVICE_STATUS_NOT_QUALIFIED:
-                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_NOT_QUALIFIED");
+				{
+                                safec_rc=strcpy_s (sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), "SDCARD_NOT_QUALIFIED");
+				if(safec_rc!=EOK)
+                                {
+                                        ERR_CHK(safec_rc);
+                                }
                                 break;
+				}
                             case RDK_STMGR_DEVICE_STATUS_DISK_FULL:
-                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_DISK_FULL");
+				{
+                                safec_rc=strcpy_s (sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), "SDCARD_DISK_FULL");
+				if(safec_rc!=EOK)
+                                {
+                                        ERR_CHK(safec_rc);
+                                }
                                 break;
+				}
                             case RDK_STMGR_DEVICE_STATUS_READ_FAILURE:
-                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_READ_FAILURE");
+				{
+                                safec_rc=strcpy_s (sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), "SDCARD_READ_FAILURE");
+				if(safec_rc!=EOK)
+                                {
+                                        ERR_CHK(safec_rc);
+                                }
                                 break;
+				}
                             case RDK_STMGR_DEVICE_STATUS_WRITE_FAILURE:
-                                strcpy (sdCardParam->sdCardProp.uchVal, "SDCARD_WRITE_FAILURE");
+				{
+                                safec_rc=strcpy_s (sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), "SDCARD_WRITE_FAILURE");
+				if(safec_rc!=EOK)
+                                {
+                                        ERR_CHK(safec_rc);
+                                }
                                 break;
+				}
                         }
                         break;
                     }
@@ -699,8 +795,14 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
                 switch(sdCardParam->eSDPropType)
                 {
                     case SD_Status:
-                        strcpy(sdCardParam->sdCardProp.uchVal, (const char*)"None");
+			{
+                        safec_rc=strcpy_s(sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), (const char*)"None");
+			if(safec_rc!=EOK)
+			{
+				ERR_CHK(safec_rc);
+			}
                         break;
+			}
                 }
             }
         }
@@ -711,8 +813,14 @@ bool getSDCardProperties(strMgrSDcardPropParam_t *sdCardParam)
         switch(sdCardParam->eSDPropType)
         {
             case SD_Status:
-                strcpy(sdCardParam->sdCardProp.uchVal, (const char*)"None");
-                break;
+		{
+	                safec_rc=strcpy_s(sdCardParam->sdCardProp.uchVal,sizeof(sdCardParam->sdCardProp.uchVal), (const char*)"None");
+			if(safec_rc!=EOK)
+			{
+				ERR_CHK(safec_rc);
+			}
+                	break;
+		}
         }
     }
 

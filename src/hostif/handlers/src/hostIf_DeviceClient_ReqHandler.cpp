@@ -42,6 +42,7 @@
 #include "Device_DeviceInfo_ProcessStatus.h"
 #include "Device_DeviceInfo_ProcessStatus_Process.h"
 #include "hostIf_msgHandler.h"
+#include "safec_lib.h"
 
 #ifdef USE_XRDK_BT_PROFILE
 #include "XrdkBlueTooth.h"
@@ -689,6 +690,7 @@ int DeviceClientReqHandler::handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 int DeviceClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
 {
     int ret = NOT_HANDLED;
+    errno_t rc = -1;
     int instanceNumber = 0;
     const char *pSetting;
     hostIf_DeviceInfo::getLock();
@@ -714,7 +716,11 @@ int DeviceClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         if((NULL != notifyValuePtr) && (NULL != notifyKey))
         {
             *notifyValuePtr = 1;
-            strcpy(notifyKey,stMsgData->paramName);
+            rc=strcpy_s(notifyKey,strlen(stMsgData->paramName)+1,stMsgData->paramName);
+	    if(rc!=EOK)
+    	    {
+	  	ERR_CHK(rc);
+    	    }
             g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
             ret = OK;
         }

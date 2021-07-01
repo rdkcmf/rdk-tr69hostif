@@ -40,6 +40,8 @@
 #include <net/if.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
+#include "safec_lib.h"
+
 
 IP hostIf_IP::stIPInstance = {TRUE,FALSE,{"Disabled"},FALSE,0,0};
 
@@ -70,7 +72,7 @@ hostIf_IP::hostIf_IP(int dev_id):
     backupInterfaceNumberOfEntries(0),
     backupActivePortNumberOfEntries(0)
 {
-    strcpy(backupIPv4Status,"");
+    backupIPv4Status[0]='\0';
 }
 
 hostIf_IP* hostIf_IP::getInstance(int dev_id)
@@ -329,7 +331,12 @@ char* hostIf_IP::getVirtualInterfaceName (struct if_nameindex *phy_if_list, unsi
                     {
                         if (++virtual_if_count == virtual_if_index)
                         {
-                            strcpy (virtual_if_name, ifa_node->ifa_name);
+			    errno_t rc = -1;
+                            rc=strcpy_s (virtual_if_name,IF_NAMESIZE, ifa_node->ifa_name);
+			    if(rc!=EOK)
+		       	    {
+				ERR_CHK(rc);
+	 		    }
                             ret = virtual_if_name;
                             goto freeResources; // we have found the virtualInterfaceName no need to try any matching ifa_node->ifa_name further
                         }
@@ -389,6 +396,7 @@ int hostIf_IP::get_Device_IP_Fields(EIPMembers ipMem)
     char resultBuff[BUFF_LENGTH] = {'\0'};
     char command[BUFF_LENGTH] = {'\0'};
     int ipv4AddressAvailable = 0;
+    errno_t rc = -1;
 
 
     switch(ipMem)
@@ -420,13 +428,21 @@ int hostIf_IP::get_Device_IP_Fields(EIPMembers ipMem)
         if(0 == ipv4AddressAvailable)
         {
             stIPInstance.iPv4Enable = FALSE;
-            strcpy(stIPInstance.iPv4Status,"Disabled");
+            rc=strcpy_s(stIPInstance.iPv4Status,sizeof(stIPInstance.iPv4Status),"Disabled");
+	    if(rc!=EOK)
+    	    { 
+		    ERR_CHK(rc);
+	    }
             //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): stIPInstance.iPv4Enable = %d,stIPInstance.iPv4Status = %s\n",__FUNCTION__,stIPInstance.iPv4Enable,stIPInstance.iPv4Status);
         }
         else
         {
             stIPInstance.iPv4Enable = TRUE;
-            strcpy(stIPInstance.iPv4Status,"Enabled");
+            rc=strcpy_s(stIPInstance.iPv4Status,sizeof(stIPInstance.iPv4Status),"Enabled");
+	    if(rc!=EOK)
+	    {
+		    ERR_CHK(rc);
+	    }
             //RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"%s(): stIPInstance.iPv4Enable = %d,stIPInstance.iPv4Status = %s\n",__FUNCTION__,stIPInstance.iPv4Enable,stIPInstance.iPv4Status);
         }
 
@@ -669,16 +685,25 @@ int hostIf_IP::get_Device_IP_ActivePortNumberOfEntries(HOSTIF_MsgData_t *stMsgDa
 int hostIf_IP::set_Device_IP_IPv4Enable(HOSTIF_MsgData_t *stMsgData)
 {
     char command[BUFF_LENGTH]= {'\0'};
+    errno_t rc = -1;
 
     if(get_int(stMsgData->paramValue) == 1)
     {
-        strcpy(command,"ifup -a");
+        rc=strcpy_s(command,sizeof(command),"ifup -a");
+	if(rc!=EOK)
+	{
+		ERR_CHK(rc);
+	}
         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] Enabled \n",__FUNCTION__);
 
     }
     else if(get_int(stMsgData->paramValue) == 0)
     {
-        strcpy(command,"ifdown -a");
+        rc=strcpy_s(command,sizeof(command),"ifdown -a");
+	if(rc!=EOK)
+        {
+                ERR_CHK(rc);
+        }
         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s()] Disabled \n",__FUNCTION__);
     }
 

@@ -77,6 +77,7 @@ extern "C" {
 
 #include "hostIf_rbus_Dml_Provider.h"
 #include "Device_DeviceInfo.h"
+#include "safec_lib.h"
 
 //------------------------------------------------------------------------------
 // Initialize global variables and functions.
@@ -194,6 +195,7 @@ int GetFeatureEnabled(char *cmd)
 int main(int argc, char *argv[])
 {
     int ch = 0;
+    errno_t rc = -1;
 #ifdef WEBPA_RFC_ENABLED
     int retVal=0;
 #endif
@@ -242,7 +244,11 @@ int main(int argc, char *argv[])
             if(optarg)
             {
                 memset(argList.confFile, '\0', sizeof (argList.confFile));
-                strcpy (argList.confFile, optarg);
+                rc=strcpy_s (argList.confFile,sizeof(argList.confFile),optarg);
+		if(rc!=EOK)
+    		{
+	    		ERR_CHK(rc);
+    		}
 //                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"argList.confFile : %s optarg : %s\n", argList.confFile, optarg);
             }
             break;

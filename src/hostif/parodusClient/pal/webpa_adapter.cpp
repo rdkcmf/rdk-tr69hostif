@@ -31,7 +31,7 @@
 #include "rdk_debug.h"
 #include "hostIf_NotificationHandler.h"
 #include "libpd.h"
-
+#include "safec_lib.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -314,12 +314,17 @@ void processRequest(char *reqPayload,char *transactionId, char **resPayload)
                 }
                 resObj->u.paramRes->params = (param_t *) malloc(sizeof(param_t)*paramCount);
                 memset(resObj->u.paramRes->params, 0, sizeof(param_t)*paramCount);
-
+		errno_t rc = -1;
                 for (i = 0; i < paramCount; i++)
                 {
                     resObj->u.paramRes->params[i].name = (char *) malloc(sizeof(char) * MAX_PARAMETERNAME_LEN);
-                    strcpy(resObj->u.paramRes->params[i].name, reqObj->u.setReq->param[i].name);
-                    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> params[%d].name = %s\n",i,resObj->u.paramRes->params[i].name);
+                    if(resObj->u.paramRes->params[i].name!=NULL){
+		    rc=strcpy_s(resObj->u.paramRes->params[i].name, MAX_PARAMETERNAME_LEN, reqObj->u.setReq->param[i].name);
+                    if(rc!=EOK)
+		    {
+			ERR_CHK(rc);
+		    }}
+		    RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> params[%d].name = %s\n",i,resObj->u.paramRes->params[i].name);
                     resObj->u.paramRes->params[i].value = NULL;
                     resObj->u.paramRes->params[i].type = WDMP_STRING;
                     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Response:> retStatus[%d] = %d\n",i,resObj->retStatus[i]);
