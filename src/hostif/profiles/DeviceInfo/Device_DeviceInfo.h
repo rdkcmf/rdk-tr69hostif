@@ -163,6 +163,7 @@
 #define UHD_RFC_ENABLE                                  "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.UhdEnable.Enable"
 #define XRE_CONTAINER_RFC_ENABLE                        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.LXC.XRE.Enable"
 #define TR181_AUTOREBOOT_ENABLE                         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.AutoReboot.Enable"
+#define SHORTS_RFC_ENABLE                               "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.SHORTS.Enable"
 /* Profile: X_RDKCENTRAL-COM_RFC.Control */
 #define RFC_CTL_RETRIEVE_NOW                            "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.RetrieveNow"
 /* Profile: X_RDKCENTRAL-COM_IPRemoteSupport */
@@ -240,6 +241,8 @@ class hostIf_DeviceInfo {
 
     string getEstbIp();
     bool isRsshactive();
+    bool isShortsEnabled();
+    int findLocalPortAvailable();
     size_t findIgnoreCase (std::string haystack, std::string needle, size_t pos = 0);
     string getStbMacIf_fr_devProperties();
 

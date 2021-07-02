@@ -107,6 +107,10 @@
 #define MAX_TR69_DOS_THRESHOLD 30
 #define HTTP_OK 200
 
+/* Localhost port range for stunnel client to listen/accept */
+#define MIN_PORT_RANGE 3000
+#define MAX_PORT_RANGE 3020
+
 GHashTable* hostIf_DeviceInfo::ifHash = NULL;
 GHashTable* hostIf_DeviceInfo::m_notifyHash = NULL;
 GMutex* hostIf_DeviceInfo::m_mutex = NULL;
@@ -118,9 +122,10 @@ static int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t *);
 static int get_PartnerId_From_Curl(string& );
 static char stbMacCache[TR69HOSTIFMGR_MAX_PARAM_LEN] = {'\0'};
 static string reverseSSHArgs;
-static string stunnelSSHArgs;
+map<string,string> stunnelSSHArgs;
 const string sshCommand = "/lib/rdk/startTunnel.sh";
 const string stunnelCommand = "/lib/rdk/startStunnel.sh";
+const string watchTunnelCommand = "/lib/rdk/watchTunnel.sh";
 
 string hostIf_DeviceInfo::m_xFirmwareDownloadProtocol;
 string hostIf_DeviceInfo::m_xFirmwareDownloadURL;
@@ -2695,11 +2700,58 @@ int hostIf_DeviceInfo::get_xOpsDMMoCALogPeriod (HOSTIF_MsgData_t *stMsgData)
     return OK;
 }
 
+// Check SHORTS RFC
+bool hostIf_DeviceInfo::isShortsEnabled()
+{
+    HOSTIF_MsgData_t stRfcData = {0};
+    strcpy(stRfcData.paramName, SHORTS_RFC_ENABLE);
+
+    if((get_xRDKCentralComRFC(&stRfcData) == OK) && (strncmp(stRfcData.paramValue, "true", sizeof("true")) == 0))
+    {
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] SHORTS enabled: %s \n",  __FUNCTION__, "True");
+        return true;
+    }
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] SHORTS enabled: %s \n",  __FUNCTION__, "False");
+    return false;
+}
+
+// Find localhost port available in specified range for stunnel-client to listen
+int hostIf_DeviceInfo::findLocalPortAvailable()
+{
+    struct sockaddr_in address;
+    int sockfd = -1, status;
+    int port = MIN_PORT_RANGE;
+
+    while (port <= MAX_PORT_RANGE) {
+        address.sin_family = AF_INET;
+        address.sin_addr.s_addr = inet_addr("127.0.0.1");
+        address.sin_port = htons(port);
+
+        sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+        status = connect(sockfd, (struct sockaddr *)&address, sizeof(address));
+
+        if (status<0)
+        {
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Port %d is available.\n", __FUNCTION__, port);
+            close(sockfd);
+            return port;
+        }
+
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Port %d is in use.\n", __FUNCTION__, port);
+        close(sockfd);
+        port++;
+    }
+    return -1;
+}
+
 int hostIf_DeviceInfo::set_xOpsReverseSshTrigger(HOSTIF_MsgData_t *stMsgData)
 {
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
     string inputStr(stMsgData->paramValue);
+    const string startShorts = "start shorts";
     bool trigger = strncmp(inputStr.c_str(),"start",strlen("start")) == 0;
+    bool trigger_shorts = strncmp(inputStr.c_str(), startShorts.c_str(), startShorts.length()) == 0;
 
     if (trigger)
     {
@@ -2707,14 +2759,36 @@ int hostIf_DeviceInfo::set_xOpsReverseSshTrigger(HOSTIF_MsgData_t *stMsgData)
         if (!isRsshactive())
         {
 #endif
+            // Run stunnel client to establish stunnel.
+            if (isShortsEnabled() && trigger_shorts) {
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting Stunnel \n",__FUNCTION__);
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] StunnelSSH Command  = /bin/sh %s %s %s %s \n",
+                                                   __FUNCTION__,
+                                                   stunnelCommand.c_str(),
+                                                   stunnelSSHArgs.at("localport").c_str(),
+                                                   stunnelSSHArgs.at("host").c_str(),
+                                                   stunnelSSHArgs.at("stunnelport").c_str());
+                v_secure_system("/bin/sh %s %s %s %s &", stunnelCommand.c_str(),
+                                                   stunnelSSHArgs.at("localport").c_str(),
+                                                   stunnelSSHArgs.at("host").c_str(),
+                                                   stunnelSSHArgs.at("stunnelport").c_str());
+            }
+
             RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting SSH Tunnel \n",__FUNCTION__);
             string command = sshCommand + " start " + reverseSSHArgs;
             system(command.c_str());
+
+            // Keep watching the pid of SSH tunnel. Once SSH session is closed or timed-out,
+            // terminate the associated stunnel-client to close the stunnel.
+            if (isShortsEnabled() && trigger_shorts) {
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Watching Tunnel for termination \n",__FUNCTION__);
+                v_secure_system("/bin/sh %s &", watchTunnelCommand.c_str());
+            }
 #ifdef __SINGLE_SESSION_ONLY__
         }
         else
         {
-            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "[%s] SSH Session is already active. Not starting again!",__FUNCTION__);
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF, "[%s] SSH Session is already active. Not starting again! \n",__FUNCTION__);
             return NOK;
         }
 #endif
@@ -2772,56 +2846,57 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
         }
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] parsed Values are : %s\n",__FUNCTION__,parsedValues.c_str());
 
-        // two paths to follow either reversessh or stunnel based on whether the parsed map contains type key
-        if (!parsedMap.count("type")) {
-            reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":";
-            string estbip = getEstbIp();
-            unsigned char buf[sizeof(struct in6_addr)];
-	    //Check if estbip is ipv6 address
-            if (inet_pton(AF_INET6, estbip.c_str(), buf))
-            {
-                reverseSSHArgs += "[" + estbip + "]";
-                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] SSH Tunnel estb ipv6 address is : %s\n",__FUNCTION__,estbip.c_str());
-            }
-            else
-            {
-                reverseSSHArgs += estbip;
-                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] SSH Tunnel estb ipv4 address is : %s\n",__FUNCTION__,estbip.c_str());
-            }
+        reverseSSHArgs = " -I " + parsedMap["idletimeout"] + " -f -N -y -T -R " + parsedMap["revsshport"] + ":";
+        string estbip = getEstbIp();
+        unsigned char buf[sizeof(struct in6_addr)];
+        //Check if estbip is ipv6 address
+        if (inet_pton(AF_INET6, estbip.c_str(), buf))
+        {
+            reverseSSHArgs += "[" + estbip + "]";
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] SSH Tunnel estb ipv6 address is : %s\n",__FUNCTION__,estbip.c_str());
+        }
+        else
+        {
+            reverseSSHArgs += estbip;
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] SSH Tunnel estb ipv4 address is : %s\n",__FUNCTION__,estbip.c_str());
+        }
 
-            reverseSSHArgs +=  ":22 " + parsedMap["user"] + "@" + parsedMap["host"];
-            if (parsedMap.find("sshport") != parsedMap.end())
-            {
-                reverseSSHArgs += " -p " + parsedMap["sshport"];
-            }
-
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] String is  : %s\n",__FUNCTION__,reverseSSHArgs.c_str());
-
-            string::const_iterator it = std::find_if(reverseSSHArgs.begin(), reverseSSHArgs.end(), [](char c) {
-                return !(isalnum(c) || (c == ' ') || (c == ':') || (c == '-') || (c == '.') || (c == '@') || (c == '_') || (c == '[') || (c == ']'));
-            });
-
-            if (it  != reverseSSHArgs.end())
-            {
-                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Exception Accured... \n",__FUNCTION__);
-                reverseSSHArgs = "";
+        reverseSSHArgs +=  ":22 " + parsedMap["user"] + "@";
+        if (isShortsEnabled() && parsedMap.count("stunnelport")) {
+            string localPort = to_string(findLocalPortAvailable());
+            if (localPort == "-1") {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Reserved ports are not availale... \n",__FUNCTION__);
                 return NOK;
             }
+            reverseSSHArgs += string("localhost") + " -p " + localPort;
 
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] ReverseSSH Args = %s \n",__FUNCTION__,reverseSSHArgs.c_str());
+            // Arguments for stunnel script in the form " Local port + Remote FQDN + Stunnel port "
+            stunnelSSHArgs["localport"] = localPort;
+            stunnelSSHArgs["host"] = parsedMap.at("host");
+            stunnelSSHArgs["stunnelport"] = parsedMap.at("stunnelport");
+            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Stunnel Args = %s %s %s \n",
+                                                       __FUNCTION__, localPort,
+                                                       parsedMap.at("host"),
+                                                       parsedMap.at("stunnelport"));
         } else {
-            string localIP = getEstbIp();
-
-            // for arguments for script in the form " ip_version_number localIP + remoteIP + remotePort + remoteTerminalRows
-            //                                        + remoteTerminalColumns"
-            stunnelSSHArgs = parsedMap.at("type") + " " + localIP + " " + parsedMap.at("host") + " " + parsedMap.at("callbackport") + " " +  parsedMap.at("rows") + " " + parsedMap.at("columns");
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] StunnelSSH Args = %s \n",__FUNCTION__,stunnelSSHArgs.c_str());
-
-            string runCommand = stunnelCommand + " " + stunnelSSHArgs + " &";
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] StunnelSSH Command = %s \n",__FUNCTION__,runCommand.c_str());
-
-            system(runCommand.c_str());
+            reverseSSHArgs += parsedMap["host"] + " -p " + parsedMap["sshport"];
         }
+
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] String is  : %s\n",__FUNCTION__,reverseSSHArgs.c_str());
+
+        string::const_iterator it = std::find_if(reverseSSHArgs.begin(), reverseSSHArgs.end(), [](char c) {
+            return !(isalnum(c) || (c == ' ') || (c == ':') || (c == '-') || (c == '.') || (c == '@') || (c == '_') || (c == '[') || (c == ']'));
+        });
+
+        if (it  != reverseSSHArgs.end())
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Exception Accured... \n",__FUNCTION__);
+            reverseSSHArgs = "";
+            return NOK;
+        }
+
+        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] ReverseSSH Args = %s \n",__FUNCTION__,reverseSSHArgs.c_str());
+
     } catch (const std::exception e) {
         std::cout << __FUNCTION__ << "An exception occurred. " << e.what() << endl;
 
