@@ -36,7 +36,6 @@ if [ -z "$TOKEN_SERVER_URL" ]; then
 fi
 
 REBOOT_REASON_SECURE_FILE="/opt/secure/reboot/previousreboot.info"
-REBOOT_REASON_REGULAR_FILE="/opt/persistent/previousreboot.info"
 
 Serial=""
 BootTime=""
@@ -55,8 +54,6 @@ fi
 
 if [ -f "$REBOOT_REASON_SECURE_FILE" ]; then
     REBOOT_INFO=$REBOOT_REASON_SECURE_FILE
-else
-    REBOOT_INFO=$REBOOT_REASON_REGULAR_FILE
 fi
 
 get_webpa_string_parameter()
