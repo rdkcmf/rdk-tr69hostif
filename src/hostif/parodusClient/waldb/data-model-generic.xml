@@ -313,6 +313,18 @@
        </syntax>
       </parameter>
      </object>
+     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.PressAndRelease." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
+      <parameter base="EOSTimeout" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+       <syntax>
+        <int/>
+       </syntax>
+      </parameter>
+      <parameter base="EOSMethod" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+       <syntax>
+        <int/>
+       </syntax>
+      </parameter>
+    </object>
      <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XRmacPolling." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
       <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
        <syntax>
