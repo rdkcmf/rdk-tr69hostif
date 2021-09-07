@@ -517,8 +517,14 @@ int main(int argc, char *argv[])
     hostIf_DeviceInfo::send_DeviceManageableNotification();
 
     main_loop = g_main_loop_new (NULL, FALSE);
-    g_main_loop_run(main_loop);
-    g_main_loop_unref (main_loop);
+
+    if(main_loop) {
+        g_main_loop_run(main_loop);
+        g_main_loop_unref (main_loop);
+    }
+    else {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s]Fails to Create a main loop.", __FUNCTION__);
+    }
 
     if(hostIf_JsonIfThread)
         g_thread_join(hostIf_JsonIfThread);
