@@ -266,6 +266,8 @@ class hostIf_DeviceInfo {
     int set_xRDKCentralComRFCAutoRebootEnable(HOSTIF_MsgData_t*);
     int ScheduleAutoReboot(bool);
 
+    int set_xRDKCentralComNewNtpEnable(HOSTIF_MsgData_t *);
+
     int get_xRDKCentralComRFCAccountId (HOSTIF_MsgData_t *);
     int get_xOpsDeviceMgmtRPCRebootNow (HOSTIF_MsgData_t *);
     int get_xOpsRPCDevManageableNotification(HOSTIF_MsgData_t *);

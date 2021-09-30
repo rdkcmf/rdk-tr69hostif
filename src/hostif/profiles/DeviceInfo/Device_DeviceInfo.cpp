@@ -102,6 +102,7 @@
 #define IPREMOTE_INTERFACE_INFO            "/tmp/ipremote_interface_info"
 #define MODEL_NAME_FILE                    "/tmp/.model"
 #define PREVIOUS_REBOT_REASON_FILE         "/opt/secure/reboot/previousreboot.info"
+#define NTPENABLED_FILE                    "/opt/.ntpEnabled"
 #define TR069DOSLIMIT_THRESHOLD            "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Tr069DoSLimit.Threshold"
 #define MIN_TR69_DOS_THRESHOLD 0
 #define MAX_TR69_DOS_THRESHOLD 30
@@ -3275,6 +3276,10 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     {
         ret = set_xRDKCentralComRFCAutoRebootEnable(stMsgData);
     }
+    else if (!strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.newNTP.Enable") )
+    {
+        ret = set_xRDKCentralComNewNtpEnable(stMsgData);
+    }
 #ifdef USE_HWSELFTEST_PROFILE
     else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.hwHealthTest.Enable"))
     {
@@ -3317,6 +3322,50 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
         ret = set_xRDKCentralComRFC_hwHealthTest_ResultFilter_ResultsFiltered(stMsgData);
     }
 #endif /* USE_HWSELFTEST_PROFILE */
+    return ret;
+}
+
+int hostIf_DeviceInfo::set_xRDKCentralComNewNtpEnable(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret = NOK;
+    bool enable;
+    LOG_ENTRY_EXIT;
+    if(stMsgData->paramtype == hostIf_BooleanType)
+    {
+        enable = get_boolean(stMsgData->paramValue);
+        if( enable )
+        {
+            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] set newNTP enable to true\n", __FUNCTION__);
+            ofstream ofp(NTPENABLED_FILE);
+            ret = OK;
+        }
+        else
+        {
+            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] set newNTP.Enable to false\n", __FUNCTION__);
+            ifstream ifp(NTPENABLED_FILE);
+            if(ifp.is_open())
+            {
+                if(remove(NTPENABLED_FILE) == 0)
+                {
+                    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Removed File %s, newNTP is disabled\n", __FUNCTION__, NTPENABLED_FILE);
+                    ret = OK;
+                }
+                else
+                {
+                    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Unable to remove File %s, newNTP.Enable is unchanged\n", __FUNCTION__, NTPENABLED_FILE);
+                }
+            }
+            else
+            {
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] File %s is already removed, newNTP is disabled already\n", __FUNCTION__, NTPENABLED_FILE);
+                ret = OK;
+            }
+        }
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Failed due to wrong data type for %s, please use boolean(0/1) to set.\n", __FUNCTION__, __LINE__, stMsgData->paramName);
+    }
     return ret;
 }
 

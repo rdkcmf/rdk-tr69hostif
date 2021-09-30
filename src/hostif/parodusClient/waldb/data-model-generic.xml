@@ -36,6 +36,36 @@
           <string/>
         </syntax>
       </parameter>
+      <parameter base="NTPServer4" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="NTPServer5" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="Status" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="CurrentLocalTime" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="LocalTimeZone" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
     </object>
     <object base="Device.X_RDKCENTRAL-COM_T2." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
         <parameter base="ReportProfiles" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
@@ -1245,5 +1275,13 @@
         </syntax>
       </parameter>
    </object>
+    <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.newNTP." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax>
+          <boolean/>
+          <default type="factory" value="false"/>
+        </syntax>
+      </parameter>
+    </object>
   </model>
 </dm:document>

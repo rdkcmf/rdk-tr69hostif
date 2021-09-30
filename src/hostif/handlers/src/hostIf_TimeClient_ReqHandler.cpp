@@ -30,8 +30,12 @@
 **/
 //#define HAVE_VALUE_CHANGE_EVENT
 #include "hostIf_main.h"
+#include "hostIf_utils.h"
 #include "hostIf_TimeClient_ReqHandler.h"
 #include "safec_lib.h"
+
+#define NTPSTATUS_NAME_FILE   "/tmp/ntp_status"
+#define NTPENABLED_FILE       "/opt/.ntpEnabled"
 
 TimeClientReqHandler* TimeClientReqHandler::pInstance = NULL;
 updateCallback TimeClientReqHandler::mUpdateCallback = NULL;
@@ -177,6 +181,53 @@ int TimeClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         else if (strcasecmp(stMsgData->paramName,"Device.Time.CurrentLocalTime") == 0)
         {
             ret = pIface->get_Device_Time_CurrentLocalTime(stMsgData);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.Time.Status") == 0)
+        {
+            FILE *fp = NULL;
+            char ntpStatus[64] = {'\0'};
+
+            fp = fopen(NTPSTATUS_NAME_FILE,"r");
+            if(fp == NULL) {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] Failed to open NTP Status file\n.!",__FUNCTION__, __FILE__, __LINE__);
+                hostIf_Time::releaseLock();
+                return NOK;
+            }
+            if(fgets(ntpStatus, 64,fp)!=NULL) {
+                // Remove new line char if any in model name
+                int len = strlen(ntpStatus);
+                if(ntpStatus[len-1] == '\n') ntpStatus[len-1] = '\0';
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] ntpStatus = %s.\n",__FUNCTION__, __FILE__, __LINE__,ntpStatus);
+                strncpy((char *)stMsgData->paramValue, ntpStatus,sizeof(stMsgData->paramValue)-1);
+                stMsgData->paramValue[sizeof(stMsgData->paramValue)-1] = '\0';
+                stMsgData->paramLen = strlen(ntpStatus);
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s:%d] paramValue: %s stMsgData->paramLen: %d \n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramValue,stMsgData->paramLen);
+                ret = OK;
+            } else {
+                RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"%s(): Failed to read ntp status.\n", __FUNCTION__);
+            }
+            fclose(fp);
+        }
+        else if (strcasecmp(stMsgData->paramName,"Device.Time.Enable") == 0)
+        {
+            bool enable = false;
+            ifstream ifp(NTPENABLED_FILE);
+            if(ifp.is_open())
+            {
+                enable=true;
+                RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s] %s exists, NTP sync enabled\n", __FUNCTION__, NTPENABLED_FILE);
+
+            }
+            else
+            {
+                enable=false;
+                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] File does not exist, NTP sync disabled\n", __FUNCTION__);
+            }
+
+            put_boolean(stMsgData->paramValue,enable);
+            stMsgData->paramtype = hostIf_BooleanType;
+            stMsgData->paramLen = sizeof(bool);
+            ret = OK;
         }
         else
         {
