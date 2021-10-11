@@ -374,13 +374,6 @@
        </parameter>
     </object>
     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS." access="readOnly" minEntries="1" maxEntries="1"/>
-    <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsLogUpload." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
-      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
-        <syntax>
-          <boolean/>
-        </syntax>
-      </parameter>
-    </object>
     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsDCMUpload." access="readOnly" minEntries="0" maxEntries="1" addObjIdx="0" delObjIdx="0">
      <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>
