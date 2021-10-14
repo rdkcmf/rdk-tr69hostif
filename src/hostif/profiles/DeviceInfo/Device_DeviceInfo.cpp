@@ -125,7 +125,6 @@ static string reverseSSHArgs;
 map<string,string> stunnelSSHArgs;
 const string sshCommand = "/lib/rdk/startTunnel.sh";
 const string stunnelCommand = "/lib/rdk/startStunnel.sh";
-const string watchTunnelCommand = "/lib/rdk/watchTunnel.sh";
 
 string hostIf_DeviceInfo::m_xFirmwareDownloadProtocol;
 string hostIf_DeviceInfo::m_xFirmwareDownloadURL;
@@ -2762,27 +2761,25 @@ int hostIf_DeviceInfo::set_xOpsReverseSshTrigger(HOSTIF_MsgData_t *stMsgData)
             // Run stunnel client to establish stunnel.
             if (isShortsEnabled() && trigger_shorts) {
                 RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting Stunnel \n",__FUNCTION__);
-                RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] StunnelSSH Command  = /bin/sh %s %s %s %s \n",
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] StunnelSSH Command  = /bin/sh %s %s %s %s %s %s \n",
                                                    __FUNCTION__,
                                                    stunnelCommand.c_str(),
                                                    stunnelSSHArgs.at("localport").c_str(),
                                                    stunnelSSHArgs.at("host").c_str(),
-                                                   stunnelSSHArgs.at("stunnelport").c_str());
-                v_secure_system("/bin/sh %s %s %s %s &", stunnelCommand.c_str(),
+                                                   stunnelSSHArgs.at("hostIp").c_str(),
+                                                   stunnelSSHArgs.at("stunnelport").c_str(),
+                                                   reverseSSHArgs.c_str());
+                v_secure_system("/bin/sh %s %s %s %s %s %s &", stunnelCommand.c_str(),
                                                    stunnelSSHArgs.at("localport").c_str(),
                                                    stunnelSSHArgs.at("host").c_str(),
-                                                   stunnelSSHArgs.at("stunnelport").c_str());
-            }
+                                                   stunnelSSHArgs.at("hostIp").c_str(),
+                                                   stunnelSSHArgs.at("stunnelport").c_str(),
+                                                   reverseSSHArgs.c_str());
+            } else {
 
-            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting SSH Tunnel \n",__FUNCTION__);
-            string command = sshCommand + " start " + reverseSSHArgs;
-            system(command.c_str());
-
-            // Keep watching the pid of SSH tunnel. Once SSH session is closed or timed-out,
-            // terminate the associated stunnel-client to close the stunnel.
-            if (isShortsEnabled() && trigger_shorts) {
-                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Watching Tunnel for termination \n",__FUNCTION__);
-                v_secure_system("/bin/sh %s &", watchTunnelCommand.c_str());
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting SSH Tunnel \n",__FUNCTION__);
+                string command = sshCommand + " start " + reverseSSHArgs;
+                system(command.c_str());
             }
 #ifdef __SINGLE_SESSION_ONLY__
         }
@@ -2873,10 +2870,12 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
             // Arguments for stunnel script in the form " Local port + Remote FQDN + Stunnel port "
             stunnelSSHArgs["localport"] = localPort;
             stunnelSSHArgs["host"] = parsedMap.at("host");
+            stunnelSSHArgs["hostIp"] = parsedMap.at("hostIp");
             stunnelSSHArgs["stunnelport"] = parsedMap.at("stunnelport");
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] Stunnel Args = %s %s %s \n",
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Stunnel Args = %s %s %s %s \n",
                                                        __FUNCTION__, localPort,
                                                        parsedMap.at("host"),
+                                                       parsedMap.at("hostIp"),
                                                        parsedMap.at("stunnelport"));
         } else {
             reverseSSHArgs += parsedMap["host"] + " -p " + parsedMap["sshport"];
