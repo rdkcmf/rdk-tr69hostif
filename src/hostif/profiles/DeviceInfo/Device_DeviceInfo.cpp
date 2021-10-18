@@ -3344,8 +3344,62 @@ int hostIf_DeviceInfo::get_xRDKCentralComRFC(HOSTIF_MsgData_t *stMsgData)
     ret=m_rfcStorage.getValue(stMsgData);
 #endif
 
+    if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.AccountInfo.AccountID") == 0 && strcasecmp(stMsgData->paramValue,"unknown") == 0)
+    {
+        ret = get_xRDKCentralComRFCAccountId(stMsgData);
+    }
+
     return ret;
 }
+
+int hostIf_DeviceInfo::get_xRDKCentralComRFCAccountId(HOSTIF_MsgData_t *stMsgData)
+{
+    int ret=NOK;
+    string response;
+    CURL *curl = curl_easy_init();
+    if(curl)
+    {
+        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: call curl to get Account ID..\n", __FUNCTION__);
+        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:50050/authService/getServiceAccountId");
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCurlResponse);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+        CURLcode res = curl_easy_perform(curl);
+        long http_code = 0;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+        RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: curl response : %d http response code: %ld\n", __FUNCTION__, res, http_code);
+        curl_easy_cleanup(curl);
+
+        if(res == CURLE_OK)
+        {
+            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: curl response string = %s\n", __FUNCTION__, response.c_str());
+            cJSON* root = cJSON_Parse(response.c_str());
+            if(root)
+            {
+                cJSON* accountIdObj    = cJSON_GetObjectItem(root, "serviceAccountId");
+                if(accountIdObj->type == cJSON_String && accountIdObj->valuestring && strlen(accountIdObj->valuestring) > 0)
+                {
+                    RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Found accountId value = %s\n", accountIdObj->valuestring);
+                    char *acctId = accountIdObj->valuestring;
+                    if(acctId) {
+                        putValue(stMsgData, acctId);
+                        ret = OK;
+                    }
+                }
+                cJSON_Delete(root);
+            }
+            else
+            {
+                RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: json parse error\n", __FUNCTION__);
+            }
+        }
+    }
+    else
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: curl init failed\n", __FUNCTION__);
+    }
+    return ret;
+}
+
 int hostIf_DeviceInfo::set_xRDKCentralComRFCAutoRebootEnable(HOSTIF_MsgData_t *stMsgData)
 {
     bool enableStatus = false;
