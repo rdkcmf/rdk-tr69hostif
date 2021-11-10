@@ -3344,9 +3344,13 @@ int hostIf_DeviceInfo::get_xRDKCentralComRFC(HOSTIF_MsgData_t *stMsgData)
     ret=m_rfcStorage.getValue(stMsgData);
 #endif
 
-    if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.AccountInfo.AccountID") == 0 && strcasecmp(stMsgData->paramValue,"unknown") == 0)
+    if (strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.AccountInfo.AccountID") == 0 && (strlen(stMsgData->paramValue) == 0 || strcasecmp(stMsgData->paramValue,"unknown") == 0))
     {
-        ret = get_xRDKCentralComRFCAccountId(stMsgData);
+        if ((ret = get_xRDKCentralComRFCAccountId(stMsgData)) == OK)
+        {
+           // Store the value from authservice into the db so we don't get here again
+           m_rfcStorage.setValue(stMsgData);
+        }
     }
 
     return ret;
@@ -3379,11 +3383,9 @@ int hostIf_DeviceInfo::get_xRDKCentralComRFCAccountId(HOSTIF_MsgData_t *stMsgDat
                 if(accountIdObj->type == cJSON_String && accountIdObj->valuestring && strlen(accountIdObj->valuestring) > 0)
                 {
                     RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Found accountId value = %s\n", accountIdObj->valuestring);
-                    char *acctId = accountIdObj->valuestring;
-                    if(acctId) {
-                        putValue(stMsgData, acctId);
-                        ret = OK;
-                    }
+                    putValue(stMsgData, accountIdObj->valuestring);
+                    stMsgData->faultCode = fcNoFault;
+                    ret = OK;
                 }
                 cJSON_Delete(root);
             }
