@@ -107,20 +107,25 @@ string XRFCStore::getRawValue(const string &key)
 {
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Entering %s \n", __FUNCTION__);
 
-    std::unordered_map<std::string, std::string> &dict = m_dict;
     if (strstr((char *)key.c_str(),TR181_RFC_NONPERSISTENT_PREFIX) != NULL)
     {
-        dict = m_nonpersist_dict;
         ifstream ifs_rfc("/tmp/.rfcSyncDone");
         if(!ifs_rfc.is_open())
         {
            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: file /tmp/.rfcSyncDone doesn't exist, use default value.\n", __FUNCTION__);
            return "";
         }
+        unordered_map<string,string>::const_iterator it = m_nonpersist_dict.find(key);
+        if (it == m_nonpersist_dict.end()) {
+            return "";
+        }
+        RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s : Value = %s \n", __FUNCTION__, it->second.c_str());
+
+        return it->second;
     }
 
-    unordered_map<string,string>::const_iterator it = dict.find(key);
-    if (it == dict.end()) {
+    unordered_map<string,string>::const_iterator it = m_dict.find(key);
+    if (it == m_dict.end()) {
         return "";
     }
     RDK_LOG (RDK_LOG_TRACE1, LOG_TR69HOSTIF, "Leaving %s : Value = %s \n", __FUNCTION__, it->second.c_str());
