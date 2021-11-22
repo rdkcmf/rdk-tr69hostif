@@ -40,6 +40,7 @@ using namespace tinyxml2;
 #define BLUETOOTH_DISCOVERED_DEVICE_COUNT_PARAM  "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.DiscoveredDeviceCnt"
 #define BLUETOOTH_PAIRED_DEVICE_COUNT_PARAM  "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.PairedDeviceCnt"
 #define BLUETOOTH_CONNECTED_DEVICE_COUNT_PARAM   "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.ConnectedDeviceCnt"
+#define DEVAPPS_COUNT_PARAM "Device.X_COMCAST-COM_Xcalibur.DevApp.devAppNumAps"
 
 /**
  * @briefGHashTable For holding Parameter count query strings
@@ -171,6 +172,7 @@ void initNumEntityParamList()
         g_hash_table_insert(instanceNumParamHash, (gpointer)"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.DiscoveredDevice", (gpointer)BLUETOOTH_DISCOVERED_DEVICE_COUNT_PARAM);
         g_hash_table_insert(instanceNumParamHash,(gpointer) "Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.PairedDevice",(gpointer) BLUETOOTH_PAIRED_DEVICE_COUNT_PARAM);
         g_hash_table_insert(instanceNumParamHash, (gpointer)"Device.DeviceInfo.X_RDKCENTRAL-COM_xBlueTooth.ConnectedDevice", (gpointer)BLUETOOTH_CONNECTED_DEVICE_COUNT_PARAM);
+        g_hash_table_insert(instanceNumParamHash, (gpointer)"Device.X_COMCAST-COM_Xcalibur.DevApp.devAppTable", (gpointer)DEVAPPS_COUNT_PARAM);
     }
 }
 
