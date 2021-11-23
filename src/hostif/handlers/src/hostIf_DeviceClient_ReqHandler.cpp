@@ -417,6 +417,13 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
         ret = pIface->get_xOpsReverseSshStatus(stMsgData);
     }
+
+    else if(strncasecmp(stMsgData->paramName,APPARMOR_BLOCKLIST_PROCESS,strlen(APPARMOR_BLOCKLIST_PROCESS)) == 0)
+    {
+        hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
+        ret = pIface->get_ApparmorBlockListStatus(stMsgData);
+    }
+
 #ifdef USE_XRDK_BT_PROFILE
     else if(strncasecmp(stMsgData->paramName,X_BT_ROOT_OBJ,strlen(X_BT_ROOT_OBJ))==0)
     {

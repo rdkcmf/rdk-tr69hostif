@@ -177,6 +177,7 @@
 
 #define FWDNLD_DEFER_REBOOT                             "Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadDeferReboot"
 
+#define APPARMOR_BLOCKLIST_PROCESS                      "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.NonRootSupport.ApparmorBlocklist"
 /**
  * @brief This class provides the interface for getting device information.
  * @ingroup TR69_HOSTIF_DEVICEINFO_CLASSES
@@ -256,7 +257,7 @@ class hostIf_DeviceInfo {
     int set_xRDKCentralComRFCRoamTrigger(HOSTIF_MsgData_t *);
 
     int set_xRDKCentralComRFCRetrieveNow(HOSTIF_MsgData_t *);
-
+    int set_xRDKCentralComApparmorBlocklist(HOSTIF_MsgData_t *);
 #ifdef ENABLE_LLAMA_PLATCO
     int set_xRDKCentralComRFCVideoTelFreq(HOSTIF_MsgData_t *);
 #endif
@@ -1062,6 +1063,8 @@ public:
     * @retval NOK if operation fails.
     */
     int get_xOpsReverseSshStatus(HOSTIF_MsgData_t *);
+
+    int get_ApparmorBlockListStatus(HOSTIF_MsgData_t *);
 
     /**
     * @brief set_xOpsDeviceMgmtRPCRebootNow

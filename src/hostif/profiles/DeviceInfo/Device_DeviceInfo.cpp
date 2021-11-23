@@ -57,7 +57,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-
+#include <dirent.h>
 #include "libIBus.h"
 #include "mfrMgr.h"
 #include "Device_DeviceInfo.h"
@@ -2931,8 +2931,49 @@ int hostIf_DeviceInfo::get_xOpsReverseSshStatus(HOSTIF_MsgData_t *stMsgData)
     return OK;
 }
 
+static void Replace_AllOccurrence(char *str, int size, char ch, char Newch)
+{
+    int i=0;
+    for(i = 0; i<size-1; i++)
+    {
+        if(str[i] == ch || str[i] == '\r')
+        {
+            str[i] = Newch;
+        }
+    }
+    str[i]='\0';
+}
 
+int hostIf_DeviceInfo::get_ApparmorBlockListStatus(HOSTIF_MsgData_t * stMsgData)
+{
+    const char *apparmor_config = "/opt/secure/Apparmor_blocklist";
+    const char *info_str = "Apparmorblocklist is empty";
+    char *buf = NULL;
+    FILE *fp = NULL;
+    size_t len = 0;
+    ssize_t read = 0;
+    errno_t rc = -1;
 
+    /* check the parameter name and return the corresponding value */
+    fp = fopen(apparmor_config,"r");
+    if(fp != NULL) {
+        read = getdelim( &buf, &len, '\0', fp);
+        if (read != -1) {
+            rc = strcpy_s(stMsgData->paramValue, sizeof(stMsgData->paramValue), buf);
+            if(rc!=EOK)
+            {
+                ERR_CHK(rc);
+            }
+            Replace_AllOccurrence(stMsgData->paramValue, strlen(stMsgData->paramValue), '\n', '#');
+        }
+        fclose(fp);
+        return 0;
+    }
+    else {
+       strncpy( stMsgData->paramValue,info_str,strlen(info_str));
+    }
+    return -1;
+}
 
 int hostIf_DeviceInfo::get_xOpsDeviceMgmtForwardSSHEnable(HOSTIF_MsgData_t * stMsgData)
 {
@@ -3133,6 +3174,117 @@ int hostIf_DeviceInfo::set_xRDKCentralComBootstrap(HOSTIF_MsgData_t * stMsgData)
     return ret;
 }
 
+static bool ValidateInput_Arguments(char *input, FILE *tmp_fptr)
+{
+    const char *apparmor_profiledir = "/etc/apparmor.d";
+    struct dirent *entry=NULL;
+    DIR *dir=NULL;
+    char files_name[1024]={0};
+    char *token=NULL;
+    char *subtoken=NULL;
+    char *sub_string=NULL;
+    char *sp=NULL;
+    char *sptr=NULL;
+    char tmp[64]={0};
+    char *arg=NULL;
+    dir=opendir(apparmor_profiledir);
+    if( (dir == NULL) || (tmp_fptr == NULL) ) {
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Failed to open Apparmor Profile directory\n");
+        return FALSE;
+    }
+    entry = readdir(dir);
+    memset(files_name,'\0',sizeof(files_name));
+    /* storing Apparmor profile (file) names into files_name which can be used to check with input arguments using strstr() */
+    while(entry != NULL) {
+        strncat(files_name,entry->d_name,strlen(entry->d_name));
+        entry = readdir(dir);
+    }
+    if (closedir(dir) != 0) {
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Failed to close Apparmor Profile  directory\n");
+        return FALSE;
+    }
+    /* Read the input arguments and ensure the corresponding profiles exist or not by searching in
+     Apparmor profile directory (/etc/apparmor.d/). Returns false if input does not have the
+     apparmor profile, Returns true if apparmor profile finds for the input */
+    token=strtok_r( input,"#", &sp);
+    while(token != NULL) {
+        arg=strchr(token,':');
+        if ( ( (strcmp(arg+1,"disable") != 0) && (strcmp(arg+1,"complain") != 0) && (strcmp(arg+1,"enforce") != 0) ) ) {
+              RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Invalid arguments in the parser:%s\n", token);
+              return FALSE;
+        }
+        strncpy(tmp,token,sizeof(tmp));
+        subtoken=strtok_r(tmp,":",&sptr);
+        if(subtoken != NULL) {
+            sub_string=strstr(files_name, subtoken);
+            if(sub_string != NULL) {
+                fprintf(tmp_fptr,"%s\n",token);
+            }
+            else {
+                RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Invalid arguments %s error found in the parser\n", subtoken);
+                return FALSE;
+            }
+         }
+    token=strtok_r(NULL,"#",&sp);
+    }
+    return TRUE;
+}
+
+int hostIf_DeviceInfo::set_xRDKCentralComApparmorBlocklist(HOSTIF_MsgData_t *stMsgData)
+{
+    const char *apparmor_config = "/opt/secure/Apparmor_blocklist";
+    const char *apparmor_tmp_config = "/opt/secure/Apparmor_blocklist_bck.txt";
+    FILE *fptr = NULL;
+    FILE *tmp_fptr = NULL;
+    char buf[128] = {0};
+    char *token = NULL;
+    char *sub_string = NULL;
+    char *sp = NULL;
+    char tmp[128] = {0};
+    int ret=NOK;
+
+    fptr = fopen(apparmor_config,"r");
+    tmp_fptr = fopen(apparmor_tmp_config,"w+");
+    if( (!stMsgData->paramValue) || (strlen(stMsgData->paramValue) == 0) ||(tmp_fptr == NULL)) {
+         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Failed to open the file or invalid argument\n");
+         return ret;
+    }
+    /* Traversing the Blocklist file and write the contents into tmp file expect the entry in Blocklist if it matches with input arguments */
+    if(fptr != NULL ) {
+        while(fgets( buf, sizeof(buf), fptr) != NULL)  {
+              buf[strcspn(buf,"\n")] = 0;
+              strncpy( tmp, buf, sizeof(tmp));
+              token=strtok_r(tmp,":",&sp);
+              if(token != NULL) {
+                 sub_string=strstr(stMsgData->paramValue, token);
+                 if(sub_string != NULL)
+                    continue;
+                 else
+                    fprintf(tmp_fptr,"%s\n",buf);
+              }
+        }
+    }
+
+    /* To ensure input arguments are valid or not */
+    if (ValidateInput_Arguments(stMsgData->paramValue, tmp_fptr) != TRUE) {
+       if(fptr != NULL)
+           fclose(fptr);
+       if (tmp_fptr!= NULL)
+           fclose(tmp_fptr);
+       return ret;
+    }
+    /* Copying tmp file contents into main file by using rename() */
+    if(fptr != NULL)
+        fclose(fptr);
+    fclose(tmp_fptr);
+    if(rename( apparmor_tmp_config, apparmor_config) != 0) {
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Error in renaming  file\n");
+        return ret;
+    }
+    ret=OK;
+    return ret;
+}
+
 int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
 {
     int ret = NOK;
@@ -3265,6 +3417,10 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     else if (strcasecmp(stMsgData->paramName,RFC_CTL_RETRIEVE_NOW) == 0)
     {
         ret = set_xRDKCentralComRFCRetrieveNow(stMsgData);
+    }
+    else if (strcasecmp(stMsgData->paramName,APPARMOR_BLOCKLIST_PROCESS) == 0)
+    {
+        ret = set_xRDKCentralComApparmorBlocklist(stMsgData);
     }
 #ifdef ENABLE_LLAMA_PLATCO
     else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.VideoTelemetry.FrequncyMinutes"))
