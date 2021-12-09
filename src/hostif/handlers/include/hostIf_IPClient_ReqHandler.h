@@ -65,10 +65,10 @@ private:
     static updateCallback mUpdateCallback;
 
     static int curNumOfIPInterface;
-    static int curNumOfInterfaceIPv4Addresses[20];
+    static int curNumOfInterfaceIPv4Addresses[100];
 #ifdef IPV6_SUPPORT
-    static int curNumOfInterfaceIPv6Addresses[20];
-    static int curNumOfInterfaceIPv6Prefixes[20];
+    static int curNumOfInterfaceIPv6Addresses[100];
+    static int curNumOfInterfaceIPv6Prefixes[100];
 #endif // IPV6_SUPPORT
     static int curNumOfIPv4Interface[20];
     static int curNumOfActivePorts[20];
