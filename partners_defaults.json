@@ -236,7 +236,6 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:pairing:youtubetv:youtubekids",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "true",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsDCMUpload.Enable" : "true",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsLogUpload.Enable" : "true",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.TR069support.Enable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.XconfUrl" : "https://secure.xconfds.coast.xcal.tv",
