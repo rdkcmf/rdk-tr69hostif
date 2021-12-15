@@ -67,14 +67,14 @@ static int process_integer(void * ctx, long long integerVal) {
 static int process_double(void * ctx, double doubleVal) {
     return 1;
 }
-static int process_number(void * ctx, const char * numberVal, unsigned int numberLen) {
+static int process_number(void * ctx, const char * numberVal, size_t numberLen) {
     return 1;
 }
 
 /*
  * Grab a string, assuming we're in the right mode.
  */
-static int process_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen)
+static int process_string(void * ctx, const unsigned char * stringVal, size_t stringLen)
 {
     parser_state_t  *context = (parser_state_t *) ctx;
 
@@ -95,7 +95,7 @@ static int process_start_map(void * ctx)
     return 1;
 }
 
-static int process_map_key(void * ctx, const unsigned char * key, unsigned int stringLen)
+static int process_map_key(void * ctx, const unsigned char * key, size_t stringLen)
 {
     parser_state_t  *context = (parser_state_t *) ctx;
     char buffer[256];

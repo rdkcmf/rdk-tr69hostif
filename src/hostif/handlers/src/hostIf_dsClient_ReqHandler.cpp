@@ -449,7 +449,7 @@ void DSClientReqHandler::checkForUpdates()
     GList *devList = hostIf_STBServiceHDMI::getAllInstances();
     for(elem = devList; elem; elem = elem->next,index++)
     {
-        hostIf_STBServiceHDMI *pIface = hostIf_STBServiceHDMI::getInstance((int)elem->data);
+        hostIf_STBServiceHDMI *pIface = hostIf_STBServiceHDMI::getInstance((intptr_t)elem->data);
         if(pIface)
         {
 			pIface->doUpdates(mUpdateCallback);
@@ -461,7 +461,7 @@ void DSClientReqHandler::checkForUpdates()
 	devList = hostIf_STBServiceVideoOutput::getAllInstances();
     for(elem = devList; elem; elem = elem->next,index++)
     {
-        hostIf_STBServiceVideoOutput *pIface = hostIf_STBServiceVideoOutput::getInstance((int)elem->data);
+        hostIf_STBServiceVideoOutput *pIface = hostIf_STBServiceVideoOutput::getInstance((intptr_t)elem->data);
         if(pIface)
         {
 			pIface->doUpdates(mUpdateCallback);
@@ -473,7 +473,7 @@ void DSClientReqHandler::checkForUpdates()
 	devList = hostIf_STBServiceVideoDecoder::getAllInstances();
     for(elem = devList; elem; elem = elem->next,index++)
     {
-        hostIf_STBServiceVideoDecoder *pIface = hostIf_STBServiceVideoDecoder::getInstance((int)elem->data);
+        hostIf_STBServiceVideoDecoder *pIface = hostIf_STBServiceVideoDecoder::getInstance((intptr_t)elem->data);
         if(pIface)
         {
 			pIface->doUpdates(mUpdateCallback);
@@ -486,7 +486,7 @@ void DSClientReqHandler::checkForUpdates()
 
     for(elem = devList; elem; elem = elem->next,index++)
     {
-        hostIf_STBServiceAudioInterface *pIfaceAudio = hostIf_STBServiceAudioInterface::getInstance((int)elem->data);
+        hostIf_STBServiceAudioInterface *pIfaceAudio = hostIf_STBServiceAudioInterface::getInstance((intptr_t)elem->data);
 
         if(pIfaceAudio)
         {
@@ -499,7 +499,7 @@ void DSClientReqHandler::checkForUpdates()
     
     for (elem = devList; elem; elem = elem->next, index++)
     {
-        hostIf_STBServiceSPDIF *pIfaceSPDIF = hostIf_STBServiceSPDIF::getInstance((int)elem->data);
+        hostIf_STBServiceSPDIF *pIfaceSPDIF = hostIf_STBServiceSPDIF::getInstance((intptr_t)elem->data);
         if (pIfaceSPDIF)
         {
             pIfaceSPDIF->doUpdates(mUpdateCallback);
