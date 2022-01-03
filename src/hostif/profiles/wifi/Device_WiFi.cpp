@@ -288,8 +288,8 @@ int hostIf_WiFi::get_Device_WiFi_AccessPointNumberOfEntries(HOSTIF_MsgData_t *st
 
     put_int(stMsgData->paramValue, accessPointNumOfEntries);
 
-    stMsgData->paramtype = hostIf_BooleanType;
-    stMsgData->paramLen=4;
+    stMsgData->paramtype = hostIf_UnsignedIntType;
+    stMsgData->paramLen = sizeof (unsigned int);
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s] Exiting..\n", __FUNCTION__, __FILE__);
 
