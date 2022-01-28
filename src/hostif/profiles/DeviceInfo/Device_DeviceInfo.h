@@ -177,6 +177,12 @@
 
 #define FWDNLD_DEFER_REBOOT                             "Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadDeferReboot"
 
+/* Profile: X_RDKCENTRAL-COM_RDKRemoteDebugger */
+#ifdef USE_REMOTE_DEBUGGER
+#define RDK_REMOTE_DEBUGGER_ENABLE                      "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RDKRemoteDebugger.Enable"
+#define RDK_REMOTE_DEBUGGER_ISSUETYPE                   "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RDKRemoteDebugger.IssueType"
+#endif
+
 #define APPARMOR_BLOCKLIST_PROCESS                      "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.NonRootSupport.ApparmorBlocklist"
 /**
  * @brief This class provides the interface for getting device information.
@@ -1119,6 +1125,21 @@ public:
     int get_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(HOSTIF_MsgData_t *, bool *pChanged = NULL);
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_XRPollingAction(HOSTIF_MsgData_t *);
 
+#ifdef USE_REMOTE_DEBUGGER
+    /*
+      * @brief set_Device_DeviceInfo_X_RDKCENTRAL_COM_RDKRemoteDebuggerIssueType
+      *
+      * This method is to get the Issuetype from QA.
+      * with following TR-069 definition:
+      *   Parameter Name: Device.DeviceInfo.X_RDKCENTRAL-COM_RDKRemoteDebugger.IssueType
+      *   Data type: String - Arguments Issuetype
+      *
+      * @retval OK if it is successful.
+      * @retval NOK if operation fails.
+      */
+    
+    int set_Device_DeviceInfo_X_RDKCENTRAL_COM_RDKRemoteDebuggerIssueType(HOSTIF_MsgData_t *);
+#endif    
     /*
       * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId
       *

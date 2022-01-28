@@ -75,6 +75,10 @@
 #include "netsrvmgrIarm.h"
 #endif
 
+#ifdef USE_REMOTE_DEBUGGER
+#include "rrdIarm.h"
+#endif
+
 #ifdef YOCTO_BUILD
 #include "secure_wrapper.h"
 #endif
@@ -3422,6 +3426,12 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     {
         ret = set_xRDKCentralComApparmorBlocklist(stMsgData);
     }
+#ifdef USE_REMOTE_DEBUGGER    
+    else if (strcasecmp(stMsgData->paramName,RDK_REMOTE_DEBUGGER_ISSUETYPE) == 0)
+    {
+        ret = set_Device_DeviceInfo_X_RDKCENTRAL_COM_RDKRemoteDebuggerIssueType(stMsgData);
+    }
+#endif    
 #ifdef ENABLE_LLAMA_PLATCO
     else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.VideoTelemetry.FrequncyMinutes"))
     {
@@ -3605,6 +3615,29 @@ int hostIf_DeviceInfo::get_xRDKCentralComRFCAccountId(HOSTIF_MsgData_t *stMsgDat
     }
     return ret;
 }
+
+#ifdef USE_REMOTE_DEBUGGER
+int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_RDKRemoteDebuggerIssueType (HOSTIF_MsgData_t *stMsgData)
+{
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Entering... \n",__FUNCTION__);
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Param Value is %s \n",__FUNCTION__, stMsgData->paramValue);
+
+    strncpy(issueStr,stMsgData->paramValue,sizeof(issueStr)-1);
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Issue string Value is %s \n",__FUNCTION__, issueStr);
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] CAlling IARM_Bus_BroadcastEvent %s %d for %s \n",__FUNCTION__, IARM_BUS_RDK_REMOTE_DEBUGGER_NAME, IARM_BUS_RDK_REMOTE_DEBUGGER_ISSUETYPE, issueStr);
+    if (IARM_Bus_BroadcastEvent(IARM_BUS_RDK_REMOTE_DEBUGGER_NAME, (IARM_EventId_t) IARM_BUS_RDK_REMOTE_DEBUGGER_ISSUETYPE, (void *) &issueStr, sizeof(issueStr)) == IARM_RESULT_SUCCESS)
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] SUCCESS: RDK Remote Debugger IARM BroadcastEvent %s \n",__FUNCTION__);
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] FAILED: RDK Remote Debugger IARM BroadcastEvent \n",__FUNCTION__);
+    }
+    RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s] Exiting... \n",__FUNCTION__);
+
+    return OK;
+}
+#endif
 
 int hostIf_DeviceInfo::set_xRDKCentralComRFCAutoRebootEnable(HOSTIF_MsgData_t *stMsgData)
 {
