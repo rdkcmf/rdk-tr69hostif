@@ -280,6 +280,8 @@ void HttpServerStop()
 {
     RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"SERVER: Stopping HTTP Server....\n");
     if(http_server) {
+        std::unique_lock<std::mutex> lck(mtx_httpServerThreadDone);
+        httpServerThreadDone = false;
         soup_server_disconnect(http_server);
         RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF,"SERVER: Stopped server successfully.\n");
     }
