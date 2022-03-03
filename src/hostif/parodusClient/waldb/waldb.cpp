@@ -303,18 +303,23 @@ int isWildCardParam(char *paramName)
  */
 void replaceWithInstanceNumber(char *paramName, int instanceNumber)
 {
-    errno_t safec_rc = -1;
+//   errno_t safec_rc = -1;
     char *position;
     char number[10];
 
     if(!(position = strstr(paramName, INSTANCE_NUMBER_INDICATOR)))
         return;
     sprintf(number,"%d.",instanceNumber);
+
+    //TO DO: paramName size is not predictable, revert to use strcpy
+#if 0
     safec_rc=strcpy_s(paramName+(strlen(paramName)-4),MAX_PARAMETER_LENGTH,number);
     if(safec_rc!= EOK)
     {
 	    ERR_CHK(safec_rc);
     }
+#endif
+    strcpy(paramName+(strlen(paramName)-4),number);
 }
 
 /**
