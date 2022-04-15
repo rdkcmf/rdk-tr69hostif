@@ -313,6 +313,29 @@
         <syntax> <boolean/> </syntax>
       </parameter>
     </object>
+    <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ctrlm." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+      <parameter base="vsdk" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax> <string/> </syntax>
+      </parameter>
+      <parameter base="voice" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax> <string/> </syntax>
+      </parameter>
+      <parameter base="network_rf4ce" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax> <string/> </syntax>
+      </parameter>
+      <parameter base="network_ble" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax> <string/> </syntax>
+      </parameter>
+      <parameter base="network_ip" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax> <string/> </syntax>
+      </parameter>
+      <parameter base="global" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax> <string/> </syntax>
+      </parameter>
+      <parameter base="device_update" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
+        <syntax> <string/> </syntax>
+      </parameter>
+    </object>
     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Voice." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
       <parameter base="AudioMode" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax> <int/> </syntax>
