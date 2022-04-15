@@ -64,6 +64,7 @@ extern "C"
 #define BACKOFF_SLEEP_DELAY_5_SEC 	    5
 #define ETAG_HEADER 		    "ETag:"
 #define BLE_DETECTION_WEBCONFIG_ENDPOINT "https://cpe-config.xdp.comcast.net/api/v1/device/{mac}/config/ble"
+#define BLE_DETECTION_WEBCONFIG_SUFIX "/ble"
 #define LOG_TR69HOSTIF  "LOG.RDK.TR69HOSTIF"
 #define CURL_FILE "/tmp/adzvfchig-res.mch"
 #define CONFIG_VERSION_FILE "/opt/persistent/webconfig_Version"
@@ -390,6 +391,7 @@ static int requestWebConfigData(char **configData, long *code, char **transactio
     struct token_data data;
     data.size = 0;
     char c[] = "{mac}";
+    errno_t rc = -1;
     void * dataVal = NULL;
     curl = curl_easy_init();
     if(curl)
@@ -409,8 +411,30 @@ static int requestWebConfigData(char **configData, long *code, char **transactio
             WAL_FREE(transID);
         }
 
+        char endPoint[128] = {'\0'};
         //Replace {mac} string from default init url with actual deviceMAC
-        webconfigEndPoint = replaceMacWord(BLE_DETECTION_WEBCONFIG_ENDPOINT, c, deviceMac);
+        RFC_ParamData_t param = {0};
+        WDMP_STATUS status = getRFCParameter((char*)"webcfg", "Device.X_RDK_WebConfig.URL", &param);
+
+        if (status == WDMP_SUCCESS) {
+            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webcfg: name = %s, type = %d, value = %s\n", param.name, param.type, param.value);
+            rc=strcpy_s(endPoint,sizeof(param.value) ,param.value);
+            if(rc==EOK)
+            {
+                rc=strcat_s(endPoint,strlen(BLE_DETECTION_WEBCFG_ENDPOINT),BLE_DETECTION_WEBCFG_ENDPOINT);
+            }
+            if(rc==EOK)
+            {
+                webconfigEndPoint = replaceMacWord(endPoint, c, deviceMac);
+            }
+        }
+
+        if(status != WDMP_SUCCESS || rc!=EOK)
+        {
+            webconfigEndPoint = replaceMacWord(BLE_DETECTION_WEBCONFIG_ENDPOINT, c, deviceMac);
+        }
+
+
         RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF,"webconfig_lite:webConfigURL is %s \n", webconfigEndPoint);
         curl_easy_setopt(curl, CURLOPT_URL, webconfigEndPoint );
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, CURL_TIMEOUT_SEC);

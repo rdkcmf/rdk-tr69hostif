@@ -25,6 +25,7 @@ AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
 	-I$(top_srcdir)/src/hostif/profiles/X_COMCAST-COM/X_COMCAST-COM_Xcalibur/include \
 	-I$(top_srcdir)/src/hostif/profiles/moca \
 	-I$(top_srcdir)/src/hostif/profiles/Ethernet \
+	-I$(top_srcdir)/src/hostif/profiles/Device \
 	-I$(top_srcdir)/src/hostif/profiles/DeviceInfo \
 	-I$(top_srcdir)/src/hostif/profiles/IP \
 	-I$(top_srcdir)/src/hostif/profiles/Time \
@@ -93,7 +94,7 @@ AM_CXXFLAGS += -DWIFI_CLIENT_ROAMING
 endif
 
 if WITH_WEB_CONFIG
-AM_CXXFLAGS += -DWEB_CONFIG_ENABLED -I$(top_srcdir)/src/hostif/profiles/webConfig
+AM_CXXFLAGS += -DWEB_CONFIG_ENABLED 
 endif
 
 noinst_LTLIBRARIES = libMsgHandlers.la
@@ -108,7 +109,8 @@ libMsgHandlers_la_SOURCES =	src/hostIf_IARM_ReqHandler.cpp \
 				src/hostIf_IPClient_ReqHandler.cpp \
 				src/hostIf_EthernetClient_ReqHandler.cpp \
 				src/hostIf_XrdkCentralT2_ReqHandler.cpp \
-				src/hostIf_rbus_Dml_Provider.cpp
+				src/hostIf_rbus_Dml_Provider.cpp \
+                src/x_rdk_req_handler.cpp
 
 if WITH_MOCA_PROFILE
 libMsgHandlers_la_SOURCES +=    src/hostIf_MoCAClient_ReqHandler.cpp
@@ -133,10 +135,6 @@ endif
 
 if WITH_SNMP_ADAPTER
 libMsgHandlers_la_SOURCES +=     src/hostIf_SNMPClient_ReqHandler.cpp
-endif
-
-if WITH_WEB_CONFIG
-libMsgHandlers_la_SOURCES +=     src/x_rdk_webconfig_dml_req_handler.cpp
 endif
 
 if WITH_IPV6_SUPPORT

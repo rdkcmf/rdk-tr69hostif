@@ -20,7 +20,22 @@
 <dm:document spec="http://dimark.com" xmlns:dm="urn:broadband-forum-org:cwmp:datamodel-1-2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:broadband-forum-org:cwmp:datamodel-1-2 data/cwmp-datamodel-1-2-dimark.xsd cwmp-datamodel-1-2-dimark.xsd">
   <model name="data-model">
     <object base="Device." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1"/>
-       <object base="Device.Time." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+      <object base="Device.X_RDK_WebPA_Server." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+        <parameter base="URL" bsUpdate="allUpdate" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+          <syntax> <string/> </syntax>
+         </parameter>
+      </object>
+      <object base="Device.X_RDK_WebPA_TokenServer." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+        <parameter base="URL" bsUpdate="allUpdate" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+          <syntax> <string/> </syntax>
+         </parameter>
+      </object>
+      <object base="Device.X_RDK_WebPA_DNSText." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
+        <parameter base="URL" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+          <syntax> <string/> </syntax>
+         </parameter>
+      </object>
+      <object base="Device.Time." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
        <parameter base="NTPServer1" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">
         <syntax>
           <string/>

@@ -62,10 +62,7 @@
 #ifdef SNMP_ADAPTER_ENABLED
 #include "hostIf_SNMPClient_ReqHandler.h"
 #endif
-#ifdef WEB_CONFIG_ENABLED
-#include "x_rdk_webconfig_dml_req_handler.h"
-#endif
-
+#include "x_rdk_req_handler.h"
 
 extern GHashTable* paramMgrhash;
 extern T_ARGLIST argList;
@@ -171,10 +168,10 @@ void hostIf_Init_Dummy_stMsgData (HOSTIF_MsgData_t **stMsgData)
     {
         stMsgDummyData = new HOSTIF_MsgData_t();
         rc=strcpy_s(stMsgDummyData->paramName,sizeof(stMsgDummyData->paramName), TEST_STR);
-	if(rc!=EOK)
-    	{
-	    ERR_CHK(rc);
-    	}
+        if(rc!=EOK)
+        {
+            ERR_CHK(rc);
+        }
         stMsgDummyData->reqType = HOSTIF_GET;
         stMsgDummyData->instanceNum = 0;
         *stMsgData = stMsgDummyData;
@@ -297,12 +294,11 @@ bool hostIf_initalize_ConfigManger()
                 mgrName = HOSTIF_SNMPAdapterMgr;
             }
 #endif
-#ifdef WEB_CONFIG_ENABLED
-            else if(strcasecmp(mgr, "webConfigMgr") == 0)
+            else if(strcasecmp(mgr, "rdkProfileMgr") == 0)
             {
-                mgrName = HOSTIF_WebConfigMgr;
+                mgrName = HOSTIF_RdkProfileMgr;
             }
-#endif
+
             if(mgrName != HOSTIF_INVALID_Mgr) {
                 RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"param: %s \tMgr: [%s => %d]\n", param, mgr, mgrName);
                 g_hash_table_insert(paramMgrhash, (gpointer)g_strdup(param), (gpointer)mgrName);
@@ -403,13 +399,12 @@ msgHandler* HostIf_GetMgr(HOSTIF_MsgData_t *stMsgHandlerData)
                     pRet = SNMPClientReqHandler::getInstance();
                     break;
 #endif
-#ifdef WEB_CONFIG_ENABLED
-                case HOSTIF_WebConfigMgr:
-                    pRet = X_RDK_WebConfig_Dml_ReqHandler::getInstance();
-                    break;
-#endif
                 case HOSTIF_TelemetryMgr:
                     pRet = XRdkCentralT2::getInstance();
+                    break;
+                case HOSTIF_RdkProfileMgr:
+                    pRet = X_rdk_req_hdlr::getInstance();
+                    break;
                 default:
                     ;
                 }

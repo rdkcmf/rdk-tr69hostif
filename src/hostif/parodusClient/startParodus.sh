@@ -26,11 +26,11 @@ CRUD_CONFIG_FILE="/opt/parodus_cfg.json"
 SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
 CONFIG_RES_FILE="/tmp/adzvfchig-res.mch"
 JWT_KEY="/etc/ssl/certs/webpa-rs256.pem"
-DNS_TEXT_URL=$(tr181 -g Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.HostIf.ParodusDnsTextUrl 2>&1)
+DNS_TEXT_URL=$(tr181 -g Device.X_RDK_WebPA_DNSText.URL 2>&1)
 if [ -z "$DNS_TEXT_URL" ]; then
    DNS_TEXT_URL="fabric.xmidt.comcast.net"
 fi
-TOKEN_SERVER_URL=$(tr181 -g Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.HostIf.ParodusTokenServerUrl 2>&1)
+TOKEN_SERVER_URL=$(tr181 -g Device.X_RDK_WebPA_TokenServer.URL 2>&1)
 if [ -z "$TOKEN_SERVER_URL" ]; then
    TOKEN_SERVER_URL="https://issuer.xmidt.comcast.net:8080/issue"
 fi
@@ -119,7 +119,7 @@ get_BootTime()
 parodus_start_up()
 {
     # Getting Webpa Parameters
-    ServerIP=$(tr181 -g Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.HostIf.ParodusServerUrl 2>&1)
+    ServerIP=$(tr181 -g Device.X_RDK_WebPA_Server.URL 2>&1)
     if [ -z "$ServerIP" ]; then
          ServerIP=$(get_webpa_string_parameter "ServerIP")
     fi

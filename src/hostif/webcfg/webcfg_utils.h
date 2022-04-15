@@ -34,6 +34,7 @@
 #define SUCCESS 0
 
 #define BLE_DETECTION_WEBCFG_ENDPOINT "https://cpe-config.xdp.comcast.net/api/v1/device/{mac}/config?group_id=ble"
+#define BLE_DETECTION_WEBCFG_SUFIX "?group_id=ble"
 #define DEV_DETAILS_FILE "/tmp/.deviceDetails.cache"
 
 #endif

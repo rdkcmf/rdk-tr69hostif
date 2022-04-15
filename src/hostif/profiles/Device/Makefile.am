@@ -18,8 +18,28 @@
 ##########################################################################
 
 SUBDIRS =
+DIST_SUBDIRS =
 
-AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include -I$(top_srcdir)/src/hostif/handlers/include  $(GLIB_CFLAGS) $(G_THREAD_CFLAGS)
+AM_CXXFLAGS = -I$(top_srcdir)/src/hostif/include \
+    -I$(top_srcdir)/src/hostif/handlers/include \
+    -I$(top_srcdir)/src/hostif/profiles/DeviceInfo \
+    $(GLIB_CFLAGS) $(G_THREAD_CFLAGS)
 
-noinst_LTLIBRARIES = libxRdkWebConfig.la
-libxRdkWebConfig_la_SOURCES =  x_rdk_webconfig_dml.cpp
+
+AM_LDFLAGS = " "
+
+if IS_YOCTO_ENABLED
+AM_LDFLAGS += -lsecure_wrapper
+endif
+
+if WITH_WEB_CONFIG
+AM_CXXFLAGS += -DWEB_CONFIG_ENABLED
+AM_LDFLAGS += -lwebcfg -lcurl -luuid
+AM_CXXFLAGS += -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/wdmp-c
+AM_CXXFLAGS += -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/webcfg
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/webcfg/
+endif
+
+noinst_LTLIBRARIES = libdevice.la
+libdevice_la_SOURCES = x_rdk_profile.cpp
+libdevice_la_CXXFLAGS = $(AM_CXXFLAGS) -std=c++0x

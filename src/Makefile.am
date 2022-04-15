@@ -44,7 +44,8 @@ AM_CXXFLAGS = $(GLIB_CFLAGS) $(GTHREAD_CFLAGS) \
 	-I$(top_srcdir)/src/hostif/profiles/Ethernet \
 	-I$(top_srcdir)/src/hostif/profiles/IP \
 	-I$(top_srcdir)/src/hostif/profiles/Time \
-	-I$(top_srcdir)/src/hostif/profiles/DeviceInfo
+	-I$(top_srcdir)/src/hostif/profiles/DeviceInfo \
+	-I$(top_srcdir)/src/hostif/profiles/Device
 
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/parodusClient/pal \
                -I$(top_srcdir)/src/hostif/parodusClient/waldb 
@@ -79,13 +80,6 @@ if WITH_WEBCONFIG_LITE_SUPPORT
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/webconfig_lite
 endif
 
-if WITH_WEB_CONFIG
-AM_CXXFLAGS += -DWEB_CONFIG_ENABLED
-AM_CXXFLAGS += -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/wdmp-c
-AM_CXXFLAGS += -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/webcfg
-AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/webcfg/
-endif
-
 if WITH_WEBPA_RFC
 AM_CXXFLAGS += -DWEBPA_RFC_ENABLED
 endif
@@ -113,6 +107,14 @@ endif
 AM_CFLAGS =  $(GLIB_CFLAGS) $(GTHREAD_CFLAGS)
 AM_CPPFLAGS =  $(GLIB_CFLAGS) $(GTHREAD_CFLAGS)
 
+if WITH_WEB_CONFIG
+AM_CXXFLAGS += -DWEB_CONFIG_ENABLED
+AM_LDFLAGS += -lwebcfg -lcurl -luuid
+AM_CXXFLAGS += -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/wdmp-c
+AM_CXXFLAGS += -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/webcfg
+AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/webcfg/
+endif
+
 
 # Start : Support for DeviceSetting client.
 #ENABLE_WITH_DS_CLIENT=@DEF_ENABLE_WITH_DS_CLIENT@
@@ -130,6 +132,7 @@ endif
 bin_PROGRAMS = tr69hostif
 tr69hostif_SOURCES = $(top_srcdir)/src/hostif/src/hostIf_main.cpp $(top_srcdir)/src/hostif/src/hostIf_utils.cpp
 tr69hostif_SOURCES += $(top_srcdir)/src/hostif/src/IniFile.cpp
+
 if WITH_WEB_CONFIG
 tr69hostif_SOURCES += $(top_srcdir)/src/hostif/webcfg/webcfg_utils.cpp
 endif
@@ -140,6 +143,7 @@ tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/IP/libhostIfIP.la
 tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/Time/libhostIfTime.la
 tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/Ethernet/libhostIfEthernet.la
 tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/DeviceInfo/libdeviceinfo.la
+tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/Device/libdevice.la
 
 if WITH_DHCP_PROFILE
 tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/DHCPv4/libhostIfDHCPv4Client.la
@@ -175,11 +179,6 @@ endif
 
 if WITH_WEBCONFIG_LITE_SUPPORT
 tr69hostif_LDADD += $(top_builddir)/src/hostif/webconfig_lite/libwebconfiglite.la
-endif
-
-if WITH_WEB_CONFIG
-AM_LDFLAGS += -lwebcfg -lcurl -luuid
-tr69hostif_LDADD += $(top_builddir)/src/hostif/profiles/webConfig/libxRdkWebConfig.la
 endif
 
 AM_CXXFLAGS += -I$(top_srcdir)/src/hostif/parodusClient/pal 

@@ -17,7 +17,7 @@
 # limitations under the License.
 ##########################################################################
 
-SUBDIRS =   STBService DeviceInfo Ethernet IP Time
+SUBDIRS =   STBService Device DeviceInfo Ethernet IP Time
 if WITH_DHCP_PROFILE
 SUBDIRS += DHCPv4
 endif
@@ -30,24 +30,17 @@ endif
 if WITH_WIFI_PROFILE
 SUBDIRS += wifi
 endif
-if WITH_WEB_CONFIG
-SUBDIRS += webConfig
-endif
-
 
 DIST_SUBDIRS =  STBService DeviceInfo Ethernet IP Time
 if WITH_DHCP_PROFILE
-DIST_SUBDIRS += DHCPv4
+   DIST_SUBDIRS += DHCPv4
 endif
 if WITH_STORAGESERVICE_PROFILE
-DIST_SUBDIRS += StorageService 
+   DIST_SUBDIRS += StorageService
 endif
 if WITH_INTFSTACK_PROFILE
-DIST_SUBDIRS += InterfaceStack 
+   DIST_SUBDIRS += InterfaceStack
 endif
 if WITH_WIFI_PROFILE
-DIST_SUBDIRS += wifi
-endif
-if WITH_WEB_CONFIG
-DIST_SUBDIRS += webConfig
+   DIST_SUBDIRS += wifi
 endif

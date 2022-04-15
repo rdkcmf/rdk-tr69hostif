@@ -73,6 +73,7 @@ typedef enum _HostIf_ParamMgr
     HOSTIF_DHCPv4,
     HOSTIF_InterfaceStack,
     HOSTIF_TelemetryMgr,
+    HOSTIF_RdkProfileMgr,
 #ifdef WEB_CONFIG_ENABLED
     HOSTIF_WebConfigMgr,
 #endif
@@ -106,57 +107,57 @@ protected:
     msgHandler() {};
 
 public:
-/**
- * @brief This is a pure virtual function used for initialization. Currently not implemented.
- *
- * @return Returns the status of the operation.
- *
- * @retval true if initialization is successful .
- * @retval false if initialization is not successful.
- * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
- */
+    /**
+     * @brief This is a pure virtual function used for initialization. Currently not implemented.
+     *
+     * @return Returns the status of the operation.
+     *
+     * @retval true if initialization is successful .
+     * @retval false if initialization is not successful.
+     * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
+     */
     virtual bool init() = 0;
-	
-/**
- * @brief This is a pure virtual function used for un initialization. Currently not implemented.
- *
- * @return Returns the status of the operation.
- *
- * @retval true if initialization is successful.
- * @retval false if initialization is not successful.
- * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
- */
+
+    /**
+     * @brief This is a pure virtual function used for un initialization. Currently not implemented.
+     *
+     * @return Returns the status of the operation.
+     *
+     * @retval true if initialization is successful.
+     * @retval false if initialization is not successful.
+     * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
+     */
     virtual bool unInit() = 0;
 
     virtual int handleGetAttributesMsg(HOSTIF_MsgData_t *stMsgData) = 0;
     virtual int handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData) = 0;
-	
-/**
- * @brief This is a pure virtual function used to handle the set message request.
- * Currently not implemented.
- *
- * @param[out] stMsgData TR-069 Host interface message request.
- *
- * @return Returns the status of the operation.
- *
- * @retval OK if successful.
- * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
- * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
- */
+
+    /**
+     * @brief This is a pure virtual function used to handle the set message request.
+     * Currently not implemented.
+     *
+     * @param[out] stMsgData TR-069 Host interface message request.
+     *
+     * @return Returns the status of the operation.
+     *
+     * @retval OK if successful.
+     * @retval ERR_INTERNAL_ERROR if not able to set the data to the device.
+     * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
+     */
     virtual int handleSetMsg(HOSTIF_MsgData_t *stMsgData) = 0;
 
-/**
- * @brief This is a pure virtual function used to handle the get message request.
- * Currently not implemented.
- *
- * @param[out] stMsgData TR-069 Host interface message request.
- *
- * @return Returns the status of the operation.
- *
- * @retval OK if successful.
- * @retval ERR_INTERNAL_ERROR if not able to get the data from the device.
- * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
- */
+    /**
+     * @brief This is a pure virtual function used to handle the get message request.
+     * Currently not implemented.
+     *
+     * @param[out] stMsgData TR-069 Host interface message request.
+     *
+     * @return Returns the status of the operation.
+     *
+     * @retval OK if successful.
+     * @retval ERR_INTERNAL_ERROR if not able to get the data from the device.
+     * @ingroup TR-069HOSTIF_MESSAGE_REQHANDLER_CLASSES
+     */
     virtual int handleGetMsg(HOSTIF_MsgData_t *stMsgData) = 0;
 };
 
