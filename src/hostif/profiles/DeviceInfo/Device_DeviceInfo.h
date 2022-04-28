@@ -130,7 +130,7 @@
 #define xFirmwareDownloadNow_STR                        "Device.DeviceInfo.X_RDKCENTRAL-COM_FirmwareDownloadNow" /* boolean [w] Trigger download on set true. */
 #define X_RDKCENTRAL_COM_LastRebootReason               "Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason"
 #define X_RDKCENTRAL_COM_Experience                     "Device.DeviceInfo.X_RDKCENTRAL-COM_Experience"
-
+#define X_RDK_FirmwareName                              "Device.DeviceInfo.X_RDK_FirmwareName"
 /* Profile: X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging. */
 #define xOpsDMUploadLogsNow_STR                         "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMUploadLogsNow"
 #define xOpsDMLogsUploadStatus_STR                      "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMLogsUploadStatus"
@@ -1137,9 +1137,9 @@ public:
       * @retval OK if it is successful.
       * @retval NOK if operation fails.
       */
-    
+
     int set_Device_DeviceInfo_X_RDKCENTRAL_COM_RDKRemoteDebuggerIssueType(HOSTIF_MsgData_t *);
-#endif    
+#endif
     /*
       * @brief get_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_PartnerId
       *
@@ -1381,6 +1381,7 @@ public:
     int get_X_RDKCENTRAL_COM_LastRebootReason(HOSTIF_MsgData_t *);
     int set_X_RDKCENTRAL_COM_LastRebootReason(HOSTIF_MsgData_t *);
     int get_X_RDKCENTRAL_COM_experience(HOSTIF_MsgData_t *);
+    int get_X_RDK_FirmwareName(HOSTIF_MsgData_t *);
 
 };
 /* End of doxygen group */

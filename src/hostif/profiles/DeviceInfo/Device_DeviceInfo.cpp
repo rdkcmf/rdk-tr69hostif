@@ -413,10 +413,10 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_SoftwareVersion(HOSTIF_MsgData_t * 
                         tmpStr++;
                     }
                     rc=strcpy_s(version,sizeof(version), tmpStr);
-		    if(rc!=EOK)
-		    {
-			ERR_CHK(rc);
-		    }
+                    if(rc!=EOK)
+                    {
+                        ERR_CHK(rc);
+                    }
                     versionFlag = true;
                     if(!isTrunkbuild)	break;
                 }
@@ -1076,7 +1076,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgDat
     param.type = mfrSERIALIZED_TYPE_DEVICEMAC;
     int len = strlen(stbMacCache);
 
-    
+
     try
     {
         if((stbMacCache[0] == '\0') && (len == 0)) {
@@ -1128,10 +1128,10 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_COMCAST_COM_STB_MAC(HOSTIF_MsgDat
     if(!stb_mac.empty())
     {
         rc=strcpy_s(stMsgData->paramValue,sizeof(stMsgData->paramValue), stb_mac.c_str());
-	if(rc!=EOK)
-	{
-		ERR_CHK(rc);
-	}
+        if(rc!=EOK)
+        {
+            ERR_CHK(rc);
+        }
     }
     else
         stMsgData->faultCode = fcInvalidParameterValue;
@@ -1463,10 +1463,10 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareFilename(H
             if(line.length()) {
                 char * cstr = new char [line.length()+1];
                 rc=strcpy_s (cstr,(line.length()+1), line.c_str());
-		if(rc!=EOK)
-		{
-			ERR_CHK(rc);
-		}
+                if(rc!=EOK)
+                {
+                    ERR_CHK(rc);
+                }
                 char * pch = NULL;
                 pch = strstr (cstr,":");
                 pch++;
@@ -1827,10 +1827,10 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus (HOSTIF
         {
             memset(statusStr, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
             rc=strcpy_s(statusStr,sizeof(statusStr), "Connection successful");
-	    if(rc!=EOK)
-	    {
-		ERR_CHK(rc);
-	    }
+            if(rc!=EOK)
+            {
+                ERR_CHK(rc);
+            }
             check_AcsConnStatus = true;
         }
         RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] BootStatus: %s GatewayConnStatuss: %d\n", __FILE__, __FUNCTION__, statusStr, get_GatewayConnStatus());
@@ -1862,10 +1862,10 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus (HOSTIF
         {
             memset(statusStr, '\0', TR69HOSTIFMGR_MAX_PARAM_LEN);
             rc=strcpy_s(statusStr,sizeof(statusStr), "Contacting ACS");
-	    if(rc!=EOK)
-	    {
-		ERR_CHK(rc);
-	    }
+            if(rc!=EOK)
+            {
+                ERR_CHK(rc);
+            }
             check_XreConnStatus = true;
         }
 //	RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s:%s] BootStatus: %s gAcsConnStatus: %d\n", __FILE__, __FUNCTION__, statusBuf, get_ACSStatus());
@@ -1944,7 +1944,7 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_PreferredGatewayTy
         if(fgets(prefGatewayValue, GATEWAY_NAME_SIZE, fp) == NULL)
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s]not able to read string from file \n", __FUNCTION__);
-	    prefGatewayValue[0]='\0';
+            prefGatewayValue[0]='\0';
         }
         fclose(fp);
     }
@@ -1988,7 +1988,7 @@ int hostIf_DeviceInfo::get_xOpsDMLogsUploadStatus(HOSTIF_MsgData_t *stMsgData)
     else
     {
         RDK_LOG (RDK_LOG_DEBUG, LOG_TR69HOSTIF, "[%s] Successfully read from %s. The value is \'%s\'. \n", __FUNCTION__, CURRENT_LOG_UPLOAD_STATUS,
-                  curLogUploadStatus);
+                 curLogUploadStatus);
         fclose (logUpfile);
     }
 
@@ -2582,10 +2582,10 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpa
                         tmpStr++;
                     }
                     rc=strcpy_s(ipAddress,sizeof(ipAddress), tmpStr);
-		    if(rc!=EOK)
-		    {
-			ERR_CHK(rc);
-		    }
+                    if(rc!=EOK)
+                    {
+                        ERR_CHK(rc);
+                    }
                 }
             }
             remoteInterface_file.close();
@@ -2597,9 +2597,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportIpa
 
             //values not populated so unknown.
             rc=strcpy_s(ipAddress,sizeof(ipAddress),"unknown");
-	    if(rc!=EOK)
+            if(rc!=EOK)
             {
-                   ERR_CHK(rc);
+                ERR_CHK(rc);
             }
             snprintf((char *)stMsgData->paramValue, strlen(stMsgData->paramValue)-1, "%s",ipAddress);
         }
@@ -2635,10 +2635,10 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMAC
                         tmpStr++;
                     }
                     rc=strcpy_s(macAddress,sizeof(macAddress), tmpStr);
-		    if(rc!=EOK)
-		    {
-			ERR_CHK(rc);
-		    }
+                    if(rc!=EOK)
+                    {
+                        ERR_CHK(rc);
+                    }
                 }
             }
             remoteInterface_file.close();
@@ -2650,9 +2650,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_IPRemoteSupportMAC
 
             //values not populated so unknown.
             rc=strcpy_s(macAddress,sizeof(macAddress),"unknown");
-	    if(rc!=EOK)
+            if(rc!=EOK)
             {
-                  ERR_CHK(rc);
+                ERR_CHK(rc);
             }
             snprintf((char *)stMsgData->paramValue, strlen(stMsgData->paramValue)-1, "%s",macAddress);
         }
@@ -2767,19 +2767,19 @@ int hostIf_DeviceInfo::set_xOpsReverseSshTrigger(HOSTIF_MsgData_t *stMsgData)
             if (isShortsEnabled() && trigger_shorts) {
                 RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting Stunnel \n",__FUNCTION__);
                 RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] StunnelSSH Command  = /bin/sh %s %s %s %s %s %s \n",
-                                                   __FUNCTION__,
-                                                   stunnelCommand.c_str(),
-                                                   stunnelSSHArgs.at("localport").c_str(),
-                                                   stunnelSSHArgs.at("host").c_str(),
-                                                   stunnelSSHArgs.at("hostIp").c_str(),
-                                                   stunnelSSHArgs.at("stunnelport").c_str(),
-                                                   reverseSSHArgs.c_str());
+                        __FUNCTION__,
+                        stunnelCommand.c_str(),
+                        stunnelSSHArgs.at("localport").c_str(),
+                        stunnelSSHArgs.at("host").c_str(),
+                        stunnelSSHArgs.at("hostIp").c_str(),
+                        stunnelSSHArgs.at("stunnelport").c_str(),
+                        reverseSSHArgs.c_str());
                 v_secure_system("/bin/sh %s %s %s %s %s %s &", stunnelCommand.c_str(),
-                                                   stunnelSSHArgs.at("localport").c_str(),
-                                                   stunnelSSHArgs.at("host").c_str(),
-                                                   stunnelSSHArgs.at("hostIp").c_str(),
-                                                   stunnelSSHArgs.at("stunnelport").c_str(),
-                                                   reverseSSHArgs.c_str());
+                                stunnelSSHArgs.at("localport").c_str(),
+                                stunnelSSHArgs.at("host").c_str(),
+                                stunnelSSHArgs.at("hostIp").c_str(),
+                                stunnelSSHArgs.at("stunnelport").c_str(),
+                                reverseSSHArgs.c_str());
             } else {
 
                 RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Starting SSH Tunnel \n",__FUNCTION__);
@@ -2878,10 +2878,10 @@ int hostIf_DeviceInfo::set_xOpsReverseSshArgs(HOSTIF_MsgData_t *stMsgData)
             stunnelSSHArgs["hostIp"] = parsedMap.at("hostIp");
             stunnelSSHArgs["stunnelport"] = parsedMap.at("stunnelport");
             RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Stunnel Args = %s %s %s %s \n",
-                                                       __FUNCTION__, localPort,
-                                                       parsedMap.at("host"),
-                                                       parsedMap.at("hostIp"),
-                                                       parsedMap.at("stunnelport"));
+                    __FUNCTION__, localPort,
+                    parsedMap.at("host"),
+                    parsedMap.at("hostIp"),
+                    parsedMap.at("stunnelport"));
         } else {
             reverseSSHArgs += parsedMap["host"] + " -p " + parsedMap["sshport"];
         }
@@ -2974,7 +2974,7 @@ int hostIf_DeviceInfo::get_ApparmorBlockListStatus(HOSTIF_MsgData_t * stMsgData)
         return 0;
     }
     else {
-       strncpy( stMsgData->paramValue,info_str,strlen(info_str));
+        strncpy( stMsgData->paramValue,info_str,strlen(info_str));
     }
     return -1;
 }
@@ -3031,28 +3031,28 @@ int hostIf_DeviceInfo::set_xOpsDeviceMgmtForwardSSHEnable(HOSTIF_MsgData_t * stM
     {
         RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Default Enable value:%s --> Parameter[%s]\n", __FUNCTION__, ForwardSSH, stMsgData->paramName);
         /*rc = strcpy_s(ForwardSSH, sizeof(ForwardSSH), get_boolean(stMsgData->paramValue) ? "true" : "false");
-        if (rc != EOK) 
-	{
-        	ERR_CHK(rc);
-    	}*/
-	if (get_boolean(stMsgData->paramValue))
+        if (rc != EOK)
+        {
+               	ERR_CHK(rc);
+           	}*/
+        if (get_boolean(stMsgData->paramValue))
         {
             rc=strcpy_s(ForwardSSH,sizeof(ForwardSSH),"true");
-	    if(rc!=EOK)
-	    {
-		ERR_CHK(rc);
-	
-    	    }
-	}
+            if(rc!=EOK)
+            {
+                ERR_CHK(rc);
+
+            }
+        }
         else
         {
             rc=strcpy_s(ForwardSSH,sizeof(ForwardSSH),"false");
-	    if(rc!=EOK)
+            if(rc!=EOK)
             {
                 ERR_CHK(rc);
             }
         }
-	fprintf(fp,"ForwardSSH=%s", ForwardSSH);
+        fprintf(fp,"ForwardSSH=%s", ForwardSSH);
     }
     fclose(fp);
     return OK;
@@ -3183,13 +3183,13 @@ static bool ValidateInput_Arguments(char *input, FILE *tmp_fptr)
     const char *apparmor_profiledir = "/etc/apparmor.d";
     struct dirent *entry=NULL;
     DIR *dir=NULL;
-    char files_name[1024]={0};
+    char files_name[1024]= {0};
     char *token=NULL;
     char *subtoken=NULL;
     char *sub_string=NULL;
     char *sp=NULL;
     char *sptr=NULL;
-    char tmp[64]={0};
+    char tmp[64]= {0};
     char *arg=NULL;
     dir=opendir(apparmor_profiledir);
     if( (dir == NULL) || (tmp_fptr == NULL) ) {
@@ -3214,8 +3214,8 @@ static bool ValidateInput_Arguments(char *input, FILE *tmp_fptr)
     while(token != NULL) {
         arg=strchr(token,':');
         if ( ( (strcmp(arg+1,"disable") != 0) && (strcmp(arg+1,"complain") != 0) && (strcmp(arg+1,"enforce") != 0) ) ) {
-              RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Invalid arguments in the parser:%s\n", token);
-              return FALSE;
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Invalid arguments in the parser:%s\n", token);
+            return FALSE;
         }
         strncpy(tmp,token,sizeof(tmp));
         subtoken=strtok_r(tmp,":",&sptr);
@@ -3228,8 +3228,8 @@ static bool ValidateInput_Arguments(char *input, FILE *tmp_fptr)
                 RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Invalid arguments %s error found in the parser\n", subtoken);
                 return FALSE;
             }
-         }
-    token=strtok_r(NULL,"#",&sp);
+        }
+        token=strtok_r(NULL,"#",&sp);
     }
     return TRUE;
 }
@@ -3250,32 +3250,32 @@ int hostIf_DeviceInfo::set_xRDKCentralComApparmorBlocklist(HOSTIF_MsgData_t *stM
     fptr = fopen(apparmor_config,"r");
     tmp_fptr = fopen(apparmor_tmp_config,"w+");
     if( (!stMsgData->paramValue) || (strlen(stMsgData->paramValue) == 0) ||(tmp_fptr == NULL)) {
-         RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Failed to open the file or invalid argument\n");
-         return ret;
+        RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"Failed to open the file or invalid argument\n");
+        return ret;
     }
     /* Traversing the Blocklist file and write the contents into tmp file expect the entry in Blocklist if it matches with input arguments */
     if(fptr != NULL ) {
         while(fgets( buf, sizeof(buf), fptr) != NULL)  {
-              buf[strcspn(buf,"\n")] = 0;
-              strncpy( tmp, buf, sizeof(tmp));
-              token=strtok_r(tmp,":",&sp);
-              if(token != NULL) {
-                 sub_string=strstr(stMsgData->paramValue, token);
-                 if(sub_string != NULL)
+            buf[strcspn(buf,"\n")] = 0;
+            strncpy( tmp, buf, sizeof(tmp));
+            token=strtok_r(tmp,":",&sp);
+            if(token != NULL) {
+                sub_string=strstr(stMsgData->paramValue, token);
+                if(sub_string != NULL)
                     continue;
-                 else
+                else
                     fprintf(tmp_fptr,"%s\n",buf);
-              }
+            }
         }
     }
 
     /* To ensure input arguments are valid or not */
     if (ValidateInput_Arguments(stMsgData->paramValue, tmp_fptr) != TRUE) {
-       if(fptr != NULL)
-           fclose(fptr);
-       if (tmp_fptr!= NULL)
-           fclose(tmp_fptr);
-       return ret;
+        if(fptr != NULL)
+            fclose(fptr);
+        if (tmp_fptr!= NULL)
+            fclose(tmp_fptr);
+        return ret;
     }
     /* Copying tmp file contents into main file by using rename() */
     if(fptr != NULL)
@@ -3404,7 +3404,7 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     }
     else if (strcasecmp(stMsgData->paramName,LE_RFC_ENABLE) == 0)
     {
-       ret = set_xRDKCentralComRFCLoudnessEquivalenceEnable(stMsgData);
+        ret = set_xRDKCentralComRFCLoudnessEquivalenceEnable(stMsgData);
     }
     else if (strcasecmp(stMsgData->paramName,HDR_RFC_ENABLE) == 0)
     {
@@ -3426,12 +3426,12 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFC(HOSTIF_MsgData_t * stMsgData)
     {
         ret = set_xRDKCentralComApparmorBlocklist(stMsgData);
     }
-#ifdef USE_REMOTE_DEBUGGER    
+#ifdef USE_REMOTE_DEBUGGER
     else if (strcasecmp(stMsgData->paramName,RDK_REMOTE_DEBUGGER_ISSUETYPE) == 0)
     {
         ret = set_Device_DeviceInfo_X_RDKCENTRAL_COM_RDKRemoteDebuggerIssueType(stMsgData);
     }
-#endif    
+#endif
 #ifdef ENABLE_LLAMA_PLATCO
     else if (!strcasecmp(stMsgData->paramName, "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.VideoTelemetry.FrequncyMinutes"))
     {
@@ -3562,8 +3562,8 @@ int hostIf_DeviceInfo::get_xRDKCentralComRFC(HOSTIF_MsgData_t *stMsgData)
     {
         if ((ret = get_xRDKCentralComRFCAccountId(stMsgData)) == OK)
         {
-           // Store the value from authservice into the db so we don't get here again
-           m_rfcStorage.setValue(stMsgData);
+            // Store the value from authservice into the db so we don't get here again
+            m_rfcStorage.setValue(stMsgData);
         }
     }
 
@@ -3663,7 +3663,7 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCAutoRebootEnable(HOSTIF_MsgData_t *s
     else
     {
         RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] Value Incorrect, Auto Reboot Enable status unchanged \n" \
-                , __FUNCTION__);
+                 , __FUNCTION__);
         ret=NOK;
     }
 
@@ -3885,7 +3885,7 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCVideoTelFreq(HOSTIF_MsgData_t *stMsg
         }
         else
         {
-            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] FrequncyMinutes value should be in the range between 1 to 60 (Minutes) \n", __FUNCTION__, __LINE__); 
+            RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s:%d] FrequncyMinutes value should be in the range between 1 to 60 (Minutes) \n", __FUNCTION__, __LINE__);
         }
     }
     return ret;
@@ -3979,10 +3979,10 @@ int hostIf_DeviceInfo::readFirmwareInfo(char *param, HOSTIF_MsgData_t * stMsgDat
         }
 
         rc=strcpy_s (cstr,(line.length()+1), line.c_str());
-	if(rc!=EOK)
-	{
-		ERR_CHK(rc);
-	}
+        if(rc!=EOK)
+        {
+            ERR_CHK(rc);
+        }
         char * pch = NULL;
         pch = strstr (cstr,"|");
         if (pch == NULL) {
@@ -4050,7 +4050,7 @@ int hostIf_DeviceInfo::writeFirmwareInfo(char *param, HOSTIF_MsgData_t * stMsgDa
             infwDwnfile.close();
             tmpfwDwnfile.close();
         }
-           //CID:90007 , 82197-Checked return
+        //CID:90007 , 82197-Checked return
         if((remove(FW_DWN_FILE_PATH) == 0) && (rename(TEMP_FW_DWN_FILE_PATH, FW_DWN_FILE_PATH) == 0))
         {
             RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF,"[%s] File removed from the path ,  Temp file is set \n", __FUNCTION__);
@@ -4283,7 +4283,7 @@ int hostIf_DeviceInfo::get_xOpsRPCDevManageableNotification(HOSTIF_MsgData_t* st
     rc=strcpy_s(stMsgData->paramValue,sizeof(stMsgData->paramValue), chVal);
     if(rc!=EOK)
     {
-	ERR_CHK(rc);
+        ERR_CHK(rc);
     }
     return OK;
 }
@@ -4375,7 +4375,7 @@ int hostIf_DeviceInfo::set_xOpsRPCDevManageableNotification(HOSTIF_MsgData_t *st
     rc=strcpy_s(stRfcData.paramName,sizeof(stRfcData.paramName), X_RDK_RFC_MANGEBLENOTIFICATION_ENABLE);
     if(rc!=EOK)
     {
- 	ERR_CHK(rc);
+        ERR_CHK(rc);
     }
     if((get_xRDKCentralComRFC(&stRfcData) == OK) && (strncmp(stRfcData.paramValue, "true", sizeof("true")) == 0))
     {
@@ -4647,6 +4647,62 @@ int hostIf_DeviceInfo::get_X_RDKCENTRAL_COM_experience( HOSTIF_MsgData_t *stMsgD
     return OK;
 }
 
+/**
+ * @brief This function identifying the imagename of the running image
+ *        This Value comes from "imagename" property in /version.txt file
+ * @param[out] stMsgData TR-069 Host interface message request.
+ * @param[in] pChanged Status of the operation.
+ *
+ * @return Returns the status of the operation.
+ *
+ * @retval OK if it is successful.
+ * @retval ERR_INTERNAL_ERROR if not able to fetch from device.
+ * @ingroup TR69_HOSTIF_DEVICEINFO_API
+ */
+int hostIf_DeviceInfo::get_X_RDK_FirmwareName(HOSTIF_MsgData_t * stMsgData)
+{
+    string line;
+    ifstream versionfile (VERSION_FILE);
+    char imagename[100] = {'\0'};
+    errno_t rc = -1;
+
+    try {
+        if (versionfile.is_open()) {
+            while ( getline (versionfile,line) ) {
+                if (line.find("imagename") !=string::npos) {
+                    char *tmpStr = strstr((char *)line.c_str(), ":");
+                    tmpStr++;
+                    while(isspace(*tmpStr)) {
+                        tmpStr++;
+                    }
+                    rc=strcpy_s(imagename,sizeof(imagename), tmpStr);
+                    if(rc!=EOK) {
+                        ERR_CHK(rc);
+                    }
+                    break;
+                }
+            }
+            versionfile.close();
+        }
+        else
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s()] Failed to open [%s] file.\n", __FUNCTION__, VERSION_FILE);
+            return NOK;
+        }
+
+        if(imagename[0] != '\0') {
+            stMsgData->paramLen = strlen(imagename);
+            strncpy(stMsgData->paramValue,imagename, stMsgData->paramLen);
+        }
+        stMsgData->paramtype = hostIf_StringType;
+    }
+    catch (const std::exception e) {
+        RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"[%s()]Exception caught.\n", __FUNCTION__);
+        return NOK;
+    }
+    RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()] Exiting..\n", __FUNCTION__ );
+    return OK;
+}
 /* End of doxygen group */
 /**
  * @}

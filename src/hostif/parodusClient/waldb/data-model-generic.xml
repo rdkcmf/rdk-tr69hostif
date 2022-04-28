@@ -96,6 +96,9 @@
        <default type="factory" value="false"/>
       </syntax>
      </parameter>
+     <parameter base="X_RDK_FirmwareName" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <syntax> <string/> </syntax>
+     </parameter>
     </object>
     <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
       <parameter base="TR69ACSConnectURL_dev" bsUpdate="allUpdate" access="readWrite" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="18001">

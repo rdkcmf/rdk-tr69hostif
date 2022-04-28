@@ -661,6 +661,10 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         {
             ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_FirmwareDownloadDeferReboot(stMsgData);
         }
+        else if (!strcasecmp(stMsgData->paramName, X_RDK_FirmwareName))
+        {
+            ret = pIface->get_X_RDK_FirmwareName(stMsgData);
+        }
         else
         {
             RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Parameter : \'%s\' is Not Supported  \n", __FUNCTION__, __LINE__, stMsgData->paramName);
@@ -732,10 +736,10 @@ int DeviceClientReqHandler::handleSetAttributesMsg(HOSTIF_MsgData_t *stMsgData)
         {
             *notifyValuePtr = 1;
             rc=strcpy_s(notifyKey,strlen(stMsgData->paramName)+1,stMsgData->paramName);
-	    if(rc!=EOK)
-    	    {
-	  	ERR_CHK(rc);
-    	    }
+            if(rc!=EOK)
+            {
+                ERR_CHK(rc);
+            }
             g_hash_table_insert(notifyhash,notifyKey,notifyValuePtr);
             ret = OK;
         }
