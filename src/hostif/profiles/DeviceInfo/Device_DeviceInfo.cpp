@@ -4703,6 +4703,39 @@ int hostIf_DeviceInfo::get_X_RDK_FirmwareName(HOSTIF_MsgData_t * stMsgData)
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s()] Exiting..\n", __FUNCTION__ );
     return OK;
 }
+
+int hostIf_DeviceInfo::set_xRDKDownloadManager_InstallPackage(HOSTIF_MsgData_t * stMsgData)
+{
+    int ret = NOK;
+    char *rdm_comm = "/etc/rdm/rdmBundleMgr.sh";
+    char *install_cmd = NULL;
+  
+    RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF, "[%s] Entering..\n", __FUNCTION__ );
+
+    if( (!stMsgData->paramValue) || (strlen(stMsgData->paramValue) == 0 )) {
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Invalid parameter value\n", __FUNCTION__);
+        return NOK;
+    }
+
+    RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] Executing command - sh %s %s & \n", __FUNCTION__ , rdm_comm, stMsgData->paramValue);
+
+#ifdef YOCTO_BUILD
+    ret = v_secure_system("sh %s %s &", rdm_comm, stMsgData->paramValue);
+#else
+    install_cmd = (char *) calloc(strlen(rdm_comm) + strlen(stMsgData->paramValue) + 10, sizeof(char));
+    sprintf(install_cmd, "sh %s \"%s\" &", rdm_comm, stMsgData->paramValue);
+    ret = system(install_cmd);
+    free(install_cmd);
+#endif
+
+    if (ret != 0) {
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] Failed to execute the command. Returned error code '%d'\n", __FUNCTION__, ret);
+        return NOK;
+    }
+
+    RDK_LOG(RDK_LOG_TRACE1, LOG_TR69HOSTIF, "[%s] Exiting..\n", __FUNCTION__ );
+    return OK;
+}
 /* End of doxygen group */
 /**
  * @}
