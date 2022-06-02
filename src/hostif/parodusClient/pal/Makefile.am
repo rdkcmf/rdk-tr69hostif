@@ -21,6 +21,7 @@
 lib_LTLIBRARIES = libparodusclient.la
 AM_CXXFLAGS=  -I$(top_srcdir)/src/hostif/parodusClient/pal \
             -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/libparodus \
+            -I$(PKG_CONFIG_SYSROOT_DIR)/usr/include/rbus \
             -I$(top_srcdir)/src/hostif/include  \
             -I$(top_srcdir)/src/hostif/handlers/include \
             -I$(top_srcdir)/src/hostif/parodusClient/waldb \

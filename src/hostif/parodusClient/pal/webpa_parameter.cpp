@@ -32,7 +32,7 @@
 #include "waldb.h"
 #include "hostIf_msgHandler.h"
 #include "hostIf_utils.h"
-
+#include "rbus.h"
 
 /*----------------------------------------------------------------------------*/
 /*                             Function Prototypes                            */
@@ -101,13 +101,210 @@ void setValues(const ParamVal paramVal[], const unsigned int paramCount, const W
     }
 }
 
+/******************************************************************************/
+/*                      RBUS  Internal  functions                             */
+/******************************************************************************/
+rbusHandle_t   g_busHandle = 0;
+
+static void ensureRbusHandle()
+{
+    if(!g_busHandle)
+    {
+        rbusError_t rc;
+        char compName[50] = "";
+        snprintf(compName, 50, "parodus-rbus-If");
+        rc = rbus_open(&g_busHandle, compName);
+        if(rc != RBUS_ERROR_SUCCESS)
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"rbus_open failed err: %d\n", rc);
+            return;
+        }
+    }
+    return;
+}
+
+static rbusValueType_t getRbusDataTypefromWebPA(WAL_DATA_TYPE type)
+{
+    if (type == WAL_STRING)
+        return RBUS_STRING;
+
+    if (type == WAL_INT)
+        return RBUS_INT32;
+
+    if (type == WAL_UINT)
+        return RBUS_UINT32;
+
+    if (type == WAL_BOOLEAN)
+        return RBUS_BOOLEAN;
+
+    if (type == WAL_DATETIME)
+        return RBUS_DATETIME;
+
+    if (type == WAL_BASE64)
+        return RBUS_BYTES;
+
+    if (type == WAL_LONG)
+        return RBUS_INT64;
+
+    if (type == WAL_ULONG)
+        return RBUS_UINT64;
+
+    if (type == WAL_FLOAT)
+        return RBUS_SINGLE;
+
+    if (type == WAL_DOUBLE)
+        return RBUS_DOUBLE;
+
+    if (type == WAL_BYTE)
+        return RBUS_BYTE;
+
+    return RBUS_STRING;
+}
+
+static DATA_TYPE mapRbusDataTypeToWebPA (rbusValueType_t type)
+{
+    DATA_TYPE rc = WDMP_STRING;
+    switch(type)
+    {
+    case RBUS_BOOLEAN:
+        rc = WDMP_BOOLEAN;
+        break;
+    case RBUS_CHAR :
+    case RBUS_BYTE:
+    case RBUS_INT8:
+    case RBUS_UINT8:
+        rc = WDMP_BYTE;
+        break;
+    case RBUS_INT16:
+    case RBUS_INT32:
+        rc = WDMP_INT;
+        break;
+    case RBUS_UINT16:
+    case RBUS_UINT32:
+        rc = WDMP_UINT;
+        break;
+    case RBUS_INT64:
+        rc = WDMP_LONG;
+        break;
+    case RBUS_UINT64:
+        rc = WDMP_ULONG;
+        break;
+    case RBUS_STRING:
+        rc = WDMP_STRING;
+        break;
+    case RBUS_DATETIME:
+        rc = WDMP_DATETIME;
+        break;
+    case RBUS_BYTES:
+        rc = WDMP_BASE64;
+        break;
+    case RBUS_SINGLE:
+        rc = WDMP_FLOAT;
+        break;
+    case RBUS_DOUBLE:
+        rc = WDMP_DOUBLE;
+        break;
+    case RBUS_PROPERTY:
+    case RBUS_OBJECT:
+    case RBUS_NONE:
+        rc = WDMP_NONE;
+        break;
+    }
+    return rc;
+}
+
+static WDMP_STATUS rbusGetParamInfo (const char *pParameterName, param_t ***parametervalPtrPtr, int *paramCountPtr, int index)
+{
+    WDMP_STATUS ret = WDMP_FAILURE;
+    rbusError_t rc;
+    int numOfOutVals = 0;
+    rbusProperty_t outputVals = NULL;
+
+    ensureRbusHandle();
+
+    *paramCountPtr = 0;
+    if (isWildCardParam(pParameterName)) // It is a wildcard Param
+        rc = rbus_getExt(g_busHandle, 1, &pParameterName, &numOfOutVals, &outputVals);
+    else
+    {
+        rbusValue_t getVal;
+        rc = rbus_get(g_busHandle, pParameterName, &getVal);
+        if(RBUS_ERROR_SUCCESS == rc)
+        {
+            numOfOutVals = 1;
+            rbusProperty_Init(&outputVals, pParameterName, getVal);
+            rbusValue_Release(getVal);
+        }
+    }
+
+    if(RBUS_ERROR_SUCCESS == rc)
+    {
+        rbusProperty_t next = outputVals;
+        *paramCountPtr = numOfOutVals;
+
+        (*parametervalPtrPtr)[index] = (param_t *) calloc(sizeof(param_t),*paramCountPtr);
+
+        for (int i = 0; i < numOfOutVals; i++)
+        {
+            rbusValue_t val = rbusProperty_GetValue(next);
+            rbusValueType_t type = rbusValue_GetType(val);
+
+            (*parametervalPtrPtr)[index][i].name  = strdup(rbusProperty_GetName(next));
+            (*parametervalPtrPtr)[index][i].value = rbusValue_ToString(val,NULL,0);
+            (*parametervalPtrPtr)[index][i].type  = mapRbusDataTypeToWebPA(type);
+
+            next = rbusProperty_GetNext(next);
+        }
+        /* Free the memory */
+        rbusProperty_Release(outputVals);
+        ret = WDMP_SUCCESS;
+    }
+    else
+    {
+        RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Failed to get the data for %s with error : %d\n", pParameterName, rc);
+    }
+
+    return ret;
+}
+
+static WAL_STATUS rbusSetParamInfo(ParamVal paramVal, char * transactionID)
+{
+    rbusError_t rc;
+    WAL_STATUS ret = WAL_SUCCESS;
+    rbusValue_t setVal;
+
+    ensureRbusHandle();
+
+    /* Get Param Type */
+    rbusValueType_t type = getRbusDataTypefromWebPA(paramVal.type);
+    rbusValue_Init(&setVal);
+    if (rbusValue_SetFromString(setVal, type, paramVal.value))
+    {
+        rbusSetOptions_t opts = {true, strtoul (transactionID, NULL, 0)};
+        rc = rbus_set(g_busHandle, paramVal.name, setVal, &opts);
+        if(rc != RBUS_ERROR_SUCCESS)
+        {
+            RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF," Invalid Parameter name %s\n",paramVal.name);
+            ret = WAL_ERR_INVALID_PARAMETER_VALUE;
+        }
+        /* Free the data pointer that was allocated */
+        rbusValue_Release(setVal);
+        RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"set_ParamValues_tr69hostIf %d\n",ret);
+    }
+    else
+    {
+        RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF," Invalid Parameter name %s\n",paramVal.name);
+        ret = WAL_ERR_INVALID_PARAMETER_NAME;
+    }
+    return ret;
+}
+
+
 /*----------------------------------------------------------------------------*/
 /*                             Internal functions                             */
 /*----------------------------------------------------------------------------*/
-
 static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***parametervalPtrPtr, int *paramCountPtr,int index)
 {
-
     void *dataBaseHandle = NULL;
     DB_STATUS dbRet = DB_FAILURE;
     HOSTIF_MsgData_t Param = { 0 };
@@ -221,8 +418,8 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
             {
                 free(getParamList);
                 free(ParamDataTypeList);
-                RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, " Wild card Param list is empty\n");
-                ret = WDMP_FAILURE;
+                RDK_LOG (RDK_LOG_INFO, LOG_PARODUS_IF, " %s :: Wild card Param list is empty; Not owned by tr69HostIf; Post it to RBUS\n", pParameterName);
+                ret = rbusGetParamInfo(pParameterName, parametervalPtrPtr, paramCountPtr, index);
             }
         }
         else // Not a wildcard Parameter Lets fill it
@@ -312,14 +509,15 @@ static WDMP_STATUS GetParamInfo (const char *pParameterName, param_t ***paramete
             }
             else
             {
-                RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Invalid Parameter Name  :-  %s \n",pParameterName);
-                ret = WDMP_ERR_INVALID_PARAMETER_NAME;
+                RDK_LOG (RDK_LOG_INFO, LOG_PARODUS_IF, "%s :: Not owned by tr69HostIf; Post it to RBUS.\n",pParameterName);
+                ret = rbusGetParamInfo(pParameterName, parametervalPtrPtr, paramCountPtr, index);
             }
         }
     }
     else
     {
         RDK_LOG (RDK_LOG_ERROR, LOG_PARODUS_IF, "Data base Handle is not Initialized %s\n", pParameterName);
+        ret = rbusGetParamInfo(pParameterName, parametervalPtrPtr, paramCountPtr, index);
     }
     return ret;
 }
@@ -336,10 +534,9 @@ static WAL_STATUS SetParamInfo(ParamVal paramVal, char * transactionID)
     if(!dataBaseHandle)
     {
         RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF,"Data Model Not Initialized... Unable to process the SET operation\n");
-        return WAL_FAILURE;
+        ret = rbusSetParamInfo(paramVal, transactionID);
     }
-
-    if(getParamInfoFromDataModel((void *)dataBaseHandle,paramVal.name,&dmParam))
+    else if(getParamInfoFromDataModel((void *)dataBaseHandle,paramVal.name,&dmParam))
     {
         WAL_DATA_TYPE walType;
         if(dmParam.dataType != NULL)
@@ -432,22 +629,24 @@ static WAL_STATUS SetParamInfo(ParamVal paramVal, char * transactionID)
                 Param.paramValue[MAX_PARAM_LENGTH-1]='\0';
             }
         }
-
+#if 0
         /* transactionID */
         if ((NULL != strstr (Param.paramName, "Device.X_RDK_WebConfig.")) && (transactionID))
         {
             strncpy(Param.transactionID, transactionID, _BUF_LEN_256-1);
             Param.transactionID[_BUF_LEN_256-1]='\0';
         }
-
+#endif
         ret = set_ParamValues_tr69hostIf(&Param);
         RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"set_ParamValues_tr69hostIf %d\n",ret);
     }
     else
     {
-        RDK_LOG(RDK_LOG_ERROR,LOG_PARODUS_IF," Invalid Parameter name %s\n",paramVal.name);
-        ret = WAL_ERR_INVALID_PARAMETER_NAME;
+        /* Its not owned by tr69HostIf. lets post it thro the rbus. */
+        RDK_LOG(RDK_LOG_WARN, LOG_PARODUS_IF, " %s :: Not owned by TR69HostIF.. Forward to RBUS\n",paramVal.name);
+        ret = rbusSetParamInfo(paramVal, transactionID);
     }
+
     return ret;
 }
 
@@ -560,6 +759,7 @@ static void converttohostIfType(char *ParamDataType,HostIf_ParamType_t* pParamTy
     else
         *pParamType = hostIf_StringType;
 }
+
 static void converttoWalType(HostIf_ParamType_t paramType,WAL_DATA_TYPE* pwalType)
 {
     RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"Inside converttoWalType \n");
