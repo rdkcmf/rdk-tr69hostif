@@ -188,8 +188,7 @@ parodus_start_up()
     PARODUS_ARGS=" --hw-mac=$HwMac --webpa-ping-time=$PingWaitTime --webpa-interface-used=$NwInterface --webpa-url=$ServerIP --partner-id=$PartnerId --webpa-backoff-max=9 --ssl-cert-path=$SSL_CERT_FILE  --acquire-jwt=$ACQUIRE_JWT --dns-txt-url=$DNS_TEXT_URL --jwt-public-key-file=$JWT_KEY --jwt-algo=RS256 --crud-config-file=$CRUD_CONFIG_FILE  --hw-manufacturer=$Manufacture --fw-name=$Image --hw-model=$Model --hw-serial-number=$Serial --boot-time=$BootTime --hw-last-reboot-reason=$reboot_reason --client-cert-path=$clientCertPath --token-server-url=$TOKEN_SERVER_URL"
 
     echo "Starting parodus with arguments $PARODUS_ARGS "
-    /bin/systemctl set-environment PARODUS_CMD="$PARODUS_ARGS"
-    echo "Parodus command set.."
+    /usr/bin/parodus $PARODUS_ARGS &
 }
 
 parodus_start_up

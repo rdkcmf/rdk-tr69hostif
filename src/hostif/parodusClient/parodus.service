@@ -24,9 +24,9 @@ ConditionPathExists=/tmp/route_available
 
 [Service]
 SyslogIdentifier="parodus"
-ExecStartPre=/lib/rdk/startParodus.sh
-ExecStartPre=/bin/systemctl import-environment PARODUS_CMD
-ExecStart=/bin/sh -c '/usr/bin/parodus $PARODUS_CMD'
+Type=forking
+PIDFile=/run/parodus.pid
+ExecStart=/lib/rdk/startParodus.sh
 ExecStop=/bin/kill -2 $MAINPID
 RestartSec=40s
 Restart=always
