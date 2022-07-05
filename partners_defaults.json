@@ -67,7 +67,10 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "true",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.ServiceUrl" : "https://dtm-client-analytics-prod.cs.xcal.tv",
+        "Device.DeviceInfo.X_RDKCETNRAL-COM_RFC.Feature.DtmAnalytics.RecordsToBuffer" : "5"
    },
    "sky-de" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -105,7 +108,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
     "sky-italia" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -142,7 +146,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
     "sky-uk" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -179,7 +184,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "sky-uk-dev" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -216,7 +222,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
     "sky-deu" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -251,7 +258,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "sky-deu-dev" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -286,7 +294,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
   "sky-it" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -321,7 +330,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "sky-it-dev" : {
        "Device.Time.NTPServer1" : "devicetime1.sky.com",
@@ -356,7 +366,8 @@
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "true",
-       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true"
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true",
+       "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "xglobal" : {
         "Device.Time.NTPServer1" : "time.xfinity.com",
@@ -393,7 +404,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.XconfUrl" : "https://secure.xconfds.coast.xcal.tv",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.XconfRecoveryUrl" : "https://recovery.xconfds.coast.xcal.tv/xconf/swu/stb",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Bootstrap.SsrUrl" : "https://secure.ssr.coast.xcal.tv",
-         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true"
+         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MTLS.mTlsCrashdumpUpload.Enable" : "true",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "cox" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -427,7 +439,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "cox-hospitality" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -461,7 +474,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "cox-dev" : {
         "Device.Time.NTPServer1" : "cpentp.services.coxlab.net",
@@ -495,7 +509,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "cox-qa" : {
         "Device.Time.NTPServer1" : "cpentp.services.cox.net",
@@ -529,7 +544,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "MIT" : {
        "Device.Time.NTPServer1" : "time.xfinity.com",
@@ -560,7 +576,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "shaw" : {
         "Device.Time.NTPServer1" : "ntp.shawcable.net",
@@ -594,7 +611,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "shaw-dev" : {
         "Device.Time.NTPServer1" : "ntp.shawcable.net",
@@ -628,7 +646,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "rogers" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -660,7 +679,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "rogers-dev" : {
         "Device.Time.NTPServer1" : "pool.ntp.net.rogers.com",
@@ -692,7 +712,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "videotron" : {
         "Device.Time.NTPServer1" : "vl-vi-ntp001.ip.videotron.ca",
@@ -726,7 +747,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "charter" : {
         "Device.Time.NTPServer1" : "2.us.pool.ntp.org",
@@ -760,7 +782,8 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    },
    "charter-dev" : {
         "Device.Time.NTPServer1" : "2.us.pool.ntp.org",
@@ -794,6 +817,7 @@
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.WolWakeEnable" : "false",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.AppList" : "youtube:spotify:netflix:system",
         "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.DynamicAppList" : "false",
-        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false"
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.FriendlyNameEnable" : "false",
+        "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.DtmAnalytics.Enable" : "false"
    }
 }
