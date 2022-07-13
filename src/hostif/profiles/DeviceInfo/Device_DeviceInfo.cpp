@@ -577,9 +577,21 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_ManufacturerOUI(HOSTIF_MsgData_t * 
         try
         {
             if( param.buffer && param.bufLen) {
+#ifdef ENABLE_MFR_MFGOUI_HEX_CONVERSION
+                char tmpConv[2]="\0";
+                memset(&(*((char *)stMsgData->paramValue)),0,sizeof((*((char *)stMsgData->paramValue))));
+                for(int MOUI_indx=0;MOUI_indx<param.bufLen;MOUI_indx++)
+                {
+                  sprintf(tmpConv,"%02hhX",param.buffer[MOUI_indx]);
+                  strcat((char *)stMsgData->paramValue,tmpConv);
+                }
+                stMsgData->paramValue[(param.bufLen * 2)+1] = '\0';
+                stMsgData->paramLen = (param.bufLen * 2);
+#else
                 strncpy((char *)stMsgData->paramValue, param.buffer, param.bufLen);
                 stMsgData->paramValue[param.bufLen+1] = '\0';
                 stMsgData->paramLen = param.bufLen;
+#endif              
                 if(bCalledManufacturerOUI && pChanged && strncmp(stMsgData->paramValue,backupManufacturerOUI,_BUF_LEN_16 ))
                 {
                     *pChanged =  true;
