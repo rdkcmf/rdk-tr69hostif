@@ -57,7 +57,6 @@ private:
 
     XBSStore();
     XBSStore(XBSStore const&){};
-    XBSStore& operator=(XBSStore const&){};
 
     bool init();
     string getRawValue(const string &key);

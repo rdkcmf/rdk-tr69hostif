@@ -52,7 +52,6 @@ private:
 
     XRFCStore();
     XRFCStore(XRFCStore const&){};
-    XRFCStore& operator=(XRFCStore const&){};
 
     bool init();
     string getRawValue(const string &key);

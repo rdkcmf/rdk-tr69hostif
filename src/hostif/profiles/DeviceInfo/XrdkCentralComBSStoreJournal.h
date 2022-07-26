@@ -68,7 +68,6 @@ private:
     XBSStoreJournal();
     XBSStoreJournal(const char *);
     XBSStoreJournal(XBSStoreJournal const&){};
-    XBSStoreJournal& operator=(XBSStoreJournal const&){};
 
     bool init();
     bool loadJournalRecordsIntoCache();

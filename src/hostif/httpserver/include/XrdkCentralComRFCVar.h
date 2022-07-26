@@ -46,7 +46,6 @@ private:
 
     XRFCVarStore();
     XRFCVarStore(XRFCVarStore const&){};
-    XRFCVarStore& operator=(XRFCVarStore const&){};
 
     void initRFCVarFileName();
     bool loadRFCVarIntoCache();
