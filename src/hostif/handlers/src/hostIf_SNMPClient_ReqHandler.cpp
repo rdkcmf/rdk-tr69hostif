@@ -133,8 +133,7 @@ int SNMPClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     hostIf_snmpAdapter::getLock();
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
-
-    if(strncasecmp(stMsgData->paramName,"Device.X_RDKCENTRAL-COM_DocsIf",strlen("Device.X_RDKCENTRAL-COM_DocsIf"))==0)
+    if(strncasecmp(stMsgData->paramName,"Device.X_RDKCENTRAL-COM_DocsIf",strlen("Device.X_RDKCENTRAL-COM_DocsIf"))==0 || strncasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDK_SNMP",strlen("Device.DeviceInfo.X_RDK_SNMP"))==0)
     {
         hostIf_snmpAdapter *pIfaceStatus = hostIf_snmpAdapter::getInstance(instanceNumber);
         stMsgData->instanceNum = instanceNumber;

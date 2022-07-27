@@ -302,10 +302,12 @@ void init_rbus_dml_provider()
                             continue;
                         } else {
                             dataElements[rbus_param_counter].name = strdup(pParamNameList[i]);
-                            if(strcmp(pParamNameList[i] + strlen(pParamNameList[i]) - 5, ".{i}.") == 0) {
-                                RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s] [rbusdml] Parameter [%d] : [ %s ] registered as [RBUS_ELEMENT_TYPE_TABLE]\n", __FUNCTION__, i + 1,pParamNameList[i]);
-                                dataElements[rbus_param_counter].type = RBUS_ELEMENT_TYPE_TABLE;
-                            } else {
+                            if(strstr(pParamNameList[i],".{i}.")){
+                              RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s] [rbusdml] Parameter [%d] : [ %s ] registered as [RBUS_ELEMENT_TYPE_TABLE]\n", __FUNCTION__, i + 1,pParamNameList[i]);
+                              dataElements[rbus_param_counter].type = RBUS_ELEMENT_TYPE_TABLE;
+                              dataElements[rbus_param_counter].cbTable.getHandler = TR_Dml_GetHandler;
+                            }
+                            else {
                                 RDK_LOG(RDK_LOG_DEBUG, LOG_TR69HOSTIF,"[%s] [rbusdml]Parameter [%d] : [ %s ] registered as [RBUS_ELEMENT_TYPE_PROPERTY]\n", __FUNCTION__, i + 1,pParamNameList[i]);
                                 dataElements[rbus_param_counter].type = RBUS_ELEMENT_TYPE_PROPERTY;
                                 dataElements[rbus_param_counter].cbTable.getHandler = TR_Dml_GetHandler;

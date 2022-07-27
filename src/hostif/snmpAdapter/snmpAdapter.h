@@ -100,7 +100,7 @@ class hostIf_snmpAdapter {
     static  GHashTable  *m_notifyHash;
 
     int dev_id;
-	static map<string, string> tr181SNMPMap;
+    static map<string, vector<pair <string, string>>> tr181Map;
 
     hostIf_snmpAdapter(int dev_id);
 

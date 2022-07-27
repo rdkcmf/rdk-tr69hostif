@@ -43,7 +43,10 @@
 #include "Device_DeviceInfo_ProcessStatus_Process.h"
 #include "hostIf_msgHandler.h"
 #include "safec_lib.h"
-
+#ifdef SNMP_ADAPTER_ENABLED
+#include "hostIf_SNMPClient_ReqHandler.h"
+#include "snmpAdapter.h"
+#endif
 #ifdef USE_XRDK_BT_PROFILE
 #include "XrdkBlueTooth.h"
 #endif
@@ -127,7 +130,6 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     const char *pSetting;
     int instanceNumber = 0;  //CID:84325 - UNINIT
     hostIf_DeviceInfo::getLock();
-
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
 
     if (stMsgData->bsUpdate != HOSTIF_NONE)
@@ -147,6 +149,20 @@ int DeviceClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
         else
             RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s()] Not setting the bootstrap param:%s [bsUpdate=%d, requestor=%d]\n", __FUNCTION__, stMsgData->paramName, stMsgData->bsUpdate, stMsgData->requestor);
     }
+#ifdef SNMP_ADAPTER_ENABLED
+    else if(strncasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDK_SNMP",strlen("Device.DeviceInfo.X_RDK_SNMP"))==0)
+     {
+          hostIf_snmpAdapter *pIStatus = hostIf_snmpAdapter::getInstance(instanceNumber);
+          stMsgData->instanceNum = instanceNumber;
+          if(pIStatus){
+              ret = pIStatus->set_ValueToSNMPAdapter(stMsgData);
+          }
+          else{
+            ret = NOK;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] hostIf_snmpAdapter::getInstance is NULL for %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+             }
+     }
+#endif
     else if(strncasecmp(stMsgData->paramName,"Device.DeviceInfo",strlen("Device.DeviceInfo"))==0)
     {
         hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
@@ -313,7 +329,6 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
     const char *pSetting;
     int instanceNumber = 0;
     hostIf_DeviceInfo::getLock();
-
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
 
     if (stMsgData->bsUpdate != HOSTIF_NONE)
@@ -440,6 +455,20 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
         ret = pIface->handleGetMsg(stMsgData);
     }
 #endif
+#ifdef SNMP_ADAPTER_ENABLED
+    else if(strncasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDK_SNMP",strlen("Device.DeviceInfo.X_RDK_SNMP"))==0)
+        {
+          hostIf_snmpAdapter *pIStatus = hostIf_snmpAdapter::getInstance(instanceNumber);
+          stMsgData->instanceNum = instanceNumber;
+          if(pIStatus){
+              ret = pIStatus->get_ValueFromSNMPAdapter(stMsgData);
+          }
+          else{
+            ret = NOK;
+            RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%s:%d] hostIf_snmpAdapter::getInstance is NULL for %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
+             }
+        }
+#endif
     else if(strncasecmp(stMsgData->paramName,"Device.DeviceInfo",strlen("Device.DeviceInfo"))==0)
     {
         hostIf_DeviceInfo *pIface = hostIf_DeviceInfo::getInstance(instanceNumber);
@@ -449,7 +478,6 @@ int DeviceClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
             hostIf_DeviceInfo::releaseLock();
             return NOK;
         }
-
         if(strcasecmp(stMsgData->paramName,"Device.DeviceInfo.X_RDKCENTRAL-COM.BootStatus") == 0)
         {
             ret = pIface->get_Device_DeviceInfo_X_RDKCENTRAL_COM_BootStatus(stMsgData);

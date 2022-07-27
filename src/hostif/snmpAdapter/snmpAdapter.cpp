@@ -50,20 +50,24 @@
 #include "snmpAdapter.h"
 #include <fstream>
 #include "safec_lib.h"
+#include <vector>
+#include <cstring>
 
 #ifdef YOCTO_BUILD
 #include "secure_wrapper.h"
 #endif
 
 #define TR181_SNMPOID_FILE              "/etc/tr181_snmpOID.conf"
-#define SNMP_AGENT_IP_ADDRESS           "192.168.100.1" //"127.0.0.1"
+#define interface_STB                   "STB"
+#define interface_CM                    "CM"
+#define SNMP_AGENT_CM_IP_ADDRESS        "192.168.100.1" 
+#define SNMP_AGENT_STB_IP_ADDRESS       "127.0.0.1"
 #define SNMP_COMMUNITY                  "hDaFHJG7"
 
 GHashTable* hostIf_snmpAdapter::ifHash = NULL;
 GHashTable* hostIf_snmpAdapter::m_notifyHash = NULL;
 GMutex* hostIf_snmpAdapter::m_mutex = NULL;
-map<string, string> hostIf_snmpAdapter::tr181SNMPMap;
-
+map<string, vector<pair <string, string>>> hostIf_snmpAdapter::tr181Map;
 /****************************************************************************************************************************************************/
 // Device.X_RDKCENTRAL Profile. Getters:
 /****************************************************************************************************************************************************/
@@ -101,7 +105,7 @@ void hostIf_snmpAdapter::init(void)
     ifstream fileStream (TR181_SNMPOID_FILE);
     char delimeter[] = " \t\n\r\f\v";
 
-    tr181SNMPMap.clear();
+    tr181Map.clear();
     if (fileStream.is_open())
     {
         while(getline(fileStream, line))
@@ -109,27 +113,34 @@ void hostIf_snmpAdapter::init(void)
             int pos = line.find('=');
             if(pos != string::npos)
             {
+                string OID_value,interface_value;
                 string key = line.substr(0, pos);
-                string value = line.substr(pos + 1);
+                int result = line.find(interface_STB);
+                if(result>0)
+                {
+                    interface_value = interface_STB;
+                    line.erase(line.find(interface_value));
+                    OID_value = line.substr(pos+1);
+                }
+                else
+                {
+                    interface_value = interface_CM;
+                    line.erase(line.find(interface_value));
+                    OID_value = line.substr(pos+1);
+                }
                 key.erase(0, key.find_first_not_of(delimeter));
                 key.erase(key.find_last_not_of(delimeter) + 1);
 
-                value.erase(0, value.find_first_not_of(delimeter));
-                value.erase(value.find_last_not_of(delimeter) + 1);
+                OID_value.erase(0, OID_value.find_first_not_of(delimeter));
+                OID_value.erase(OID_value.find_last_not_of(delimeter) + 1);
 
-                tr181SNMPMap[key] = value;
+                tr181Map.insert( { key, {{ OID_value, interface_value }} } );
             }
+            
         }
     }
     else
         RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] Error opening %s fileStream.", __FUNCTION__, __LINE__, TR181_SNMPOID_FILE );
-
-    if (!tr181SNMPMap.empty())
-    {
-        RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] %s count %d\n", __FUNCTION__, TR181_SNMPOID_FILE, tr181SNMPMap.size());
-        for(map<string, string>::iterator it = tr181SNMPMap.begin(); it != tr181SNMPMap.end(); it++)
-            RDK_LOG(RDK_LOG_DEBUG,LOG_TR69HOSTIF,"[%s] %s : %s\n", __FUNCTION__, it->first.c_str(), it->second.c_str());
-    }
 }
 
 /**
@@ -138,7 +149,7 @@ void hostIf_snmpAdapter::init(void)
  */
 void hostIf_snmpAdapter::unInit(void)
 {    
-    tr181SNMPMap.clear();
+    tr181Map.clear();
 }
 
 hostIf_snmpAdapter* hostIf_snmpAdapter::getInstance(int dev_id)
@@ -227,19 +238,30 @@ int hostIf_snmpAdapter::get_ValueFromSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
     char cmd[BUFF_LENGTH_256] = { 0 };
     char resultBuff[BUFF_LENGTH_256] = { 0 };
     char delimeter[] = " \t\n\r\f\v";
-    map<string,string>::iterator it;
+    map<string, vector<pair <string, string>>>::iterator it;
     string consoleString("");
     errno_t rc = -1;
-
+  
     if(stMsgData)
     {
-        it = tr181SNMPMap.find(stMsgData->paramName);
-        if (it != tr181SNMPMap.end())
+        it = tr181Map.find(stMsgData->paramName);
+        if (it != tr181Map.end())
         {
-            snprintf (cmd, BUFF_LENGTH_256, "snmpget -OQ -Ir -v 2c -c %s %s %s",
+            string value = it->second[0].second;
+            if (value.compare(interface_STB) == 0)
+              {
+               snprintf (cmd, BUFF_LENGTH_256, "snmpget -OQ -Ir -v 2c -c %s %s %s",
                 SNMP_COMMUNITY,
-                SNMP_AGENT_IP_ADDRESS,
-                it->second.c_str());
+                SNMP_AGENT_STB_IP_ADDRESS,
+                it->second[0].first.c_str());
+              }
+            else
+            {
+               snprintf (cmd, BUFF_LENGTH_256, "snmpget -OQ -Ir -v 2c -c %s %s %s",
+                SNMP_COMMUNITY,
+                SNMP_AGENT_CM_IP_ADDRESS,
+                it->second[0].first.c_str());
+            }
 
             RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s] %s\n", __FUNCTION__, cmd);
             ret = GetStdoutFromCommand( cmd, consoleString);
@@ -289,7 +311,7 @@ int hostIf_snmpAdapter::set_ValueToSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
     int ret = NOT_HANDLED;
     char cmd[BUFF_LENGTH_256] = { 0 };
     char resultBuff[BUFF_LENGTH_256] = { 0 };
-    map<string,string>::iterator it;
+    map<string, vector<pair <string, string>>>::iterator it;
 
 #ifdef YOCTO_BUILD
     FILE *fp;
@@ -300,37 +322,65 @@ int hostIf_snmpAdapter::set_ValueToSNMPAdapter(HOSTIF_MsgData_t *stMsgData)
 
     if(stMsgData)
     {
-        it = tr181SNMPMap.find(stMsgData->paramName);
-        if (it != tr181SNMPMap.end())
+        it = tr181Map.find(stMsgData->paramName);
+        if (it != tr181Map.end())
         {
+            string value = it->second[0].second;
             switch(stMsgData->paramtype)
             {
                 case hostIf_StringType:
-                    CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s s %s", 
-                        SNMP_COMMUNITY, SNMP_AGENT_IP_ADDRESS, 
-                        it->second.c_str(),
+                    if (value.compare(interface_STB) == 0){
+                       CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s s %s", 
+                        SNMP_COMMUNITY, SNMP_AGENT_STB_IP_ADDRESS, 
+                        it->second[0].first.c_str(),
                         stMsgData->paramValue);
+                        }
+                    else{
+                        CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s s %s", 
+                        SNMP_COMMUNITY, SNMP_AGENT_CM_IP_ADDRESS, 
+                        it->second[0].first.c_str(),
+                        stMsgData->paramValue);
+                        }
                     break;
 
                 case hostIf_IntegerType:
-                    CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s i %d",
-                        SNMP_COMMUNITY, SNMP_AGENT_IP_ADDRESS,
-                        it->second.c_str(),
+                    if (value.compare(interface_STB) == 0)
+                    {
+                        CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s i %d",
+                        SNMP_COMMUNITY, SNMP_AGENT_STB_IP_ADDRESS,
+                        it->second[0].first.c_str(),
                         stMsgData->paramValue);
+                    }
+                   else{
+                        CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s i %d",
+                        SNMP_COMMUNITY, SNMP_AGENT_CM_IP_ADDRESS,
+                        it->second[0].first.c_str(),
+                        stMsgData->paramValue);
+                        }
                     break;
 
                 case hostIf_UnsignedIntType:
-                    CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s u %d",
+                    if (value.compare(interface_STB) == 0)
+                    {
+                        CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s u %d",
                         SNMP_COMMUNITY,
-                        SNMP_AGENT_IP_ADDRESS,
-                        it->second.c_str(),
+                        SNMP_AGENT_STB_IP_ADDRESS,
+                        it->second[0].first.c_str(),
                         stMsgData->paramValue);
+                    }
+                   else{
+                        CMD(cmd, BUFF_LENGTH_256, "snmpset -v 2c -c %s %s %s u %d",
+                        SNMP_COMMUNITY,
+                        SNMP_AGENT_CM_IP_ADDRESS,
+                        it->second[0].first.c_str(),
+                        stMsgData->paramValue);
+                       }
                     break;
 
                 case hostIf_BooleanType:
                 case hostIf_DateTimeType:
                 case hostIf_UnsignedLongType:
-                default:			
+                default:
                     RDK_LOG(RDK_LOG_ERROR,LOG_TR69HOSTIF,"[%s:%d] %s not supported type %d\n", __FUNCTION__, __LINE__, stMsgData->paramName, stMsgData->paramtype);
                     return NOK;
             }
