@@ -974,8 +974,10 @@ unsigned int hostIf_IPInterface::getIPAddressNumberOfEntries (sa_family_t addres
     LOG_ENTRY_EXIT;
 
     struct ifaddrs *ifa;
-    if (getifaddrs (&ifa))
+    if (getifaddrs (&ifa) == -1) {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s() Failed in getifaddrs(),  errno(%d) [%s].\n", __FUNCTION__, errno, strerror( errno) );
         return 0;
+    }
 
     int ipAddressNumberOfEntries = 0;
     for (struct ifaddrs *ifa_node = ifa; ifa_node; ifa_node = ifa_node->ifa_next)
