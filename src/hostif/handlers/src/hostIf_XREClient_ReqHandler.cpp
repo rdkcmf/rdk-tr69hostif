@@ -34,7 +34,6 @@
 #include "hostIf_utils.h"
 #ifdef USE_XRESRC
 #include "hostIf_XREClient_ReqHandler.h"
-#include "Device_XComcast_Xcalibur_Client_CoPilot.h"
 #include "Device_XComcast_Xcalibur_Client_XRE.h"
 #include "Device_XComcast_Xcalibur_Client_XRE_ConnectionTable.h"
 #include "Device_XComcast_Xcalibur_TRM.h"
@@ -139,14 +138,6 @@ int XREClientReqHandler::handleSetMsg(HOSTIF_MsgData_t *stMsgData)
     {
         ret = set_Device_X_COMCAST_COM_Xcalibur_Client_xconfCheckNow (stMsgData);
     }
-    else if (strcasecmp (stMsgData->paramName, "Device.X_COMCAST-COM_Xcalibur.Client.CoPilot.rssServerArgs") == 0)
-    {
-        ret = set_Device_X_COMCAST_COM_Xcalibur_Client_CoPilot_rssServerArgs (stMsgData);
-    }
-    else if (strcasecmp (stMsgData->paramName, "Device.X_COMCAST-COM_Xcalibur.Client.CoPilot.rssServerMode") == 0)
-    {
-        ret = set_Device_X_COMCAST_COM_Xcalibur_Client_CoPilot_rssServerMode (stMsgData);
-    }
     else if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.Client.XRE.xreEnable") == 0)
     {
         ret = set_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreEnable(stMsgData);
@@ -215,15 +206,7 @@ int XREClientReqHandler::handleGetMsg(HOSTIF_MsgData_t *stMsgData)
 
     RDK_LOG(RDK_LOG_TRACE1,LOG_TR69HOSTIF,"[%s:%s:%d] Found string as %s\n", __FUNCTION__, __FILE__, __LINE__, stMsgData->paramName);
 
-    if (strcasecmp (stMsgData->paramName, "Device.X_COMCAST-COM_Xcalibur.Client.CoPilot.rssServerArgs") == 0)
-    {
-        ret = get_Device_X_COMCAST_COM_Xcalibur_Client_CoPilot_rssServerArgs (stMsgData);
-    }
-    else if (strcasecmp (stMsgData->paramName, "Device.X_COMCAST-COM_Xcalibur.Client.CoPilot.rssServerMode") == 0)
-    {
-        ret = get_Device_X_COMCAST_COM_Xcalibur_Client_CoPilot_rssServerMode (stMsgData);
-    }
-    else if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.Client.XRE.xreEnable") == 0)
+    if(strcasecmp(stMsgData->paramName,"Device.X_COMCAST-COM_Xcalibur.Client.XRE.xreEnable") == 0)
     {
         ret = get_Device_X_COMCAST_COM_Xcalibur_Client_XRE_xreEnable(stMsgData);
     }
