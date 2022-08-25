@@ -102,6 +102,7 @@ class MoCADevice {
 
     MoCADevice() {};
     ~MoCADevice() {};
+    static std::mutex m_mutex;
 public:
     static class MoCADevice *getInstance();
     static void closeInstance();

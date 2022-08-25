@@ -50,6 +50,7 @@
 #define HIGHEST_MOCA_VERSION    0X20
 
 MoCADevice* MoCADevice::Instance = NULL;
+std::mutex MoCADevice::m_mutex;
 
 
 MoCADevice* MoCADevice::getInstance()
@@ -62,6 +63,7 @@ MoCADevice* MoCADevice::getInstance()
 
 void* MoCADevice::getRmhContext()
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     /* Initialized the RMH Context */
     static RMH_Handle rmhContext = NULL;
     uint32_t waitedSeconds = 0;
