@@ -63,7 +63,7 @@ static long timeValDiff(struct timespec *starttime, struct timespec *finishtime)
 /*----------------------------------------------------------------------------*/
 /*                             Global Variables                             */
 /*----------------------------------------------------------------------------*/
-libpd_instance_t libparodus_instance;
+libpd_instance_t libparodus_instance = NULL;
 char parodus_url[URL_SIZE] = {'\0'};
 char client_url[URL_SIZE] = {'\0'};
 bool exit_parodus_recv = false;
@@ -420,8 +420,11 @@ static void connect_parodus()
                 RDK_LOG(RDK_LOG_INFO,LOG_PARODUS_IF,"backoffRetryTime reached max value, reseting to initial value\n");
             }
         }
-        retval = libparodus_shutdown(&libparodus_instance);
-        RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"libparodus_shutdown retval %d\n", retval);
+        if(libparodus_instance)
+        {
+           retval = libparodus_shutdown(&libparodus_instance);
+           RDK_LOG(RDK_LOG_DEBUG,LOG_PARODUS_IF,"libparodus_shutdown retval %d\n", retval);
+        }
     }
 }
 
