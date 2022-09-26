@@ -17,99 +17,99 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<dm:document spec="http://dimark.com" xmlns:dm="urn:broadband-forum-org:cwmp:datamodel-1-2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:broadband-forum-org:cwmp:datamodel-1-2 data/cwmp-datamodel-1-2-dimark.xsd cwmp-datamodel-1-2-dimark.xsd">
+<dm:document spec="urn:broadband-forum-org:tr-181-2-12-0-usp" xmlns:dm="urn:broadband-forum-org:cwmp:datamodel-1-2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:broadband-forum-org:cwmp:datamodel-1-2 http://www.broadband-forum.org/cwmp/cwmp-datamodel-1-2.xsd" >
   <model name="data-model">
-  <object base="Device.DeviceInfo.X_RDK_SNMP." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
-      <parameter base="PowerStatus" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+  <object base="Device.DeviceInfo.X_RDK_SNMP." access="readOnly" minEntries="1" maxEntries="1" >
+      <parameter base="PowerStatus" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-      <parameter base="ACOutletStatus" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="ACOutletStatus" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
       </object>
-    <object base="Device.DeviceInfo.X_RDK_SNMP.Firmware." access="readOnly" minEntries="1" maxEntries="1" addObjIdx="-1" delObjIdx="-1">
-      <parameter base="DownloadStatus" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+    <object base="Device.DeviceInfo.X_RDK_SNMP.Firmware." access="readOnly" minEntries="1" maxEntries="1" >
+      <parameter base="DownloadStatus" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
      </object>
-    <object base="Device.DeviceInfo.X_RDK_SNMP.TunerInfo.Tuner.{i}." access="readOnly" minEntries="0" maxEntries="unbounded" addObjIdx="0" delObjIdx="0">
-      <parameter base="ModulationMode" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+    <object base="Device.DeviceInfo.X_RDK_SNMP.TunerInfo.Tuner.{i}." access="readOnly" minEntries="0" maxEntries="unbounded" >
+      <parameter base="ModulationMode" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <string/>
         </syntax>
       </parameter>
-      <parameter base="Frequency" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="Frequency" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-      <parameter base="Interleaver" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="Interleaver" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-      <parameter base="Power" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="Power" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-      <parameter base="AGC" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="AGC" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-      <parameter base="SNR" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="SNR" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-     <parameter base="Unerrord" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+     <parameter base="Unerrord" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-     <parameter base="Corrected" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+     <parameter base="Corrected" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-      <parameter base="Uncorrectable" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="Uncorrectable" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-      <parameter base="CarrierLostLocks" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="CarrierLostLocks" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-      <parameter base="PCRErrors" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="PCRErrors" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-      <parameter base="PTSErrors" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="PTSErrors" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-      <parameter base="State" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="State" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-      <parameter base="EQGain" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+      <parameter base="EQGain" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>
       </parameter>
-     <parameter base="MainTapCoefficient" access="readOnly" notification="0" maxNotification="2" rebootIdx="0" initIdx="1" getIdx="18000" setIdx="-1">
+     <parameter base="MainTapCoefficient" access="readOnly" notification="0" maxNotification="2" >
         <syntax>
           <unsignedInt/>
         </syntax>

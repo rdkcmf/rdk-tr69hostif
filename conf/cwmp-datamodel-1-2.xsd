@@ -990,10 +990,10 @@
       <xs:attribute name="id" type="tns:OpaqueID" />
       <xs:attribute name="notification" type="xs:integer" use="required" />
       <xs:attribute name="maxNotification" type="xs:integer" use="required" />
-      <xs:attribute name="rebootIdx" type="xs:integer" use="required" />
-      <xs:attribute name="initIdx" type="xs:integer" use="required" />
-      <xs:attribute name="setIdx" type="xs:integer" use="required" />
-      <xs:attribute name="getIdx" type="xs:integer" use="required" />
+      <xs:attribute name="rebootIdx" type="xs:integer" use="optional" />
+      <xs:attribute name="initIdx" type="xs:integer" use="optional" />
+      <xs:attribute name="setIdx" type="xs:integer" use="optional" />
+      <xs:attribute name="getIdx" type="xs:integer" use="optional" />
       <xs:attribute name="bsUpdate" type="tns:bsUpdate" use="optional" />
       <xs:attribute name="alwaysInclude" type="xs:boolean" use="optional" />
       <xs:anyAttribute namespace="##other" />

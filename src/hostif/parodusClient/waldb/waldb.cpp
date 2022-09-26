@@ -578,14 +578,11 @@ static XMLNode* getList(XMLNode *pParent,char *paramName,char* currentParam,char
                 {
                     if(strlen(currentParam) > 0)
                     {
-                        if(pChild->ToElement()->Attribute("getIdx") && strtol(pChild->ToElement()->Attribute("getIdx"),NULL,10) >= 1)
-                        {
                             ptrParamList[*paramCount] = (char *) malloc(MAX_PARAMETER_LENGTH * sizeof(char));
                             pParamDataTypeList[*paramCount] = (char *) malloc(MAX_DATATYPE_LENGTH * sizeof(char));
                             snprintf(ptrParamList[*paramCount],MAX_PARAMETER_LENGTH,"%s%s",currentParam,pChild->ToElement()->FirstAttribute()->Value());
                             strncpy(pParamDataTypeList[*paramCount],pChild->FirstChild()->FirstChild()->Value(),MAX_DATATYPE_LENGTH-1);
                             (*paramCount)++;
-                        }
                     }
                 }
             }
@@ -999,12 +996,9 @@ static DB_STATUS get_complete_parameter_list_from_dml_xml (
                 {
                     if(strlen(currentParam) > 0)
                     {
-                        if(pChild->ToElement()->Attribute("getIdx") && strtol(pChild->ToElement()->Attribute("getIdx"),NULL,10) >= 1)
-                        {
                             pOutParamNameList[params_count] = (char *) calloc(MAX_PARAMETER_LENGTH, sizeof(char));
                             snprintf(pOutParamNameList[params_count],MAX_PARAMETER_LENGTH,"%s%s",currentParam,pChild->ToElement()->FirstAttribute()->Value());
                             params_count++;
-                        }
                     }
                 }
             }
