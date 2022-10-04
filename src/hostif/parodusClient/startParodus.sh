@@ -153,7 +153,7 @@ parodus_start_up()
     fi
 
     # use partner-id from auth service to start parodus
-    if ! getDeviceIdResponse=$(curl -f -s -d POST http://127.0.0.1:50050/authService/getDeviceId); then
+    if ! getDeviceIdResponse=$(/lib/rdk/getDeviceId.sh); then
         echo "Could not get Partner-id from authservice. Exiting."
         exit 2 # Retry handled by parodus.service (Restart=always)
     fi

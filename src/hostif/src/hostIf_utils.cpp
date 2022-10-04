@@ -34,6 +34,7 @@
 #include <sstream>
 #include "hostIf_utils.h"
 #include "safec_lib.h"
+#include "cJSON.h"
 
 #if defined (RDK_DEVICE_CISCO_XI4) || defined (RDK_DEVICE_EMU)
 #define INTERFACE_ETH          "eth0"
@@ -566,6 +567,44 @@ unsigned long get_device_manageble_time()
     while(epoch_time == 0);
 
     return epoch_time;
+}
+
+std::string get_security_token() {
+    std::string sToken = "";
+    char pSecurityOutput[256] = {0};
+    bool status;
+    FILE *pSecurity = popen("/usr/bin/WPEFrameworkSecurityUtility", "r");
+    if(pSecurity) {
+        if (fgets(pSecurityOutput, 256, pSecurity) != NULL) {
+            cJSON* root = cJSON_Parse(pSecurityOutput);
+            if (root) {
+                cJSON *res = cJSON_GetObjectItem(root, "success");
+                if(cJSON_IsTrue(res) == 1) {
+                   cJSON* token = cJSON_GetObjectItem(root, "token");
+                   if (token != NULL && token->type == cJSON_String && token->valuestring != NULL) {
+                       RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: Security Token retrieved successfully\n", __FUNCTION__);
+                       sToken = token->valuestring;
+                    }
+                 }
+                 else {
+                    RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF,"%s: Security Token retrieval failed!\n", __FUNCTION__);
+                 }
+                 cJSON_Delete(root);
+             }
+             else {
+                RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] json parse error\n", __FUNCTION__);
+                if (NULL != pSecurity)
+                    pclose(pSecurity);
+             }
+         }
+     }
+     else {
+        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF,"%s: Failed to open security utility\n", __FUNCTION__);
+     }
+     if (NULL != pSecurity)
+         pclose(pSecurity);
+
+     return sToken;
 }
 
 /** @} */

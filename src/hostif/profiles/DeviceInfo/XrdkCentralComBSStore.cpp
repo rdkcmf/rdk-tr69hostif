@@ -93,18 +93,39 @@ void XBSStore::getAuthServicePartnerID()
 
         string newPartnerId = "";
         string response;
+        string postData;
+        string tokenheader;
+
         CURL *curl = curl_easy_init();
         if(curl)
         {
             RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: call curl to get partner ID..\n", __FUNCTION__);
-            CURL_EASY_SETOPT(curl, CURLOPT_URL, "http://127.0.0.1:50050/authService/getDeviceId");
-            CURL_EASY_SETOPT(curl, CURLOPT_WRITEFUNCTION, writeCurlResponse);
-            CURL_EASY_SETOPT(curl, CURLOPT_WRITEDATA, &response);
+            std::string sToken = get_security_token();
+	    if(sToken.empty()) {
+               RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: Thunder security token is empty..\n", __FUNCTION__);
+            }
+            tokenheader = "Authorization: Bearer " + sToken;
+
+            postData = "{\"jsonrpc\":\"2.0\",\"id\":\"3\",\"method\": \"org.rdk.AuthService.getDeviceId\" }";
+
+            struct curl_slist *list = NULL;
+
+            list = curl_slist_append(list, tokenheader.c_str());
+            list = curl_slist_append(list, "Content-Type: application/json");
+
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+            curl_easy_setopt(curl, CURLOPT_POST, 1L);
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCurlResponse);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+            curl_easy_setopt(curl, CURLOPT_URL, JSONRPC_URL);
+
             CURLcode res = curl_easy_perform(curl);
             long http_code = 0;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
             RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: curl response : %d http response code: %ld\n", __FUNCTION__, res, http_code);
             curl_easy_cleanup(curl);
+            curl_slist_free_all(list);
 
             if(res == CURLE_OK)
             {
@@ -112,18 +133,35 @@ void XBSStore::getAuthServicePartnerID()
                 cJSON* root = cJSON_Parse(response.c_str());
                 if(root)
                 {
-                    cJSON* partnerID    = cJSON_GetObjectItem(root, "partnerId");
-                    if(partnerID->type == cJSON_String && partnerID->valuestring && strlen(partnerID->valuestring) > 0)
+                    cJSON* jsonObj    = cJSON_GetObjectItem(root, "result");
+                    if(jsonObj)
                     {
-                        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Found partnerID value = %s\n", partnerID->valuestring);
-                        newPartnerId = partnerID->valuestring;
-                    }
+                       cJSON* partnerID    = cJSON_GetObjectItem(jsonObj, "partnerId");
+                       if(partnerID && partnerID->type == cJSON_String && partnerID->valuestring && strlen(partnerID->valuestring) > 0)
+                       {
+                          RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Found partnerID value = %s\n", partnerID->valuestring);
+                          newPartnerId = partnerID->valuestring;
+                       }
+                       else
+                       {
+                          RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] json parse error, no \"partnerId\" in the output from Thunder plugin\n", __FUNCTION__);
+                          cJSON_Delete(root);
+                          return;
+                       }
+                     }
+                     else
+                     {
+                         RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] json parse error, no \"result\" in the output from Thunder plugin\n", __FUNCTION__);
+                         cJSON_Delete(root);
+                         return;
+                     }
+
                     cJSON_Delete(root);
-                }
-                else
-                {
-                    RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: json parse error\n", __FUNCTION__);
-                }
+                 }
+                 else
+                 {
+                     RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: json parse error\n", __FUNCTION__);
+                 }
             }
         }
         else

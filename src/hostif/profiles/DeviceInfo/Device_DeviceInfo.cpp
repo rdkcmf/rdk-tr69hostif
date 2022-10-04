@@ -116,6 +116,9 @@
 #define MIN_PORT_RANGE 3000
 #define MAX_PORT_RANGE 3020
 
+#define DEVICEID_SCRIPT_PATH "/lib/rdk/getDeviceId.sh"
+#define SCRIPT_OUTPUT_BUFFER_SIZE 512
+
 GHashTable* hostIf_DeviceInfo::ifHash = NULL;
 GHashTable* hostIf_DeviceInfo::m_notifyHash = NULL;
 GMutex* hostIf_DeviceInfo::m_mutex = NULL;
@@ -124,7 +127,7 @@ void *ResetFunc(void *);
 
 
 static int get_ParamValue_From_TR69Agent(HOSTIF_MsgData_t *);
-static int get_PartnerId_From_Curl(string& );
+static int get_PartnerId_From_Script(string& );
 static char stbMacCache[TR69HOSTIFMGR_MAX_PARAM_LEN] = {'\0'};
 static string reverseSSHArgs;
 map<string,string> stunnelSSHArgs;
@@ -2334,10 +2337,10 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_Partne
         return NOK;
     }
 
-    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Calling get_PartnerId_From_Curl \n",__FUNCTION__);
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Calling get_PartnerId_From_Script \n",__FUNCTION__);
 
-    /* get the value from the curl and see if they are different */
-    ret = get_PartnerId_From_Curl (current_PartnerId);
+    /* get the value from the script and see if they are different */
+    ret = get_PartnerId_From_Script (current_PartnerId);
 
     //we get a valid partnerID after the curl.
     if( !current_PartnerId.empty() && ret == OK )
@@ -2346,16 +2349,34 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_Partne
         {
             CURL *curl = curl_easy_init();
             bool upload_flag = false;
+            std::string postData;
+            std::string tokenheader;
+
             if(curl)
             {
                 /* We have different partner IDs
                  * set the partnerId using setpartnerid() */
                 long http_code = 0;
-                RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] call curl to set partner ID.. with New PartnerId = %s \n", __FUNCTION__, n_PartnerId);
+                RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] call curl to set partner ID.. with New PartnerId = %s \n", __FUNCTION__, n_PartnerId.c_str());
 
-                curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:50050/authService/setPartnerId");
-                curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)n_PartnerId.length());
-                curl_easy_setopt(curl, CURLOPT_POSTFIELDS,n_PartnerId.c_str());
+                std::string sToken = get_security_token();
+
+                tokenheader = "Authorization: Bearer " + sToken;
+
+                postData = "{\"jsonrpc\":\"2.0\",\"id\":\"3\",\"method\": \"org.rdk.AuthService.setPartnerId\", \"params\" : { \"partnerId\" : \"";
+                postData += n_PartnerId;
+                postData += "\"}}";
+
+                struct curl_slist *list = NULL;
+
+                list = curl_slist_append(list, tokenheader.c_str());
+                list = curl_slist_append(list, "Content-Type: application/json");
+
+                curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+                curl_easy_setopt(curl, CURLOPT_POST, 1L);
+                curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)postData.length());
+                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
+                curl_easy_setopt(curl, CURLOPT_URL, JSONRPC_URL);
 
                 CURLcode res = curl_easy_perform(curl);
 
@@ -2366,6 +2387,7 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_Partne
                 }
 
                 curl_easy_cleanup(curl);
+                curl_slist_free_all(list);
 
                 if( res == CURLE_OK && http_code == HTTP_OK )
                 {
@@ -2425,63 +2447,34 @@ int hostIf_DeviceInfo::set_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_Partne
     return OK;
 }
 
-int static get_PartnerId_From_Curl( string& current_PartnerId )
+int static get_PartnerId_From_Script( string& current_PartnerId )
 {
-    string response="";
-    CURL *curl = curl_easy_init();
+    FILE *deviceIdScript = NULL;
+    char scriptoutput[SCRIPT_OUTPUT_BUFFER_SIZE] = {0};
 
-    if(curl)
-    {
-        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] call curl to get partner ID..\n", __FUNCTION__);
-
-        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:50050/authService/getDeviceId");
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCurlResponse);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-
-        CURLcode res = curl_easy_perform(curl);
-
-        long http_code = 0;
-
-        if(res == CURLE_OK)
-        {
-            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
-            RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] curl response : %d http response code: %ld\n", __FUNCTION__, res, http_code);
-        }
-
-        curl_easy_cleanup(curl);
-
-        if(res == CURLE_OK && http_code == HTTP_OK )
-        {
-            RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s] curl response string = %s\n", __FUNCTION__, response.c_str());
-            cJSON* root = cJSON_Parse(response.c_str());
-            if(root)
-            {
-                cJSON* partnerID    = cJSON_GetObjectItem(root, "partnerId");
-                if(partnerID->type == cJSON_String && partnerID->valuestring && strlen(partnerID->valuestring) > 0)
-                {
-                    RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Found partnerID value = %s\n", partnerID->valuestring);
-                    current_PartnerId = partnerID->valuestring;
-                }
-                cJSON_Delete(root);
-            }
-            else
-            {
-                RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] json parse error\n", __FUNCTION__);
-                return NOK;
-            }
-        }
-        else
-        {
-            RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] curl returned error with : %d http response code: %ld\n", __FUNCTION__, res, http_code);
-            return NOK;
-        }
+    deviceIdScript = popen(DEVICEID_SCRIPT_PATH, "r");
+    if ( (NULL != deviceIdScript) ) {
+          if (fgets(scriptoutput,SCRIPT_OUTPUT_BUFFER_SIZE,deviceIdScript)!=NULL) {
+              cJSON* root = cJSON_Parse(scriptoutput);
+              if (root)
+              {
+                  cJSON* partnerID    = cJSON_GetObjectItem(root, "partnerId");
+                  if (partnerID->type == cJSON_String && partnerID->valuestring && strlen(partnerID->valuestring) > 0)
+                  {
+                      RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Found partnerID value = %s\n", partnerID->valuestring);
+                      current_PartnerId = partnerID->valuestring;
+                  }
+                      cJSON_Delete(root);
+              }
+              else
+              {
+                  RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] json parse error\n", __FUNCTION__);
+		  pclose(deviceIdScript);
+                  return NOK;
+              }
+          }
     }
-    else
-    {
-        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] curl init failed\n", __FUNCTION__);
-        return NOK;
-    }
-
+    pclose(deviceIdScript);
     return OK;
 }
 
@@ -2492,9 +2485,9 @@ int hostIf_DeviceInfo::get_Device_DeviceInfo_X_RDKCENTRAL_COM_Syndication_Partne
     string current_PartnerId = "";
     int ret = NOK;
 
-    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Calling get_PartnerId_From_Curl \n",__FUNCTION__);
-    ret = get_PartnerId_From_Curl( current_PartnerId );
-    /* we get a valid partnerID after the curl */
+    RDK_LOG(RDK_LOG_INFO,LOG_TR69HOSTIF,"[%s] Calling get_PartnerId_From_Script \n",__FUNCTION__);
+    ret = get_PartnerId_From_Script( current_PartnerId );
+    /* we get a valid partnerID */
     if( !current_PartnerId.empty() && ret == OK )
     {
         stMsgData->paramLen = current_PartnerId.length();
@@ -3586,18 +3579,36 @@ int hostIf_DeviceInfo::get_xRDKCentralComRFCAccountId(HOSTIF_MsgData_t *stMsgDat
 {
     int ret=NOK;
     string response;
+    std::string postData;
+    std::string tokenheader;
     CURL *curl = curl_easy_init();
     if(curl)
     {
         RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: call curl to get Account ID..\n", __FUNCTION__);
-        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:50050/authService/getServiceAccountId");
+
+        std::string sToken = get_security_token();
+        tokenheader = "Authorization: Bearer " + sToken;
+
+        postData = "{\"jsonrpc\":\"2.0\",\"id\":\"3\",\"method\": \"org.rdk.AuthService.getServiceAccountId\" }";
+
+        struct curl_slist *list = NULL;
+
+        list = curl_slist_append(list, tokenheader.c_str());
+        list = curl_slist_append(list, "Content-Type: application/json");
+
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+        curl_easy_setopt(curl, CURLOPT_POST, 1L);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCurlResponse);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+        curl_easy_setopt(curl, CURLOPT_URL, JSONRPC_URL);
+
         CURLcode res = curl_easy_perform(curl);
         long http_code = 0;
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
         RDK_LOG(RDK_LOG_INFO, LOG_TR69HOSTIF, "%s: curl response : %d http response code: %ld\n", __FUNCTION__, res, http_code);
         curl_easy_cleanup(curl);
+        curl_slist_free_all(list);
 
         if(res == CURLE_OK)
         {
@@ -3605,13 +3616,31 @@ int hostIf_DeviceInfo::get_xRDKCentralComRFCAccountId(HOSTIF_MsgData_t *stMsgDat
             cJSON* root = cJSON_Parse(response.c_str());
             if(root)
             {
-                cJSON* accountIdObj    = cJSON_GetObjectItem(root, "serviceAccountId");
-                if(accountIdObj->type == cJSON_String && accountIdObj->valuestring && strlen(accountIdObj->valuestring) > 0)
+                cJSON* jsonObj    = cJSON_GetObjectItem(root, "result");
+
+                if (jsonObj)
                 {
-                    RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Found accountId value = %s\n", accountIdObj->valuestring);
-                    putValue(stMsgData, accountIdObj->valuestring);
-                    stMsgData->faultCode = fcNoFault;
-                    ret = OK;
+                    cJSON *accountIdObj = cJSON_GetObjectItem(jsonObj, "serviceAccountId");
+
+                    if (accountIdObj && accountIdObj->type == cJSON_String && accountIdObj->valuestring && strlen(accountIdObj->valuestring) > 0)
+                    {
+                        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "Found serviceAccountId value = %s\n", accountIdObj->valuestring);
+                        putValue(stMsgData, accountIdObj->valuestring);
+                        stMsgData->faultCode = fcNoFault;
+                        ret = OK;
+                    }
+                    else
+                    {
+                        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] json parse error, no \"serviceAccountId\" in the output from Thunder plugin\n", __FUNCTION__);
+                        cJSON_Delete(root);
+                        return NOK;
+                    }
+                }
+                else
+                {
+                    RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] json parse error, no \"result\" in the output from Thunder plugin\n", __FUNCTION__);
+                    cJSON_Delete(root);
+                    return NOK;
                 }
                 cJSON_Delete(root);
             }
@@ -4596,6 +4625,8 @@ int hostIf_DeviceInfo::get_X_RDKCENTRAL_COM_experience( HOSTIF_MsgData_t *stMsgD
 {
     string resp="";
     string experience = "";
+    std::string postData;
+    std::string tokenheader;
 
     CURL *curl = curl_easy_init();
 
@@ -4607,9 +4638,22 @@ int hostIf_DeviceInfo::get_X_RDKCENTRAL_COM_experience( HOSTIF_MsgData_t *stMsgD
 
     if(curl)
     {
-        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:50050/authService/getExperience");
+        std::string sToken = get_security_token();
+        tokenheader = "Authorization: Bearer " + sToken;
+
+        postData = "{\"jsonrpc\":\"2.0\",\"id\":\"3\",\"method\": \"org.rdk.AuthService.getExperience\" }";
+
+        struct curl_slist *list = NULL;
+
+        list = curl_slist_append(list, tokenheader.c_str());
+        list = curl_slist_append(list, "Content-Type: application/json");
+
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+        curl_easy_setopt(curl, CURLOPT_POST, 1L);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCurlResponse);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resp);
+        curl_easy_setopt(curl, CURLOPT_URL, JSONRPC_URL);
 
         CURLcode res = curl_easy_perform(curl);
 
@@ -4622,6 +4666,7 @@ int hostIf_DeviceInfo::get_X_RDKCENTRAL_COM_experience( HOSTIF_MsgData_t *stMsgD
         }
 
         curl_easy_cleanup(curl);
+        curl_slist_free_all(list);
 
         if(res == CURLE_OK && http_code == HTTP_OK )
         {
@@ -4631,12 +4676,29 @@ int hostIf_DeviceInfo::get_X_RDKCENTRAL_COM_experience( HOSTIF_MsgData_t *stMsgD
 
             if(root)
             {
-                cJSON* jsonObj    = cJSON_GetObjectItem(root, "experience");
+                cJSON* jsonObj    = cJSON_GetObjectItem(root, "result");
 
-                if(jsonObj->type == cJSON_String && jsonObj->valuestring && (strlen(jsonObj->valuestring) > 0))
+                if (jsonObj)
                 {
-                    RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s]The parameter [%s] value is [%s].\n", __FUNCTION__, stMsgData->paramName, jsonObj->valuestring);
-                    experience = jsonObj->valuestring;
+                    cJSON *experienceObj = cJSON_GetObjectItem(jsonObj, "experience");
+
+                    if(experienceObj && experienceObj->type == cJSON_String && experienceObj->valuestring && (strlen(experienceObj->valuestring) > 0))
+                    {
+                        RDK_LOG (RDK_LOG_INFO, LOG_TR69HOSTIF, "[%s]The parameter [%s] value is [%s].\n", __FUNCTION__, stMsgData->paramName, experienceObj->valuestring);
+                        experience = experienceObj->valuestring;
+                    }
+                    else
+                    {
+                        RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] json parse error, no \"experience\" in the output from Thunder plugin\n", __FUNCTION__);
+                        cJSON_Delete(root);
+                        return NOK;
+                    }
+                }
+                else
+                {
+                    RDK_LOG (RDK_LOG_ERROR, LOG_TR69HOSTIF, "[%s] json parse error, no \"result\" in the output from Thunder plugin\n", __FUNCTION__);
+                    cJSON_Delete(root);
+                    return NOK;
                 }
 
                 cJSON_Delete(root);

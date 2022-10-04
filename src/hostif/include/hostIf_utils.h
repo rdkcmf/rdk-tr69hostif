@@ -41,6 +41,7 @@
 #define NTP_FILE_NAME "/opt/persistent/firstNtpTime"
 #define FW_DWN_FILE_PATH "/opt/fwdnldstatus.txt"
 #define TEMP_FW_DWN_FILE_PATH "/opt/fwdnldstatus_tmp.txt"
+#define JSONRPC_URL    "http://127.0.0.1:9998/jsonrpc"
 
 #define BUFF_MAC 18
 #define BUFF_MIN_16 16
@@ -173,6 +174,12 @@ bool isWebpaReady();
 bool isNtpTimeFilePresent();
 unsigned long get_system_manageble_ntp_time();
 unsigned long get_device_manageble_time();
+
+/**
+ * This function retrieves the security token for Thunder.
+ * @return A string containing the security token or an empty string.
+ */
+std::string get_security_token();
 
 
 #endif /* HOSTIF_UTILS_H_*/

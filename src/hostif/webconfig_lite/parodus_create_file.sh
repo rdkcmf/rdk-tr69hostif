@@ -43,7 +43,7 @@ CURL_FILE_RESPONSE="/tmp/adzvfchig-conf.mch"
 get_PartnerIdFromAuthService()
 {
     # use partner-id from auth service
-    if getDeviceIdResponse=$(curl -f -s -d POST http://127.0.0.1:50050/authService/getDeviceId); then
+    if getDeviceIdResponse=$(/lib/rdk/getDeviceId.sh); then
 	PartnerId=$(echo $getDeviceIdResponse | cut -d\, -f2 | tr -d \} | cut -d: -f2 | tr -d \" | xargs)
 	#echo "$(date) authservice returned Partner-id as \"$PartnerId\""
     fi
