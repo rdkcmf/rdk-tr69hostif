@@ -587,11 +587,6 @@ void exit_gracefully (int sig_received)
         /*Stop libSoup server and exit Json Thread */
         hostIf_HttpServerStop();
 
-#ifndef NEW_HTTP_SERVER_DISABLE
-        /*Stop HTTP Server Thread*/
-        HttpServerStop();
-#endif
-
         updateHandler::stop();
         XBSStore::getInstance()->stop();
 
@@ -606,6 +601,10 @@ void exit_gracefully (int sig_received)
         RDK_LOG(RDK_LOG_NOTICE,LOG_TR69HOSTIF,"[%s:%s] Exiting program gracefully..\n", __FUNCTION__, __FILE__);
         if (g_main_loop_is_running(main_loop)) {
             g_main_loop_quit(main_loop);
+#ifndef NEW_HTTP_SERVER_DISABLE
+            /*Stop HTTP Server Thread*/
+            HttpServerStop();
+#endif
         }
         pthread_mutex_unlock(&graceful_exit_mutex);
     }
