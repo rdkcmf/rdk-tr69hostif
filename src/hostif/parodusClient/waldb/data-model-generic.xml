@@ -759,7 +759,157 @@
           <string/>
         </syntax>
       </parameter>
-    </object>
+      <parameter base="networkTimeout" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <unsignedLong/>
+        </syntax>
+      </parameter>
+      <parameter base="manifestTimeout" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <unsignedLong/>
+        </syntax>
+      </parameter>
+      <parameter base="playlistTimeout" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <unsignedLong/>
+        </syntax>
+      </parameter>
+      <parameter base="defaultBitrate" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <unsignedLong/>
+        </syntax>
+      </parameter>
+      <parameter base="defaultBitrate4K" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <unsignedLong/>
+        </syntax>
+      </parameter>
+      <parameter base="client-dai" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="minBitrate" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <unsignedLong/>
+        </syntax>
+      </parameter>
+      <parameter base="maxBitrate" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <unsignedLong/>
+        </syntax>
+      </parameter>
+      <parameter base="asyncTune" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="enableCMCD" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="SlowMotion" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="curlStore" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="enableLowLatencyDash" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="sharedSSL" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="enableVideoEndEvent" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="disableEC3" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="disableATMOS" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="disableAC4" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="stereoOnly" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="disableAC3" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="cdvrLiveOffset" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <unsignedLong/>
+        </syntax>
+      </parameter>
+      <parameter base="liveOffset" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <unsignedLong/>
+        </syntax>
+      </parameter>
+      <parameter base="preferredDrm" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <int/>
+        </syntax>
+      </parameter>
+      <parameter base="useWesterosSink" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="tsbInterruptHandling" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="useSecManager" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="maxInitFragCachePerTrack" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <int/>
+        </syntax>
+      </parameter>
+      <parameter base="supportTLS" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <unsignedLong/>
+        </syntax>
+      </parameter>
+      <parameter base="persistBitrateOverSeek" access="readWrite" notification="0" maxNotification="2"  >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+      <parameter base="info" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <boolean/>
+        </syntax>
+      </parameter>
+     </object>
      <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.JSPPCache." access="readOnly" minEntries="0" maxEntries="1" >
        <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" >
          <syntax>
