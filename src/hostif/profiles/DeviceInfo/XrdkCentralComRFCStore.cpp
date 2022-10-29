@@ -23,6 +23,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <sstream>
+#include "semaphore.h"
+#include <fcntl.h>
 
 #include "XrdkCentralComRFCStore.h"
 #include "hostIf_utils.h"
@@ -42,6 +44,7 @@
 
 #define TR181_CLEAR_PARAM "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.ClearParam"
 XRFCStore* XRFCStore::xrfcInstance = NULL;
+const char *semName = "localstore";
 
 void XRFCStore::clearAll()
 {
@@ -187,6 +190,19 @@ bool XRFCStore::writeHashToFile(const string &key, const string &value, unordere
 faultCode_t XRFCStore::clearValue(const string &key, const string &value)
 {
     bool foundInLocalStore = false;
+
+    sem_t *sem_id = sem_open(semName, O_CREAT, 0600, 1);
+    if (sem_id == SEM_FAILED){
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_open failed \n", __FUNCTION__);
+        return fcInternalError;
+    }
+
+    if (sem_wait(sem_id) < 0)
+    {
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_wait failed \n", __FUNCTION__);
+    }
+
+    loadFileToCache(m_local_filename, m_local_dict);
     unordered_map<string, string> temp_local_dict(m_local_dict);
 
     for (unordered_map<string, string>::iterator it=temp_local_dict.begin(); it!=temp_local_dict.end(); ++it)
@@ -209,6 +225,13 @@ faultCode_t XRFCStore::clearValue(const string &key, const string &value)
     }
     else
         RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "Parameter to be cleared is not present in tr181localstore.ini\n");
+
+    if (sem_post(sem_id) < 0)
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_post failed \n", __FUNCTION__);
+
+    if (sem_close(sem_id) != 0){
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_close failed \n", __FUNCTION__);
+    }
 
     return fcNoFault;
 }
@@ -293,7 +316,29 @@ faultCode_t  XRFCStore::setValue(HOSTIF_MsgData_t *stMsgData)
     }
 
     if (stMsgData->requestor == HOSTIF_SRC_WEBPA) {
-        if(!writeHashToFile(stMsgData->paramName, givenValue, m_local_dict, m_local_filename))
+
+        sem_t *sem_id = sem_open(semName, O_CREAT, 0600, 1);
+        if (sem_id == SEM_FAILED){
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_open failed \n", __FUNCTION__);
+            return fcInternalError;
+        }
+
+        if (sem_wait(sem_id) < 0)
+        {
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_wait failed \n", __FUNCTION__);
+        }
+
+        loadFileToCache(m_local_filename, m_local_dict);
+        bool writeStatus = writeHashToFile(stMsgData->paramName, givenValue, m_local_dict, m_local_filename);
+
+        if (sem_post(sem_id) < 0)
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_post failed \n", __FUNCTION__);
+
+        if (sem_close(sem_id) != 0){
+            RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_close failed \n", __FUNCTION__);
+        }
+
+        if(!writeStatus)
         {
             return fcInternalError;
         }
@@ -438,7 +483,27 @@ bool XRFCStore::loadFileToCache(const string &filename, unordered_map<string, st
 bool XRFCStore::loadTR181PropertiesIntoCache()
 {
     loadFileToCache(m_filename, m_dict);
+
+    sem_t *sem_id = sem_open(semName, O_CREAT, 0600, 1);
+    if (sem_id == SEM_FAILED){
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_open failed \n", __FUNCTION__);
+        return fcInternalError;
+    }
+
+    if (sem_wait(sem_id) < 0)
+    {
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_wait failed \n", __FUNCTION__);
+    }
+
     loadFileToCache(m_local_filename, m_local_dict);
+
+    if (sem_post(sem_id) < 0)
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_post failed \n", __FUNCTION__);
+
+    if (sem_close(sem_id) != 0){
+        RDK_LOG(RDK_LOG_ERROR, LOG_TR69HOSTIF, "%s: sem_close failed \n", __FUNCTION__);
+    }
+
     loadFileToCache(TR181_STORE_NONPERSISTENT_FILE, m_nonpersist_dict);
 
     ifstream ifs_rfcdef(RFCDEFAULTS_FILE);
