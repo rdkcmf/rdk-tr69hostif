@@ -909,6 +909,11 @@
           <boolean/>
         </syntax>
       </parameter>
+      <parameter base="liveOffset4K" access="readWrite" notification="0" maxNotification="2" >
+        <syntax>
+          <string/>
+        </syntax>
+      </parameter>
      </object>
      <object base="Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.JSPPCache." access="readOnly" minEntries="0" maxEntries="1" >
        <parameter base="Enable" access="readWrite" notification="0" maxNotification="2" >
