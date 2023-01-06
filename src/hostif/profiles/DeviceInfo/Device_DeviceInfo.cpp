@@ -3762,9 +3762,16 @@ int hostIf_DeviceInfo::set_xRDKCentralComRFCLoudnessEquivalenceEnable(HOSTIF_Msg
     if(stMsgData->paramtype == hostIf_BooleanType)
     {
         enable = get_boolean(stMsgData->paramValue);
+        try
+        {
+            //set the value TRUE/FALSE.
+            status = device::Host::getInstance().getAudioOutputPort("HDMI0").enableLEConfig((enable)?1:0);
+        }
+        catch (const std::exception e)
+        {
+            RDK_LOG(RDK_LOG_WARN,LOG_TR69HOSTIF,"Caught exception %s.\n", e.what());
+        }
 
-        //set the value TRUE/FALSE.
-        status = device::Host::getInstance().getAudioOutputPort("HDMI0").enableLEConfig((enable)?1:0);
         if(status != dsERR_NONE)
         {
             /* We return NOK and log for all failed/unsupported calls. */
